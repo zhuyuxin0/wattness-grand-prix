@@ -1,399 +1,424 @@
-/* Seal: the sealed record board. Every class here is prefixed by its block:
-   board, metric, sealclock. */
+/* Seal. One surface: sections divided by rules, no frames. Yellow only on the
+   seal itself (the lead, its mark, the lead's span on the clock). */
 
-/* ---------------------------------------------------------------- the board */
+.seal-flow {
+  display: block;
+  margin-top: var(--t-space-2);
+  font-size: var(--t-fs-sm);
+}
 
-.board {
+/* ---------------------------------------------------------------- the lead */
+
+.seal-lead {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  gap: var(--t-space-3) var(--gp-space-7);
+  align-items: end;
+  margin-bottom: var(--t-space-6);
+}
+.seal-lead__figure {
+  display: grid;
+  gap: 2px;
+}
+/* The view's one hero figure: the system face, proportional digits (it never
+   changes), in the seal's words color. */
+.seal-lead__value {
+  font-family: var(--w-font-sans);
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--seal-text);
+  white-space: nowrap;
+}
+.seal-lead__unit {
+  font-size: var(--t-fs-title);
+  color: var(--w-muted);
+}
+.seal-lead__text {
+  max-width: 72ch;
+  line-height: var(--t-lh-prose);
+  color: var(--w-fg);
+}
+.seal-lead__text .num,
+.seal-late .num {
+  white-space: nowrap;
+}
+.seal-lead__text .seal-mark {
+  margin-left: 0;
+  margin-right: 8px;
+}
+@media (max-width: 767px) {
+  .seal-lead {
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: var(--t-space-5);
+  }
+  .seal-lead__value {
+    font-size: 40px;
+  }
+}
+
+/* ---------------------------------------------------------------- the clock */
+
+.sclock {
+  margin: 0;
+}
+/* Rows, top to bottom: a label above the track (0-18), the track (24-48, axis
+   at 36), two label rows below it (56-74, 78-96), the axis labels (104-118). */
+.sclock__plot {
   position: relative;
-  background: var(--chrome);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  height: 120px;
+  margin: 0 4px;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  white-space: nowrap;
 }
-.board__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3) var(--space-4);
-  padding: var(--space-6) var(--space-6) var(--space-5);
+.sclock__axis {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 36px;
+  height: 1px;
+  background: var(--ch-axis);
 }
-.board__title {
-  font-size: var(--text-lg);
-  font-weight: 500;
-  letter-spacing: -0.01em;
+.sclock__closed {
+  position: absolute;
+  top: 24px;
+  height: 24px;
+  right: 0;
+  background: var(--s-bad-bg);
 }
-.board__scope {
-  margin-left: auto;
-  font-size: var(--text-xs);
-  color: var(--faint);
+/* The lead: from the seal to the gate, a thin mark in the seal's yellow (with
+   its keyline on light ground). */
+.sclock__lead {
+  position: absolute;
+  top: 34px;
+  height: 4px;
+  border-radius: 1px;
+  background: var(--seal);
+  box-shadow: 0 0 0 1px var(--seal-keyline);
 }
-.board__label {
+.sclock__tick {
+  position: absolute;
+  top: 36px;
+  width: 1px;
+  height: 6px;
+  background: var(--ch-axis);
+}
+.sclock__gate {
+  position: absolute;
+  top: 18px;
+  height: 34px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--w-fg);
+}
+.sclock__mark {
+  position: absolute;
+  top: 36px;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--t-pane);
+}
+.sclock__mark--plan {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: var(--w-fg);
+}
+.sclock__mark--seal {
+  background: var(--seal);
+  box-shadow:
+    0 0 0 1px var(--seal-keyline),
+    0 0 0 3px var(--t-pane);
+}
+.sclock__mark--alt {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+}
+.sclock__mark--late {
+  display: grid;
+  place-items: center;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  background: var(--t-pane);
+  box-shadow: 0 0 0 1px var(--s-bad);
+  color: var(--s-bad);
+}
+.sclock__leader {
+  position: absolute;
+  width: 1px;
+  background: var(--ch-axis);
+}
+.sclock__leader--up {
+  top: 18px;
+  height: 14px;
+}
+.sclock__leader--down1 {
+  top: 42px;
+  height: 14px;
+}
+.sclock__leader--down2 {
+  top: 42px;
+  height: 36px;
+}
+.sclock__label {
+  position: absolute;
+  line-height: 18px;
+}
+.sclock__label b {
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.sclock__label--above {
+  top: 0;
+}
+.sclock__label--below1 {
+  top: 56px;
+}
+.sclock__label--below2 {
+  top: 78px;
+}
+.sclock__label--end {
+  transform: translateX(-100%);
+  padding-right: 6px;
+}
+.sclock__label:not(.sclock__label--end) {
+  padding-left: 0;
+  transform: translateX(-1px);
+}
+.sclock__label--bad,
+.sclock__label--bad b {
+  color: var(--s-bad);
+}
+.sclock__axis-label {
+  position: absolute;
+  top: 104px;
+  font-size: var(--t-fs-2xs);
+  line-height: 14px;
+  transform: translateX(-50%);
+}
+.sclock__axis-label--start {
+  transform: none;
+}
+.sclock__axis-label--end {
+  transform: translateX(-100%);
+}
+.sclock__caption {
+  margin-top: var(--t-space-3);
+  max-width: 96ch;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- the root */
+
+.seal-root {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: var(--t-space-1) var(--t-space-4);
+  align-items: baseline;
+  padding-bottom: var(--t-space-5);
+}
+.seal-root__label {
   font-size: var(--t-fs-xs);
   font-weight: 600;
   color: var(--w-muted);
 }
-
-.board__metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
+.seal-root__hash {
+  font-size: var(--t-fs);
 }
-.metric {
-  display: grid;
-  gap: var(--space-1);
-  align-content: start;
-  padding: var(--space-5) var(--space-6) var(--space-6);
-  min-width: 0;
-}
-.metric + .metric {
-  border-left: 1px solid var(--border);
-}
-/* The system face's tabular figures at the hero step: wider than the old
-   condensed face, so the board's four columns keep their room. */
-.metric__value {
-  font-weight: 600;
-  font-size: clamp(1.5rem, 2.4vw, var(--gp-fs-hero));
-  line-height: 1.1;
-  letter-spacing: -0.01em;
-  color: var(--text-strong);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.metric__note {
-  margin-top: var(--space-1);
-  font-size: var(--text-xs);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.metric--sealed .metric__value {
-  color: var(--seal-text);
-}
-.metric--refused .metric__value {
-  color: var(--refused);
-}
-@media (max-width: 899px) {
-  .board__metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .metric:nth-child(3) {
-    border-left: 0;
-  }
-  .metric:nth-child(n + 3) {
-    border-top: 1px solid var(--border);
-  }
-}
-@media (max-width: 479px) {
-  .metric {
-    padding: var(--space-4);
-  }
-  .metric__value {
-    font-size: 2rem;
-  }
-}
-
-/* ---------------------------------------------------------------- seal clock */
-
-.sealclock {
-  margin: 0;
-  padding: var(--space-6) var(--space-6) var(--space-5);
-  border-bottom: 1px solid var(--border);
-}
-.sealclock__row {
-  position: relative;
-  height: 20px;
-  font-size: var(--text-xs);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.sealclock__row--top {
-  margin-bottom: var(--space-2);
-}
-.sealclock__row--bottom {
-  margin-top: var(--space-2);
-}
-.sealclock__label {
-  position: absolute;
-  top: 0;
-}
-.sealclock__label b {
-  font-family: var(--font-timing);
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--text);
-  margin-right: 4px;
-}
-.sealclock__label b.is-sealed {
-  color: var(--seal-text);
-}
-.sealclock__label--end {
-  transform: translateX(calc(-100% - 8px));
-}
-.sealclock__label--late {
-  transform: translateX(-100%);
-}
-.sealclock__label--late b {
-  color: var(--refused);
-}
-.sealclock__label--plan {
-  top: 18px;
-}
-.sealclock__row--bottom {
-  height: 38px;
-}
-.sealclock__axis {
-  position: absolute;
-  top: 0;
-  transform: translateX(-50%);
-  color: var(--faint);
-  font-size: var(--text-2xs);
-}
-.sealclock__axis:first-child {
-  transform: none;
-}
-
-.sealclock__track {
-  position: relative;
-  height: 28px;
-  background: linear-gradient(var(--border), var(--border)) 0 50% / 100% 1px no-repeat;
-}
-.sealclock__after {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  background: repeating-linear-gradient(-56deg, var(--refused-dim) 0 3px, transparent 3px 7px);
-}
-.sealclock__lead {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  background: var(--bnb-dim);
-  border-top: 1px solid var(--bnb);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-.sealclock__lead-text {
-  font-family: var(--font-timing);
-  font-weight: 600;
-  font-size: 0.8125rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--seal-text);
-  white-space: nowrap;
-}
-.sealclock__tick {
-  position: absolute;
-  bottom: -3px;
-  height: 6px;
-  width: 1px;
-  background: var(--border-strong);
-}
-.sealclock__mark {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  margin-left: -1px;
-}
-.sealclock__mark--plan {
-  top: 8px;
-  bottom: 8px;
-  background: var(--teal);
-}
-.sealclock__mark--seal {
-  background: var(--bnb);
-}
-.sealclock__mark--alt {
-  top: 4px;
-  bottom: 4px;
-  width: 1px;
-  background: var(--bnb);
-  opacity: 0.6;
-}
-.sealclock__gate {
-  position: absolute;
-  top: -6px;
-  bottom: -6px;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--text-strong);
-}
-.sealclock__mark--late {
-  top: 6px;
-  bottom: 6px;
-  width: 8px;
-  margin-left: -4px;
-  background: var(--refused);
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-}
-@media (max-width: 599px) {
-  .sealclock {
-    padding: var(--space-5) var(--space-4) var(--space-4);
-  }
-  .sealclock__axis {
-    display: none;
-  }
-  .sealclock__label--plan {
-    top: 0;
-  }
-  .sealclock__row--bottom {
-    height: 20px;
-  }
-  .sealclock__lead-text {
-    font-size: 0.75rem;
-  }
-}
-
-/* ---------------------------------------------------------------- root */
-
-.board__root {
-  display: grid;
-  grid-template-columns: 7em minmax(0, 1fr);
-  gap: var(--space-2) var(--space-4);
-  align-items: baseline;
-  padding: var(--space-5) var(--space-6);
-  border-bottom: 1px solid var(--border);
-}
-.board__root-hash {
-  font-size: var(--text-md);
-  color: var(--text-strong);
-  min-width: 0;
-}
-.board__root-note {
+.seal-root__note {
   grid-column: 2;
-  font-size: var(--text-xs);
-  color: var(--faint);
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
 }
-@media (max-width: 599px) {
-  .board__root {
+@media (max-width: 767px) {
+  .seal-root {
     grid-template-columns: minmax(0, 1fr);
-    padding: var(--space-4);
   }
-  .board__root-note {
+  .seal-root__note {
     grid-column: 1;
   }
-  .board__root-hash {
-    font-size: var(--text-sm);
-  }
 }
 
-/* ---------------------------------------------------------------- chains */
+/* ---------------------------------------------------------------- receipts, field by field */
 
-.board__chains {
+.rt {
   display: grid;
+  font-size: var(--t-fs-sm);
 }
-.board__row {
+.rt__row {
   display: grid;
-  grid-template-columns: minmax(180px, 1.3fr) minmax(110px, 0.8fr) minmax(240px, 1.6fr) 72px minmax(170px, 1.1fr);
-  gap: var(--space-4);
+  grid-template-columns: 9rem minmax(0, 1fr) minmax(0, 1fr) 7rem;
+  gap: var(--t-space-4);
   align-items: center;
-  padding: 12px var(--space-6);
-  border-bottom: 1px solid var(--rule);
-  font-size: var(--text-sm);
+  min-height: var(--t-row);
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--t-rule);
+}
+.rt__row > * {
   min-width: 0;
 }
-.board__row > * {
-  min-width: 0;
-}
-.board__row--head {
-  padding-top: var(--space-4);
-  padding-bottom: var(--space-2);
-  font-family: var(--font-timing);
-  font-size: 0.8125rem;
+/* Heads on chrome, below the pane: 11px, 600, sentence case. */
+.rt__row--head {
+  min-height: var(--t-hdr-h);
+  background: var(--t-chrome);
+  border-bottom-color: var(--w-border);
+  font-size: var(--t-fs-xs);
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  border-bottom-color: var(--border);
+  color: var(--w-muted);
 }
-.board__chain {
-  display: grid;
-  gap: 1px;
+.rt__code {
+  font-weight: 400;
 }
-.board__chain-name {
-  color: var(--text-strong);
-  font-weight: 500;
+.rt__field {
+  color: var(--w-muted);
 }
-.board__chain-id {
-  font-size: var(--text-xs);
-  color: var(--faint);
-}
-.board__time {
+.rt-time {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 var(--space-3);
+  gap: 0 var(--t-space-3);
 }
-.board__lead {
-  font-family: var(--font-timing);
-  font-size: 1.125rem;
+.rt-code {
+  overflow-wrap: anywhere;
+}
+.rt__same {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--s-ok);
   font-weight: 600;
-  color: var(--seal-text);
 }
-.board__row .align-right {
-  text-align: right;
+.rt__same--bad {
+  color: var(--s-bad);
+}
+.rt__same .muted {
+  font-weight: 400;
 }
 @media (max-width: 899px) {
-  .board__row--head {
+  .rt__row--head {
     display: none;
   }
-  .board__row {
+  .rt__row {
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--space-2) var(--space-4);
-    padding: var(--space-4);
+    gap: 2px var(--t-space-4);
+    padding: var(--t-space-3) 0;
   }
-  .board__row > [data-label] {
+  .rt__field {
+    color: var(--w-fg);
+    font-weight: 600;
+  }
+  .rt__cell {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: 7rem minmax(0, 1fr);
-    gap: var(--space-3);
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    gap: var(--t-space-3);
     align-items: baseline;
   }
-  .board__row > [data-label]::before {
-    content: attr(data-label);
-    font: 400 var(--text-xs) / 1.4 var(--font-sans);
-    letter-spacing: 0;
-    text-transform: none;
-    color: var(--muted);
+  .rt__cell::before {
+    content: attr(data-chain);
+    font-size: var(--t-fs-xs);
+    color: var(--w-muted);
   }
-  .board__row .board__time {
-    display: grid;
-  }
-  .board__row > .board__lead.align-right {
-    text-align: left;
+  .rt__same {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: var(--t-fs-xs);
   }
 }
 
-/* ---------------------------------------------------------------- late seal */
+/* ---------------------------------------------------------------- the gate */
 
-.board__late {
+.seal-gate {
+  margin: 0;
+  display: grid;
+}
+.seal-gate > div {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: var(--t-space-4);
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--t-rule);
+}
+.seal-gate dt {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.seal-gate dd {
+  margin: 0;
+  min-width: 0;
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--t-space-3);
+}
+.seal-gate code {
+  color: var(--w-muted);
+}
+.seal-gate code.seal-gate__rule {
+  color: var(--w-fg);
+  overflow-wrap: anywhere;
+}
+.seal-late {
+  display: flex;
+  align-items: baseline;
+  gap: var(--t-space-4);
+  margin-top: var(--t-space-5);
+  max-width: 96ch;
+}
+.seal-late p {
+  line-height: var(--t-lh-prose);
+}
+.seal-late code {
+  overflow-wrap: anywhere;
+}
+/* A state is a word with its glyph. */
+.seal-late__state {
+  flex: none;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-3) var(--space-4);
-  padding: var(--space-5) var(--space-6) var(--space-6);
-  font-size: var(--text-sm);
-  color: var(--muted);
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--t-radius);
+  background: var(--s-bad-bg);
+  color: var(--s-bad);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
 }
-.board__late p {
-  flex: 1 1 40ch;
-  max-width: 88ch;
-}
-.board__late code {
-  color: var(--text-strong);
-}
-@media (max-width: 599px) {
-  .board__head,
-  .board__late {
-    padding-left: var(--space-4);
-    padding-right: var(--space-4);
+@media (max-width: 767px) {
+  .seal-gate > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
   }
-  .board__scope {
-    margin-left: 0;
-    flex-basis: 100%;
+  .seal-late {
+    flex-direction: column;
+    gap: var(--t-space-3);
   }
+}
+
+/* ---------------------------------------------------------------- next */
+
+.seal-next {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--t-space-2) var(--t-space-4);
+  padding-top: var(--t-space-5);
+  border-top: 1px solid var(--t-rule);
+  font-size: var(--t-fs-sm);
+}
+.seal-next__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-fs);
+  font-weight: 600;
 }
