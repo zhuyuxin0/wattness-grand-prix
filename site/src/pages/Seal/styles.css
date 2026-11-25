@@ -28,12 +28,9 @@
   color: var(--faint);
 }
 .board__label {
-  font-family: var(--font-timing);
-  font-size: 0.8125rem;
+  font-size: var(--t-fs-xs);
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
+  color: var(--w-muted);
 }
 
 .board__metrics {
@@ -52,12 +49,13 @@
 .metric + .metric {
   border-left: 1px solid var(--border);
 }
+/* The system face's tabular figures at the hero step: wider than the old
+   condensed face, so the board's four columns keep their room. */
 .metric__value {
-  font-family: var(--font-timing);
-  font-weight: 500;
-  font-size: clamp(2.25rem, 4.4vw, 3.5rem);
-  line-height: 1;
-  letter-spacing: 0;
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.4vw, var(--gp-fs-hero));
+  line-height: 1.1;
+  letter-spacing: -0.01em;
   color: var(--text-strong);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

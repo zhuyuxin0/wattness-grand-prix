@@ -22,22 +22,9 @@
   padding-left: var(--space-6);
   border-left: 1px solid var(--rule);
 }
-/* Each session's progress sits on the top rule, like a sector on a timing screen. */
-.strip__step::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -1px;
-  height: 2px;
-  background: transparent;
-}
-.strip__step--done::before,
-.strip__step--live::before {
-  background: var(--teal);
-}
-.strip__step--sealed::before {
-  background: var(--bnb);
+/* Only the sealed step wears the seal's edge; a state is a word and its mark. */
+.strip__step--sealed {
+  box-shadow: inset 0 2px 0 var(--seal);
 }
 .strip__top {
   display: flex;
@@ -46,20 +33,15 @@
   gap: var(--space-3);
 }
 .strip__n {
-  font-family: var(--font-timing);
-  font-weight: 600;
-  font-size: 0.9375rem;
-  color: var(--faint);
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
 }
 .strip__status {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-family: var(--font-timing);
+  font-size: var(--t-fs-xs);
   font-weight: 600;
-  font-size: 0.8125rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 .strip__status--done {
@@ -69,16 +51,15 @@
   color: var(--seal-text);
 }
 .strip__status--live {
-  color: var(--t-accent-text);
+  color: var(--s-ok);
 }
 .strip__status--next {
   color: var(--text);
 }
 .strip__term {
   margin-top: var(--space-3);
-  font-size: var(--text-xl);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-size: var(--t-fs-title);
+  font-weight: 600;
 }
 .strip__what {
   color: var(--muted);
@@ -90,20 +71,17 @@
   margin: var(--space-4) 0 var(--space-2);
 }
 .strip__clock {
-  font-family: var(--font-timing);
-  font-weight: 500;
-  font-size: 2rem;
-  line-height: 1;
+  font-weight: 600;
+  font-size: var(--t-fs-stat);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
   color: var(--text-strong);
   white-space: nowrap;
 }
 .strip__from {
-  font-size: 0.5em;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  vertical-align: 0.4em;
+  font-size: var(--t-fs-sm);
+  font-weight: 400;
+  color: var(--w-muted);
 }
 .strip__dash {
   color: var(--faint);
@@ -128,9 +106,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--text-sm);
-  color: var(--t-accent-text);
-  text-decoration: none;
+  font-size: var(--t-fs);
   align-self: start;
 }
 .strip__link:hover {

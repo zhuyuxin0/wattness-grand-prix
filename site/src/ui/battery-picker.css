@@ -162,3 +162,13 @@
   padding: var(--t-space-3) 0;
   border-bottom: 1px solid var(--t-rule);
 }
+
+/* Right under a page's head, as the Battery tab's toolbar sits. */
+.page-header + .battery-bar {
+  margin-top: calc(var(--t-space-5) - var(--gp-space-8));
+}
+@media (max-width: 767px) {
+  .page-header + .battery-bar {
+    margin-top: calc(var(--t-space-5) - var(--gp-space-7));
+  }
+}
