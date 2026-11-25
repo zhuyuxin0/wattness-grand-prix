@@ -23,7 +23,7 @@ import {
   type ReleasePin,
   type Snapshot,
 } from "@gatelock/data";
-import { fromData, gateUnix, plan, type ArmId, type Manifest, type RecordKind } from "@gatelock/engine";
+import { fromData, gateUnix, plan, type ArmId, type CournotReading, type Manifest, type RecordKind } from "@gatelock/engine";
 import type { Address, Hex } from "viem";
 
 export const ENGINE_REPO = "https://github.com/zhuyuxin0/wattness-grand-prix";
@@ -42,7 +42,8 @@ export interface DayPlanOptions {
   kind: RecordKind;
   salt: Hex;
   wallet: Address;
-  source: { commit: string; tree: string };
+  /** repo defaults to ENGINE_REPO; a replay of a sealed record passes the record's own. */
+  source: { commit: string; tree: string; repo?: string };
   /** Resources to plan besides the showcase; empty plans the showcase alone. */
   others: readonly string[] | "census";
   /** Previous syncs by resource, for an offline replay. */
@@ -53,6 +54,10 @@ export interface DayPlanOptions {
   log?: (line: string) => void;
   /** Clock for the plan-time stamp, in milliseconds. */
   now?: () => number;
+  /** The risk officer's Cournot reading, taken before planning; every leaf applies the weather rule to it. */
+  cournot?: CournotReading;
+  /** The planner's ERC-8004 agent id, written into every leaf. */
+  erc8004Id?: string | null;
 }
 
 export interface PlannedLeaf {
@@ -147,8 +152,9 @@ export async function planDay(o: DayPlanOptions): Promise<DayPlan> {
         planUnix,
         ...fromData(inputs),
         salt: o.salt,
-        engine: { repo: ENGINE_REPO, commit: o.source.commit, tree: o.source.tree },
-        agent: { wallet: o.wallet, erc8004Id: null },
+        engine: { repo: o.source.repo ?? ENGINE_REPO, commit: o.source.commit, tree: o.source.tree },
+        agent: { wallet: o.wallet, erc8004Id: o.erc8004Id ?? null },
+        ...(o.cournot ? { cournot: o.cournot } : {}),
         arms,
         ...(showcase ? {} : { jointTimeLimitSeconds: o.otherJointSeconds ?? 5 }),
       });
@@ -171,7 +177,12 @@ export async function planDay(o: DayPlanOptions): Promise<DayPlan> {
       leaf: leafHash(p.manifest),
     });
     const solved = arms.filter((a) => (p.manifest.arms as Record<string, unknown>)[a] !== null).join("");
-    log(`${resource.padEnd(18)} ${inputs.battery.settlementPoint.padEnd(14)} arms ${solved.padEnd(3)} selected ${String(p.manifest.selected_arm)}`);
+    const officer = p.cournot
+      ? p.cournot.status === "applied"
+        ? ` cournot: stress ${p.cournot.after!.stress_weight_ppm} ppm, cap ${p.cournot.after!.max_contracts_per_hour}`
+        : " cournot: not applied"
+      : "";
+    log(`${resource.padEnd(18)} ${inputs.battery.settlementPoint.padEnd(14)} arms ${solved.padEnd(3)} selected ${String(p.manifest.selected_arm)}${officer}`);
   }
 
   const sorted = sortLeaves(leaves);

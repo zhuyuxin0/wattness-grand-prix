@@ -7,3 +7,4 @@ export * from "./anchor.js";
 export * from "./manifest.js";
 export * from "./shape.js";
 export * from "./fleet.js";
+export * from "./weather.js";

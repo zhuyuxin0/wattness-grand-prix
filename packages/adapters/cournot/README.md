@@ -12,6 +12,27 @@ This adapter reads a live event assessment from the official Cournot Intelligenc
 
 The conditional probabilities and the sizing rule are Wattness's declared policy, not parameters returned by Cournot. Cournot's probability for a temperature event is not a probability of an electricity price spike; Wattness owns that mapping and labels it. A policy with an earlier information cutoff rejects a later observation.
 
+## Before the gate: the weather rule
+
+The planner can read one Cournot probability before ERCOT's day-ahead gate and seal what it did with it. The rule is `gate-record.weather-stress.v1`, in `packages/core/src/weather.ts`; its parameters are written into every manifest that reads Cournot, under `outside_inputs.cournot.rule`.
+
+- **The market.** A Kalshi lower-tail minimum-temperature market at Dallas-Fort Worth (station CLIDFW), for the operating day or the day before it. The claim (market id, station, threshold, date) is read from the market's title and rules text, which must agree.
+- **The reading.** The returned probability p, in parts per million, and the response's receipt time, rounded up to the second. The reading must be received before the plan time and the gate, and at most 24 hours before the plan time.
+- **The stress bucket.** From the battery's own scenario matrix: each history day is scored by its hub settlement prices summed over ERCOT's winter peaks, hour ending 7 to 10 and 18 to 21 (Central). The top quarter of history days, rounded up, ties to the later day, are the stress days; every scenario built on one is in the bucket.
+- **The weights.** The bucket carries w = p × 0.80 + (1 − p) × 0.25 of the probability, the other scenarios 1 − w, equally within each group. The fair-value entry, the mean and the CVaR all use these weights, so the three arms are scored on one measure.
+- **The hedge limit.** L = 50 MWh × (1 − 0.50 × w), floored to the kWh; the hourly contract cap is the lower of the plan's own cap and L in whole contracts.
+
+The two conditional probabilities, the 50 MWh base and the 50% cut are declared assumptions of the rule. At the rule's prior p = 0.30 it gives w = 0.415 and L = 39.625 MWh; Cournot's 25 Nov probability for the 26 Nov Dallas market, p = 0.01, gives w = 0.2555 and L = 43.612 MWh, 43 contracts an hour.
+
+Planning with a saved call, or with one live call:
+
+    pnpm plan --od 2026-11-27 --fleet --cournot <saved-call.json>
+    pnpm plan --od 2026-11-27 --fleet --cournot live --cournot-resolve <saved-resolve.json> --cournot-market <id>
+
+The live form checks the market against the rule first, then makes exactly one probability request with a 20-second limit. The response is published beside the record as `cournot/probability.json`, and each leaf records its SHA-256. If the market is not one the rule reads, the call fails, or the response cannot be read, the plan proceeds without it: the manifest records `status: "not_applied"` and the reason, and the scenarios stay equally weighted. Without `--cournot`, `outside_inputs` stays null and the plan is the same as before.
+
+The verifier recomputes all of it: V7 hashes the published response and compares its claim, probability, basis and time with the manifest; V8 recomputes the rule and the stress bucket; V5 recomputes each arm's mean and CVaR under the weights.
+
 ## Setup and validation
 
 From the repository root:
