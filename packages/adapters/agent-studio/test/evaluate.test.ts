@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluate, parseRequest, reportDigest, type EvaluationReport } from "../src/index.js";
+import { evaluate, fixtureFiles, parseRequest, reportDigest, type EvaluationReport } from "../src/index.js";
 
 describe("Evaluation boundary", () => {
   it("rejects arbitrary paths, extra fields and mainnet requests", () => {
@@ -23,5 +23,21 @@ describe("Evaluation boundary", () => {
     const report = await evaluate({ resource: "CLO_ESR1", chain: "offline" });
     const altered: EvaluationReport = { ...report, status: "failed" };
     expect(reportDigest(altered)).not.toBe(reportDigest(report));
+  });
+  it("an embedded fixture gives the same report as the fixture directory", async () => {
+    const now = () => new Date("2026-11-26T00:00:00Z");
+    const files = await fixtureFiles();
+    expect(Object.keys(files).sort()).toEqual([
+      "leaves/CLO_ESR1.json", "leaves/CLO_ESR1.scenarios.json",
+      "leaves/DSWL_ESS_ESR1.json", "leaves/DSWL_ESS_ESR1.scenarios.json",
+      "manifest.json", "record.bsc-testnet.json",
+    ]);
+    const fromDir = await evaluate({ resource: "DSWL_ESS_ESR1", chain: "offline" }, { now });
+    const embedded = await evaluate({ resource: "DSWL_ESS_ESR1", chain: "offline" }, { now, fixture: JSON.parse(JSON.stringify(files)) });
+    expect(reportDigest(embedded)).toBe(reportDigest(fromDir));
+  });
+  it("an embedded fixture serves only the files it holds", async () => {
+    const files = await fixtureFiles(undefined, ["CLO_ESR1"]);
+    await expect(evaluate({ resource: "DSWL_ESS_ESR1", chain: "offline" }, { fixture: files })).rejects.toThrow(/not embedded/);
   });
 });
