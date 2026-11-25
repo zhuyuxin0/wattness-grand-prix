@@ -403,15 +403,15 @@ if (existsSync(modulesDir)) {
 // ---------------------------------------------------------------- checks
 
 const secrets = secretValues();
-const SEALED = /\b2026-(0[789])-(\d\d)\b/g;
+const EXCLUDED = /\b2026-(0[789])-(\d\d)\b/g;
 let total = 0;
 for (const f of written) {
   const text = readFileSync(join(outDir, f.path), "utf8");
   total += f.bytes;
   for (const s of secrets) if (text.includes(s)) throw new Error(`${f.path}: holds a private value; refusing to publish`);
-  for (const m of text.matchAll(SEALED)) {
+  for (const m of text.matchAll(EXCLUDED)) {
     const d = m[0];
-    if (d >= "2026-07-30" && d <= "2026-09-29") throw new Error(`${f.path}: names ${d}, inside the held-out window`);
+    if (d >= "2026-07-30" && d <= "2026-09-29") throw new Error(`${f.path}: names ${d}, an excluded day`);
   }
 }
 

@@ -15,8 +15,8 @@ pnpm preview    # http://127.0.0.1:15192/
 `public/data` is committed. In a clone without `out/`, `pnpm data` keeps the published record data rather than
 replacing it with the two-leaf fixture (pass `--fixture` to force it). The Terminal graph and the Living Brain
 readback come from `cache/site-sources/` (or `GP_SOURCES`, `--structure`, `--brain`); when absent, their last
-published copies are kept. The script refuses to publish a credential from the private env file or any date in
-2026-07-30..2026-09-29, and keeps `public/data` under 3 MB.
+published copies are kept. The script refuses to publish a credential from the private env file or any of the
+verifier's excluded days, and keeps `public/data` under 3 MB.
 
 ## Recording
 
