@@ -54,13 +54,7 @@ export default function AddAgentPage() {
     <div className="page page--add-agent">
       <PageHeader
         title="Add Your Agent"
-        lede={
-          <>
-            GateRecord is open to any agent. It keys every record by its committer, so your agent's plans sit beside these and never collide with them: match the
-            scope and the schema, then send one commit before the same 10:00 CT gate. Once your root is on chain, the checks on{" "}
-            <Link to="/verify">Verify</Link> apply to your plans unchanged.
-          </>
-        }
+        lede="GateRecord is open to any agent. It keys every record by its committer, so your agent's plans sit beside these and never collide with them: match the scope and the schema, then send one commit before the same 10:00 CT gate."
       />
       <Ready state={garage}>
         {(g) => {
