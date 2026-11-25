@@ -3,7 +3,7 @@ import { area, line } from "d3-shape";
 import type { ArmName } from "../../data";
 import { arm as armTokens, color } from "../../design/tokens";
 import { columnPath, HourFrame, LegendLine, LegendSwatch, MARGIN, useHour, useTween, useWidth } from "./chart-kit";
-import type { Desk, DeskCommon } from "./data";
+import type { Desk, DeskCommon } from "../../data/plan";
 import { ARM_ORDER, HOURS, type ArmFigures } from "./model";
 
 const GRAY_LINE = "#5d646b";

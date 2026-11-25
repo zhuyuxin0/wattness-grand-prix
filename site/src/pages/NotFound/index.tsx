@@ -4,7 +4,7 @@ import { PageHeader } from "../../ui";
 export default function NotFoundPage() {
   return (
     <div className="page">
-      <PageHeader kicker="Off track" title="No page here" lede={<Link to="/">Back to the race weekend</Link>} />
+      <PageHeader kicker="Not found" title="No page here" lede={<Link to="/overview">Open the overview</Link>} />
     </div>
   );
 }

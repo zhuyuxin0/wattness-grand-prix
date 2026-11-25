@@ -274,7 +274,7 @@
   --radius-sm: var(--t-radius-xs);
   --radius-md: var(--t-radius-md);
   --radius-lg: var(--t-radius-md);
-  --stripe: 2px;
+  --stripe: 0px;
   --ease: var(--m-ease-out);
   --dur-fast: var(--m-dur-s);
   --dur: var(--m-dur-m);

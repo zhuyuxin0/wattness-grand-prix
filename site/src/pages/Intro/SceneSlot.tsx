@@ -52,8 +52,8 @@ class Contain extends Component<{ children: ReactNode }, { failed: boolean }> {
 
 const WIDE = "(min-width: 720px)";
 
-// On a phone the scene's corner annotations crowd the grid, and the hero and
-// the record board below already carry the same facts and source lines.
+// On a phone the scene's corner annotations crowd the grid, and the copy under
+// the stage already carries the same facts and source line.
 function useWide(): boolean {
   const [wide, setWide] = useState(() => typeof window === "undefined" || window.matchMedia(WIDE).matches);
   useEffect(() => {
@@ -70,9 +70,8 @@ export function SceneSlot() {
   if (!Scene) return null;
   return (
     <Contain>
-      {/* The stage keeps its own dark in either theme, as wattness.tech's intro does. */}
-      <div className="rw-scene" data-atmosphere="dark" role="region" aria-label="The starting grid: every sealed plan for the operating day">
-        <Suspense fallback={<div className="rw-scene__hold" />}>
+      <div className="intro-scene" role="region" aria-label="The starting grid: every sealed plan for the operating day">
+        <Suspense fallback={<div className="intro-scene__hold" />}>
           <Scene hud={wide} />
         </Suspense>
       </div>

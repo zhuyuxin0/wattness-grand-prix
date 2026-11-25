@@ -1,4 +1,4 @@
-// The Stewards page's leaf hash, proof walk and limits check against the
+// The Verify tab's leaf hash, proof walk and limits check against the
 // sealed record of 2026-11-26. Run with `pnpm test` (Node 22.18 or later runs
 // the TypeScript module directly).
 
@@ -15,7 +15,7 @@ import {
   merkleRoot,
   rebuildManifest,
   walkProof,
-} from "../src/pages/Stewards/verify/core.ts";
+} from "../src/pages/Verify/verify/core.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, "..", "..");

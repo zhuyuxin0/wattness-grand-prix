@@ -1,4 +1,4 @@
-import { BANGKOK_TZ, CENTRAL_TZ, GATE_HOUR_CT } from "../config";
+import { CENTRAL_TZ, GATE_HOUR_CT } from "../config";
 
 // Clock math for the gate. Everything here is a pure function of the instant
 // it is given, so a page (or a recording) passes a fixed clock and gets the
@@ -135,14 +135,13 @@ export interface DualTime {
   ct: string;
   /** The reader's own clock, "21:15 yours", or null when it reads the same as CT. */
   yours: string | null;
-  bangkok: string;
 }
 
 /** Market time first, the reader's own beside it. Never UTC. */
 export function dualTime(unix: number, opts: { seconds?: boolean; date?: boolean } = {}): DualTime {
   const ct = formatInZone(unix, CENTRAL_TZ, opts);
   const own = formatInZone(unix, READER_TZ, opts);
-  return { ct: `${ct} CT`, yours: own === ct ? null : `${own} yours`, bangkok: `${formatInZone(unix, BANGKOK_TZ, opts)} Bangkok` };
+  return { ct: `${ct} CT`, yours: own === ct ? null : `${own} yours` };
 }
 
 /** "Thu, Nov 26, 2026" for an operating day. */

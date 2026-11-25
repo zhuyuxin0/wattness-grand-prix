@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { captureClock } from "../../lib/capture";
-import { CENTRAL_TZ } from "../../config";
-import { zonedInstant } from "../../lib/time";
+import { captureClock } from "./capture";
+import { CENTRAL_TZ } from "../config";
+import { zonedInstant } from "./time";
 
 /** The page clock in unix ms: fixed when recording, otherwise ticking at `everyMs`. */
 export function usePageClock(everyMs = 1000): number {

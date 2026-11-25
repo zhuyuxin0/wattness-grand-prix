@@ -73,7 +73,6 @@ function Stewards({ day }: { day: DayIndex }) {
   return (
     <>
       <PageHeader
-        kicker="Stewards"
         title="Check any plan against the chain"
         lede="Every plan is one leaf of a root committed on BNB Smart Chain before the gate. This page recomputes the leaf in your browser, follows its proof to the root, reads the record back from the contract, and replays the battery's limits hour by hour."
       />
@@ -83,7 +82,7 @@ function Stewards({ day }: { day: DayIndex }) {
           batteries={day.batteries}
           value={resource}
           showcase={day.showcase}
-          onPick={(r) => navigate({ pathname: `/stewards/${r}`, search: params.toString() })}
+          onPick={(r) => navigate({ pathname: `/verify/${r}`, search: params.toString() })}
         />
         <div className="st-seg" role="radiogroup" aria-label="Chain">
           <span className="st-picker__label">Chain</span>
@@ -265,7 +264,7 @@ pnpm verify fixtures/od-20261126/manifest.json \\
           </div>
         </div>
         <p className="st-cli__contract">
-          GateRecord <Hash value={CONTRACT_ADDRESS} href={`${network.explorer}/address/${CONTRACT_ADDRESS}`} label="contract address" /> on {network.short}. Its verified source is in the <Link to="/garage">Garage</Link>.
+          GateRecord <Hash value={CONTRACT_ADDRESS} href={`${network.explorer}/address/${CONTRACT_ADDRESS}`} label="contract address" /> on {network.short}. Its verified source is under <Link to="/about/agents">Add Your Agent</Link>.
         </p>
       </Section>
     </>

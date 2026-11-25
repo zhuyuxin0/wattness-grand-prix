@@ -1,22 +1,31 @@
 import type { ReactNode } from "react";
+import { useLocation } from "react-router-dom";
+import { groupOf, tabAt } from "../shell/tabs";
 
 interface PageHeaderProps {
-  /** The race-weekend term, e.g. "Stewards". */
-  kicker: string;
   title: ReactNode;
   lede?: ReactNode;
-  /** Right column: a badge, a countdown, a receipt summary. */
+  /** The eyebrow over the title; the tab's group by default. */
+  kicker?: string;
+  /** The Grand Prix's word for the page, as one short note; the tab's own by default, or false for none. */
+  term?: string | false;
+  /** Right column: a status, a count, a control. */
   aside?: ReactNode;
   className?: string;
 }
 
-export function PageHeader({ kicker, title, lede, aside, className }: PageHeaderProps) {
+/** A page's head: its group, its title in the brand face, one plain lede. */
+export function PageHeader({ title, lede, kicker, term, aside, className }: PageHeaderProps) {
+  const tab = tabAt(useLocation().pathname);
+  const eyebrow = kicker ?? (tab ? groupOf(tab)?.label : undefined);
+  const word = term === false ? undefined : (term ?? tab?.term);
   return (
     <header className={`page-header${className ? ` ${className}` : ""}`}>
       <div className="page-header__text">
-        <div className="page-header__kicker">{kicker}</div>
+        {eyebrow && <div className="page-header__eyebrow">{eyebrow}</div>}
         <h1 className="page-header__title">{title}</h1>
         {lede && <p className="page-header__lede">{lede}</p>}
+        {word && <p className="page-header__term">In racing terms, {word}.</p>}
       </div>
       {aside && <div className="page-header__aside">{aside}</div>}
     </header>

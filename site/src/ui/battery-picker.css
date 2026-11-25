@@ -1,0 +1,164 @@
+/* The battery picker, shared by the Battery and agent tabs. */
+
+.battery-picker__label {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- picker */
+
+.battery-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  max-width: 100%;
+}
+.battery-picker__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 36px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 var(--space-3);
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+}
+.battery-picker__button:hover,
+.battery-picker.is-open .battery-picker__button {
+  border-color: var(--border-strong);
+  background: var(--raised-2);
+}
+.battery-picker__button svg {
+  color: var(--muted);
+  flex: none;
+}
+.battery-picker__value {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.battery-picker__name {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.battery-picker__code {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.battery-picker__name + .battery-picker__code {
+  color: var(--muted);
+}
+.battery-picker__meta {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+.battery-picker__pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  width: min(520px, calc(100vw - 2 * var(--gutter)));
+  background: var(--raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+.battery-picker__search {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.battery-picker__search input {
+  width: 100%;
+  height: 34px;
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--text-strong);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  outline: none;
+}
+.battery-picker__search input:focus {
+  border-color: var(--teal-line);
+}
+.battery-picker__search input::placeholder {
+  color: var(--faint);
+}
+.battery-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1) 0;
+  max-height: 340px;
+  overflow: auto;
+}
+.battery-picker__list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "main arm" "meta arm";
+  column-gap: var(--space-3);
+  padding: 7px var(--space-3) 7px var(--space-4);
+  cursor: pointer;
+  border-left: 2px solid transparent;
+}
+.battery-picker__list li.is-cursor {
+  background: var(--raised-2);
+}
+.battery-picker__list li.is-current {
+  border-left-color: var(--teal);
+}
+.battery-picker__row-main {
+  grid-area: main;
+  display: flex;
+  gap: var(--space-2);
+  align-items: baseline;
+  min-width: 0;
+}
+.battery-picker__row-meta {
+  grid-area: meta;
+  font-size: var(--text-xs);
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.battery-picker__arm {
+  grid-area: arm;
+  align-self: center;
+  font-family: var(--font-timing);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--muted);
+}
+.battery-picker__foot {
+  padding: var(--space-2) var(--space-4);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+
+/* ---------------------------------------------------------------- bar */
+
+.battery-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-4) var(--gp-space-7);
+  padding: var(--t-space-3) 0;
+  border-bottom: 1px solid var(--t-rule);
+}

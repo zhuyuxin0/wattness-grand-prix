@@ -5,7 +5,7 @@
 // and only https links are followed.
 
 import { Section } from "../../ui";
-import { useOptional } from "./data";
+import { useOptional } from "../../data/plan";
 
 type Obj = Record<string, unknown>;
 

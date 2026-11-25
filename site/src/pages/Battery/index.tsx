@@ -1,23 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { SHOWCASE, SOURCE_LINE } from "../../config";
 import { useDay, type ArmName } from "../../data";
 import { arm as armTokens } from "../../design/tokens";
 import { formatOperatingDay } from "../../lib/time";
-import { ErrorNote, Loading, PageHeader, ParcFerme, Section } from "../../ui";
-import { BatteryPicker } from "./BatteryPicker";
+import { useSelectedBattery } from "../../shell/battery";
+import { BatteryPicker, ErrorNote, Loading, PageHeader, ParcFerme, Section } from "../../ui";
 import { HourContext } from "./chart-kit";
 import { ContractsChart, PriceChart, ScheduleChart, SocChart } from "./charts";
-import { useDesk, useDeskCommon, type Desk } from "./data";
+import { useDesk, useDeskCommon, type Desk } from "../../data/plan";
 import { allFigures, ARM_ORDER, brief, HOURS, lambda, tailPercent } from "./model";
 import { ArmControl, Compare, Engineer, HourTable, Mandate, Readout, Terms } from "./panels";
 import { TeamData, WeatherRadar } from "./sponsors";
 import "./styles.css";
 
-// Pit wall: the decision desk, with Ness as race engineer. One battery's three
-// arms under the same inputs (A no hedge, B a hedge on A's schedule, C both
-// chosen together). The URL carries the state, so any frame can be loaded
-// directly: #/pit-wall?battery=DSWL_ESS_ESR1&arm=B&hour=17
+// Battery: one battery's plan in full. Its three arms under the same inputs (A
+// no hedge, B a hedge on A's schedule, C both chosen together). The URL carries
+// the state, so any frame can be loaded directly:
+// #/battery/DSWL_ESS_ESR1?arm=B&hour=17. The battery carries to the agent tabs.
 
 const NAMES: Record<string, string> = { [SHOWCASE.resource]: SHOWCASE.name };
 const TABLE_ID = "pw-hours";
@@ -40,14 +40,21 @@ function useHeldDesk(resource: string) {
   return { state, desk: state.status === "ready" ? state.data : held };
 }
 
-export default function PitWallPage() {
+export default function BatteryPage() {
   const [params, setParams] = useSearchParams();
+  const { "*": splat = "" } = useParams();
+  const navigate = useNavigate();
+  const [carried, carry] = useSelectedBattery();
   const day = useDay();
   const common = useDeskCommon();
 
   const batteries = day.status === "ready" ? day.data.batteries : [];
-  const asked = params.get("battery");
-  const resource = asked && (batteries.length === 0 || batteries.some((b) => b.resource === asked)) ? asked : SHOWCASE.resource;
+  const known = (r: string) => batteries.length === 0 || batteries.some((b) => b.resource === r);
+  const asked = splat || params.get("battery") || carried;
+  const resource = asked && known(asked) ? asked : SHOWCASE.resource;
+  useEffect(() => {
+    if (batteries.length > 0) carry(resource);
+  }, [resource, batteries.length, carry]);
   const { state, desk } = useHeldDesk(resource);
   const stale = state.status === "loading" && desk !== null;
 
@@ -67,7 +74,7 @@ export default function PitWallPage() {
 
   if (common.status === "error") return <ErrorNote error={common.error} />;
   if (state.status === "error" && !desk) return <ErrorNote error={state.error} />;
-  if (common.status !== "ready" || !desk) return <Loading label="Loading the pit wall" />;
+  if (common.status !== "ready" || !desk) return <Loading label="Loading the plan" />;
 
   const c = common.data;
   const figs = allFigures(desk, c);
@@ -83,7 +90,6 @@ export default function PitWallPage() {
     <HourContext.Provider value={hourState}>
       <div className="page page--pit-wall" data-ready={stale ? undefined : "1"}>
         <PageHeader
-          kicker="Pit wall"
           title={name ?? desk.resource}
           lede={`One battery, one set of inputs, three ways to run ${formatOperatingDay(c.operatingDay)}: no hedge, a hedge added to a fixed schedule, and schedule and hedge chosen together. Choose an arm and every chart and figure follows.`}
           aside={
@@ -97,7 +103,11 @@ export default function PitWallPage() {
         />
 
         <div className="pw-toolbar">
-          <BatteryPicker batteries={batteries} value={desk.resource} names={NAMES} onChange={(r) => set({ battery: r, arm: null, hour: null }, false)} />
+          <BatteryPicker batteries={batteries} value={desk.resource} names={NAMES} onChange={(r) => {
+              const next = new URLSearchParams(params);
+              for (const k of ["battery", "arm", "hour"]) next.delete(k);
+              navigate({ pathname: `/battery/${r}`, search: next.toString() });
+            }} />
           <div className="pw-toolbar__arms">
             <span className="pw-toolbar__label">Arm</span>
             <ArmControl value={active} sealed={desk.selectedArm} available={available} onChange={(a) => set({ arm: a === desk.selectedArm ? null : a })} />
@@ -116,7 +126,6 @@ export default function PitWallPage() {
 
           <div className="pw-col pw-col--center">
             <Section
-              kicker="Race plan"
               title={
                 <>
                   <span className="pw-arm-dot" style={{ background: armTokens[active].color }} aria-hidden="true" />
@@ -168,7 +177,7 @@ export default function PitWallPage() {
             >
               <Compare common={c} figs={figs} active={active} sealed={desk.selectedArm} onPick={(a) => set({ arm: a === desk.selectedArm ? null : a })} />
             </Section>
-            <Section kicker="Race engineer" title="What differs between the arms" variant="panel" className="pw-panel">
+            <Section title="What differs between the arms" variant="panel" className="pw-panel">
               <Engineer lines={lines} count={c.scenarios.count} />
             </Section>
             <WeatherRadar resource={desk.resource} />

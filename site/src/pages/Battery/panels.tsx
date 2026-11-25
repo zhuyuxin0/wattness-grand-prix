@@ -1,10 +1,11 @@
+import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
 import type { ArmName } from "../../data";
 import { arm as armTokens } from "../../design/tokens";
 import { dualTime } from "../../lib/time";
 import { Glyph, Hash } from "../../ui";
 import { useHour } from "./chart-kit";
-import type { Desk, DeskCommon } from "./data";
+import type { Desk, DeskCommon } from "../../data/plan";
 import {
   ARM_ORDER,
   count,
@@ -208,16 +209,16 @@ export function Mandate({ desk, common, name }: { desk: Desk; common: DeskCommon
       <div className="pw-mandate__sub">Decision cutoff</div>
       <div className="pw-cutoff">
         <div className="pw-cutoff__time">{gate.ct}</div>
-        <div className="pw-cutoff__alt num">{gate.bangkok}</div>
+        {gate.yours && <div className="pw-cutoff__alt num">{gate.yours}</div>}
         <div className="pw-cutoff__note">ERCOT's day-ahead gate. Planned at {plan.ct}.</div>
       </div>
       <div className="pw-mandate__leaf">
         <div className="pw-mandate__sub">Sealed leaf</div>
         <Hash value={desk.leaf} label="leaf hash" />
-        <a className="pw-link" href="#/stewards">
-          Check it with the stewards
-          <Glyph name="chevron-right" size={12} />
-        </a>
+        <Link className="pw-link" to={`/verify/${desk.resource}`}>
+          Verify this plan
+          <Glyph name="next" />
+        </Link>
       </div>
       <p className="pw-scope">{common.physicalScope.replace(/^./, (c) => c.toUpperCase())}.</p>
     </div>

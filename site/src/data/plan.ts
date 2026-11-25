@@ -1,7 +1,10 @@
-// The pit wall's own published files (scripts/data/pit-wall.mjs) and the two
-// sponsor-lane files it shows only when they exist.
+// One battery's published plan (scripts/data/pit-wall.mjs writes
+// public/data/pit-wall/): the Battery tab and the agent tabs read it. Also the
+// optional files other lanes publish when they land.
 
-import { dataUrl, fetchJson, useLoad, type ArmName } from "../../data";
+import type { ArmName } from "../design/tokens";
+import { useLoad } from "./hooks";
+import { dataUrl, fetchJson } from "./load";
 
 export interface ArmSplit {
   /** Expected energy revenue at the node over the scenarios. */

@@ -9,7 +9,6 @@ export const REPO_URL = "https://github.com/zhuyuxin0/wattness-grand-prix";
 export const TERMINAL_URL = "https://wattness.tech";
 
 export const CENTRAL_TZ = "America/Chicago";
-export const BANGKOK_TZ = "Asia/Bangkok";
 
 /** ERCOT's day-ahead gate, in market time. */
 export const GATE_HOUR_CT = 10;

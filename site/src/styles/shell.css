@@ -1,4 +1,7 @@
-/* App shell: top bar, page frame, footer. */
+/* The app's frame, after wattness.tech's: a 40px masthead on the page ground,
+   a 190px side panel of grouped tabs, the page, and a footer on chrome.
+   Geometry from wattness-site apps/mms/src/console-layout.css and
+   skins/wattness.css (masthead, .sidenav). */
 
 .app {
   min-height: 100vh;
@@ -8,39 +11,44 @@
 
 .skip {
   position: absolute;
-  left: var(--gutter);
+  left: 12px;
   top: 0;
-  transform: translateY(-150%);
   z-index: 100;
-  padding: var(--space-2) var(--space-3);
-  background: var(--raised);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  transform: translateY(-150%);
 }
 .skip:focus {
-  transform: translateY(var(--space-2));
+  transform: translateY(6px);
 }
 
-/* ---------------------------------------------------------------- top bar */
+/* ---------------------------------------------------------------- masthead */
 
-.topbar {
+.masthead {
   position: sticky;
   top: 0;
-  z-index: 50;
-  background: color-mix(in srgb, var(--chrome) 92%, transparent);
-  backdrop-filter: saturate(140%) blur(10px);
-  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  z-index: 20;
+  background: var(--t-pane);
+  border-bottom: 1px solid var(--w-border);
 }
-
-.topbar__inner {
-  max-width: var(--content-max);
-  margin: 0 auto;
-  height: var(--bar-height);
-  padding: 0 var(--gutter);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+.masthead__row {
+  height: calc(var(--gp-masthead-h) - 1px);
+  padding: 0 12px;
+  display: flex;
   align-items: center;
-  gap: var(--space-6);
+  justify-content: space-between;
+  gap: 12px;
+}
+.masthead__end {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.masthead__page {
+  display: none;
 }
 
 /* The lockup: the mark and "Wattness" on one middle line, the product name
@@ -104,59 +112,40 @@
   }
 }
 
-.nav {
-  min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
-}
-.nav::-webkit-scrollbar {
-  display: none;
-}
-.nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: var(--space-1);
-}
-.nav__link {
-  position: relative;
-  display: block;
-  padding: 18px 10px;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--muted);
-  text-decoration: none;
+/* "13:42:07 CT · 02:42 yours": the time in ink, the reader's own muted. */
+.market-clock {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  font-size: var(--t-fs-xs);
+  color: var(--w-fg);
   white-space: nowrap;
 }
-.nav__link:hover {
-  color: var(--text-strong);
+.market-clock__ct {
+  font-size: var(--t-fs);
+  font-weight: 600;
 }
-.nav__link.is-active {
-  color: var(--text-strong);
-}
-.nav__link::after {
-  content: "";
-  position: absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 0;
-  height: 2px;
-  background: var(--teal);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--dur) var(--ease);
-}
-.nav__link.is-active::after {
-  transform: scaleX(1);
+.market-clock__yours {
+  color: var(--w-muted);
 }
 
-.topbar__end {
-  justify-self: end;
-  display: flex;
+/* The gate, as the Terminal's phase tag: ok until the last ten minutes, then bad. */
+.gate-tag {
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 5px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--t-radius);
+  background: var(--s-ok-bg);
+  color: var(--s-ok);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.gate-tag--late {
+  background: var(--s-bad-bg);
+  color: var(--s-bad);
 }
 
 /* One square, the glyph at 12px (wattness.tech's theme-switch.css). */
@@ -167,79 +156,282 @@
   padding: 0;
 }
 
-@media (max-width: 899px) {
-  .topbar__inner {
-    grid-template-columns: auto auto;
-    grid-template-rows: var(--bar-height) 44px;
-    height: auto;
-    column-gap: var(--space-4);
-    row-gap: 0;
+/* The phone's page button: the page's name and a caret, never a hamburger. */
+.page-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  box-shadow: var(--t-shadow-1);
+  color: var(--w-fg);
+  font-size: var(--t-fs);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.page-menu__group {
+  font-weight: 400;
+  color: var(--w-muted);
+}
+.page-menu__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 767px) {
+  .masthead__end > .market-clock,
+  .masthead__end > .gate-tag {
+    display: none;
   }
-  .nav {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    margin: 0 calc(var(--gutter) * -1);
-    padding: 0 var(--gutter);
-  }
-  .nav__link {
-    padding: 12px 10px;
-  }
-  .nav ul {
-    margin-left: -10px;
+  .masthead__page {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: var(--gp-masthead-h);
+    padding: 0 16px;
+    border-top: 1px solid var(--t-rule);
   }
 }
 
-/* ---------------------------------------------------------------- page frame */
+/* ---------------------------------------------------------------- side panel */
 
-.main {
+.app__body {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+}
+
+.sidenav {
+  background: var(--t-pane);
+}
+.sidenav--rail {
+  flex: 0 0 var(--gp-panel-w);
+  position: sticky;
+  top: var(--gp-masthead-h);
+  align-self: flex-start;
+  height: calc(100vh - var(--gp-masthead-h));
+  overflow-y: auto;
+  padding-bottom: 16px;
+  border-right: 1px solid var(--t-rule);
+}
+.sidenav--rail.collapsed {
+  flex-basis: 30px;
+}
+.sidenav-toggle {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 0;
+  border-bottom: 1px solid var(--t-rule);
+  background: var(--t-pane);
+  color: var(--w-muted);
+  cursor: pointer;
+}
+.sidenav-toggle:hover {
+  background: var(--t-hover);
+  color: var(--w-fg);
+}
+.sidenav--rail.collapsed .sidenav-toggle {
+  justify-content: center;
+  padding: 0;
+}
+
+/* Group heads read as heads: a band on chrome, ruled above and below. */
+.sidenav-group {
+  margin-top: 10px;
+}
+.sidenav-group--top {
+  margin-top: 4px;
+}
+.sidenav-group h2 {
+  margin: 0 0 2px;
+  padding: 6px 16px 5px;
+  background: var(--t-chrome);
+  border-top: 1px solid var(--w-border);
+  border-bottom: 1px solid var(--w-border);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+  cursor: default;
+  user-select: none;
+}
+.sidenav-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--t-row);
+  padding: 0 16px 0 14px;
+  border-left: 2px solid transparent;
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.sidenav-item:hover {
+  background: var(--t-hover);
+  border-left-color: var(--t-accent-mark);
+  color: var(--w-fg);
+}
+.sidenav-item[aria-current="page"] {
+  background: var(--t-selected);
+  border-left-color: var(--t-accent-mark);
+  font-weight: 600;
+}
+.sidenav-item:focus-visible {
+  outline-offset: -2px;
+}
+.sidenav-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 767px) {
+  .sidenav--rail {
+    display: none;
+  }
+}
+
+/* The phone's drawer: the same list on a sheet from the left. */
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+.drawer__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 12, 14, 0.42);
+}
+.drawer__sheet {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(300px, 86vw);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: var(--t-pane);
+  box-shadow: var(--t-shadow-2);
+  animation: drawer-in var(--m-dur-m) var(--m-ease-out);
+}
+.drawer__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: var(--gp-masthead-h);
+  padding: 0 12px;
+  border-bottom: 1px solid var(--w-border);
+}
+.drawer__close {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+}
+.sidenav--drawer {
+  padding-bottom: 24px;
+}
+.sidenav--drawer .sidenav-item {
+  min-height: 40px;
+  font-size: var(--t-fs);
+}
+@keyframes drawer-in {
+  from {
+    transform: translateX(-12px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------- page */
+
+.app__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.app__main:focus {
+  outline: none;
+}
+.app__page {
   flex: 1;
   width: 100%;
-  max-width: var(--content-max);
-  margin: 0 auto;
-  padding: var(--space-12) var(--gutter) var(--space-24);
+  max-width: calc(var(--gp-max) + 2 * var(--gp-gutter));
+  padding: var(--t-space-6) var(--gp-gutter) var(--gp-space-9);
 }
 
 .page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-16);
+  gap: var(--gp-space-8);
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .page {
+    gap: var(--gp-space-7);
+  }
 }
 
 .page-header {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-8);
+  gap: var(--t-space-5);
   align-items: end;
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--t-space-5);
+  border-bottom: 1px solid var(--t-rule);
 }
 @media (min-width: 900px) {
   .page-header:has(.page-header__aside) {
     grid-template-columns: minmax(0, 1fr) auto;
   }
 }
-.page-header__kicker {
-  font-size: var(--text-2xs);
+.page-header__eyebrow {
+  margin-bottom: var(--t-space-3);
+  font-size: var(--t-fs-xs);
   font-weight: 600;
-  letter-spacing: var(--tracking-caps);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--t-accent-text);
-  margin-bottom: var(--space-4);
+  color: var(--w-muted);
 }
 .page-header__title {
-  text-wrap: balance;
-  font-size: var(--text-4xl);
-  font-weight: 200;
-  letter-spacing: -0.035em;
-  line-height: 1.02;
-  max-width: 18ch;
+  font-family: var(--t-font-display);
+  font-size: var(--t-fs-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  max-width: 40ch;
 }
 .page-header__lede {
-  margin-top: var(--space-5);
-  max-width: 62ch;
-  font-size: var(--text-lg);
-  line-height: 1.5;
-  color: var(--muted);
+  margin-top: var(--t-space-3);
+  max-width: 88ch;
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.page-header__term {
+  margin-top: var(--t-space-2);
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
 }
 .page-header__aside {
   min-width: 0;
@@ -248,59 +440,96 @@
 /* ---------------------------------------------------------------- footer */
 
 .footer {
-  border-top: 1px solid var(--border);
-  background: var(--chrome);
+  margin-top: auto;
+  background: var(--t-chrome);
+  border-top: 1px solid var(--w-border);
 }
 .footer__inner {
-  max-width: var(--content-max);
-  margin: 0 auto;
-  padding: var(--space-10) var(--gutter);
+  max-width: calc(var(--gp-max) + 2 * var(--gp-gutter));
+  padding: var(--t-space-6) var(--gp-gutter);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-6);
-  font-size: var(--text-sm);
+  gap: var(--t-space-6);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
 }
-@media (min-width: 900px) {
+@media (min-width: 1000px) {
   .footer__inner {
-    grid-template-columns: 220px minmax(0, 1fr) auto;
-    gap: var(--space-10);
+    grid-template-columns: minmax(200px, 240px) minmax(0, 1fr) auto;
+    gap: var(--gp-space-7);
   }
+}
+.footer__about {
+  display: grid;
+  gap: var(--t-space-3);
+  align-content: start;
 }
 .footer__brand {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   color: var(--w-fg);
-  align-self: start;
 }
 .footer__mark {
   width: 16px;
   height: auto;
 }
 .footer__word {
+  margin-right: 9px;
   font: 600 13px/16px var(--t-font-display);
   letter-spacing: -0.025em;
-  margin-right: 9px;
 }
 .footer__lines {
   display: grid;
-  gap: var(--space-2);
-  max-width: 68ch;
+  gap: var(--t-space-2);
+  align-content: start;
+  max-width: 72ch;
 }
 .footer__source {
-  color: var(--text);
+  color: var(--w-fg);
 }
 .footer__links {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: var(--space-2);
+  gap: var(--t-space-2);
+  align-content: start;
 }
 .footer__links a {
-  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--w-muted);
   text-decoration: none;
 }
 .footer__links a:hover {
-  color: var(--text-strong);
+  color: var(--w-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--t-accent-mark);
+}
+/* BNB Chain's horizontal logo, aligned left, with X (its own height) clear on every side. */
+.footer__sealed {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  padding-top: var(--t-space-4);
+  border-top: 1px solid var(--t-rule);
+}
+.footer__bnb {
+  display: block;
+  padding: 20px;
+}
+.bnb-logo {
+  display: block;
+  width: auto;
+  height: 20px;
+}
+.bnb-logo--yellow,
+:root[data-theme="dark"] .bnb-logo--black {
+  display: none;
+}
+:root[data-theme="dark"] .bnb-logo--yellow {
+  display: block;
 }

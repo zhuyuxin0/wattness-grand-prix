@@ -1,0 +1,203 @@
+/* Overview. The day's timeline (strip) came from the old race weekend page. */
+
+/* ---------------------------------------------------------------- strip */
+
+.strip {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+}
+.strip__step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-6) var(--space-2) 0;
+  min-width: 0;
+}
+.strip__step + .strip__step {
+  padding-left: var(--space-6);
+  border-left: 1px solid var(--rule);
+}
+/* Each session's progress sits on the top rule, like a sector on a timing screen. */
+.strip__step::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 2px;
+  background: transparent;
+}
+.strip__step--done::before,
+.strip__step--live::before {
+  background: var(--teal);
+}
+.strip__step--sealed::before {
+  background: var(--bnb);
+}
+.strip__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.strip__n {
+  font-family: var(--font-timing);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--faint);
+}
+.strip__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-timing);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.strip__status--done {
+  color: var(--muted);
+}
+.strip__status--sealed {
+  color: var(--seal-text);
+}
+.strip__status--live {
+  color: var(--t-accent-text);
+}
+.strip__status--next {
+  color: var(--text);
+}
+.strip__term {
+  margin-top: var(--space-3);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+.strip__what {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.strip__time {
+  display: grid;
+  gap: 2px;
+  margin: var(--space-4) 0 var(--space-2);
+}
+.strip__clock {
+  font-family: var(--font-timing);
+  font-weight: 500;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--text-strong);
+  white-space: nowrap;
+}
+.strip__from {
+  font-size: 0.5em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  vertical-align: 0.4em;
+}
+.strip__dash {
+  color: var(--faint);
+  margin: 0 0.08em;
+}
+.strip__zone {
+  font-size: var(--text-xs);
+  color: var(--text);
+}
+.strip__alt {
+  font-size: var(--text-xs);
+  color: var(--faint);
+}
+.strip__detail {
+  font-size: var(--text-sm);
+  color: var(--muted);
+  max-width: 34ch;
+}
+.strip__link {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-sm);
+  color: var(--t-accent-text);
+  text-decoration: none;
+  align-self: start;
+}
+.strip__link:hover {
+  color: var(--text-strong);
+}
+@media (max-width: 1023px) {
+  .strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .strip__step:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .strip__step:nth-child(n + 3) {
+    margin-top: var(--space-6);
+    border-top: 1px solid var(--border);
+  }
+}
+@media (max-width: 559px) {
+  .strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .strip__step,
+  .strip__step + .strip__step {
+    padding: var(--space-5) 0 var(--space-4);
+    border-left: 0;
+  }
+  .strip__step + .strip__step {
+    margin-top: 0;
+    border-top: 1px solid var(--border);
+  }
+  .strip__detail {
+    max-width: none;
+  }
+}
+
+/* ---------------------------------------------------------------- paths */
+
+.ov-paths {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: var(--t-space-6) var(--gp-space-7);
+}
+.ov-paths__group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--t-space-4);
+}
+.ov-paths__head {
+  margin-bottom: var(--t-space-3);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.ov-paths__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.ov-paths__group p {
+  margin-top: 2px;
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+  max-width: 52ch;
+}

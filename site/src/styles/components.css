@@ -493,3 +493,46 @@
 [data-capture="1"] .gp-table__sort-glyph {
   opacity: 1;
 }
+
+/* ---------------------------------------------------------------- seg */
+
+/* The Terminal's segmented control (ui/shapes.css): the chosen button wears the
+   selected fill, the ink, strong, and the accent bar under it. */
+.seg {
+  display: inline-flex;
+  flex: none;
+  height: var(--t-ctl-h);
+  vertical-align: middle;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  overflow: hidden;
+}
+.seg button {
+  height: 100%;
+  margin: 0;
+  padding: 0 var(--t-space-3);
+  border: 0;
+  background: none;
+  color: var(--w-muted);
+  font: inherit;
+  font-size: var(--t-fs-xs);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.seg button + button {
+  border-left: 1px solid var(--w-border);
+}
+.seg button:where(:hover:not(:disabled)) {
+  background: var(--t-hover);
+  color: var(--w-fg);
+}
+.seg button:focus-visible {
+  outline-offset: -2px;
+}
+.seg button:is([aria-pressed="true"], [aria-selected="true"]) {
+  background: var(--t-selected);
+  color: var(--w-fg);
+  font-weight: var(--t-fw-strong);
+  box-shadow: var(--t-mark-under);
+}

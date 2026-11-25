@@ -2,7 +2,7 @@
 // is arithmetic on the manifest's own numbers; nothing is estimated.
 
 import type { ArmName } from "../../data";
-import type { Desk, DeskArm, DeskCommon } from "./data";
+import type { Desk, DeskArm, DeskCommon } from "../../data/plan";
 
 export const ARM_ORDER: ArmName[] = ["A", "B", "C"];
 export const HOURS = 24;

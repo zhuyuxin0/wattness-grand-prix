@@ -109,8 +109,11 @@ export function Detail({ b, onClose }: { b: BatterySummary; onClose: () => void 
             <span className="eyebrow">Leaf</span> <Hash value={b.leaf} head={10} tail={8} label="leaf hash" />
           </span>
           <span className="sd-detail__links">
-            <Link className="sd-link" to={`/stewards/${b.resource}`}>
-              Check this plan <Glyph name="chevron-right" size={12} />
+            <Link className="sd-link" to={`/battery/${b.resource}`}>
+              Open the plan <Glyph name="next" />
+            </Link>
+            <Link className="sd-link" to={`/verify/${b.resource}`}>
+              Verify it <Glyph name="next" />
             </Link>
             <button type="button" className="sd-link sd-link--quiet" onClick={onClose}>
               Close

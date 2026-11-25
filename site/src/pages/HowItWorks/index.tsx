@@ -15,8 +15,7 @@ export default function PaddockPage() {
   return (
     <div className="page page--paddock">
       <PageHeader
-        kicker="Paddock"
-        title="How the Grand Prix runs"
+        title="How It Works"
         lede="Agents plan tomorrow for every real ERCOT battery and seal each plan on BNB Chain before the day-ahead gate. The plans are shadow plans: computed from public data, never used to operate the batteries. What the record proves is that no plan changed after the gate."
         aside={<Facts day={day} />}
       />
@@ -211,19 +210,19 @@ interface Term {
 function terms(day: DayIndex | null): [Term[], Term[]] {
   return [
     [
-      { term: "Starting grid", means: `ERCOT's grid of real batteries${day ? `: ${formatInt(day.leafCount)} in the sealed root` : ""}`, to: "/" },
-      { term: "Qualifying", means: "Agents plan tomorrow", to: "/" },
-      { term: "Parc Ferme", means: "10:00 CT: plans sealed on BNB Chain; no changes, and a late seal reverts", to: "/" },
+      { term: "Starting grid", means: `ERCOT's grid of real batteries${day ? `: ${formatInt(day.leafCount)} in the sealed root` : ""}`, to: "/fleet" },
+      { term: "Qualifying", means: "Agents plan tomorrow", to: "/battery" },
+      { term: "Parc Ferme", means: "10:00 CT: plans sealed on BNB Chain; no changes, and a late seal reverts", to: "/seal" },
       { term: "Race day", means: "The operating day; real-time prices are the telemetry" },
-      { term: "Stewards", means: "The verifier anyone can run", to: "/stewards" },
-      { term: "Standings", means: "Scores per battery on matched conditions", to: "/standings" },
+      { term: "Stewards", means: "The verifier anyone can run", to: "/verify" },
+      { term: "Standings", means: "Scores per battery on matched conditions", to: "/fleet" },
       { term: "Timing screens", means: "Atlas and CoinMarketCap prices" },
     ],
     [
-      { term: "Pit wall and team radio", means: "The decision desk, with Ness as race engineer", to: "/pit-wall" },
-      { term: "Team data", means: "Living Brain memory" },
+      { term: "Pit wall and team radio", means: "The decision desk, with Ness as race engineer", to: "/battery" },
+      { term: "Team data", means: "Living Brain memory", to: "/agents/memory" },
       { term: "Weather radar", means: "Cournot's Texas weather odds" },
-      { term: "The garage", means: "BNB Agent Studio builds the agents and AWS runs them", to: "/garage" },
+      { term: "The garage", means: "BNB Agent Studio builds the agents and AWS runs them", to: "/about/agents" },
       { term: "Season purse", means: "Flap season launch" },
       { term: "License to launch", means: "OpenFour evidence-gated graduation" },
     ],

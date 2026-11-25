@@ -103,7 +103,7 @@ export function CheckCard({ id, result, tamper, onRetry }: CheckCardProps) {
           <div>
             <span className="eyebrow">Committed</span>
             <span className="st-gate__t num">{t.ct}</span>
-            <span className="muted num">{t.bangkok}</span>
+            {t.yours && <span className="muted num">{t.yours}</span>}
           </div>
           <div className="st-gate__lead">
             <span className="st-gate__digits num">{formatLead(lead)}</span>
@@ -112,7 +112,7 @@ export function CheckCard({ id, result, tamper, onRetry }: CheckCardProps) {
           <div>
             <span className="eyebrow">Gate</span>
             <span className="st-gate__t num">{g.ct}</span>
-            <span className="muted num">{g.bangkok}</span>
+            {g.yours && <span className="muted num">{g.yours}</span>}
           </div>
         </div>,
       );

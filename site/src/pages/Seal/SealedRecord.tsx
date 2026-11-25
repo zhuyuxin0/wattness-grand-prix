@@ -1,9 +1,9 @@
 import type { ChainReceipt, DayIndex, LateSeal, Receipts } from "../../data";
 import { formatInt } from "../../lib/format";
 import { dualTime, formatInZone, formatOperatingDay } from "../../lib/time";
-import { BANGKOK_TZ, CENTRAL_TZ } from "../../config";
+import { CENTRAL_TZ } from "../../config";
 import { Hash, ParcFerme } from "../../ui";
-import { clockDigits, minSec } from "./clock";
+import { clockDigits, minSec } from "../../lib/clock";
 
 interface SealedRecordProps {
   day: DayIndex;
@@ -16,6 +16,7 @@ export function SealedRecord({ day, receipts, late }: SealedRecordProps) {
   const main = receipts.receipts.find((r) => r.mainnet) ?? receipts.receipts[0];
   if (!main) return null;
   const sealed = dualTime(main.blockTime);
+  const lateAt = dualTime(late.attemptUnix, { date: false });
 
   return (
     <article className="board" aria-labelledby="board-title">
@@ -65,9 +66,9 @@ export function SealedRecord({ day, receipts, late }: SealedRecordProps) {
       <div className="board__late">
         <ParcFerme state="refused" size="sm" />
         <p>
-          A second plan for the same day, simulated at {formatInZone(late.attemptUnix, CENTRAL_TZ, { date: false })} CT (
-          {formatInZone(late.attemptUnix, BANGKOK_TZ, { date: false })} Bangkok), is refused on both chains with <code>{late.errorText}</code>. The
-          contract computes the gate itself.
+          A second plan for the same day, simulated at {lateAt.ct}
+          {lateAt.yours ? ` (${lateAt.yours})` : ""}, is refused on both chains with <code>{late.errorText}</code>. The contract computes the gate
+          itself.
         </p>
       </div>
     </article>
@@ -100,7 +101,7 @@ function ChainRow({ r }: { r: ChainReceipt }) {
       <span role="cell" className="num" data-label="Block time">
         <span className="board__time">
           <span>{t.ct}</span>
-          <span className="muted">{t.bangkok}</span>
+          {t.yours && <span className="muted">{t.yours}</span>}
         </span>
       </span>
       <span role="cell" className="board__lead num align-right" data-label="Lead">

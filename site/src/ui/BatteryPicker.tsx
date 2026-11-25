@@ -1,7 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import type { BatterySummary } from "../../data";
-import { Glyph } from "../../ui";
-import { mw1 } from "./model";
+import type { BatterySummary } from "../data";
+import { formatDec1 } from "../lib/format";
+import { Glyph } from "./Glyph";
+import "./battery-picker.css";
 
 const SHOWN = 60;
 
@@ -23,7 +24,7 @@ function matches(b: BatterySummary, names: Record<string, string>, q: string) {
     .every((t) => hay.includes(t));
 }
 
-/** A searchable list of every battery on the starting grid. */
+/** A searchable list of every battery in the sealed root: the Battery and agent tabs share it. */
 export function BatteryPicker({ batteries, value, names, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -79,21 +80,21 @@ export function BatteryPicker({ batteries, value, names, onChange }: Props) {
   };
 
   return (
-    <div className={`pw-picker${open ? " is-open" : ""}`} ref={root}>
-      <span className="pw-toolbar__label" id={`${id}-label`}>
+    <div className={`battery-picker${open ? " is-open" : ""}`} ref={root}>
+      <span className="battery-picker__label" id={`${id}-label`}>
         Battery
       </span>
-      <button type="button" className="pw-picker__button" aria-haspopup="listbox" aria-expanded={open} aria-labelledby={`${id}-label ${id}-value`} onClick={() => setOpen((o) => !o)}>
-        <span id={`${id}-value`} className="pw-picker__value">
-          {names[value] && <span className="pw-picker__name">{names[value]}</span>}
-          <span className="pw-picker__code">{value}</span>
+      <button type="button" className="battery-picker__button" aria-haspopup="listbox" aria-expanded={open} aria-labelledby={`${id}-label ${id}-value`} onClick={() => setOpen((o) => !o)}>
+        <span id={`${id}-value`} className="battery-picker__value">
+          {names[value] && <span className="battery-picker__name">{names[value]}</span>}
+          <span className="battery-picker__code">{value}</span>
         </span>
-        {current && <span className="pw-picker__meta">{current.hub}</span>}
-        <Glyph name="chevron-down" size={14} />
+        {current && <span className="battery-picker__meta">{current.hub}</span>}
+        <Glyph name="caret" />
       </button>
       {open && (
-        <div className="pw-picker__pop">
-          <div className="pw-picker__search">
+        <div className="battery-picker__pop">
+          <div className="battery-picker__search">
             <input
               ref={input}
               type="search"
@@ -108,7 +109,7 @@ export function BatteryPicker({ batteries, value, names, onChange }: Props) {
               onKeyDown={onKey}
             />
           </div>
-          <ul className="pw-picker__list" role="listbox" id={`${id}-list`} ref={list} aria-label="Batteries">
+          <ul className="battery-picker__list" role="listbox" id={`${id}-list`} ref={list} aria-label="Batteries">
             {shown.map((b, i) => (
               <li
                 key={b.resource}
@@ -120,20 +121,20 @@ export function BatteryPicker({ batteries, value, names, onChange }: Props) {
                 onPointerEnter={() => setCursor(i)}
                 onClick={() => choose(b.resource)}
               >
-                <span className="pw-picker__row-main">
-                  <span className="pw-picker__code">{b.resource}</span>
-                  {names[b.resource] && <span className="pw-picker__name">{names[b.resource]}</span>}
+                <span className="battery-picker__row-main">
+                  <span className="battery-picker__code">{b.resource}</span>
+                  {names[b.resource] && <span className="battery-picker__name">{names[b.resource]}</span>}
                 </span>
-                <span className="pw-picker__row-meta num">
-                  {b.settlementPoint} · {b.hub} · {mw1(b.powerMw)} MW / {mw1(b.energyMwh)} MWh
+                <span className="battery-picker__row-meta num">
+                  {b.settlementPoint} · {b.hub} · {formatDec1(b.powerMw)} MW / {formatDec1(b.energyMwh)} MWh
                 </span>
-                <span className="pw-picker__arm" title={`Arm ${b.selectedArm} sealed`}>
+                <span className="battery-picker__arm" title={`Arm ${b.selectedArm} sealed`}>
                   {b.selectedArm}
                 </span>
               </li>
             ))}
           </ul>
-          <div className="pw-picker__foot num">
+          <div className="battery-picker__foot num">
             {found.length > SHOWN ? `${SHOWN} of ${found.length} shown; type to narrow` : `${found.length} of ${batteries.length} batteries`}
           </div>
         </div>

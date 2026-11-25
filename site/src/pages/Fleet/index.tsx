@@ -115,8 +115,7 @@ function Standings({ day }: { day: DayIndex }) {
   return (
     <>
       <PageHeader
-        kicker="Standings"
-        title="The starting grid, sealed"
+        title={`All ${formatInt(day.leafCount)} sealed plans`}
         lede={`Every ERCOT battery planned for ${formatOperatingDay(day.operatingDay)} under the same rules, from the same public data, each plan sealed as one leaf of the day's root before the gate.`}
         aside={
           <div className="sd-aside">

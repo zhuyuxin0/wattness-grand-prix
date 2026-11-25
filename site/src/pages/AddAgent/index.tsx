@@ -48,8 +48,7 @@ export default function GaragePage() {
   return (
     <div className="page page--garage">
       <PageHeader
-        kicker="Garage"
-        title="Build an agent, take the grid"
+        title="Add Your Agent"
         lede="One agent wallet plans every battery on ERCOT's grid for tomorrow and commits the day to a contract that refuses anything after the gate. The contract is open: any agent can enter under its own wallet, with the same scope and schema."
       />
       <Ready state={garage}>
@@ -129,7 +128,7 @@ export default function GaragePage() {
                           <div>
                             <dt>Deployed</dt>
                             <dd className="num">
-                              {t.ct} <span className="muted">{t.bangkok}</span>
+                              {t.ct} {t.yours && <span className="muted">{t.yours}</span>}
                             </dd>
                           </div>
                           <div>
@@ -331,7 +330,7 @@ const hash = await wallet.writeContract({
         />
       </div>
       <p className="gr-after">
-        After it lands, read it back with <code>get(key)</code>. The checks the <Link to="/stewards">Stewards</Link> run on this agent's plans apply to yours unchanged: recompute a leaf, walk its proof to your root, read your record. A commit after the gate reverts with <code>AfterGate(od, gate)</code>; a second one for the same key reverts with <code>AlreadyCommitted(key)</code>.
+        After it lands, read it back with <code>get(key)</code>. The checks <Link to="/verify">Verify</Link> runs on this agent's plans apply to yours unchanged: recompute a leaf, walk its proof to your root, read your record. A commit after the gate reverts with <code>AfterGate(od, gate)</code>; a second one for the same key reverts with <code>AlreadyCommitted(key)</code>.
       </p>
     </Section>
   );

@@ -1,30 +1,51 @@
-import { NavLink } from "react-router-dom";
-import { captureClock } from "../lib/capture";
-import { Countdown } from "../ui/Countdown";
+import type { RefObject } from "react";
+import { Glyph } from "../ui/Glyph";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { Brand } from "./Brand";
-import { NAV } from "./nav";
+import { GateTag, MarketClock, useSecondClock } from "./MarketClock";
+import { groupOf, type PanelTab } from "./tabs";
 
-export function TopBar() {
+interface MastheadProps {
+  tab: PanelTab | undefined;
+  menuOpen: boolean;
+  onMenu: () => void;
+  menuRef: RefObject<HTMLButtonElement>;
+}
+
+/**
+ * wattness.tech's masthead: the lockup and the product name at the left; the
+ * market clock, the gate and the theme toggle at the right. On a phone a second
+ * band names the page and opens the tab list as a drawer.
+ */
+export function Masthead({ tab, menuOpen, onMenu, menuRef }: MastheadProps) {
+  const now = useSecondClock();
+  const group = tab ? groupOf(tab) : null;
   return (
-    <header className="topbar">
-      <div className="topbar__inner">
+    <header className="masthead">
+      <div className="masthead__row">
         <Brand />
-        <nav className="nav" aria-label="Primary">
-          <ul>
-            {NAV.map((item) => (
-              <li key={item.path}>
-                <NavLink to={item.path} end={item.path === "/"} title={item.gloss} className={({ isActive }) => `nav__link${isActive ? " is-active" : ""}`}>
-                  {item.label}
-                </NavLink>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <div className="topbar__end">
-          <Countdown size="sm" bare now={captureClock()} className="topbar__clock" />
+        <div className="masthead__end">
+          <MarketClock now={now} />
+          <GateTag now={now} />
           <ThemeToggle />
         </div>
+      </div>
+      <div className="masthead__page">
+        <button
+          ref={menuRef}
+          type="button"
+          className="page-menu"
+          aria-haspopup="dialog"
+          aria-expanded={menuOpen}
+          aria-controls="tab-drawer"
+          aria-label={`${tab?.label ?? "Pages"}: open the tab list`}
+          onClick={onMenu}
+        >
+          {group && <span className="page-menu__group">{group.label}</span>}
+          <span className="page-menu__label">{tab?.label ?? "Pages"}</span>
+          <Glyph name="caret" />
+        </button>
+        <GateTag now={now} compact />
       </div>
     </header>
   );
