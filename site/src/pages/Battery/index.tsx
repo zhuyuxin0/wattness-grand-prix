@@ -188,6 +188,9 @@ export default function BatteryPage() {
                   label={`State of charge in MWh at the end of each hour, plan ${active}, with the other plans in gray`}
                   tableId={TABLE_ID}
                   height={190}
+                  // No end label here: its margin would narrow this chart's hour axis
+                  // under the other three. The readout above gives where the day ends.
+                  endLabel={false}
                 />
                 <ColumnsChart
                   title="Hedge"
