@@ -84,6 +84,27 @@ function shortReason(err: unknown): string {
 
 type Loaded = Awaited<ReturnType<typeof loadPlanInputs>>;
 
+/** The longest the plan-time stamp waits for a reading's second to pass. */
+export const STAMP_WAIT_MS = 2_000;
+
+/**
+ * The plan-time stamp, in unix seconds. A reading's time is rounded up to the second and the stamp down, so a
+ * reading received in the same second as the stamp would look later than the plan and the weather rule would
+ * refuse it. The stamp waits out that second first, never longer than STAMP_WAIT_MS; a reading timed further
+ * ahead than that is left for the rule to refuse.
+ */
+export async function stampPlanTime(
+  now: () => number,
+  observedUnix: number | null,
+  sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
+): Promise<number> {
+  if (observedUnix !== null) {
+    const wait = observedUnix * 1000 - now();
+    if (wait > 0 && wait <= STAMP_WAIT_MS) await sleep(wait);
+  }
+  return Math.floor(now() / 1000);
+}
+
 export async function planDay(o: DayPlanOptions): Promise<DayPlan> {
   const log = o.log ?? (() => {});
   const gate = gateUnix(o.operatingDay);
@@ -137,7 +158,7 @@ export async function planDay(o: DayPlanOptions): Promise<DayPlan> {
   }
   for (const r of others) await loadOne(r, false);
 
-  const planUnix = o.planUnix ?? Math.floor((o.now ?? Date.now)() / 1000);
+  const planUnix = o.planUnix ?? (await stampPlanTime(o.now ?? Date.now, o.cournot?.observedUnix ?? null));
   if (planUnix >= gate) throw new Error(`plan time ${planUnix} is at or after the gate ${gate}`);
 
   const leaves: PlannedLeaf[] = [];
