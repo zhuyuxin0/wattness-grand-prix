@@ -5,6 +5,7 @@ import { isCapture } from "../lib/capture";
 import { Loading } from "../ui/States";
 import { Footer } from "./Footer";
 import { Masthead } from "./Masthead";
+import { Pager } from "./Pager";
 import { SidePanel, TabDrawer } from "./SidePanel";
 import { tabAt } from "./tabs";
 
@@ -58,6 +59,7 @@ export function Layout() {
             <Suspense fallback={<Loading />}>
               <Outlet />
             </Suspense>
+            <Pager />
           </div>
           <Footer />
         </main>
