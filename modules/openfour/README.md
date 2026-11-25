@@ -68,6 +68,24 @@ pnpm --filter @gatelock/openfour typecheck
 
 Contracts compile with Hardhat (solc 0.8.28, cancun, optimizer 200, via IR). The tests run in vitest on Hardhat's in-process chain against the real GateRecord, compiled from `@gatelock/contracts`, and test doubles for Core, the vault, the token and a V2 pair.
 
+## Run a launch
+
+1. Deploy a developer-owned proxy set on BSC testnet with the OpenFour fork toolkit (`developer/fork-deploy` in [openfour-docs](https://github.com/four-meme-community/openfour-docs), `npm run fork:dry`, then `npm run fork`). Its `out/fork-deployment.json` is the `--fork` input below; the deployer owns the Registry and signs creates.
+2. Run the steps in order. Each reads the key `OPENFOUR_TESTNET_PRIVATE_KEY` through `loadSecrets`, refuses any chain but 97 and 31337, and writes what it sent and read to `--evidence`. Keep that directory outside the repository.
+
+```sh
+cd modules/openfour
+node scripts/launch.ts deploy   --fork <fork-deployment.json> --evidence <dir>
+node scripts/launch.ts create   --fork <…> --evidence <dir> --agent <committer> --min-od 20261126 --min-leaves 300 --code-hash <bytes32>
+node scripts/launch.ts buy      --fork <…> --evidence <dir>
+node scripts/launch.ts graduate --fork <…> --evidence <dir> --expect-revert   # evidence missing: mined, reverts
+node scripts/launch.ts bind     --fork <…> --evidence <dir> --od 20261126 --root <root>
+node scripts/launch.ts graduate --fork <…> --evidence <dir>
+node scripts/launch.ts verify   --fork <…> --evidence <dir>                   # re-read from a second RPC
+```
+
+`deploy` registers the module on the fork's Registry and adds a preset that copies Bonding V1 with this Migrate. `create` launches the placeholder token Grand Prix Planner (PLNR): 10 billion supply, 8 billion on the curve, a 0.1 WBNB raise, anti-sniper off. `--rpc http://127.0.0.1:<port>` runs the same steps on a local fork of BSC testnet.
+
 ## Discovery probe and encoding
 
 `src/probe.ts` reads OpenFour's BSC testnet Registry, Core, Tools, proxy implementation slots, presets, module implementations, descriptors and schemas at one block, through an allowlist of read-only RPC methods:
@@ -81,4 +99,4 @@ node dist/probe.js <output.json> <block>
 
 ## Licensing
 
-All code here is original and MIT. The OpenFour structures are declared in `contracts/interfaces/OpenFour.sol` from the public interfaces' ABI; no OpenFour file is copied.
+All code here is original and MIT. The OpenFour structures are declared in `contracts/interfaces/OpenFour.sol` from the public interfaces' ABI; no OpenFour file is copied. The fork toolkit is run from its own checkout and is not vendored.

@@ -19,7 +19,8 @@
     "build": "hardhat build --quiet && tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json",
     "test": "hardhat build --quiet && vitest run",
-    "probe": "node dist/probe.js"
+    "probe": "node dist/probe.js",
+    "launch": "node scripts/launch.ts"
   },
   "dependencies": {
     "@gatelock/core": "workspace:*",
