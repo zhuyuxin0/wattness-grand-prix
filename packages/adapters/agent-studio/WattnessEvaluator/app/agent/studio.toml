@@ -1,0 +1,83 @@
+[project]
+name = "WattnessEvaluator-agent"
+
+[stack]
+# Project-lifetime facts: which runtime adapter recipe this Agent was
+# scaffolded against. doctor / dev / deploy read these to know what to
+# check, load, and route. runtime: agentcore | azure-foundry.
+runtime = "agentcore"
+# Public faces exposed by this one runtime and signer (canonical order):
+#   A2A — serveA2a: agent card + negotiate/notify_funded skills.
+#   MCP — streamable-HTTP /mcp: negotiate (signed quote) + notify_funded
+#         (verify → deliver → submit, synchronously within the tool call) +
+#         read-only chain tools.
+#   X402 or MPP — publish exactly one sibling B402 seller route (/x402 or
+#          /mpp). Payment-only still uses A2A as the cloud carrier but hides
+#          that native face at the public gateway.
+protocols = ["A2A"]
+
+[network]
+default = "bsc-testnet"
+
+[deploy]
+# Legacy scaffold intent: this project was created for the managed BNB trial.
+# Deployment still requires an explicit `bag deploy --provider bnb` choice;
+# this field is never used as a silent provider default. Post-deploy state is
+# recorded under [deploy.platform].
+destination = "platform"
+# Artifact channel: 'zip' (evm-local default — managed runtime, no Docker)
+# or 'container' (local Docker build → brokered ECR; forced for twak).
+platform_artifact = "zip"
+
+[wallet]
+# Local keystore signer. The Agent is the SOLE key-holder/signer.
+# The keystore lives at the WORKSPACE root — outside app/agent (the deploy
+# codeLocation) — so no packaging path can bundle it into a deploy artifact.
+kind = "evm-local"
+signer = "local"
+keystore_dir = "../../.studio/wallets"
+# Filled by `bag wallet new`: the disposable testnet wallet, never one used on mainnet.
+address = "0x333bfe3905210a5e3E985fe12D324D0dE9FE6FbC"
+
+[llm]
+# The work is the deterministic evaluator (src/evaluationWork.ts).
+provider = "none"
+model = ""
+
+[payments]
+# Buyer spending allow-list for `bag erc8183 buy --asset`. Match a UI
+# symbol or canonical AssetId. Narrow this to lock spending to specific stables.
+allowed_payment_tokens = ["U","USDC","USDT"]
+
+[payments.seller]
+# One USD price for every rail and asset; "0" means free.
+price_usd = "0.10"
+# Canonical AssetIds on this network, in order; any non-empty subset. Only
+# assets the ERC-8183 contract stack can escrow are listed.
+assets = ["TEST_U","TEST_USDC","TEST_USDT"]
+
+[payments.erc8183]
+# Price and assets come from [payments.seller]; this table holds ERC-8183 behavior only.
+enabled = true
+quote_ttl_seconds = 900                        # seconds a signed quote stays valid; SDK caps at 900 (~15min work window)
+default_estimated_completion_seconds = 600
+poll_interval_seconds = 30
+auto_settle = false                            # opt-in: detect dispute-window-elapsed → settle
+
+[storage]
+# Deliverables written to local disk (file://). Offline-dev only —
+# does NOT survive deploy. Path from STORAGE_LOCAL_PATH.
+kind = "local"
+
+
+[budget]
+# auto-topup consent — `acknowledged_at` is the ISO-8601 UTC
+# timestamp marking when the user explicitly accepted the auto-topup terms.
+# Both `enabled = true` AND a valid `acknowledged_at` are required for the
+# in-process auto-topup hook to fire (defends against hand-edits).
+enabled = false
+acknowledged_at = "2026-11-25T18:42:46Z"
+# Caps — tighten/loosen via `bag budget enable --max-per-topup-usd N ...`
+max_per_topup_usd = 1.0
+max_per_day_usd = 3.0
+max_per_month_usd = 15.0
