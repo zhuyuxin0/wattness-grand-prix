@@ -48,6 +48,8 @@ const finite = (x: unknown, label: string): number => {
   return n;
 };
 export function checkPrice(price: Price, now: number, maxAge = 180, futureDrift = 60): void {
+  // NaN compares false both ways, so an invalid clock would pass every freshness check.
+  if (![now, maxAge, futureDrift].every(Number.isFinite) || maxAge < 0 || futureDrift < 0) throw new Error("Invalid freshness reference");
   if (!Number.isFinite(price.priceUsd)) throw new Error("Non-finite price");
   if (!(price.priceUsd > 0)) throw new Error("Non-positive price");
   if (!Number.isInteger(price.observedAtSeconds) || price.observedAtSeconds <= 0) throw new Error("Invalid price timestamp");

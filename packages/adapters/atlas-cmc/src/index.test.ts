@@ -120,6 +120,11 @@ describe("price and coverage controls", () => {
     expect(() => checkPrice({ ...p, priceUsd: Infinity }, now)).toThrow("Non-finite");
     expect(() => checkPrice({ ...p, priceUsd: NaN }, now)).toThrow("Non-finite");
   });
+  it("refuses an invalid clock instead of skipping the freshness checks", () => {
+    expect(() => checkPrice({ ...p, observedAtSeconds: 1 }, NaN)).toThrow("freshness reference");
+    expect(() => checkPrice(p, now, Number.NaN)).toThrow("freshness reference");
+    expect(() => checkPrice(p, now, 180, -1)).toThrow("freshness reference");
+  });
   it("keeps missing vendor data unknown", () => {
     expect(parseSecurity({ data: [] }).state).toBe("unknown");
     expect(parseSecurity([{ exist: false }]).flagged).toBeNull();
@@ -202,6 +207,7 @@ describe("funding decision", () => {
   it("refuses non-finite inputs instead of pricing them", () => {
     expect(() => fundingDecision({ treasuryBnb: .25, atlas, cmc: [{ ...cmc[0]!, priceUsd: Infinity }], security, now })).toThrow("Non-finite");
     expect(() => fundingDecision({ treasuryBnb: .25, atlas, cmc: [{ ...cmc[0]!, percentChange24h: NaN }], security, now })).toThrow("24-hour change");
+    expect(() => fundingDecision({ treasuryBnb: .25, atlas, cmc, security, now: NaN })).toThrow("freshness reference");
   });
   it("refuses stale or out-of-range inputs", () => {
     expect(() => fundingDecision({ treasuryBnb: .25, atlas: [{ ...p, observedAtSeconds: now - 181 }, atlas[1]!], cmc, security, now })).toThrow("Stale");
