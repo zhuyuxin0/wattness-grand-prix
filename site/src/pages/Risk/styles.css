@@ -1,0 +1,65 @@
+/* Risk: the sealed plan's score leads; the plans on one dollar axis (worst
+   case to mean, score as a tick); what moved it; the tables and the method. */
+
+.rk-bell {
+  width: 100%;
+  min-width: 0;
+}
+.rk-bell__svg {
+  cursor: default;
+}
+.rk-bell__hit {
+  fill: transparent;
+}
+.rk-bell__row:hover .rk-bell__hit,
+.rk-bell__row.is-on .rk-bell__hit {
+  fill: var(--t-hover);
+}
+.rk-bell__row:focus {
+  outline: none;
+}
+.rk-bell__row:focus-visible .rk-bell__hit {
+  stroke: var(--t-focus);
+  stroke-width: 2;
+}
+.rk-bell__label {
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+  fill: var(--w-fg);
+}
+.rk-bell__ring {
+  fill: var(--t-pane);
+  stroke: var(--plan);
+  stroke-width: 2;
+}
+.rk-bell__row .pk-dot {
+  stroke-width: 2;
+}
+.rk-bell__tick {
+  stroke: var(--w-fg);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.rk-bell__score {
+  font-size: var(--t-fs-sm);
+  font-variant-numeric: tabular-nums;
+  fill: var(--w-fg);
+}
+.rk-bell__score.is-sealed {
+  font-weight: 600;
+}
+.rk-step {
+  display: grid;
+  gap: 1px;
+  padding: 4px 0;
+  white-space: normal;
+  min-width: 14em;
+}
+.rk-readout .pk-readout__time {
+  font-size: var(--t-fs-title);
+}
+@media (max-width: 600px) {
+  .rk-step {
+    min-width: 0;
+  }
+}
