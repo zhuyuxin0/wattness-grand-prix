@@ -180,6 +180,25 @@ describe("SeasonLauncher", () => {
     await viem.assertions.revertWithCustomError(l.write.launch(), l, "NotOpen");
   });
 
+  it("with a stage milestone, waits for that outcome to be linked", async () => {
+    const { viem, gr, clock, config, create, contribute, seal, alice, bob, agent } = await setup();
+    const l = await create(config({ milestoneStage: 1 }));
+    await contribute(l.address, alice, USD(1_000));
+    await contribute(l.address, bob, USD(1_000));
+    await seal(20261126, GATE_1126 - 60n);
+    assert.equal(await l.read.milestoneMet(), false);
+    await viem.assertions.revertWithCustomError(l.write.launch(), l, "MilestoneNotMet");
+
+    // Stage 1 (day-ahead settled) opens at the gate.
+    const asAgent = await viem.getContractAt("TestGateRecord", gr.address, { client: { wallet: agent } });
+    const key = await gr.read.keyOf([agent.account.address, SCOPE, 20261126]);
+    await clock.setNextBlockTimestamp({ timestamp: GATE_1126 + 60n });
+    await asAgent.write.linkOutcome([key, 1, keccak256(stringToHex("da-settled"))]);
+    assert.equal(await l.read.milestoneMet(), true);
+    await l.write.launch();
+    assert.equal(await l.read.status(), 1);
+  });
+
   it("pays contributors their part of the reserve pro rata, once", async () => {
     const { viem, config, create, contribute, seal, alice, bob, asLauncher } = await setup();
     const l = await create(config());
