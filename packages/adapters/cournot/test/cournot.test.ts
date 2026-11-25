@@ -26,14 +26,18 @@ describe("Cournot event assessment", () => {
     expect(a.dataAgeMs).toBeNull();
   });
   it("accepts nested response and exposes basis source age rather than inventing freshness", () => {
-    const a = parseAssessment(market, record({ code: 0, data: { probability: { result: { point_estimate: .7 }, basis: [{ source: "Weather", time: "2026-11-25T14:00:01Z" }] } } }));
+    const a = parseAssessment(market, record({ code: 0, data: { probability: { result: { point_estimate: .7 }, basis: [{ source: "Weather", time: "2026-11-25T14:00:01Z", end_time: "2026-11-27T07:00:00Z" }] }, markets: [{ market_info: { id: 77 } }] } }));
     expect(a.dataAgeMs).toBe(3600000);
     expect(a.basisSourceTimes).toEqual(["2026-11-25T14:00:01.000Z"]);
+    const future = parseAssessment(market, record({ code: 0, data: { probability: .7, basis: [{ end_time: "2026-11-27T07:00:00Z" }], markets: [{ id: 77 }] } }));
+    expect(future.dataAgeMs).toBeNull();
   });
   it("refuses probabilities outside [0,1], unanswered responses and different event identities", () => {
-    expect(() => parseAssessment(market, record({ code: 0, data: { probability: 70 } }))).toThrow("finite probability");
+    expect(() => parseAssessment(market, record({ code: 0, data: { probability: 70, markets: [{ id: 77 }] } }))).toThrow("finite probability");
     expect(() => parseAssessment(market, record({ code: 0, data: { probability: .7, answered: false } }))).toThrow("did not answer");
     expect(() => parseAssessment(market, record({ code: 0, data: { probability: .7, markets: [{ id: 88 }] } }))).toThrow("identity");
+    expect(() => parseAssessment(market, record({ code: 0, data: { probability: .7 } }))).toThrow("identity");
+    expect(() => parseAssessment(market, record({ code: 0, data: { probability: .7, markets: [{ id: 77 }, { id: 88 }] } }))).toThrow("identity");
   });
   it("redacts keys and IPs recursively without discarding new evidence fields", () => {
     expect(sanitize({ basis: { free_quota: { ip: "192.0.2.1", remaining: 2 }, api_key: "secret", summary: "unchanged" } })).toEqual({ basis: { free_quota: { ip: "[redacted]", remaining: 2 }, api_key: "[redacted]", summary: "unchanged" } });
@@ -77,7 +81,7 @@ describe("package entries", () => {
 
 describe("declared weather sensitivity", () => {
   it("changes a real recommendation using a separate explicit conditional model", () => {
-    const a = parseAssessment(market, record({ code: 0, data: { probability: .7 } }));
+    const a = parseAssessment(market, record({ code: 0, data: { probability: .7, markets: [{ id: 77 }] } }));
     const result = applyWeatherPolicy(a, policy);
     expect(result.before.stressScenarioWeight).toBeCloseTo(.415);
     expect(result.after.stressScenarioWeight).toBeCloseTo(.635);
@@ -87,7 +91,7 @@ describe("declared weather sensitivity", () => {
     expect(result.relationToExistingSeal).toContain("not included");
   });
   it("blocks later observations from an earlier cutoff and prevents time travel", () => {
-    const a = parseAssessment(market, record({ code: 0, data: { probability: .7 } }));
+    const a = parseAssessment(market, record({ code: 0, data: { probability: .7, markets: [{ id: 77 }] } }));
     expect(() => applyWeatherPolicy(a, { ...policy, informationCutoff: "2026-11-25T14:00:00Z" })).toThrow("after");
     expect(() => applyWeatherPolicy(a, { ...policy, appliedAt: "2026-11-25T14:00:00Z" })).toThrow("before");
   });

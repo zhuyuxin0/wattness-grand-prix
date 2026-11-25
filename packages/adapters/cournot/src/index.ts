@@ -116,15 +116,16 @@ export function parseAssessment(market: MarketInfo, evidence: CallEvidence): Ass
   if (!probability(estimate)) {
     throw new CournotError("invalid_response", "A finite probability in [0, 1] was not returned.", evidence);
   }
-  if (Array.isArray(data.markets)) {
-    const ids = data.markets.map(v => object(v) ? (object(v.market_info) ? v.market_info.id : v.id) : null);
-    if (!ids.some(id => String(id) === String(market.id))) {
-      throw new CournotError("invalid_response", "Returned market identity does not match the selected event.", evidence);
-    }
+  // The estimate is attributable only when the response names the selected market and no other.
+  const ids = Array.isArray(data.markets) ? data.markets.map(v => object(v) ? (object(v.market_info) ? v.market_info.id : v.id) : null) : [];
+  if (ids.length === 0 || ids.some(id => String(id) !== String(market.id))) {
+    throw new CournotError("invalid_response", "Returned market identity does not match the selected event.", evidence);
   }
   const basis = nested?.basis ?? data.basis ?? null;
-  const times = sourceTimes(basis);
-  const age = times.length ? Math.max(0, Date.parse(evidence.receivedAt) - Math.min(...times.map(Date.parse))) : null;
+  // A time after receipt (a market's end, say) is not an observation, so it never makes data look fresh.
+  const received = Date.parse(evidence.receivedAt);
+  const times = sourceTimes(basis).filter(t => Date.parse(t) <= received);
+  const age = times.length ? received - Math.min(...times.map(Date.parse)) : null;
   return {
     market,
     exactClaim: market.title,
