@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import { evaluate, parseRequest, reportDigest, AGENT_CARD } from "./index.js";
 
-const port = Number(process.env.CIRCUIT_EVALUATOR_PORT ?? 15192);
+const port = Number(process.env.WATTNESS_EVALUATOR_PORT ?? 15192);
 if (!Number.isInteger(port) || port < 15191 || port > 15199) throw new Error("Use a spare fixture port 15191–15199");
 const server = createServer(async (req, res) => {
   res.setHeader("Content-Type", "application/json");
