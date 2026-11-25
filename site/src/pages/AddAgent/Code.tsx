@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { copyText } from "../../lib/clipboard";
 
+/** A code block on chrome, below the pane, with no frame; its lines wrap rather than scroll. Copy is a word, as on the Terminal. */
 export function Code({ label, code }: { label: string; code: string }) {
   const [copied, setCopied] = useState(false);
   useEffect(() => {
@@ -9,10 +10,10 @@ export function Code({ label, code }: { label: string; code: string }) {
     return () => window.clearTimeout(t);
   }, [copied]);
   return (
-    <figure className="gr-codeblock">
+    <figure className="ag-code">
       <figcaption>
-        <span className="eyebrow">{label}</span>
-        <button type="button" className="gr-codeblock__copy" onClick={async () => setCopied(await copyText(code))} aria-label={copied ? "Copied" : `Copy: ${label}`}>
+        <span className="ag-code__label">{label}</span>
+        <button type="button" className="ag-code__copy" onClick={async () => setCopied(await copyText(code))} aria-label={copied ? "Copied" : `Copy: ${label}`}>
           {copied ? "Copied" : "Copy"}
         </button>
       </figcaption>
