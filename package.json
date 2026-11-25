@@ -12,6 +12,7 @@
     "plan": "pnpm -s build:agent && node packages/agent/dist/cli/plan.js",
     "commit": "pnpm -s build:agent && node contracts/scripts/commit.ts",
     "verify": "pnpm -s build:agent && node packages/verifier/dist/cli.js",
+    "outcome": "pnpm -s build:agent && node packages/agent/dist/cli/outcome.js",
     "data:sync": "pnpm --filter @gatelock/data build && pnpm --filter @gatelock/data sync",
     "build:agent": "pnpm --filter @gatelock/agent... --filter @gatelock/verifier... build"
   },
