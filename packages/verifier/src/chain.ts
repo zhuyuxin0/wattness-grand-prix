@@ -150,6 +150,11 @@ export function rpcReader(network: NetworkInfo): ChainReader {
   const client: PublicClient = createPublicClient({
     transport: transports.length === 1 ? (transports[0] as ReturnType<typeof http>) : fallback(transports),
   });
+  return clientReader(client);
+}
+
+/** The same reads over any viem public client: an in-process chain in tests, a wallet's provider in a page. */
+export function clientReader(client: Pick<PublicClient, "getChainId" | "readContract" | "getTransaction" | "getTransactionReceipt" | "getBlock">): ChainReader {
   const call = <F extends "get" | "outcomeOf" | "keyOf" | "gateTs" | "dayEndTs">(
     address: Address,
     functionName: F,
