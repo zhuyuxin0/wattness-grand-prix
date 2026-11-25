@@ -1,0 +1,12 @@
+node_modules/
+dist/
+out/
+cache/
+artifacts/
+.hardhat/
+coverage/
+.env
+.env.*
+!.env.example
+CLAUDE.local.md
+.DS_Store
