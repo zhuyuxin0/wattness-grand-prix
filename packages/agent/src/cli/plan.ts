@@ -12,6 +12,7 @@ import { parseArgs } from "node:util";
 import { readSnapshot, type Snapshot } from "@gatelock/data";
 import { centralClock, gateUnix } from "@gatelock/engine";
 import { getAddress, type Hex } from "viem";
+import { describeReading, readLive, readSavedCall } from "../cournot.js";
 import { planDay, SHOWCASE } from "../plan-day.js";
 import { sourceState } from "../source.js";
 import { committerAddress, parseNetwork } from "../wallet.js";
@@ -25,7 +26,14 @@ const USAGE = `usage: pnpm plan --od YYYY-MM-DD [options]
   --plan-time UNIX       plan time (default: now); must be before the gate
   --offline              replay the syncs in out/<day>/sync with no network
   --out DIR              output directory (default: out/od-YYYYMMDD, or out/local/od-YYYYMMDD for local)
-  --wallet 0x...         committer address (default: from the network)`;
+  --wallet 0x...         committer address (default: from the network)
+  --erc8004-id ID        the planner's ERC-8004 agent id, written into every leaf (agent.erc8004_id)
+
+  The risk officer (gate-record.weather-stress.v1), read before the plan time is stamped:
+  --cournot FILE         a saved Cournot probability call; it is published beside the record
+  --cournot live --cournot-resolve FILE --cournot-market ID
+                         one probability call for market ID of a saved resolve response, then the plan
+  Whatever the call does, the plan proceeds; the manifest says whether the reading was applied and why.`;
 
 function findRepoRoot(from: string): string {
   for (let dir = resolve(from); ; dir = dirname(dir)) {
@@ -58,6 +66,10 @@ async function main(): Promise<number> {
       offline: { type: "boolean", default: false },
       out: { type: "string" },
       wallet: { type: "string" },
+      "erc8004-id": { type: "string" },
+      cournot: { type: "string" },
+      "cournot-resolve": { type: "string" },
+      "cournot-market": { type: "string" },
       help: { type: "boolean", short: "h", default: false },
     },
   });
@@ -93,6 +105,15 @@ async function main(): Promise<number> {
   const salt = (values.salt ?? (existsSync(saltFile) ? readFileSync(saltFile, "utf8").trim() : `0x${randomBytes(32).toString("hex")}`)) as Hex;
   if (!/^0x[0-9a-f]{64}$/.test(salt)) throw new Error("salt must be 0x and 64 lowercase hex digits");
   const wallet = values.wallet ? getAddress(values.wallet) : committerAddress(network);
+  const erc8004Id = values["erc8004-id"] ?? null;
+  // An ERC-8004 agent id is a token id: a decimal uint256.
+  if (erc8004Id !== null && !/^(0|[1-9][0-9]{0,77})$/.test(erc8004Id)) throw new Error("--erc8004-id must be a decimal agent id");
+  if (values.cournot === "live" && !(values["cournot-resolve"] && values["cournot-market"])) {
+    throw new Error("--cournot live needs --cournot-resolve FILE and --cournot-market ID");
+  }
+  if (values.cournot !== "live" && (values["cournot-resolve"] || values["cournot-market"])) {
+    throw new Error("--cournot-resolve and --cournot-market go with --cournot live");
+  }
 
   const snapshots = new Map<string, Snapshot>();
   if (values.offline) {
@@ -108,6 +129,20 @@ async function main(): Promise<number> {
   console.log(`plan time     ${givenPlanUnix === undefined ? "stamped once every input has loaded" : stamp(givenPlanUnix)}`);
   console.log(`network       ${network}, committer ${wallet}`);
   console.log(`source        tree ${source.tree}${source.dirty ? " (dirty working tree)" : ""}, HEAD ${source.commit ?? "none"}`);
+  if (erc8004Id !== null) console.log(`agent         ERC-8004 id ${erc8004Id}`);
+
+  // The risk officer reads Cournot before any input loads, so the observation precedes the plan time.
+  const cournot = values.cournot
+    ? values.cournot === "live"
+      ? await readLive({
+          resolveFile: resolve(cwd, values["cournot-resolve"] as string),
+          marketId: values["cournot-market"] as string,
+          operatingDay: od,
+          recordDir: out,
+        })
+      : readSavedCall(resolve(cwd, values.cournot), out)
+    : undefined;
+  if (cournot) console.log(`cournot       ${describeReading(cournot)}`);
   console.log("");
 
   const started = performance.now();
@@ -122,6 +157,8 @@ async function main(): Promise<number> {
     snapshots,
     offline: values.offline,
     log: (line) => console.log(line),
+    ...(cournot ? { cournot } : {}),
+    erc8004Id,
   });
 
   for (const l of day.leaves) {
@@ -140,6 +177,11 @@ async function main(): Promise<number> {
   for (const e of day.index.exclusions.slice(0, 10)) console.log(`  excluded    ${e.resource}: ${e.reason}`);
   if (day.index.exclusions.length > 10) console.log(`  ... ${day.index.exclusions.length - 10} more in manifest.json`);
   console.log(`root          ${day.index.root}`);
+  if (cournot) {
+    const leaves = day.leaves.map((l) => (l.manifest.outside_inputs as { cournot: { status: string; reason: string | null } }).cournot);
+    const applied = leaves.filter((c) => c.status === "applied").length;
+    console.log(`cournot       applied on ${applied} of ${leaves.length} leaves${applied < leaves.length ? `; first reason: ${leaves.find((c) => c.status !== "applied")?.reason}` : ""}`);
+  }
   console.log(`wrote         ${out}`);
   return 0;
 }

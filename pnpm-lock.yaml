@@ -147,6 +147,9 @@ importers:
       '@gatelock/core':
         specifier: workspace:*
         version: link:../core
+      '@gatelock/cournot':
+        specifier: workspace:*
+        version: link:../adapters/cournot
       '@gatelock/data':
         specifier: workspace:*
         version: link:../data
@@ -189,9 +192,16 @@ importers:
       '@gatelock/core':
         specifier: workspace:*
         version: link:../core
+      '@gatelock/cournot':
+        specifier: workspace:*
+        version: link:../adapters/cournot
       viem:
         specifier: 2.57.17
         version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+    devDependencies:
+      '@gatelock/engine':
+        specifier: workspace:*
+        version: link:../engine
 
 packages:
 
