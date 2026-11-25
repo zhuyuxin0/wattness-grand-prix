@@ -263,7 +263,7 @@
 .pw-arms__sealed {
   display: inline-grid;
   place-items: center;
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 @media (max-width: 719px) {
   .pw-arms__label {
@@ -450,7 +450,7 @@
   align-items: center;
   gap: 4px;
   font-size: var(--text-sm);
-  color: var(--teal);
+  color: var(--t-accent-text);
   text-decoration: none;
 }
 .pw-link:hover {
@@ -756,7 +756,7 @@
   font-size: 0.6875rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 
 /* ---------------------------------------------------------------- terms */

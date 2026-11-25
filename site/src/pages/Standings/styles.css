@@ -210,7 +210,7 @@
   opacity: 1;
 }
 .sd-table th.is-sorted {
-  color: var(--teal);
+  color: var(--t-accent-text);
 }
 
 /* fleet totals, pinned under the heads */
@@ -236,7 +236,7 @@
   font-size: 0.8125rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--bnb);
+  color: var(--seal-text);
   margin-right: 10px;
 }
 .sd-totals__n {
@@ -251,7 +251,7 @@
   margin-right: 3px;
 }
 .sd-root .hash__text {
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 
 .sd-row > td {
@@ -533,7 +533,7 @@
   border: 1px solid var(--teal-line);
   border-radius: var(--radius-md);
   background: transparent;
-  color: var(--teal);
+  color: var(--t-accent-text);
   font-size: var(--text-sm);
   font-weight: 600;
   text-decoration: none;

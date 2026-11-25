@@ -53,7 +53,7 @@
   text-decoration: none;
 }
 .gr-agent__links a:hover {
-  color: var(--teal);
+  color: var(--t-accent-text);
 }
 .gr-specs {
   margin: 0;
@@ -130,7 +130,7 @@
   padding: 0 10px;
   border: 1px solid var(--teal-line);
   border-radius: 13px;
-  color: var(--teal);
+  color: var(--t-accent-text);
   font-size: var(--text-xs);
   font-weight: 600;
   text-decoration: none;
@@ -205,7 +205,7 @@
   display: block;
 }
 .gr-code__value .is-tree {
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 .gr-code__value .is-pad {
   color: var(--faint);
@@ -260,7 +260,7 @@
   font-size: var(--text-xs);
 }
 .gr-ok {
-  color: var(--teal);
+  color: var(--t-accent-text);
 }
 .gr-bad {
   color: var(--refused);
@@ -341,7 +341,7 @@
   font-weight: 500;
   font-size: 2.5rem;
   line-height: 0.9;
-  color: var(--teal);
+  color: var(--t-accent-text);
 }
 .gr-step h3 {
   font-size: var(--text-lg);

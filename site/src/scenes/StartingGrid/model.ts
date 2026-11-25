@@ -28,7 +28,7 @@ import {
 } from "three";
 import { SHOWCASE, SOURCE_LINE } from "../../config";
 import type { BatterySummary, ChainReceipt, DayIndex, Receipts } from "../../data/types";
-import { color, font } from "../../design/tokens";
+import { font, stageColor as color } from "../../design/tokens";
 import { formatDay, shortHash } from "../../lib/format";
 import { formatInZone } from "../../lib/time";
 import { clamp01, easeInOut, easeOut, hashString, lerp, resolveText, smooth, span } from "../clock";
@@ -143,7 +143,7 @@ function numberAtlas(count: number): { texture: CanvasTexture; cols: number; row
   for (let i = 0; i < count; i++) {
     const cx = (i % cols) * cw + cw / 2;
     const cy = Math.floor(i / cols) * ch + ch / 2 + 2;
-    g.font = `600 ${i === 0 ? 38 : 32}px ${font.timing}`;
+    g.font = `600 ${i === 0 ? 38 : 32}px ${font.sans}`;
     g.fillStyle = i === 0 ? "#f6f7f8" : "#8b9198";
     g.fillText(String(i + 1), cx, cy);
   }

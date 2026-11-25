@@ -1,6 +1,6 @@
 import { Color, PerspectiveCamera, Scene, SRGBColorSpace, Vector2, Vector3, WebGLRenderer } from "three";
 import type { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
-import { color } from "../../design/tokens";
+import { stageColor as color } from "../../design/tokens";
 
 export type Quality = "low" | "medium" | "high";
 

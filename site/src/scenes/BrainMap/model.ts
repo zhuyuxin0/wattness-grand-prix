@@ -22,7 +22,7 @@ import {
   type Texture,
 } from "three";
 import type { TerminalEdge, TerminalNode } from "../../data/types";
-import { color } from "../../design/tokens";
+import { stageColor as color } from "../../design/tokens";
 import { clamp01, easeInOut, easeOut, hashString, seeded, smooth, span } from "../clock";
 import type { BrainMapData } from "../data";
 import { BRAIN_DURATION } from "../durations";

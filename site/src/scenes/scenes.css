@@ -201,7 +201,7 @@
 }
 
 .scene-clock[data-sealed="1"] {
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 
 .scene-meta {
@@ -219,7 +219,7 @@
 }
 
 .scene-meta[data-sealed="1"] b {
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 
 .scene-source {
@@ -318,7 +318,7 @@
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 
 .scene-receipt__head span:last-child {
@@ -326,7 +326,7 @@
 }
 
 .scene-receipt__lead {
-  color: var(--bnb) !important;
+  color: var(--seal-text) !important;
 }
 
 /* A tag hung to the left of its point: the rule sits on the right. */

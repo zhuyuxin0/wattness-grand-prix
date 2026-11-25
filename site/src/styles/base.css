@@ -1,3 +1,5 @@
+/* The page's base: the Terminal's ground, ink, faces and focus. */
+
 *,
 *::before,
 *::after {
@@ -12,100 +14,120 @@ html {
 html,
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
+  background: var(--t-pane);
+  color: var(--w-fg);
 }
 
 body {
-  font-family: var(--font-sans);
-  font-size: var(--text-md);
-  line-height: var(--leading);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs);
+  line-height: var(--t-lh);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
+/* Display headings take the brand face at 600; panes and sections take the
+   interface face. Never a thin weight. */
 h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-display);
-  color: var(--text-strong);
-  line-height: var(--leading-tight);
-  letter-spacing: var(--tracking-display);
   margin: 0;
+  color: var(--w-fg);
   font-weight: 600;
+  line-height: 1.2;
   text-wrap: balance;
 }
-
 h1 {
-  font-size: var(--text-4xl);
-  font-weight: 300;
+  font-family: var(--t-font-display);
+  font-size: var(--t-fs-display);
+  letter-spacing: -0.01em;
 }
 h2 {
-  font-size: var(--text-xl);
+  font-size: var(--t-fs-title);
 }
 h3 {
-  font-size: var(--text-lg);
+  font-size: var(--t-fs);
 }
 
 p {
   margin: 0;
 }
 
+/* Links are ink with a teal underline on light ground, teal on dark. */
 a {
-  color: inherit;
-  text-decoration-color: var(--border-strong);
-  text-underline-offset: 3px;
-  transition: color var(--dur-fast) var(--ease), text-decoration-color var(--dur-fast) var(--ease);
+  color: var(--t-link);
+  text-decoration-line: underline;
+  text-decoration-color: var(--t-accent-mark);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+  transition: color var(--m-dur-s) ease-out, text-decoration-color var(--m-dur-s) ease-out;
 }
 a:hover {
-  color: var(--text-strong);
-  text-decoration-color: var(--teal);
+  color: var(--w-fg);
 }
 
 :focus-visible {
-  outline: 2px solid var(--teal);
+  outline: 2px solid var(--t-focus);
   outline-offset: 2px;
-  border-radius: var(--radius-sm);
+}
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible {
+  outline: none;
 }
 
 ::selection {
-  background: var(--teal-dim);
-  color: var(--text-strong);
+  background: var(--t-selected);
+  color: var(--w-fg);
 }
 
-button {
+button,
+input,
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--t-thumb);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Code shapes only: hashes, roots, addresses, transaction ids, JSON. */
 code,
 kbd,
 samp,
 .mono {
-  font-family: var(--font-mono);
+  font-family: var(--t-font-code);
   font-size: 0.92em;
-  font-variant-numeric: tabular-nums;
 }
 
+/* Every figure that changes or lines up: the system face's tabular figures. The
+   brand's Libre Franklin has none. */
 .num {
   font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
 }
 
+/* An eyebrow: the one uppercase voice, at most one per section. */
 .eyebrow {
-  font-family: var(--font-sans);
-  font-size: var(--text-2xs);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs-xs);
   font-weight: 600;
-  letter-spacing: var(--tracking-caps);
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--w-muted);
 }
 
 .muted {
-  color: var(--muted);
+  color: var(--w-muted);
 }
 
 .visually-hidden {
@@ -115,4 +137,48 @@ samp,
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* A button in the Terminal's face: 28px, 4px corners, raised above the pane. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--t-ctl-h);
+  padding: 0 10px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  box-shadow: var(--t-shadow-1);
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--m-dur-s) ease-out, border-color var(--m-dur-s) ease-out;
+}
+.btn:hover {
+  background: color-mix(in srgb, var(--w-fg) 4%, var(--t-raised));
+  color: var(--w-fg);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+/* The one primary action per view: teal, near-black ink. */
+.btn--primary {
+  height: 32px;
+  padding: 0 16px;
+  border-color: transparent;
+  background: var(--w-accent);
+  color: var(--w-accent-ink);
+  font-size: var(--t-fs);
+  font-weight: 600;
+  box-shadow: none;
+}
+.btn--primary:hover {
+  background: var(--w-accent-hover);
+  color: var(--w-accent-ink);
 }

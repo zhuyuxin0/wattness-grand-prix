@@ -63,7 +63,7 @@
   font-weight: 600;
   letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
-  color: var(--teal);
+  color: var(--t-accent-text);
   margin-bottom: var(--space-5);
 }
 .rw-hero__kicker::before {
@@ -101,7 +101,7 @@
   }
 }
 .rw-hero__clock .countdown__label {
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 
 /* ---------------------------------------------------------------- the board */
@@ -183,7 +183,7 @@
   font-variant-numeric: tabular-nums;
 }
 .metric--sealed .metric__value {
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 .metric--refused .metric__value {
   color: var(--refused);
@@ -242,7 +242,7 @@
   margin-right: 4px;
 }
 .sealclock__label b.is-sealed {
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 .sealclock__label--end {
   transform: translateX(calc(-100% - 8px));
@@ -299,7 +299,7 @@
   font-size: 0.8125rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--bnb);
+  color: var(--seal-text);
   white-space: nowrap;
 }
 .sealclock__tick {
@@ -448,7 +448,7 @@
   font-family: var(--font-timing);
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 .board__row .align-right {
   text-align: right;
@@ -580,10 +580,10 @@
   color: var(--muted);
 }
 .strip__status--sealed {
-  color: var(--bnb);
+  color: var(--seal-text);
 }
 .strip__status--live {
-  color: var(--teal);
+  color: var(--t-accent-text);
 }
 .strip__status--next {
   color: var(--text);
@@ -643,7 +643,7 @@
   align-items: center;
   gap: 4px;
   font-size: var(--text-sm);
-  color: var(--teal);
+  color: var(--t-accent-text);
   text-decoration: none;
   align-self: start;
 }
@@ -773,7 +773,7 @@
   font-family: var(--font-timing);
   font-weight: 700;
   font-size: 1.5rem;
-  color: var(--teal);
+  color: var(--t-accent-text);
   padding-right: var(--space-5);
   border-right: 1px solid var(--border);
 }
@@ -805,7 +805,7 @@
   align-items: center;
   gap: 4px;
   font-size: var(--text-sm);
-  color: var(--teal);
+  color: var(--t-accent-text);
   white-space: nowrap;
 }
 @media (max-width: 719px) {
@@ -826,7 +826,7 @@
   align-items: center;
   gap: 4px;
   font-size: var(--text-sm);
-  color: var(--teal);
+  color: var(--t-accent-text);
   text-decoration: none;
   justify-self: start;
 }

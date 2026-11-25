@@ -57,7 +57,7 @@
   font-family: var(--font-timing);
   font-weight: 600;
   font-size: 0.9375rem;
-  color: var(--teal);
+  color: var(--t-accent-text);
 }
 .pd-steps h3 {
   font-size: var(--text-xl);
@@ -125,11 +125,11 @@
 }
 .pd-vocab__link svg {
   margin-left: 4px;
-  color: var(--teal);
+  color: var(--t-accent-text);
   vertical-align: -1px;
 }
 .pd-vocab__link:hover {
-  color: var(--teal);
+  color: var(--t-accent-text);
 }
 @media (max-width: 899px) {
   .pd-vocab {
@@ -417,7 +417,7 @@
   color: var(--muted);
 }
 .pd-road li:first-child .pd-road__lap {
-  color: var(--teal);
+  color: var(--t-accent-text);
 }
 .pd-road h3 {
   font-size: var(--text-lg);
