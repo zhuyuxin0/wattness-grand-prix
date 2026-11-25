@@ -1,12 +1,24 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { parseArgs } from "node:util";
 import { createPublicClient, formatUnits, http, parseAbi } from "viem";
 import { bscTestnet } from "viem/chains";
 import { loadSecrets } from "@gatelock/core/secrets";
 import { AtlasClient, CmcClient, TESTNET_SINGLE_FEED, checkPrice, fundingDecision, sanitize } from "./index.js";
 import type { AuditRecord, Price, SecurityCoverage } from "./index.js";
 
-const evidenceDirectory = resolve(process.cwd(), "../../../evidence/atlas-cmc");
+// The default is the repository's evidence/atlas-cmc, whatever the working directory.
+const { values: options } = parseArgs({ options: { out: { type: "string" } } });
+const evidenceDirectory = options.out ? resolve(options.out) : fileURLToPath(new URL("../../../../evidence/atlas-cmc/", import.meta.url));
+const local = (iso: string, timeZone: string): string => {
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+    timeZone, hourCycle: "h23", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit", timeZoneName: "short",
+  }).formatToParts(new Date(iso)).map(x => [x.type, x.value]));
+  return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second} ${parts.timeZoneName}`;
+};
+const stamped = (iso: string) => ({ observedAt: iso, observedAtCt: local(iso, "America/Chicago"), observedAtBangkok: local(iso, "Asia/Bangkok") });
 const audit: AuditRecord[] = [];
 const keys = loadSecrets(["ATLAS_API_KEY", "CMC_PRO_API_KEY"]);
 const secrets = [keys.ATLAS_API_KEY, keys.CMC_PRO_API_KEY];
@@ -59,7 +71,7 @@ const decision = atlasResult && cmcResult
   ? await attempt("Funding policy", async () => fundingDecision({ treasuryBnb: .25, atlas: atlasResult.prices, cmc: cmcResult, security, now }))
   : null;
 const packet = {
-  observedAt: new Date().toISOString(),
+  ...stamped(new Date().toISOString()),
   stage: "Live sponsor integration; reference-denominated planning only",
   treasuryInput: { bnbQuantity: .25, origin: "Declared demonstration planning budget, not an asserted wallet balance", evaluationPriceUsdCents: 200 },
   before: { state: "unpriced", evaluationBudgetUsdCents: null, evaluationCount: null, reason: "Await fresh signed prices and market/risk evidence" },
@@ -76,7 +88,7 @@ const packet = {
   transactions: [],
 };
 await mkdir(evidenceDirectory, { recursive: true });
-await writeFile(resolve(evidenceDirectory, "live-requests.json"), JSON.stringify(sanitize(audit, secrets), null, 2) + "\n");
+await writeFile(resolve(evidenceDirectory, "live-requests.json"), JSON.stringify(sanitize(audit.map(({ observedAt, ...rest }) => ({ ...stamped(observedAt), ...rest })), secrets), null, 2) + "\n");
 await writeFile(resolve(evidenceDirectory, "funding-decision.json"), JSON.stringify(sanitize(packet, secrets), null, 2) + "\n");
-console.log(JSON.stringify({ requests: audit.length, signedAtlas: !!atlasResult, cmcQuotes: !!cmcResult, cmcSecurity: !!securityResult, testnetRead: !!chainResult, testnetPricingEligible: chainResult?.pricingEligible ?? false, decision, failures }, null, 2));
-if (!atlasResult || !cmcResult) process.exitCode = 1;
+console.log(JSON.stringify({ evidenceDirectory, requests: audit.length, signedAtlas: !!atlasResult, cmcQuotes: !!cmcResult, cmcSecurity: !!securityResult, testnetRead: !!chainResult, testnetPricingEligible: chainResult?.pricingEligible ?? false, decision, failures }, null, 2));
+if (!atlasResult || !cmcResult || !decision) process.exitCode = 1;

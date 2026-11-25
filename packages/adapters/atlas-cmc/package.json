@@ -5,6 +5,6 @@
   "type": "module",
   "license": "MIT",
   "exports": {".": {"types": "./dist/index.d.ts", "default": "./dist/index.js"}},
-  "scripts": {"build": "tsc -p tsconfig.json", "test": "vitest run", "live": "node dist/live.js"},
+  "scripts": {"build": "tsc -p tsconfig.json", "test": "vitest run", "typecheck": "tsc -p tsconfig.test.json", "live": "node dist/live.js"},
   "dependencies": {"@gatelock/core": "workspace:*", "viem": "2.57.17"}
 }
