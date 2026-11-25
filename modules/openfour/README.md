@@ -1,41 +1,84 @@
-# OpenFour discovery and encoding
+# OpenFour: evidence-gated graduation
 
-This MIT package verifies OpenFour's deployed BSC testnet wiring and reproduces the struct-encoding boundary needed by custom launch modules. It uses a public client, no wallet and an allowlist of read-only RPC methods.
+This MIT package holds an OpenFour migrate responsibility that graduates an agent's launch only when the agent's sealed plan is on record, the read client the site's launch tower uses, and the read-only discovery probe and tuple encoder it builds on.
 
-## OpenFour Integration
+## The migrate module
 
-The probe reads Registry, Core, Tools, ERC1967 implementation slots, active presets, module beacons, actual implementation addresses, descriptors and schemas at one fixed block. Evidence preserves each public request/response, observation time and failure. It does not create a token or claim that a launch is complete.
+`contracts/EvidenceGatedMigrateModule.sol` (tag `module.migrate.evidence_gated`) replaces Migrate in a Bonding V1 preset and keeps the standard Token, Vault, Curve and Trade. A launch graduates only when both of these hold when the migration executes:
 
-## Run
+1. **Liquidity.** The vault's own predicate, read from the vault rather than from Core's context: `isSoldOut()` (predicate 0), or `totalRaised()` at least a quote floor (predicate 1).
+2. **Evidence.** A GateRecord record bound to this launch, looked up under the launch's agent, its scope and an operating day. Its committer, scope, day and root must all match, it must cover at least `minLeafCount` batteries, it must have been committed before that day's gate, and, when set, its code hash must match and a settlement outcome must be linked. A root on its own never qualifies: the record is found by `keyOf(agent, scope, od)`, so only the agent's own sealed record can satisfy it.
+
+Graduation moves the vault's remaining tokens and its raised quote into an empty PancakeSwap V2 pair and mints the LP to `0x…dEaD`. `executeMigration` returns version 1, `abi.encode(pair)`, the payload of the standard V2 migrate.
+
+### Parameters
+
+`migrateParams` is one ABI tuple, decoded with `abi.decode(raw, (Params))`, in this order. `moduleEncodeSchema()` publishes the same fields for `encodeModuleParams`.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `agent` | address | The wallet that seals the agent's plans in GateRecord |
+| `scope` | bytes32 | GateRecord scope, `keccak256` of its label (default `gate-record/ercot-da-energy`) |
+| `minOd` | uint32 | Earliest qualifying operating day, YYYYMMDD |
+| `minLeafCount` | uint32 | Batteries the record must cover |
+| `codeHash` | bytes32 | Required record code hash; zero accepts any |
+| `outcomeStage` | uint8 | 0: the sealed record; 1, 2, 3: that settlement stage must also be linked |
+| `liquidityPredicate` | uint8 | 0: sold out; 1: raised at least `minQuoteRaised` |
+| `minQuoteRaised` | uint256 | Quote floor for predicate 1; 0 with predicate 0 |
+
+The GateRecord address and the V2 factory are constructor arguments of the implementation, so a launch cannot point the gate at another record source.
+
+### Calls
+
+| Call | Who | What |
+| --- | --- | --- |
+| `bindEvidence(od, root)` | the agent or the token's creator | Checks the record and binds it; reverts with the check that fails |
+| `verifyEvidence(od, root)` | anyone, `eth_call` | The key a binding would store, or the same revert |
+| `graduate()` | anyone | Asks Core to migrate now; reverts with the missing condition (`LiquidityNotReady`, `EvidenceMissing`, `EvidenceRootMismatch`, …) |
+| `status()`, `params()`, `evidence()` | anyone | Reads for the launch tower |
+
+Outside `graduate()`, `evaluate()` answers false until both conditions hold, so a missing record never reverts the buy that sells out the sale. When the record is bound first, that buy graduates the launch in the same transaction.
+
+Events: `EvidenceBound(token, agent, key, od, root, boundBy)` and `Graduated(token, pair, evidenceKey, tokenAmount, quoteAmount, liquidity)`.
+
+## Launch tower reads
+
+`src/launch-tower.ts`, exported as `@gatelock/openfour/launch-tower`, reads one launch at one block with `eth_call` only and runs in the browser:
+
+```ts
+import { readLaunchTower } from "@gatelock/openfour/launch-tower";
+
+const tower = await readLaunchTower(publicClient, { core, token });
+tower.blockers; // [] | ["liquidity"] | ["evidence"] | ["liquidity", "evidence"]
+tower.record;   // the bound GateRecord record, read from GateRecord
+tower.pool;     // pair, reserves and LP at 0x…dEaD after graduation
+```
+
+`explainRevert(data)` names a revert from the module or GateRecord.
+
+## Build and test
 
 From the repository root:
 
 ```sh
 pnpm --filter @gatelock/openfour build
 pnpm --filter @gatelock/openfour test
-pnpm --filter @gatelock/openfour probe
+pnpm --filter @gatelock/openfour typecheck
 ```
 
-The probe writes `evidence/openfour/testnet-probe.json`. To write a separate observation at an existing block, run from this package:
+Contracts compile with Hardhat (solc 0.8.28, cancun, optimizer 200, via IR). The tests run in vitest on Hardhat's in-process chain against the real GateRecord, compiled from `@gatelock/contracts`, and test doubles for Core, the vault, the token and a V2 pair.
+
+## Discovery probe and encoding
+
+`src/probe.ts` reads OpenFour's BSC testnet Registry, Core, Tools, proxy implementation slots, presets, module implementations, descriptors and schemas at one block, through an allowlist of read-only RPC methods:
 
 ```sh
-node dist/probe.js ../../evidence/openfour/<name>.json <block>
+pnpm --filter @gatelock/openfour probe
+node dist/probe.js <output.json> <block>
 ```
 
-The first argument is an output path; the optional second argument is a fixed block number. The RPC is fixed to the public chain-97 endpoint. There is no send-transaction or signing path.
-
-## Module parameter encoding
-
-`encodeModuleParams(schema, values)` expects already-typed values in contract units, in schema order. It encodes **one tuple** to match Solidity's `abi.decode(raw, (Params))`; no parameters means `0x`.
-
-Five tests cover dynamic string/bytes round-trip, rejection of a flat-root encoding, static-only layouts, field-count checks and empty schemas. This is an encoding utility, not a complete form validator or launch module.
-
-## Files
-
-- `src/probe.ts`: original read-only discovery client, chain check and RPC-method allowlist.
-- `src/schema.ts`: original single-tuple module encoder/decoder.
-- `test/schema.test.ts`: single-tuple encoding tests.
+`encodeModuleParams(schema, values)` in `src/schema.ts` encodes values already in contract units, in schema order, as **one tuple**, matching `abi.decode(raw, (Params))`; no parameters encode as `0x`.
 
 ## Licensing
 
-The code in this package is original MIT code. ABI shapes and addresses come from the public OpenFour interfaces and testnet deployment. No OpenFour code is vendored here.
+All code here is original and MIT. The OpenFour structures are declared in `contracts/interfaces/OpenFour.sol` from the public interfaces' ABI; no OpenFour file is copied.
