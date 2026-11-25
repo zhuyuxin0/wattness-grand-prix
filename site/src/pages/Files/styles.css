@@ -1,0 +1,10 @@
+/* Files. */
+
+.files-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.files-link .glyph {
+  color: var(--w-muted);
+}
