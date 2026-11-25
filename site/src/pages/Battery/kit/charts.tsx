@@ -118,7 +118,8 @@ export function FanChart({
 
 /**
  * Columns that go both ways from zero, one plan's: power (discharge up, charge
- * down) or contracts (sold up, bought down). Labels name the two directions.
+ * down) or contracts (sold up, bought down). The chart's unit line names the two
+ * directions, so no label sits where an early or late hour's column can be.
  */
 export function ColumnsChart({
   title,
@@ -128,8 +129,6 @@ export function ColumnsChart({
   plan,
   maxAbs,
   limit,
-  up,
-  down,
   empty,
   height = 180,
   label,
@@ -144,8 +143,6 @@ export function ColumnsChart({
   maxAbs: number;
   /** A physical limit drawn either way (the battery's power). */
   limit?: number;
-  up: string;
-  down: string;
   /** Shown when every value is zero. */
   empty?: string;
   height?: number;
@@ -173,13 +170,6 @@ export function ColumnsChart({
           describedBy={tableId}
           overlay={() => (
             <g className="pk-note">
-              {/* Just inside the frame's top and bottom lines, clear of them and of a limit drawn there. */}
-              <text x={MARGIN.left + 4} y={MARGIN.top + 12}>
-                {up}
-              </text>
-              <text x={MARGIN.left + 4} y={height - MARGIN.bottom - 5}>
-                {down}
-              </text>
               {none && empty && (
                 <text className="pk-empty" x={(width + MARGIN.left - MARGIN.right) / 2} y={y(0) - 10} textAnchor="middle">
                   {empty}

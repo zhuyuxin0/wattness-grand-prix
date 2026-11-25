@@ -207,12 +207,10 @@ export default function HedgePage() {
                       <ColumnsChart
                         key={p}
                         title={<PlanName plan={p} sealed={p === sealed} />}
-                        unit="contracts of 1 MWh"
+                        unit="contracts of 1 MWh, sold above zero and bought below"
                         values={figs[p]!.arm.contracts}
                         plan={p}
                         maxAbs={maxQ}
-                        up="Sell"
-                        down="Buy"
                         height={narrow ? 150 : 160}
                         label={`Plan ${p} contracts by hour: sold above zero, bought below`}
                         tableId={TABLE_ID}

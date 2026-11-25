@@ -162,13 +162,11 @@ export default function BatteryPage() {
                 />
                 <ColumnsChart
                   title="Schedule"
-                  unit={`MW, plan ${active}; the lines mark the battery's ${Math.round(desk.maxPowerKw / 1000)} MW limit`}
+                  unit={`MW, plan ${active}: discharge above zero, charge below; the lines mark the battery's ${Math.round(desk.maxPowerKw / 1000)} MW limit`}
                   values={fig.mw}
                   plan={active}
                   maxAbs={desk.maxPowerKw / 1000}
                   limit={desk.maxPowerKw / 1000}
-                  up="Discharge"
-                  down="Charge"
                   label={`Plan ${active} schedule in MW by hour: discharge above zero, charge below`}
                   tableId={TABLE_ID}
                   height={190}
@@ -193,12 +191,10 @@ export default function BatteryPage() {
                 />
                 <ColumnsChart
                   title="Hedge"
-                  unit={`contracts of 1 MWh at ${desk.hub}, plan ${active}`}
+                  unit={`contracts of 1 MWh at ${desk.hub}, plan ${active}: sold above zero, bought below`}
                   values={fig.arm.contracts}
                   plan={active}
                   maxAbs={maxQ}
-                  up="Sell"
-                  down="Buy"
                   empty={`Plan ${active} holds no contracts`}
                   label={`Plan ${active} hedge in contracts by hour: sold above zero, bought below`}
                   tableId={TABLE_ID}
