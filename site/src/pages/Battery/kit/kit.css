@@ -1,0 +1,687 @@
+/* The Battery and agent tabs' shared pieces, in the Terminal's grammar: one
+   surface level, hairline rules, sentence-case labels, tabular figures, plan
+   colors on marks only (never on words), teal for selection alone. */
+
+/* ---------------------------------------------------------------- the flow line */
+
+.pk-flow {
+  display: block;
+  margin-top: var(--t-space-2);
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.pk-tablink {
+  color: var(--t-link);
+  font-weight: 500;
+}
+
+/* ---------------------------------------------------------------- plans */
+
+.pk-plan {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.pk-plan__swatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--plan);
+}
+.pk-plan__name {
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.pk-plan__label {
+  color: var(--w-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pk-plan__sealed {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--seal-text);
+}
+
+/* The plan selector: the shared .seg, with each plan's swatch. */
+.pk-seg {
+  height: auto;
+  min-height: var(--t-ctl-h);
+  max-width: 100%;
+}
+.pk-seg button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--t-ctl-h);
+  font-size: var(--t-fs-sm);
+}
+.pk-seg button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.pk-seg__name {
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.pk-seg button[aria-pressed="true"] .pk-seg__label {
+  color: var(--w-fg);
+  font-weight: 400;
+}
+@media (max-width: 767px) {
+  .pk-seg {
+    display: grid;
+    width: 100%;
+  }
+  .pk-seg button {
+    justify-content: flex-start;
+    min-height: 36px;
+    padding: 0 var(--t-space-4);
+  }
+  .pk-seg button + button {
+    border-left: 0;
+    border-top: 1px solid var(--w-border);
+  }
+  /* On a stacked list the chosen row takes the side mark, as a selected row does. */
+  .pk-seg button[aria-pressed="true"] {
+    box-shadow: var(--t-mark-edge);
+  }
+}
+
+/* ---------------------------------------------------------------- toolbar */
+
+.pk-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-4) var(--gp-space-7);
+}
+.pk-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: var(--t-space-3);
+  min-width: 0;
+  max-width: 100%;
+}
+.pk-toolbar__label {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+@media (max-width: 767px) {
+  .pk-toolbar__group {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: var(--t-space-2);
+  }
+}
+
+/* ---------------------------------------------------------------- the lead */
+
+/* One clear lead per tab: what was sealed, and the figure that decided it. */
+.pk-lead {
+  display: grid;
+  gap: var(--t-space-5);
+}
+.pk-lead__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--t-space-2) var(--t-space-4);
+  font-size: var(--t-fs-title);
+}
+.pk-lead__line .pk-plan__name {
+  font-size: var(--t-fs-title);
+}
+.pk-lead__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+  color: var(--seal-text);
+}
+.pk-lead__figure {
+  display: grid;
+  gap: var(--t-space-1);
+}
+.pk-lead__value {
+  font-size: var(--gp-fs-hero);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--w-fg);
+}
+.pk-lead__caption {
+  font-size: var(--t-fs);
+  color: var(--w-muted);
+  max-width: 72ch;
+}
+@media (max-width: 600px) {
+  .pk-lead__value {
+    font-size: 28px;
+  }
+}
+@media (max-width: 719px) {
+  .pk-lead .stat-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--t-space-4);
+  }
+  .pk-lead .stat-row > .stat {
+    padding-right: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- facts */
+
+.pk-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  column-gap: var(--t-space-6);
+}
+.pk-fact--wide {
+  grid-column: span 2;
+}
+@media (max-width: 600px) {
+  .pk-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--t-space-4);
+  }
+}
+.pk-fact {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: var(--t-space-3) 0;
+  border-top: 1px solid var(--t-rule);
+  min-width: 0;
+}
+.pk-fact dt {
+  display: flex;
+  align-items: center;
+  gap: var(--t-space-2);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.pk-fact dd {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+  font-size: var(--t-fs);
+  color: var(--w-fg);
+  overflow-wrap: anywhere;
+}
+.pk-fact__note {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.pk-tag {
+  display: inline-block;
+  padding: 0 5px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-xs);
+  font-size: var(--t-fs-2xs);
+  font-weight: 500;
+  line-height: 14px;
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- figures */
+
+.pk-figure {
+  margin: 0;
+  display: grid;
+  gap: var(--t-space-2);
+  min-width: 0;
+}
+.pk-figure__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--t-space-3);
+}
+.pk-figure__title {
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs);
+  font-weight: 600;
+}
+.pk-figure__unit {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.pk-figure__plot {
+  width: 100%;
+  min-width: 0;
+}
+
+.pk-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px var(--t-space-5);
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.pk-key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pk-key__mark {
+  flex: none;
+  display: inline-block;
+}
+.pk-key--line .pk-key__mark {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--plan, var(--w-fg));
+}
+.pk-key--ghost .pk-key__mark {
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--pk-ghost);
+}
+.pk-key--path .pk-key__mark {
+  width: 14px;
+  height: 1px;
+  background: color-mix(in srgb, var(--w-fg) 45%, transparent);
+}
+.pk-key--bar .pk-key__mark {
+  width: 8px;
+  height: 10px;
+  border-radius: 2px 2px 0 0;
+  background: var(--plan, var(--w-fg));
+}
+.pk-key--band .pk-key__mark {
+  width: 12px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--pk-band-90);
+}
+.pk-key--band-inner .pk-key__mark {
+  width: 12px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--pk-band-50);
+}
+.pk-key--dot .pk-key__mark {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--plan, var(--w-fg));
+}
+
+/* The chart's own tokens, from the theme's ink, so both themes get their own steps. */
+.pk-figure,
+.pk-legend,
+.pk-readout,
+.pk-chart {
+  --pk-band-90: color-mix(in srgb, var(--w-fg) 8%, transparent);
+  --pk-band-50: color-mix(in srgb, var(--w-fg) 15%, transparent);
+  --pk-ghost: color-mix(in srgb, var(--w-muted) 55%, transparent);
+  --pk-path: color-mix(in srgb, var(--w-fg) 11%, transparent);
+}
+
+.pk-chart {
+  display: block;
+  overflow: visible;
+  touch-action: pan-y;
+  cursor: crosshair;
+  font-family: var(--w-font-sans);
+}
+.pk-chart:focus-visible {
+  outline-offset: 4px;
+}
+.pk-grid line {
+  stroke: var(--ch-grid);
+  stroke-width: 1;
+}
+.pk-grid line.pk-grid__base {
+  stroke: var(--ch-axis);
+}
+.pk-grid text,
+.pk-axis text {
+  font-size: var(--t-fs-2xs);
+  fill: var(--w-muted);
+  font-variant-numeric: tabular-nums;
+}
+.pk-hour {
+  fill: var(--t-hover);
+}
+.pk-band-90 {
+  fill: var(--pk-band-90);
+}
+.pk-band-50 {
+  fill: var(--pk-band-50);
+}
+.pk-path {
+  fill: none;
+  stroke: var(--pk-path);
+  stroke-width: 1;
+}
+.pk-ink {
+  fill: none;
+  stroke: var(--w-fg);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.pk-ink--muted {
+  stroke: var(--w-muted);
+  stroke-width: 1.5;
+}
+.pk-ghost {
+  fill: none;
+  stroke: var(--pk-ghost);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.pk-line {
+  fill: none;
+  stroke: var(--plan);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.pk-area {
+  fill: var(--plan);
+  opacity: 0.1;
+}
+.pk-bar {
+  fill: var(--plan);
+}
+.pk-bar.is-dim {
+  opacity: 0.45;
+}
+.pk-dot {
+  fill: var(--plan, var(--w-fg));
+  stroke: var(--t-pane);
+  stroke-width: 2;
+}
+.pk-dot--ink {
+  fill: var(--w-fg);
+}
+.pk-dot--muted {
+  fill: var(--w-muted);
+}
+.pk-limit {
+  stroke: var(--ch-axis);
+  stroke-width: 1;
+}
+.pk-range {
+  fill: color-mix(in srgb, var(--w-fg) 4%, transparent);
+}
+.pk-note text,
+.pk-note {
+  font-size: var(--t-fs-2xs);
+  fill: var(--w-muted);
+}
+.pk-note .is-strong {
+  fill: var(--w-fg);
+  font-weight: 600;
+}
+.pk-empty {
+  font-size: var(--t-fs-sm);
+  fill: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- readout */
+
+.pk-readout {
+  display: grid;
+  gap: var(--t-space-3);
+  padding: var(--t-space-4) 0;
+  border-bottom: 1px solid var(--t-rule);
+}
+.pk-readout__when {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--t-space-3);
+  min-height: 20px;
+}
+.pk-readout__time {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.pk-readout__hint {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.pk-readout__vals {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: var(--t-space-3) var(--t-space-5);
+}
+@media (max-width: 600px) {
+  .pk-readout__vals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.pk-readout__val {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.pk-readout__val dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pk-readout__val dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 5px;
+}
+.pk-readout__num {
+  font-size: var(--t-fs-stat);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--w-fg);
+}
+.pk-readout__unit {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.pk-readout__sub {
+  flex-basis: 100%;
+  min-height: 16px;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------------------------------------------------------------- meters */
+
+.pk-meters {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+.pk-meter {
+  display: grid;
+  grid-template-columns: minmax(0, 15em) minmax(60px, 1fr) auto;
+  align-items: center;
+  gap: var(--t-space-4);
+  min-height: var(--t-row);
+  padding: var(--t-space-2) 0;
+  border-top: 1px solid var(--t-rule);
+}
+.pk-meter__name {
+  min-width: 0;
+  font-size: var(--t-fs-sm);
+}
+.pk-meter__track {
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--plan, var(--w-fg)) 16%, transparent);
+  overflow: hidden;
+}
+.pk-meter__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--plan, var(--w-fg));
+}
+.pk-meter__figure {
+  font-size: var(--t-fs-sm);
+  color: var(--w-fg);
+  text-align: right;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .pk-meter {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: var(--t-space-2);
+  }
+  .pk-meter__track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+/* ---------------------------------------------------------------- disclosure */
+
+.pk-details > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--t-space-2);
+  min-height: var(--t-ctl-h);
+  padding: 0;
+  font-size: var(--t-fs-sm);
+  font-weight: 500;
+  color: var(--w-muted);
+  cursor: pointer;
+  list-style: none;
+}
+.pk-details > summary::-webkit-details-marker {
+  display: none;
+}
+.pk-details > summary:hover {
+  color: var(--w-fg);
+}
+.pk-details .pk-details__open,
+.pk-details[open] .pk-details__closed {
+  display: none;
+}
+.pk-details[open] .pk-details__open {
+  display: inline-block;
+}
+.pk-details > .gp-table {
+  margin-top: var(--t-space-3);
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.pk-two {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gp-space-7);
+}
+@media (min-width: 1000px) {
+  .pk-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.pk-three {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--t-space-6) var(--gp-space-7);
+}
+@media (min-width: 1000px) {
+  .pk-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.pk-stack {
+  display: grid;
+  gap: var(--t-space-6);
+  min-width: 0;
+}
+.pk-prose {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--t-space-3);
+  max-width: 72ch;
+  font-size: var(--t-fs);
+  line-height: var(--t-lh-prose);
+  color: var(--w-fg);
+}
+.pk-scope {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  max-width: 96ch;
+}
+
+/* Recording mode: no fades between states. */
+[data-capture="1"] .pk-chart * {
+  transition: none !important;
+}
+
+/* A sealed row: the seal's tint and its yellow edge, never the teal selection. */
+.pk-sealed-rows tr.is-highlighted {
+  background: var(--seal-tint);
+}
+.pk-sealed-rows tr.is-highlighted td:first-child {
+  box-shadow: var(--seal-edge);
+}
+.pk-key--ring .pk-key__mark {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--plan, var(--w-fg));
+}
+.pk-key--tick .pk-key__mark {
+  width: 2px;
+  height: 12px;
+  border-radius: 1px;
+  background: var(--w-fg);
+}
+.pk-lead__unit {
+  font-size: var(--t-fs-title);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--w-muted);
+}
+
+/* Phones: tables keep their columns by giving up cell padding, not the page's width. */
+@media (max-width: 600px) {
+  .pk-tight td {
+    padding: 0 6px;
+  }
+  .pk-tight thead th > span,
+  .pk-tight .gp-table__sort {
+    padding: 0 6px;
+    gap: 2px;
+  }
+  .pk-tight td:first-child,
+  .pk-tight thead th:first-child > span,
+  .pk-tight thead th:first-child .gp-table__sort {
+    padding-left: 4px;
+  }
+}
