@@ -122,14 +122,27 @@ export function formatInZone(unix: number, timeZone: string, opts: { seconds?: b
   return opts.date === false ? time : `${MONTHS[w.month - 1]} ${w.day}, ${time}`;
 }
 
+/** The reader's own zone, from the browser; market time when it cannot be read. */
+export const READER_TZ: string = (() => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || CENTRAL_TZ;
+  } catch {
+    return CENTRAL_TZ;
+  }
+})();
+
 export interface DualTime {
   ct: string;
+  /** The reader's own clock, "21:15 yours", or null when it reads the same as CT. */
+  yours: string | null;
   bangkok: string;
 }
 
-/** Market time first, Bangkok (the event's clock) beside it. */
+/** Market time first, the reader's own beside it. Never UTC. */
 export function dualTime(unix: number, opts: { seconds?: boolean; date?: boolean } = {}): DualTime {
-  return { ct: `${formatInZone(unix, CENTRAL_TZ, opts)} CT`, bangkok: `${formatInZone(unix, BANGKOK_TZ, opts)} Bangkok` };
+  const ct = formatInZone(unix, CENTRAL_TZ, opts);
+  const own = formatInZone(unix, READER_TZ, opts);
+  return { ct: `${ct} CT`, yours: own === ct ? null : `${own} yours`, bangkok: `${formatInZone(unix, BANGKOK_TZ, opts)} Bangkok` };
 }
 
 /** "Thu, Nov 26, 2026" for an operating day. */

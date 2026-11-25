@@ -43,7 +43,7 @@ export function Receipt({ receipt: r, compact = false, className }: ReceiptProps
           <dt>Block time</dt>
           <dd className="receipt__time num">
             <span>{t.ct}</span>
-            <span className="muted">{t.bangkok}</span>
+            {t.yours && <span className="muted">{t.yours}</span>}
           </dd>
         </div>
         <div>

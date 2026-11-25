@@ -10,7 +10,7 @@ interface CountdownProps {
   /** Count to this gate (unix seconds) instead of the next 10:00 CT. */
   gateUnix?: number;
   size?: "sm" | "md" | "lg";
-  /** Hide the gate's CT and Bangkok times and the operating day. */
+  /** Hide the gate's time (CT and the reader's own) and the operating day. */
   bare?: boolean;
   label?: string;
   className?: string;
@@ -54,7 +54,7 @@ export function Countdown({ now: fixed, gateUnix, size = "md", bare = false, lab
       {!bare && (
         <span className="countdown__meta">
           <span>{t.ct}</span>
-          <span className="muted">{t.bangkok}</span>
+          {t.yours && <span className="muted">{t.yours}</span>}
           {operatingDay && <span className="muted">bids for {formatOperatingDay(operatingDay)}</span>}
         </span>
       )}
