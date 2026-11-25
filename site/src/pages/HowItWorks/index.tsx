@@ -1,199 +1,205 @@
 import { Link } from "react-router-dom";
-import { CONTRACT_ADDRESS, REPO_URL, TERMINAL_URL } from "../../config";
+import { CONTRACT_ADDRESS, REPO_URL, SHADOW_NOTE, TERMINAL_URL } from "../../config";
 import { useDay, type DayIndex } from "../../data";
 import { formatInt } from "../../lib/format";
-import { Glyph, Hash, PageHeader, Section } from "../../ui";
+import { Glyph, Hash, PageHeader, Section, Table, type Column } from "../../ui";
 import { Architecture } from "./Architecture";
 import "./styles.css";
 
-// Paddock: what the entry is, the race weekend's vocabulary, how the parts fit,
-// what is new here and what it calls, and the laps ahead.
-export default function PaddockPage() {
+// How It Works: what the entry is, how its parts fit, the glossary that maps
+// the Grand Prix's words to plain ones (and to the tab that shows each), and
+// what is new here against what it calls.
+
+export default function HowItWorksPage() {
   const state = useDay();
   const day = state.status === "ready" ? state.data : null;
 
   return (
-    <div className="page page--paddock">
+    <div className="page page--about">
       <PageHeader
         title="How It Works"
-        lede="Agents plan tomorrow for every real ERCOT battery and seal each plan on BNB Chain before the day-ahead gate. The plans are shadow plans: computed from public data, never used to operate the batteries. What the record proves is that no plan changed after the gate."
+        lede={
+          <>
+            Agents plan tomorrow for every real ERCOT battery and seal each plan on BNB Chain before the day-ahead gate. {SHADOW_NOTE} What the record proves is
+            that no plan changed after the gate.
+            <span className="hw-flow">
+              Read this before the tabs. <Link to="/about/agents">Add Your Agent</Link> comes next: how any agent seals plans of its own.
+            </span>
+          </>
+        }
         aside={<Facts day={day} />}
       />
 
-      <Section kicker="What it is" title="Plan, seal, verify">
-        <ol className="pd-steps">
+      <Section title="What It Is" lede="Three steps, in the order the tabs follow.">
+        <ol className="hw-steps">
           <li>
-            <span className="pd-steps__n num">01</span>
             <h3>Plan</h3>
             <p>
               The planner reads the Wattness Terminal's public ERCOT release, every input named by its SHA-256, and solves each battery's next day hour by hour
               within its power and energy limits: a linear program, solved with HiGHS.
             </p>
             <p>
-              Desert Willow compares three arms under the same inputs: no hedge; a hedge added to a fixed schedule; schedule and hedge chosen together. The hedge
-              uses ElectronX's published hourly bounded-future terms at an assumed fair-value entry, a scenario comparison and never a trade.
+              For Desert Willow (DSWL_ESS_ESR1) it compares three plans under the same inputs: no hedge; a hedge added on top of a fixed schedule; schedule and
+              hedge chosen together. The hedge uses ElectronX's published hourly contract terms at an assumed fair-value entry: a scenario, never a trade.
             </p>
+            <Go links={[["/fleet", "Fleet"], ["/battery", "Battery"], ["/agents/forecast", "Agents"]]} />
           </li>
           <li>
-            <span className="pd-steps__n num">02</span>
             <h3>Seal</h3>
             <p>
-              Each plan becomes an RFC 8785 canonical JSON document and a leaf of one RFC 6962 root. GateRecord stores the root with the git tree hash of the code
-              that produced it.
+              Each plan becomes an RFC 8785 canonical JSON document and one leaf of an RFC 6962 Merkle root. GateRecord stores the root on BNB Smart Chain with the
+              git tree hash of the code that produced it.
             </p>
             <p>The contract computes the 10:00 CT gate itself, daylight-saving aware, and refuses a late or a second record for the same day.</p>
+            <Go links={[["/seal", "Seal"], ["/files", "Files"]]} />
           </li>
           <li>
-            <span className="pd-steps__n num">03</span>
             <h3>Verify</h3>
             <p>
-              One command, the Stewards page or a standard-library Python script checks a battery's plan: the leaf and its proof, the record on chain, the seal
+              One command, the Verify tab or a standard-library Python script checks a battery's plan: the leaf and its proof, the record on chain, the seal
               against the gate, the battery's limits hour by hour, the accounting, and every input against the published release.
             </p>
             <p>Change one number in a plan and the check fails, naming the field.</p>
+            <Go links={[["/verify", "Verify"]]} />
           </li>
         </ol>
       </Section>
 
-      <Section kicker="Vocabulary" title="The race weekend, term by term" lede="The site's words and what each one stands for.">
-        <Vocabulary day={day} />
-      </Section>
-
       <Section
-        kicker="Architecture"
-        title="From public data to a sealed root"
-        lede="Everything the verifier needs is public: the Terminal's files, the leaves and their proofs, and the record on BNB Chain."
+        title="Architecture"
+        lede="From public data to a sealed root. Everything the check needs is public: the Terminal's files, the leaves and their proofs, and the record on BNB Chain."
         source="Diagram: Wattness."
       >
         <Architecture day={day} />
       </Section>
 
-      <Section kicker="New and existing" title="What this entry adds, and what it calls">
-        <div className="pd-split">
-          <div className="pd-split__col pd-split__col--new">
-            <h3 className="pd-split__head">
-              <span className="pd-split__mark" aria-hidden="true" />
-              New in this entry
-            </h3>
-            <p className="pd-split__lede">
+      <Section
+        title="Glossary"
+        lede="The Grand Prix's words, what each one means here, and the tab that shows it. The racing words stay in the story; the tabs use the plain names."
+      >
+        <Glossary day={day} />
+      </Section>
+
+      <Section title="What This Entry Adds, and What It Calls">
+        <div className="hw-split">
+          <div>
+            <h3 className="hw-split__head">New in this entry</h3>
+            <p className="hw-split__lede">
               Built for BNB Bangkok, MIT-licensed, in{" "}
-              <a href={REPO_URL} target="_blank" rel="noreferrer">
+              <a href={REPO_URL} target="_blank" rel="noreferrer" className="hw-out">
                 the repository
+                <Glyph name="popout" />
               </a>
               .
             </p>
-            <ul className="pd-list">
-              <li>
-                <b>GateRecord</b>
-                <span>
-                  A write-once record per committer, scope and operating day, closing at the gate it computes on chain. On BSC mainnet and testnet, source verified
-                  on Sourcify.
-                </span>
-              </li>
-              <li>
-                <b>The plan record</b>
-                <span>The manifest schema gate-record.manifest.v1, canonical JSON in integer units, its leaves and the day's root.</span>
-              </li>
-              <li>
-                <b>The fleet planner</b>
-                <span>The forecast, the price scenarios and the three-arm dispatch and hedge program, run for every battery at each gate.</span>
-              </li>
-              <li>
-                <b>The verifier</b>
-                <span>The command-line check, the in-browser check on the Stewards page, and a second leaf-hash implementation in standard-library Python.</span>
-              </li>
-              <li>
-                <b>This site</b>
-                <span>The race weekend, the pit wall, the standings, the stewards and the garage, all read from the sealed record's own files.</span>
-              </li>
-            </ul>
+            <dl className="hw-list">
+              <div>
+                <dt>GateRecord</dt>
+                <dd>
+                  A write-once record per committer, scope and operating day, closing at the gate it computes on chain. On BNB Smart Chain mainnet and testnet, with
+                  its source verified on Sourcify.
+                </dd>
+              </div>
+              <div>
+                <dt>The plan record</dt>
+                <dd>The manifest schema gate-record.manifest.v1: canonical JSON in integer units, its leaves and the day's root.</dd>
+              </div>
+              <div>
+                <dt>The fleet planner</dt>
+                <dd>The forecast, the price scenarios and the dispatch and hedge program, run for every battery at each gate.</dd>
+              </div>
+              <div>
+                <dt>The verifier</dt>
+                <dd>The command-line check, the in-browser check on the Verify tab, and a second leaf-hash implementation in standard-library Python.</dd>
+              </div>
+              <div>
+                <dt>This site</dt>
+                <dd>Every tab here, read from the sealed day's own published files.</dd>
+              </div>
+            </dl>
           </div>
-          <div className="pd-split__col pd-split__col--existing">
-            <h3 className="pd-split__head">
-              <span className="pd-split__mark" aria-hidden="true" />
-              Existing, called as a service
-            </h3>
-            <p className="pd-split__lede">Public services the entry reads. It changes nothing in them.</p>
-            <ul className="pd-list">
-              <li>
-                <b>
-                  <a href={TERMINAL_URL} target="_blank" rel="noreferrer">
+          <div>
+            <h3 className="hw-split__head">Existing, called as a service</h3>
+            <p className="hw-split__lede">Public services the entry reads or writes to. It changes nothing in them.</p>
+            <dl className="hw-list">
+              <div>
+                <dt>
+                  <a href={TERMINAL_URL} target="_blank" rel="noreferrer" className="hw-out">
                     Wattness Terminal
+                    <Glyph name="popout" />
                   </a>
-                </b>
-                <span>
+                </dt>
+                <dd>
                   The public ERCOT data release at wattness.tech, built and run by Wattness before the event. The planner reads it file by file and checks each
-                  against its published SHA-256{day ? `: ${formatInt(day.leafCount)} batteries' sizes, nodes and prices from release ${day.inputsRelease}` : ""}.
-                </span>
-              </li>
-              <li>
-                <b>ElectronX product terms</b>
-                <span>The published specification of the hourly bounded future: range, tick, size, fees and settlement. Terms only, no market data.</span>
-              </li>
-              <li>
-                <b>HiGHS</b>
-                <span>The open-source linear programming solver.</span>
-              </li>
-              <li>
-                <b>BNB Smart Chain</b>
-                <span>
+                  against its published SHA-256{day ? <>: {formatInt(day.leafCount)} batteries' sizes, nodes and prices from release <code>{day.inputsRelease}</code></> : null}.
+                </dd>
+              </div>
+              <div>
+                <dt>ElectronX product terms</dt>
+                <dd>The published specification of the hourly contract: range, tick, size, fees and settlement. Terms only, no market data.</dd>
+              </div>
+              <div>
+                <dt>HiGHS</dt>
+                <dd>The open-source linear programming solver.</dd>
+              </div>
+              <div>
+                <dt>Living Brain</dt>
+                <dd>The agents' memory, read back through its API for the Memory tab.</dd>
+              </div>
+              <div>
+                <dt>BNB Smart Chain</dt>
+                <dd>
                   Where GateRecord lives, at <Hash value={CONTRACT_ADDRESS} label="contract address" href={`https://bscscan.com/address/${CONTRACT_ADDRESS}`} /> on
                   both networks.
-                </span>
-              </li>
-            </ul>
+                </dd>
+              </div>
+              <div>
+                <dt>BNB Greenfield</dt>
+                <dd>Where the sealed day's files are published, each with its SHA-256, on Greenfield testnet.</dd>
+              </div>
+            </dl>
           </div>
         </div>
-      </Section>
-
-      <Section kicker="Roadmap" title="The laps ahead">
-        <ol className="pd-road">
-          <li>
-            <span className="pd-road__lap num">Lap 1</span>
-            <h3>Every gate sealed</h3>
-            <p>A record for every operating day, each sealed before its 10:00 CT gate by the same code, its tree hash in the record.</p>
-          </li>
-          <li>
-            <span className="pd-road__lap num">Lap 2</span>
-            <h3>Other agents join the standings</h3>
-            <p>GateRecord takes any committer. Other teams' agents seal plans for the same batteries and are scored by the same checker, on matched conditions.</p>
-          </li>
-          <li>
-            <span className="pd-road__lap num">Lap 3</span>
-            <h3>More markets</h3>
-            <p>The same record at other US power markets' day-ahead gates, each with its own gate rule computed on chain.</p>
-          </li>
-          <li>
-            <span className="pd-road__lap num">Lap 4</span>
-            <h3>From shadow plans to operated batteries</h3>
-            <p>With QSE partners, the sealed plan becomes the bid a battery submits, and the record proves it was fixed before the gate.</p>
-          </li>
-        </ol>
       </Section>
     </div>
   );
 }
 
+function Go({ links }: { links: [string, string][] }) {
+  return (
+    <p className="hw-go">
+      <span className="muted">See it in</span>
+      {links.map(([to, label]) => (
+        <Link key={to} to={to} className="hw-go__link">
+          {label}
+          <Glyph name="next" />
+        </Link>
+      ))}
+    </p>
+  );
+}
+
 function Facts({ day }: { day: DayIndex | null }) {
   return (
-    <dl className="pd-facts">
+    <dl className="hw-facts">
       <div>
         <dt>Market</dt>
-        <dd>ERCOT{day ? `, ${day.regime}` : ""}</dd>
+        <dd>ERCOT{day ? `, under ${day.regime}` : ""}</dd>
+      </div>
+      <div>
+        <dt>Batteries</dt>
+        <dd>{day ? <><span className="num">{formatInt(day.leafCount)}</span> with a sealed plan</> : "Every battery"}</dd>
       </div>
       <div>
         <dt>Chain</dt>
-        <dd>BNB Smart Chain 56 and 97</dd>
+        <dd>BNB Smart Chain (chains 56 and 97)</dd>
       </div>
       <div>
-        <dt>Starting grid</dt>
-        <dd className="num">{day ? `${formatInt(day.leafCount)} batteries` : "every battery"}</dd>
-      </div>
-      <div>
-        <dt>License</dt>
+        <dt>Source code</dt>
         <dd>
-          <a href={REPO_URL} target="_blank" rel="noreferrer">
-            MIT, open source
+          <a href={REPO_URL} target="_blank" rel="noreferrer" className="hw-out">
+            MIT, on GitHub
+            <Glyph name="popout" />
           </a>
         </dd>
       </div>
@@ -202,55 +208,46 @@ function Facts({ day }: { day: DayIndex | null }) {
 }
 
 interface Term {
+  order: number;
   term: string;
   means: string;
-  to?: string;
+  to: string;
+  tab: string;
 }
 
-function terms(day: DayIndex | null): [Term[], Term[]] {
-  return [
-    [
-      { term: "Starting grid", means: `ERCOT's grid of real batteries${day ? `: ${formatInt(day.leafCount)} in the sealed root` : ""}`, to: "/fleet" },
-      { term: "Qualifying", means: "Agents plan tomorrow", to: "/battery" },
-      { term: "Parc Ferme", means: "10:00 CT: plans sealed on BNB Chain; no changes, and a late seal reverts", to: "/seal" },
-      { term: "Race day", means: "The operating day; real-time prices are the telemetry" },
-      { term: "Stewards", means: "The verifier anyone can run", to: "/verify" },
-      { term: "Standings", means: "Scores per battery on matched conditions", to: "/fleet" },
-      { term: "Timing screens", means: "Atlas and CoinMarketCap prices" },
-    ],
-    [
-      { term: "Pit wall and team radio", means: "The decision desk, with Ness as race engineer", to: "/battery" },
-      { term: "Team data", means: "Living Brain memory", to: "/agents/memory" },
-      { term: "Weather radar", means: "Cournot's Texas weather odds" },
-      { term: "The garage", means: "BNB Agent Studio builds the agents and AWS runs them", to: "/about/agents" },
-      { term: "Season purse", means: "Flap season launch" },
-      { term: "License to launch", means: "OpenFour evidence-gated graduation" },
-    ],
+function terms(day: DayIndex | null): Term[] {
+  const list: Omit<Term, "order">[] = [
+    { term: "Starting grid", means: `Every battery with a sealed plan for the day${day ? `: ${formatInt(day.leafCount)} in the root` : ""}.`, to: "/fleet", tab: "Fleet" },
+    { term: "Qualifying", means: "Agents plan tomorrow, before the gate.", to: "/battery", tab: "Battery" },
+    { term: "Standings", means: "Every sealed plan of the day in one table, with fleet totals.", to: "/fleet", tab: "Fleet" },
+    { term: "Pit wall", means: "One battery's plan in full: its limits, schedule, state of charge and the three plans compared.", to: "/battery", tab: "Battery" },
+    { term: "Team data", means: "The agents' memory, kept in Living Brain.", to: "/agents/memory", tab: "Memory" },
+    { term: "Parc ferme", means: "The seal: the day's root on BNB Chain before the 10:00 CT gate. No plan changes after it; a late commit reverts.", to: "/seal", tab: "Seal" },
+    { term: "Race day", means: "The operating day the plans are for, 00:00 to 24:00 CT.", to: "/overview", tab: "Overview" },
+    { term: "Stewards", means: "The check anyone can run on any plan, in the browser.", to: "/verify", tab: "Verify" },
+    { term: "Paddock", means: "How the parts fit: this page.", to: "/about", tab: "How It Works" },
+    { term: "Garage", means: "How another agent enters and seals plans of its own.", to: "/about/agents", tab: "Add Your Agent" },
   ];
+  return list.map((t, order) => ({ ...t, order }));
 }
 
-function Vocabulary({ day }: { day: DayIndex | null }) {
-  return (
-    <div className="pd-vocab">
-      {terms(day).map((col, i) => (
-        <dl key={i} className="pd-vocab__col">
-          {col.map((t) => (
-            <div key={t.term} className="pd-vocab__row">
-              <dt>{t.term}</dt>
-              <dd>
-                {t.to ? (
-                  <Link to={t.to} className="pd-vocab__link">
-                    {t.means}
-                    <Glyph name="chevron-right" size={12} />
-                  </Link>
-                ) : (
-                  t.means
-                )}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      ))}
-    </div>
-  );
+const COLUMNS: Column<Term>[] = [
+  { key: "term", label: "Grand Prix term", value: (t) => t.term, render: (t) => <b className="hw-term">{t.term}</b>, width: "11rem" },
+  { key: "means", label: "What it means here", value: (t) => t.means, sortable: false },
+  {
+    key: "tab",
+    label: "Tab",
+    value: (t) => t.tab,
+    width: "10rem",
+    render: (t) => (
+      <Link to={t.to} className="hw-go__link">
+        {t.tab}
+        <Glyph name="next" />
+      </Link>
+    ),
+  },
+];
+
+function Glossary({ day }: { day: DayIndex | null }) {
+  return <Table className="hw-glossary" columns={COLUMNS} rows={terms(day)} rowKey={(t) => t.term} caption="Sort by term or tab; a third click returns the story's order." />;
 }

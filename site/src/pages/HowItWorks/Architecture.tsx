@@ -24,7 +24,7 @@ function parts(day: DayIndex | null): Part[] {
       tone: "existing",
     },
     { id: "agents", name: "Agents", what: "Plan tomorrow, per battery", artifact: day ? `${day.leafCount} batteries` : "every battery" },
-    { id: "planner", name: "Planner", what: "Dispatch and hedge LP", artifact: "HiGHS · arms A, B, C" },
+    { id: "planner", name: "Planner", what: "Dispatch and hedge LP", artifact: "HiGHS · three plans" },
     { id: "root", name: "Merkle root", what: "RFC 8785 leaves, RFC 6962", artifact: day ? middle(day.root, 6, 4) : "one root per day" },
     { id: "gate", name: "GateRecord", what: "Write-once, on BNB Chain", artifact: middle(CONTRACT_ADDRESS, 4, 4), tone: "sealed" },
   ];
@@ -56,7 +56,7 @@ function Box({ p, x, y, w = BOX_W, h = BOX_H }: { p: Part; x: number; y: number;
   return (
     <g className={`arch__part${p.tone ? ` arch__part--${p.tone}` : ""}`} transform={`translate(${x} ${y})`}>
       <rect className="arch__box" width={w} height={h} rx={6} />
-      {p.tone === "sealed" && <path className="arch__livery" d={`M10 0h52l-3 3H7Z`} />}
+      {p.tone === "sealed" && <circle className="arch__seal" cx={w - 18} cy={32} r={3.5} />}
       {p.tone === "existing" && (
         <text className="arch__tag" x={16} y={22}>
           Existing service
@@ -99,8 +99,8 @@ function Verifier({ x, y, w, h }: { x: number; y: number; w: number; h: number }
       <text className="arch__what" x={16} y={58}>
         CLI, browser or Python, by anyone
       </text>
-      <text className="arch__artifact arch__artifact--teal" x={16} y={h - 16}>
-        PASS or FAIL, check by check
+      <text className="arch__artifact arch__artifact--result" x={16} y={h - 16}>
+        Pass or fail, check by check
       </text>
     </g>
   );
