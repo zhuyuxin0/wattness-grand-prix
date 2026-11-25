@@ -8,7 +8,8 @@ const p: Page = {
   version: 2, status: "active", createdAt: time, updatedAt: time, lastCompiledAt: time,
   sources: [{ ingestSourceId: "s1", attachedAt: time }],
 };
-const s: Source = { id: "s1", brainId: "b1", status: "completed", createdAt: time, compiledAt: time };
+const origin = "wattness:DSWL_ESS_ESR1:0xroot:entry-review-v1";
+const s: Source = { id: "s1", brainId: "b1", status: "completed", createdAt: time, compiledAt: time, originRef: origin };
 const json = (value: unknown, status = 200) => new Response(JSON.stringify(value), { status, headers: { "x-request-id": "r1" } });
 function client(responses: Response[]) {
   const calls: Array<{ url: string; options?: RequestInit }> = [];
@@ -46,14 +47,28 @@ describe("as-of decision memory", () => {
   it("keeps later search snippets out of the decision and cites only read pages", async () => {
     const { c, calls } = client([json([{ slug: p.slug, status: "active", summary: "Future unsupported hint" }]), json(p), json({ items: [s] })]);
     const result = await c.retrieveAt("b1", "classify entry", time);
-    const decision = reviewFromMemory(result);
+    const decision = reviewFromMemory(result, origin);
     expect(decision.classification).toBe("assumed-entry-scenario");
-    expect(decision.citations).toEqual([{ slug: p.slug, version: 2, availableAt: time, sourceIds: ["s1"] }]);
+    expect(decision.citations).toEqual([{ slug: p.slug, version: 2, availableAt: time, sourceIds: ["s1"], originRefs: [origin] }]);
     expect(calls.map(x => x.url)).toContain("https://api.livingbrain.com/v1/brains/b1/pages/hedge-review");
     expect(JSON.stringify(result)).not.toContain("Future unsupported hint");
   });
   it("fails closed when no supported review can be retrieved", () => {
-    expect(reviewFromMemory({ cutoff: time, pages: [], exclusions: [] }).classification).toBe("needs-supported-review");
+    expect(reviewFromMemory({ cutoff: time, pages: [], exclusions: [] }, origin).classification).toBe("needs-supported-review");
+  });
+  it("does not classify from wording on a page compiled from another capture", () => {
+    const citation = { slug: p.slug, version: 2, availableAt: time, sourceIds: ["s9"], originRefs: ["wattness:DSWL_ESS_ESR1:0xroot:context-v1"] };
+    const unrelated = { cutoff: time, pages: [{ page: p, citation }], exclusions: [] };
+    expect(reviewFromMemory(unrelated, origin).classification).toBe("needs-supported-review");
+    expect(reviewFromMemory({ ...unrelated, pages: [{ page: p, citation: { ...citation, originRefs: [] } }] }, origin).citations).toEqual([]);
+    expect(() => reviewFromMemory(unrelated, "")).toThrow("originRef");
+  });
+  it("excludes a hit whose slug is not a plain identifier instead of failing the review", async () => {
+    const { c, calls } = client([json([{ slug: "../other", status: "active" }])]);
+    const result = await c.retrieveAt("b1", "classify entry", time);
+    expect(result.pages).toEqual([]);
+    expect(result.exclusions).toEqual([{ slug: "../other", reason: "Page slug is not a plain identifier" }]);
+    expect(calls).toHaveLength(1);
   });
 });
 describe("capture protocol and safety", () => {
@@ -105,5 +120,27 @@ describe("capture protocol and safety", () => {
   });
   it("redacts nested identity fields and credential echoes", () => {
     expect(redact({ subjectId: "a", nested: ["unit-key"], tenantId: "t" }, ["unit-key"])).toEqual({ subjectId: "[REDACTED]", nested: ["[REDACTED]"], tenantId: "[REDACTED]" });
+  });
+  it("redacts account and person identifiers but keeps API object ids", () => {
+    const graph = {
+      nodes: [{ id: "n1", slug: "dswl-ess-esr1", createdByUserId: "u-7", lastEditedByUserId: null, contributorIds: ["u-7"], lastEditedBy: { name: "A Person" } }],
+      people: [{ name: "A Person" }], storageBillingAccountId: "acct-1", organizationId: "org-1", brainId: "b1", pageId: "p1", ingestSourceId: "s1", affectedPageIds: ["p1"],
+    };
+    expect(redact(graph)).toEqual({
+      nodes: [{ id: "n1", slug: "dswl-ess-esr1", createdByUserId: "[REDACTED]", lastEditedByUserId: null, contributorIds: "[REDACTED]", lastEditedBy: "[REDACTED]" }],
+      people: "[REDACTED]", storageBillingAccountId: "[REDACTED]", organizationId: "[REDACTED]", brainId: "b1", pageId: "p1", ingestSourceId: "s1", affectedPageIds: ["p1"],
+    });
+  });
+  it("refuses a contact address as the subject id", () => {
+    expect(() => new LivingBrain({ apiKey: "unit-key", subjectId: "someone@example.invalid" })).toThrow("contact address");
+  });
+  it("rejects redirects and calls only the fixed API origin", async () => {
+    const { c, calls } = client([json([]), json({ items: [] })]);
+    await c.search("b1", "anything");
+    await c.sources("b1", ["s1"]);
+    for (const call of calls) {
+      expect(call.options?.redirect).toBe("error");
+      expect(call.url.startsWith("https://api.livingbrain.com/v1/")).toBe(true);
+    }
   });
 });

@@ -1,8 +1,8 @@
 # Wattness Living Brain adapter
 
-Asset-scoped persistent context for reviewing shadow plans for real ERCOT batteries.
+Asset-scoped persistent memory for reviewing shadow plans for real ERCOT batteries.
 
-This adapter captures reviewed context with a stable origin reference, waits for compilation, and lets a fresh client search and read complete pages. Reviews cite the page slug, version, source IDs and availability time.
+The adapter captures reviewed context with a stable origin reference, waits for compilation, and lets a fresh client search and read complete pages. A review cites the page slug, version, source IDs, their origin references and the time the page became available.
 
 ## Run
 
@@ -11,16 +11,17 @@ The repository workspace must discover packages/adapters/*.
     pnpm install
     pnpm --filter @gatelock/core build
     pnpm --filter @gatelock/living-brain build
+    pnpm --filter @gatelock/living-brain typecheck
     pnpm --filter @gatelock/living-brain test
     pnpm --filter @gatelock/living-brain live
 
-The live runner loads LIVING_BRAIN_API_KEY and LIVING_BRAIN_SUBJECT_ID only through the core secrets export. It sends them to the fixed Living Brain API origin. It never exposes them to a browser or evidence packet.
+The live runner loads LIVING_BRAIN_API_KEY and LIVING_BRAIN_SUBJECT_ID only through the core secrets export and sends them only to the fixed Living Brain API origin. Neither value reaches a browser or an evidence file.
 
-The runner creates/reuses one DSWL_ESS_ESR1 brain and captures two small public notes: the sealed shadow-plan context and the reviewed assumed hedge-entry rule. It uses the sealed fixture root and does not ingest private forecasts, customer data or ElectronX market data.
+The runner creates or reuses one DSWL_ESS_ESR1 brain and captures two short public notes: the sealed shadow-plan context and the reviewed hedge-entry rule. Both name the sealed fixture's root; nothing else is ingested.
 
 ## Integration
 
-The REST surface is deliberately small:
+The REST surface the adapter uses:
 
 | Method | Operation |
 |---|---|
@@ -29,25 +30,23 @@ The REST surface is deliberately small:
 | GET /v1/brains/{brainId}/sources?ids=... | Poll the exact ingest source |
 | POST /v1/brains/{brainId}/search | Find candidate pages |
 | GET /v1/brains/{brainId}/pages/{slug} | Read full content and provenance |
-| GET /v1/brains/{brainId}/graph | Read page/relationship data for visualization |
+| GET /v1/brains/{brainId}/graph | Read page and relationship data for visualization |
 
-The client supports Bearer and x-api-key authentication, each with x-subject-id. The runner falls back to x-api-key only if initial Bearer authentication returns HTTP 401.
+The client supports Bearer and x-api-key authentication, each with x-subject-id. The runner switches to x-api-key only if its first Bearer request returns HTTP 401.
 
-Capture retries use the same originRef. Network failures are not automatically replayed. Polling is bounded, and completed ingestion requires an explicit compilation timestamp.
+Each capture carries an originRef built from the asset, the sealed root and the note's version, and the runner records the captured source IDs so a rerun reads the same sources instead of capturing again. Network failures are never replayed automatically. Polling is bounded, and a completed capture must carry its compilation time.
 
 ## As-of review
 
-retrieveAt returns only full pages whose current content and every source were available by the requested cutoff. It excludes contested, stale, archived and deprecated pages. It also excludes unknown provenance or availability, later edits, and sources belonging to another brain.
+retrieveAt returns only full pages whose current content and every source were available by the requested cutoff. It excludes contested, stale, archived and deprecated pages, pages with unknown provenance or availability, pages edited after the cutoff, and sources from another brain. Search snippets stay internal and never enter the review result.
 
-This intentionally conservative policy uses current page content. It does not reconstruct a historical page from version history. A current page changed after the cutoff is excluded even if an older version exists. The raw search snippets remain internal and do not enter the review result.
-
-reviewFromMemory demonstrates a bounded, rule-based review of the known assumed-entry lesson. It records the changed classification and its citations; it does not execute trades or claim that memory improved strategy returns.
+reviewFromMemory classifies the hedge entry from cited memory. A page counts only when it was compiled from the reviewed capture, identified by its originRef, and still states the rule; the result carries those citations. The fresh client knows that public origin reference, not the rule's text.
 
 ## Evidence
 
-The live runner writes sanitized calls, ingest statuses, a fresh-session handover, the historical-cutoff check and graph data under evidence/living-brain. No transaction is required for the persistent-memory API.
+The live runner writes sanitized calls, ingest statuses, the fresh-session handover, the historical-cutoff check and the graph to evidence/living-brain at the repository root, or under the directory named by GATE_EVIDENCE_DIR. The historical check uses the sealed plan's own time from the fixture manifest. A rerun reuses the brain named in that directory's state.json.
 
-API/page IDs are retained for reproducibility; organization and subject identifiers and credential echoes are redacted.
+Brain, page and source IDs are kept for reproducibility. Credentials and credential echoes, subject, tenant, organization, account and user identifiers, and people lists are redacted. No transaction is involved.
 
 ## Sources
 
@@ -59,4 +58,4 @@ API/page IDs are retained for reproducibility; organization and subject identifi
 - https://docs.livingbrain.com/api-reference/workspace/graph
 - https://docs.livingbrain.com/mcp/sign-in
 
-The adapter is original MIT code; no external implementation was vendored.
+The adapter is original code under the MIT license; it includes no code from another implementation.

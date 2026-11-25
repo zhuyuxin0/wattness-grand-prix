@@ -2,13 +2,15 @@
   "name": "@gatelock/living-brain",
   "version": "0.0.0",
   "description": "Asset-scoped persistent decision memory with as-of retrieval.",
+  "private": true,
   "type": "module",
   "license": "MIT",
   "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
-  "files": ["dist"],
+  "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
     "live": "node dist/live.js"
   },
   "dependencies": { "@gatelock/core": "workspace:*" },

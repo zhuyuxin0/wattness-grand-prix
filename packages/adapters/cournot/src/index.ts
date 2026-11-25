@@ -1,5 +1,3 @@
-import { loadSecrets } from "@gatelock/core/secrets";
-
 export const COURNOT_ORIGIN = "https://interface.cournot.ai";
 export type MarketId = string | number;
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
@@ -58,17 +56,26 @@ const validId = (v: unknown): v is MarketId =>
 const iso = (v: unknown): v is string => typeof v === "string" && Number.isFinite(Date.parse(v));
 const probability = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v) && v >= 0 && v <= 1;
 
-/** Preserve the response's evidence while removing credential and IP fields. */
-export function sanitize(value: unknown): Json {
+const IPV4 = /\b(?:25[0-5]|2[0-4]\d|1?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3}\b/g;
+const SENSITIVE_KEY = /api.?key|authorization|payment.?signature|secret|private.?key|(?:^|[_-])ip(?:$|[_-])|ip.?addr|remote.?addr|forwarded/i;
+
+/**
+ * Preserve the response's evidence while removing credentials, IP addresses and
+ * email addresses. Known secret values are removed wherever they are echoed.
+ */
+export function sanitize(value: unknown, secrets: readonly string[] = []): Json {
   if (value === null || typeof value === "boolean" || typeof value === "number") return value;
   if (typeof value === "string") {
-    return value.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted email]");
+    let clean = value;
+    for (const secret of secrets) if (secret) clean = clean.split(secret).join("[redacted]");
+    return clean.replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, "[redacted email]").replace(IPV4, "[redacted ip]");
   }
-  if (Array.isArray(value)) return value.map(sanitize);
+  if (Array.isArray(value)) return value.map(item => sanitize(item, secrets));
   if (object(value)) {
+    // api_key_quota holds the prepaid call counts, which the evidence keeps.
     return Object.fromEntries(Object.entries(value).map(([key, item]) => [
       key,
-      key !== "api_key_quota" && /api.?key|authorization|payment.signature|secret|private.?key|^ip$/i.test(key) ? "[redacted]" : sanitize(item),
+      key !== "api_key_quota" && SENSITIVE_KEY.test(key) ? "[redacted]" : sanitize(item, secrets),
     ]));
   }
   return null;
@@ -109,15 +116,16 @@ export function parseAssessment(market: MarketInfo, evidence: CallEvidence): Ass
   if (!probability(estimate)) {
     throw new CournotError("invalid_response", "A finite probability in [0, 1] was not returned.", evidence);
   }
-  if (Array.isArray(data.markets)) {
-    const ids = data.markets.map(v => object(v) ? (object(v.market_info) ? v.market_info.id : v.id) : null);
-    if (!ids.some(id => String(id) === String(market.id))) {
-      throw new CournotError("invalid_response", "Returned market identity does not match the selected event.", evidence);
-    }
+  // The estimate is attributable only when the response names the selected market and no other.
+  const ids = Array.isArray(data.markets) ? data.markets.map(v => object(v) ? (object(v.market_info) ? v.market_info.id : v.id) : null) : [];
+  if (ids.length === 0 || ids.some(id => String(id) !== String(market.id))) {
+    throw new CournotError("invalid_response", "Returned market identity does not match the selected event.", evidence);
   }
   const basis = nested?.basis ?? data.basis ?? null;
-  const times = sourceTimes(basis);
-  const age = times.length ? Math.max(0, Date.parse(evidence.receivedAt) - Math.min(...times.map(Date.parse))) : null;
+  // A time after receipt (a market's end, say) is not an observation, so it never makes data look fresh.
+  const received = Date.parse(evidence.receivedAt);
+  const times = sourceTimes(basis).filter(t => Date.parse(t) <= received);
+  const age = times.length ? received - Math.min(...times.map(Date.parse)) : null;
   return {
     market,
     exactClaim: market.title,
@@ -141,6 +149,7 @@ export class CournotClient {
 
   private async call(operation: "resolve" | "probability", body: Json): Promise<CallEvidence> {
     const endpoint = COURNOT_ORIGIN + "/intelligence/v1/" + operation;
+    const secrets = this.options.apiKey ? [this.options.apiKey] : [];
     const requestedAt = new Date().toISOString();
     const headers: Record<string, string> = { "Content-Type": "application/json" };
     if (this.options.apiKey) headers["COURNOT-API-KEY"] = this.options.apiKey;
@@ -160,9 +169,9 @@ export class CournotClient {
     try { raw = await response.json(); }
     catch { raw = { invalidJson: true }; }
     const evidence: CallEvidence = {
-      endpoint, request: sanitize(body), requestedAt, receivedAt: new Date().toISOString(),
+      endpoint, request: sanitize(body, secrets), requestedAt, receivedAt: new Date().toISOString(),
       httpStatus: response.status, requestId: response.headers.get("x-request-id"),
-      response: sanitize(raw), transactionHashes: [],
+      response: sanitize(raw, secrets), transactionHashes: [],
     };
     if (response.status === 402) throw new CournotError("payment_required", "No probability obtained: access or payment is required. This adapter does not sign or pay.", evidence);
     if (response.status === 429) throw new CournotError("rate_limited", "The oracle rate-limited this request. No automatic retry was made.", evidence);
@@ -196,12 +205,6 @@ export class CournotClient {
   }
 }
 
-/** Call only when a prepaid account has been provisioned; missing names fail without revealing values. */
-export function clientWithConfiguredKey(): CournotClient {
-  const secrets = loadSecrets(["COURNOT_API_KEY"]);
-  return new CournotClient({ apiKey: secrets.COURNOT_API_KEY });
-}
-
 export interface ConditionalWeatherPolicy {
   id: string;
   label: string;
@@ -213,17 +216,41 @@ export interface ConditionalWeatherPolicy {
   informationCutoff: string;
   appliedAt: string;
 }
+/** A committed record the review sits beside: its label and the commit's block time. */
+export interface CommittedRecord { label: string; committedAt: string }
+export interface RecordRelation {
+  label: string;
+  committedAt: string;
+  observedAfterCommit: boolean;
+  statement: string;
+}
 export interface WeatherRecommendation {
   policy: ConditionalWeatherPolicy;
   oracleEvent: { marketId: MarketId; claim: string; probability: number; observedAt: string };
   before: { eventProbability: number; stressScenarioWeight: number; hedgeLimitMWh: number };
   after: { eventProbability: number; stressScenarioWeight: number; hedgeLimitMWh: number };
   explanation: string;
-  relationToExistingSeal: string;
+  /** Derived from the two times; null when no record is given, so nothing is asserted. */
+  relationToRecord: RecordRelation | null;
+}
+
+function relation(observedAt: string, record: CommittedRecord): RecordRelation {
+  if (typeof record.label !== "string" || !record.label.trim() || !iso(record.committedAt)) {
+    throw new CournotError("input", "A committed record needs a label and an ISO commit time.");
+  }
+  const after = Date.parse(observedAt) > Date.parse(record.committedAt);
+  return {
+    label: record.label,
+    committedAt: new Date(record.committedAt).toISOString(),
+    observedAfterCommit: after,
+    statement: after
+      ? "Observed after the " + record.label + " record was committed: a later review, not part of that record."
+      : "Observed before the " + record.label + " record was committed.",
+  };
 }
 
 /** A disclosed sensitivity policy; the assumed conditional model is not an oracle electricity forecast. */
-export function applyWeatherPolicy(assessment: Assessment, policy: ConditionalWeatherPolicy): WeatherRecommendation {
+export function applyWeatherPolicy(assessment: Assessment, policy: ConditionalWeatherPolicy, record?: CommittedRecord): WeatherRecommendation {
   for (const x of [policy.baselineEventProbability, policy.conditionalStressIfEvent, policy.conditionalStressIfNotEvent, policy.scenarioHedgeLimitReduction]) {
     if (!probability(x)) throw new CournotError("input", "Policy probability/fraction is outside [0, 1].");
   }
@@ -245,6 +272,6 @@ export function applyWeatherPolicy(assessment: Assessment, policy: ConditionalWe
     before: compute(policy.baselineEventProbability),
     after: compute(assessment.pointEstimate),
     explanation: "Cournot assesses the stated weather event. Wattness's explicitly assumed conditional model maps that event to a scenario weight and hedge-limit sensitivity; it is not a calibrated electricity-price forecast.",
-    relationToExistingSeal: "This assessment was requested after the OD26 record was sealed. It is a later review/sensitivity and is not included in, or an amendment to, that immutable record.",
+    relationToRecord: record ? relation(assessment.observedAt, record) : null,
   };
 }
