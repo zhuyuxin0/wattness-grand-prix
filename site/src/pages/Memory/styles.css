@@ -1,18 +1,264 @@
-/* Memory: long text in a table wraps instead of running off the row. */
+/* Memory: Living Brain's pages and connections in the Terminal's table
+   grammar. Long text wraps inside its row; picking a page narrows the
+   connections to its own, marked with the selection's teal edge. */
 
-.mem-table td {
-  white-space: normal;
-  height: auto;
-  padding-top: 6px;
-  padding-bottom: 6px;
-  vertical-align: top;
+.mem-lead {
+  display: grid;
+  gap: var(--t-space-3);
+  margin-top: calc(var(--t-space-3) - var(--gp-space-8));
 }
-.mem-title {
+@media (max-width: 767px) {
+  .mem-lead {
+    margin-top: calc(var(--t-space-3) - var(--gp-space-7));
+  }
+}
+.mem-stats.stat-row {
+  border-top: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+}
+.mem-phone {
+  display: none;
+}
+.mem-source {
+  max-width: 110ch;
+  font-size: var(--t-fs-xs);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.mem-n {
+  margin-left: 2px;
+  font-weight: 400;
+  color: var(--w-muted);
+}
+.mem-clear {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--t-link);
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--t-accent-mark);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- tables */
+
+.mem-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--t-fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+.mem-table th,
+.mem-table td {
+  text-align: left;
+}
+.mem-table .r {
+  text-align: right;
+}
+.mem-table thead th {
+  position: sticky;
+  top: var(--gp-masthead-h);
+  z-index: 2;
+  height: var(--t-hdr-h);
+  padding: 0;
+  background: var(--t-chrome);
+  border-bottom: 1px solid var(--w-border);
+  font-size: var(--t-fs-xs);
   font-weight: 600;
+  color: var(--w-muted);
+  white-space: nowrap;
+}
+.mem-sort {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: var(--t-hdr-h);
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.mem-table th.r .mem-sort {
+  justify-content: flex-end;
+}
+.mem-sort:hover {
+  color: var(--w-fg);
+}
+.mem-sort:focus-visible {
+  outline-offset: -2px;
+}
+.mem-sort__glyph {
+  opacity: 0;
+}
+.mem-sort:is(:hover, :focus-visible) .mem-sort__glyph {
+  opacity: 0.45;
+}
+.mem-table th.is-sorted {
+  color: var(--w-fg);
+}
+.mem-table th.is-sorted .mem-sort__glyph,
+[data-capture="1"] .mem-sort__glyph {
+  opacity: 1;
+}
+.mem-table td {
+  padding: 7px 10px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--t-rule);
+  color: var(--w-fg);
+}
+.mem-table td.num,
+.mem-table td.r {
+  white-space: nowrap;
+}
+
+.mem-row {
+  cursor: pointer;
+}
+.mem-row:hover > td {
+  background: var(--t-hover);
+}
+.mem-row:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: -2px;
+}
+.mem-row.is-on > td {
+  background: var(--t-selected);
+}
+.mem-row.is-on > td:first-child {
+  box-shadow: var(--t-mark-edge);
+}
+
+.mem-title {
+  display: block;
+  font-weight: 600;
+}
+.mem-sub {
+  display: block;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
 }
 .mem-text {
   display: block;
-  max-width: 72ch;
-  color: var(--w-muted);
+  max-width: 80ch;
+  margin-top: 2px;
   line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.mem-text--ink {
+  margin-top: 0;
+  color: var(--w-fg);
+}
+.mem-c-page {
+  min-width: 0;
+}
+.mem-c-part {
+  width: 1%;
+  white-space: nowrap;
+}
+.mem-c-pair {
+  width: 22%;
+  min-width: 180px;
+}
+.mem-c-strength {
+  width: 1%;
+  white-space: nowrap;
+}
+.mem-empty {
+  padding: var(--gp-space-7) 10px !important;
+  text-align: center;
+  color: var(--w-muted);
+}
+
+/* Strength as a three-step mark and its word: ordered, so one ink, more steps filled. */
+.mem-strength {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.mem-strength i {
+  display: inline-block;
+  width: 4px;
+  height: 10px;
+  border-radius: 1px;
+  background: var(--w-border);
+}
+.mem-strength i:nth-of-type(3) {
+  margin-right: 6px;
+}
+.mem-strength--weak i:nth-of-type(1),
+.mem-strength--medium i:nth-of-type(-n + 2),
+.mem-strength--strong i {
+  background: var(--w-fg);
+}
+
+/* ---------------------------------------------------------------- phones */
+
+@media (max-width: 767px) {
+  .mem-wide {
+    display: none;
+  }
+  .mem-table thead th {
+    position: static;
+  }
+  .mem-c-pair {
+    min-width: 0;
+  }
+  /* Each page and each pair is one stacked row on a phone, its text under it. */
+  .mem-table thead {
+    display: none;
+  }
+  .mem-table table,
+  .mem-table tbody {
+    display: block;
+  }
+  .mem-table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 4px var(--t-space-3);
+    padding: var(--t-space-3) 8px;
+    border-bottom: 1px solid var(--t-rule);
+  }
+  .mem-table td {
+    display: block;
+    width: auto !important;
+    padding: 0;
+    border: 0;
+    background: none !important;
+    box-shadow: none !important;
+  }
+  .mem-row.is-on {
+    background: var(--t-selected);
+    box-shadow: var(--t-mark-edge);
+  }
+  #mem-pages .mem-c-page,
+  #mem-links .mem-c-why {
+    grid-column: 1 / -1;
+  }
+  #mem-pages .mem-c-part {
+    grid-column: 1;
+    font-size: var(--t-fs-xs);
+  }
+  #mem-pages .mem-c-part .mem-sub {
+    display: inline;
+    margin-left: 6px;
+  }
+  #mem-pages .mem-c-degree {
+    grid-column: 2 / -1;
+    font-size: var(--t-fs-xs);
+    color: var(--w-muted);
+  }
+  .mem-phone {
+    display: inline;
+  }
+  .mem-table td.mem-wide {
+    display: none;
+  }
 }
