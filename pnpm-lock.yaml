@@ -27,6 +27,9 @@ importers:
         specifier: 2.57.17
         version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
     devDependencies:
+      '@gatelock/verifier':
+        specifier: workspace:*
+        version: link:../packages/verifier
       '@nomicfoundation/hardhat-node-test-runner':
         specifier: 3.1.2
         version: 3.1.2(hardhat@3.21.2)
