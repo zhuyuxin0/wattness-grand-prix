@@ -72,7 +72,6 @@ export function previewLaunch(
   assertTestnet(chainId);
   if (!isAddress(quote.address)) throw new Error('Invalid quote address');
   if (!quote.enabled) throw new Error('Quote pair is not enabled');
-  if (!factory.enabled) throw new Error('Launcher factory is not enabled by Flap');
   boundedBps(factory.multiplierBps);
   if (vault) boundedBps(vault.multiplierBps);
   if (!Number.isInteger(quote.decimals) || quote.decimals < 0 || quote.decimals > 255) {
@@ -90,7 +89,9 @@ export function previewLaunch(
 
   // The current indexer guide gives enabled Vault factories precedence. The live
   // ForLauncher lens remains authoritative for any deployed Launcher.
-  const multiplierBps = vault?.enabled ? vault.multiplierBps : factory.multiplierBps;
+  // The inspected chain-97 Portal admits disabled factories. Their stored
+  // discount is inactive; a successful testnet admission is not a mainnet audit.
+  const multiplierBps = vault?.enabled ? vault.multiplierBps : factory.enabled ? factory.multiplierBps : 10_000;
   const denominator = 10_000n * plan.poolToken;
   const units = 10n ** BigInt(quote.decimals);
   // Round the documented rational floor upward; never understate a funding target.

@@ -57,8 +57,17 @@ describe('Pool Launch funding preview', () => {
     expect(previewLaunch(97, native, launcher, plan, { enabled: true, multiplierBps: 0 }).creationFloorUsdWad).toBe(0n);
   });
 
-  it('rejects a disabled Launcher even when a Vault is enabled', () => {
-    expect(() => previewLaunch(97, native, { ...factory, enabled: false }, plan, factory)).toThrow('Launcher factory');
+  it('allows testnet admission but ignores a disabled Launcher discount', () => {
+    const p = previewLaunch(97, native, { enabled: false, multiplierBps: 0 }, plan);
+    expect(p.multiplierBps).toBe(10_000);
+    expect(p.creationFloorUsdWad).toBe(1_500n * WAD);
+    expect(p.meetsCreationFloor).toBe(true);
+  });
+
+  it('retains enabled Vault precedence when the testnet Launcher is disabled', () => {
+    const p = previewLaunch(97, native, { enabled: false, multiplierBps: 0 }, plan, { enabled: true, multiplierBps: 2_500 });
+    expect(p.multiplierBps).toBe(2_500);
+    expect(p.creationFloorUsdWad).toBe(375n * WAD);
   });
 
   it('rejects unsupported chains, disabled quote pairs and invalid denomination', () => {

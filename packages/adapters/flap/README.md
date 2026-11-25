@@ -27,7 +27,7 @@ const preview = previewLaunch(97, snapshot.quote, snapshot.factory, {
 });
 ```
 
-`previewLaunch` rejects disabled quote pairs, disabled Launcher factories, unsupported chains and invalid allocations. The optional enabled Vault state takes precedence over the Launcher multiplier, following the current indexer guide. Its rational floors round upward as a conservative estimate. **The on-chain lens is authoritative**, especially for fractional shares and effective factory selection.
+`previewLaunch` rejects disabled quote pairs, unsupported chains and invalid allocations. A disabled Launcher factory is not rejected; its discount is treated as inactive (1x). The optional enabled Vault state takes precedence over the Launcher multiplier, following the current indexer guide. Its rational floors round upward as a conservative estimate. **The on-chain lens is authoritative**, especially for fractional shares and effective factory selection.
 
 For an actual recorded Launcher, use `readGraduationLens(rpcRead, snapshot, params, launcher)`. It checks that `getLauncher` links the instance to the pinned factory, then calls `graduationFloorV2ForLauncher`. The generic lens excludes Launcher discounts and does not establish launch permission. A full preflight still needs factory-specific restrictions, token configuration, reserve distribution, the salt and all launch parameters validated by the contracts.
 
