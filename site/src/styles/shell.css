@@ -152,8 +152,19 @@
   transform: scaleX(1);
 }
 
-.topbar__clock {
+.topbar__end {
   justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* One square, the glyph at 12px (wattness.tech's theme-switch.css). */
+.btn.theme-toggle {
+  width: 28px;
+  height: 24px;
+  min-width: 0;
+  padding: 0;
 }
 
 @media (max-width: 899px) {

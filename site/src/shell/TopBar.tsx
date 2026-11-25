@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 import { captureClock } from "../lib/capture";
 import { Countdown } from "../ui/Countdown";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { Brand } from "./Brand";
 import { NAV } from "./nav";
 
@@ -20,7 +21,10 @@ export function TopBar() {
             ))}
           </ul>
         </nav>
-        <Countdown size="sm" bare now={captureClock()} className="topbar__clock" />
+        <div className="topbar__end">
+          <Countdown size="sm" bare now={captureClock()} className="topbar__clock" />
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );

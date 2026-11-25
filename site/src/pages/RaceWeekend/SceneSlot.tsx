@@ -70,7 +70,8 @@ export function SceneSlot() {
   if (!Scene) return null;
   return (
     <Contain>
-      <div className="rw-scene" role="region" aria-label="The starting grid: every sealed plan for the operating day">
+      {/* The stage keeps its own dark in either theme, as wattness.tech's intro does. */}
+      <div className="rw-scene" data-atmosphere="dark" role="region" aria-label="The starting grid: every sealed plan for the operating day">
         <Suspense fallback={<div className="rw-scene__hold" />}>
           <Scene hud={wide} />
         </Suspense>

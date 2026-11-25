@@ -9,4 +9,6 @@ export { Section } from "./Section";
 export { Stat, StatRow } from "./Stat";
 export { ErrorNote, Loading, Ready } from "./States";
 export { Table, type Column } from "./Table";
+export { ThemeToggle } from "./ThemeToggle";
+export { useSceneTheme, useTheme } from "./useTheme";
 export { nextSort, sortRows, type SortKind, type SortState, type SortValue } from "./sort";
