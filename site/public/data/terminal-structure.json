@@ -1,0 +1,1651 @@
+{
+  "layers": [
+    "Sources",
+    "Data readers",
+    "Selections",
+    "Tabs and sections",
+    "Workspaces",
+    "Ness routing"
+  ],
+  "nodes": [
+    {
+      "id": "source:fleet",
+      "name": "Fleet reference",
+      "short": "Fleet reference",
+      "layer": 0,
+      "layerName": "Sources",
+      "description": "Cached disclosure, daily and monthly records, joins and coverage guards.",
+      "sections": []
+    },
+    {
+      "id": "source:geo",
+      "name": "Mapped locations",
+      "short": "Locations",
+      "layer": 0,
+      "layerName": "Sources",
+      "description": "Location and layer inputs retain mapping coverage and precision.",
+      "sections": []
+    },
+    {
+      "id": "reader:fbd",
+      "name": "Fleet Board Reader",
+      "short": "Fleet Board",
+      "layer": 1,
+      "layerName": "Data readers",
+      "description": "The shared section projections retain source scope, missing observations and Figure/Table identities.",
+      "sections": [
+        {
+          "id": "fbd/glance",
+          "title": "Fleet at a glance",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics"
+          ]
+        },
+        {
+          "id": "fbd/trend",
+          "title": "Fleet revenue",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.board",
+            "fleet.compare",
+            "focus.picked",
+            "fleet.colour"
+          ]
+        },
+        {
+          "id": "fbd/legs",
+          "title": "Where the revenue comes from",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.board"
+          ]
+        },
+        {
+          "id": "fbd/ranked",
+          "title": "All batteries ranked",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "pane.ranked",
+            "fleet.table",
+            "fleet.rankBy",
+            "focus.picked"
+          ]
+        },
+        {
+          "id": "fbd/map",
+          "title": "Batteries on the map",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "focus.picked",
+            "pane.map",
+            "fleet.height",
+            "fleet.map",
+            "data.layer"
+          ]
+        },
+        {
+          "id": "fbd/heatmap",
+          "title": "Fleet heat map",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "fleet.rankBy",
+            "focus.picked"
+          ]
+        },
+        {
+          "id": "fbd/check",
+          "title": "Check your battery",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fbd/method",
+          "title": "Method and sources",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reader:fmap",
+      "name": "Fleet Map Reader",
+      "short": "Fleet Map",
+      "layer": 1,
+      "layerName": "Data readers",
+      "description": "The shared section projections retain source scope, missing observations and Figure/Table identities.",
+      "sections": [
+        {
+          "id": "fmap/map",
+          "title": "Fleet Map",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "focus.picked",
+            "pane.map",
+            "fleet.height",
+            "fleet.map",
+            "data.layer"
+          ]
+        },
+        {
+          "id": "fmap/circle",
+          "title": "Inside the circle",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "focus.picked",
+            "data.layer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reader:fesr",
+      "name": "Battery Page Reader",
+      "short": "Battery Page",
+      "layer": 1,
+      "layerName": "Data readers",
+      "description": "The shared section projections retain source scope, missing observations and Figure/Table identities.",
+      "sections": [
+        {
+          "id": "fesr/plain",
+          "title": "In plain words",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fesr/ranks",
+          "title": "Ranks and peers",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.rankBy",
+            "data.daily"
+          ]
+        },
+        {
+          "id": "fesr/gap",
+          "title": "Where the gap comes from",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fesr/months",
+          "title": "By month",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fesr/daily",
+          "title": "Daily yield against peers",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit",
+            "data.daily",
+            "data.esr"
+          ]
+        },
+        {
+          "id": "fesr/h2h",
+          "title": "Head-to-head",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "data.daily",
+            "fleet.compare",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fesr/spread",
+          "title": "Spread and capture",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reader:fqse",
+      "name": "QSEs Reader",
+      "short": "QSEs",
+      "layer": 1,
+      "layerName": "Data readers",
+      "description": "The shared section projections retain source scope, missing observations and Figure/Table identities.",
+      "sections": [
+        {
+          "id": "fqse/index",
+          "title": "Every QSE",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.fqse",
+            "fleet.rankBy"
+          ]
+        },
+        {
+          "id": "fqse/page",
+          "title": "QSE",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.fqse",
+            "fleet.rankBy",
+            "fleet.table",
+            "pane.ranked"
+          ]
+        },
+        {
+          "id": "fqse/switches",
+          "title": "Switches in and out",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fqse"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reader:fmon",
+      "name": "Month Close Reader",
+      "short": "Month Close",
+      "layer": 1,
+      "layerName": "Data readers",
+      "description": "The shared section projections retain source scope, missing observations and Figure/Table identities.",
+      "sections": [
+        {
+          "id": "fmon/index",
+          "title": "Every month",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.unit",
+            "fleet.filters",
+            "data.month"
+          ]
+        },
+        {
+          "id": "fmon/month",
+          "title": "Month Close",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.fmon",
+            "data.month",
+            "fleet.table",
+            "pane.ranked"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "state:fleet",
+      "name": "Shared Fleet view",
+      "short": "Fleet view",
+      "layer": 2,
+      "layerName": "Selections",
+      "description": "Window, filters, circle, peers, metric and comparison travel between readers that declare them.",
+      "sections": []
+    },
+    {
+      "id": "state:focus",
+      "name": "Battery focus",
+      "short": "Battery focus",
+      "layer": 2,
+      "layerName": "Selections",
+      "description": "The current battery pick. A Battery Page can follow it or retain its own battery.",
+      "sections": []
+    },
+    {
+      "id": "state:panes",
+      "name": "Pane display settings",
+      "short": "Pane settings",
+      "layer": 2,
+      "layerName": "Selections",
+      "description": "Per-pane display settings remain with saved arrangements. They do not all follow the same battery.",
+      "sections": []
+    },
+    {
+      "id": "pane:fbd",
+      "name": "Fleet Board",
+      "short": "Fleet Board",
+      "layer": 3,
+      "layerName": "Tabs and sections",
+      "description": "8 registered sections. Inspect a section below to trace its declared inputs and open its reader.",
+      "sections": [
+        {
+          "id": "fbd/glance",
+          "title": "Fleet at a glance",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics"
+          ]
+        },
+        {
+          "id": "fbd/trend",
+          "title": "Fleet revenue",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.board",
+            "fleet.compare",
+            "focus.picked",
+            "fleet.colour"
+          ]
+        },
+        {
+          "id": "fbd/legs",
+          "title": "Where the revenue comes from",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.board"
+          ]
+        },
+        {
+          "id": "fbd/ranked",
+          "title": "All batteries ranked",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "pane.ranked",
+            "fleet.table",
+            "fleet.rankBy",
+            "focus.picked"
+          ]
+        },
+        {
+          "id": "fbd/map",
+          "title": "Batteries on the map",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "focus.picked",
+            "pane.map",
+            "fleet.height",
+            "fleet.map",
+            "data.layer"
+          ]
+        },
+        {
+          "id": "fbd/heatmap",
+          "title": "Fleet heat map",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "fleet.rankBy",
+            "focus.picked"
+          ]
+        },
+        {
+          "id": "fbd/check",
+          "title": "Check your battery",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fbd/method",
+          "title": "Method and sources",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pane:fmap",
+      "name": "Fleet Map",
+      "short": "Fleet Map",
+      "layer": 3,
+      "layerName": "Tabs and sections",
+      "description": "2 registered sections. Inspect a section below to trace its declared inputs and open its reader.",
+      "sections": [
+        {
+          "id": "fmap/map",
+          "title": "Fleet Map",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "focus.picked",
+            "pane.map",
+            "fleet.height",
+            "fleet.map",
+            "data.layer"
+          ]
+        },
+        {
+          "id": "fmap/circle",
+          "title": "Inside the circle",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "fleet.colour",
+            "focus.picked",
+            "data.layer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pane:fesr",
+      "name": "Battery Page",
+      "short": "Battery Page",
+      "layer": 3,
+      "layerName": "Tabs and sections",
+      "description": "7 registered sections. Inspect a section below to trace its declared inputs and open its reader.",
+      "sections": [
+        {
+          "id": "fesr/plain",
+          "title": "In plain words",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fesr/ranks",
+          "title": "Ranks and peers",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.rankBy",
+            "data.daily"
+          ]
+        },
+        {
+          "id": "fesr/gap",
+          "title": "Where the gap comes from",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fesr/months",
+          "title": "By month",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fesr/daily",
+          "title": "Daily yield against peers",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "fleet.unit",
+            "data.daily",
+            "data.esr"
+          ]
+        },
+        {
+          "id": "fesr/h2h",
+          "title": "Head-to-head",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters",
+            "data.daily",
+            "fleet.compare",
+            "fleet.unit"
+          ]
+        },
+        {
+          "id": "fesr/spread",
+          "title": "Spread and capture",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fesr",
+            "focus.picked",
+            "fleet.peers",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.filters"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pane:fqse",
+      "name": "QSEs",
+      "short": "QSEs",
+      "layer": 3,
+      "layerName": "Tabs and sections",
+      "description": "3 registered sections. Inspect a section below to trace its declared inputs and open its reader.",
+      "sections": [
+        {
+          "id": "fqse/index",
+          "title": "Every QSE",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.fqse",
+            "fleet.rankBy"
+          ]
+        },
+        {
+          "id": "fqse/page",
+          "title": "QSE",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.fqse",
+            "fleet.rankBy",
+            "fleet.table",
+            "pane.ranked"
+          ]
+        },
+        {
+          "id": "fqse/switches",
+          "title": "Switches in and out",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "pane.fqse"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pane:fmon",
+      "name": "Month Close",
+      "short": "Month Close",
+      "layer": 3,
+      "layerName": "Tabs and sections",
+      "description": "2 registered sections. Inspect a section below to trace its declared inputs and open its reader.",
+      "sections": [
+        {
+          "id": "fmon/index",
+          "title": "Every month",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.unit",
+            "fleet.filters",
+            "data.month"
+          ]
+        },
+        {
+          "id": "fmon/month",
+          "title": "Month Close",
+          "reads": [
+            "data.disclosure",
+            "data.days",
+            "data.guard",
+            "data.geo",
+            "data.browser",
+            "data.join",
+            "fleet.window",
+            "fleet.filters",
+            "fleet.pin",
+            "fleet.radius",
+            "fleet.peers",
+            "fleet.group",
+            "fleet.unit",
+            "data.daily",
+            "data.metrics",
+            "pane.fmon",
+            "data.month",
+            "fleet.table",
+            "pane.ranked"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "workspace:my-battery",
+      "name": "My Battery",
+      "short": "My Battery",
+      "layer": 4,
+      "layerName": "Workspaces",
+      "description": "How does my battery compare with the batteries around it?",
+      "sections": []
+    },
+    {
+      "id": "workspace:fleet",
+      "name": "Fleet",
+      "short": "Fleet",
+      "layer": 4,
+      "layerName": "Workspaces",
+      "description": "Which batteries trail their neighbors, and what is behind the gap?",
+      "sections": []
+    },
+    {
+      "id": "ness:routes",
+      "name": "Local workspace guide",
+      "short": "Workspace routes",
+      "layer": 5,
+      "layerName": "Ness routing",
+      "description": "Ness recognizes available workspace names and a named battery locally.",
+      "sections": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "reader:fbd",
+      "to": "pane:fbd",
+      "kind": "projects",
+      "keys": [
+        "fbd/glance",
+        "fbd/trend",
+        "fbd/legs",
+        "fbd/ranked",
+        "fbd/map",
+        "fbd/heatmap",
+        "fbd/check",
+        "fbd/method"
+      ]
+    },
+    {
+      "from": "source:fleet",
+      "to": "reader:fbd",
+      "kind": "supplies",
+      "keys": [
+        "data.disclosure",
+        "data.days",
+        "data.guard",
+        "data.browser",
+        "data.join",
+        "data.daily",
+        "data.metrics"
+      ]
+    },
+    {
+      "from": "source:geo",
+      "to": "reader:fbd",
+      "kind": "supplies",
+      "keys": [
+        "data.geo",
+        "data.layer"
+      ]
+    },
+    {
+      "from": "state:fleet",
+      "to": "pane:fbd",
+      "kind": "controls",
+      "keys": [
+        "fleet.window",
+        "fleet.filters",
+        "fleet.pin",
+        "fleet.radius",
+        "fleet.peers",
+        "fleet.group",
+        "fleet.unit",
+        "fleet.compare",
+        "fleet.colour",
+        "fleet.table",
+        "fleet.rankBy",
+        "fleet.height",
+        "fleet.map"
+      ]
+    },
+    {
+      "from": "state:focus",
+      "to": "pane:fbd",
+      "kind": "controls",
+      "keys": [
+        "focus.picked"
+      ]
+    },
+    {
+      "from": "state:panes",
+      "to": "pane:fbd",
+      "kind": "controls",
+      "keys": [
+        "pane.board",
+        "pane.ranked",
+        "pane.map",
+        "pane.fesr"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fbd",
+      "kind": "watches",
+      "keys": [
+        "fbd/ranked"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fbd",
+      "kind": "contains",
+      "keys": [
+        "fbd/glance",
+        "fbd/trend",
+        "fbd/legs",
+        "fbd/ranked",
+        "fbd/map",
+        "fbd/heatmap",
+        "fbd/check",
+        "fbd/method"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fbd",
+      "kind": "watches",
+      "keys": [
+        "fbd/glance",
+        "fbd/trend",
+        "fbd/ranked",
+        "fbd/heatmap"
+      ]
+    },
+    {
+      "from": "reader:fmap",
+      "to": "pane:fmap",
+      "kind": "projects",
+      "keys": [
+        "fmap/map",
+        "fmap/circle"
+      ]
+    },
+    {
+      "from": "source:fleet",
+      "to": "reader:fmap",
+      "kind": "supplies",
+      "keys": [
+        "data.disclosure",
+        "data.days",
+        "data.guard",
+        "data.browser",
+        "data.join",
+        "data.daily",
+        "data.metrics"
+      ]
+    },
+    {
+      "from": "source:geo",
+      "to": "reader:fmap",
+      "kind": "supplies",
+      "keys": [
+        "data.geo",
+        "data.layer"
+      ]
+    },
+    {
+      "from": "state:fleet",
+      "to": "pane:fmap",
+      "kind": "controls",
+      "keys": [
+        "fleet.window",
+        "fleet.filters",
+        "fleet.pin",
+        "fleet.radius",
+        "fleet.peers",
+        "fleet.group",
+        "fleet.unit",
+        "fleet.colour",
+        "fleet.height",
+        "fleet.map"
+      ]
+    },
+    {
+      "from": "state:focus",
+      "to": "pane:fmap",
+      "kind": "controls",
+      "keys": [
+        "focus.picked"
+      ]
+    },
+    {
+      "from": "state:panes",
+      "to": "pane:fmap",
+      "kind": "controls",
+      "keys": [
+        "pane.map"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fmap",
+      "kind": "contains",
+      "keys": [
+        "fmap/map",
+        "fmap/circle"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fmap",
+      "kind": "watches",
+      "keys": [
+        "fmap/circle"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fmap",
+      "kind": "contains",
+      "keys": [
+        "fmap/map",
+        "fmap/circle"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fmap",
+      "kind": "watches",
+      "keys": [
+        "fmap/circle"
+      ]
+    },
+    {
+      "from": "reader:fesr",
+      "to": "pane:fesr",
+      "kind": "projects",
+      "keys": [
+        "fesr/plain",
+        "fesr/ranks",
+        "fesr/gap",
+        "fesr/months",
+        "fesr/daily",
+        "fesr/h2h",
+        "fesr/spread"
+      ]
+    },
+    {
+      "from": "source:fleet",
+      "to": "reader:fesr",
+      "kind": "supplies",
+      "keys": [
+        "data.disclosure",
+        "data.days",
+        "data.guard",
+        "data.browser",
+        "data.join",
+        "data.daily",
+        "data.esr"
+      ]
+    },
+    {
+      "from": "source:geo",
+      "to": "reader:fesr",
+      "kind": "supplies",
+      "keys": [
+        "data.geo"
+      ]
+    },
+    {
+      "from": "state:fleet",
+      "to": "pane:fesr",
+      "kind": "controls",
+      "keys": [
+        "fleet.window",
+        "fleet.peers",
+        "fleet.pin",
+        "fleet.radius",
+        "fleet.filters",
+        "fleet.unit",
+        "fleet.rankBy",
+        "fleet.compare"
+      ]
+    },
+    {
+      "from": "state:focus",
+      "to": "pane:fesr",
+      "kind": "controls",
+      "keys": [
+        "focus.picked"
+      ]
+    },
+    {
+      "from": "state:panes",
+      "to": "pane:fesr",
+      "kind": "controls",
+      "keys": [
+        "pane.fesr"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fesr",
+      "kind": "contains",
+      "keys": [
+        "fesr/plain",
+        "fesr/ranks",
+        "fesr/gap",
+        "fesr/months",
+        "fesr/daily",
+        "fesr/h2h",
+        "fesr/spread"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fesr",
+      "kind": "watches",
+      "keys": [
+        "fesr/plain",
+        "fesr/ranks",
+        "fesr/gap",
+        "fesr/months"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fesr",
+      "kind": "contains",
+      "keys": [
+        "fesr/plain",
+        "fesr/ranks",
+        "fesr/gap",
+        "fesr/months",
+        "fesr/daily",
+        "fesr/h2h",
+        "fesr/spread"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fesr",
+      "kind": "watches",
+      "keys": [
+        "fesr/plain",
+        "fesr/ranks",
+        "fesr/gap"
+      ]
+    },
+    {
+      "from": "reader:fqse",
+      "to": "pane:fqse",
+      "kind": "projects",
+      "keys": [
+        "fqse/index",
+        "fqse/page",
+        "fqse/switches"
+      ]
+    },
+    {
+      "from": "source:fleet",
+      "to": "reader:fqse",
+      "kind": "supplies",
+      "keys": [
+        "data.disclosure",
+        "data.days",
+        "data.guard",
+        "data.browser",
+        "data.join",
+        "data.daily",
+        "data.metrics"
+      ]
+    },
+    {
+      "from": "source:geo",
+      "to": "reader:fqse",
+      "kind": "supplies",
+      "keys": [
+        "data.geo"
+      ]
+    },
+    {
+      "from": "state:fleet",
+      "to": "pane:fqse",
+      "kind": "controls",
+      "keys": [
+        "fleet.window",
+        "fleet.filters",
+        "fleet.pin",
+        "fleet.radius",
+        "fleet.peers",
+        "fleet.group",
+        "fleet.unit",
+        "fleet.rankBy",
+        "fleet.table"
+      ]
+    },
+    {
+      "from": "state:panes",
+      "to": "pane:fqse",
+      "kind": "controls",
+      "keys": [
+        "pane.fqse",
+        "pane.ranked"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fqse",
+      "kind": "contains",
+      "keys": [
+        "fqse/index",
+        "fqse/page",
+        "fqse/switches"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fqse",
+      "kind": "watches",
+      "keys": [
+        "fqse/page"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fqse",
+      "kind": "contains",
+      "keys": [
+        "fqse/index",
+        "fqse/page",
+        "fqse/switches"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fqse",
+      "kind": "watches",
+      "keys": [
+        "fqse/page"
+      ]
+    },
+    {
+      "from": "reader:fmon",
+      "to": "pane:fmon",
+      "kind": "projects",
+      "keys": [
+        "fmon/index",
+        "fmon/month"
+      ]
+    },
+    {
+      "from": "source:fleet",
+      "to": "reader:fmon",
+      "kind": "supplies",
+      "keys": [
+        "data.disclosure",
+        "data.days",
+        "data.guard",
+        "data.browser",
+        "data.join",
+        "data.month",
+        "data.daily",
+        "data.metrics"
+      ]
+    },
+    {
+      "from": "source:geo",
+      "to": "reader:fmon",
+      "kind": "supplies",
+      "keys": [
+        "data.geo"
+      ]
+    },
+    {
+      "from": "state:fleet",
+      "to": "pane:fmon",
+      "kind": "controls",
+      "keys": [
+        "fleet.unit",
+        "fleet.filters",
+        "fleet.window",
+        "fleet.pin",
+        "fleet.radius",
+        "fleet.peers",
+        "fleet.group",
+        "fleet.table"
+      ]
+    },
+    {
+      "from": "state:panes",
+      "to": "pane:fmon",
+      "kind": "controls",
+      "keys": [
+        "pane.fmon",
+        "pane.ranked"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fmon",
+      "kind": "contains",
+      "keys": [
+        "fmon/index",
+        "fmon/month"
+      ]
+    },
+    {
+      "from": "workspace:my-battery",
+      "to": "pane:fmon",
+      "kind": "watches",
+      "keys": [
+        "fmon/month"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fmon",
+      "kind": "contains",
+      "keys": [
+        "fmon/index",
+        "fmon/month"
+      ]
+    },
+    {
+      "from": "workspace:fleet",
+      "to": "pane:fmon",
+      "kind": "watches",
+      "keys": [
+        "fmon/month"
+      ]
+    },
+    {
+      "from": "ness:routes",
+      "to": "workspace:my-battery",
+      "kind": "routes",
+      "keys": []
+    }
+  ]
+}
