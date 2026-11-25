@@ -184,7 +184,7 @@ export function Check({ id, result, tamper, onRetry }: CheckProps) {
         {result.notes.length > 0 && (
           <ul className={`vf-notes${result.id === 5 && result.status === "fail" ? " is-problems" : ""}`}>
             {result.notes.map((n) => (
-              <li key={n}>{n}</li>
+              <li key={n}>{n.replace(/^arm ([A-Z]):/, "Plan $1:")}</li>
             ))}
           </ul>
         )}
