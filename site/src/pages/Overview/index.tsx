@@ -1,34 +1,47 @@
 import { Link } from "react-router-dom";
 import { SOURCE_LINE } from "../../config";
 import { combine, useDay, useLateSeal, useReceipts } from "../../data";
-import { captureClock } from "../../lib/capture";
-import { minSec } from "../../lib/clock";
+import { minSec, usePageClock } from "../../lib/clock";
 import { formatInt } from "../../lib/format";
-import { dualTime, formatOperatingDay } from "../../lib/time";
+import { dualTime, formatCountdown, formatOperatingDay, nextGate } from "../../lib/time";
 import { batteryPath, useSelectedBattery } from "../../shell/battery";
 import { panelSections, type PanelGroup } from "../../shell/tabs";
-import { Countdown, Glyph, PageHeader, ParcFerme, Ready, Section, Stat, StatRow } from "../../ui";
-import { WeekendStrip } from "./WeekendStrip";
+import { Glyph, PageHeader, Ready, Section, Stat, StatRow } from "../../ui";
+import { Timeline } from "./Timeline";
 import "./styles.css";
 
-// Overview: today at a glance. The next gate, the latest sealed record, what
-// happens next, and a path into every tab.
+// Overview: where the day stands. The lead is ERCOT's next gate; then the
+// latest sealed record at a glance, the day in order with a line at now, and a
+// path into every tab.
+
+const CHAIN_SOURCE = "Commits: GateRecord on BNB Smart Chain, read from each chain's receipt.";
 
 /** Every group's tabs but this one, in the panel's order. */
 const PATHS = panelSections()
   .map((s) => ({ group: s.group, tabs: s.tabs.filter((t) => t.id !== "overview") }))
   .filter((s): s is { group: PanelGroup; tabs: typeof s.tabs } => s.group !== null && s.tabs.length > 0);
+
 export default function OverviewPage() {
   const all = combine(useDay(), useReceipts(), useLateSeal());
   const [battery] = useSelectedBattery();
+  const nowMs = usePageClock(1000);
 
   return (
     <div className="page page--overview">
       <PageHeader
         title="Overview"
-        lede="Agents plan tomorrow for every ERCOT battery and seal each plan on BNB Chain before the 10:00 CT day-ahead gate. Anyone can check any plan against the chain."
-        aside={<Countdown now={captureClock()} size="md" label="Next gate" />}
+        lede={
+          <>
+            Where the day stands: ERCOT's next day-ahead gate, the latest sealed record and what happens next.
+            <span className="ov-flow">
+              Start here. The plans themselves are in <Link to="/fleet">Fleet</Link> and <Link to={batteryPath("/battery", battery)}>Battery</Link>, and the record
+              on chain is in <Link to="/seal">Seal</Link>.
+            </span>
+          </>
+        }
       />
+
+      <NextGate nowMs={nowMs} />
 
       <Ready state={all}>
         {([day, r, late]) => {
@@ -37,13 +50,18 @@ export default function OverviewPage() {
           return (
             <>
               <Section
-                title="Latest sealed record"
-                actions={<ParcFerme state="sealed" />}
-                source={`${SOURCE_LINE} Commits: GateRecord on BNB Smart Chain, read from each chain's receipt.`}
+                title="Latest Sealed Record"
+                actions={
+                  <Link to="/seal" className="ov-more">
+                    Open Seal
+                    <Glyph name="next" />
+                  </Link>
+                }
+                source={`${SOURCE_LINE} ${CHAIN_SOURCE}`}
               >
-                <StatRow>
-                  <Stat label="Operating day" value={formatOperatingDay(day.operatingDay)} size="sm" note={`${day.market}, ${day.regime}`} />
-                  <Stat label="Plans sealed" value={formatInt(day.leafCount)} note="one leaf per battery, one root" />
+                <StatRow className="ov-stats">
+                  <Stat label="Operating day" value={formatOperatingDay(day.operatingDay)} size="sm" note={`${day.market}, under ${day.regime}`} />
+                  <Stat label="Plans sealed" value={formatInt(day.leafCount)} note="One leaf per battery, under one root" />
                   {main && sealedAt && (
                     <Stat
                       label="Sealed before the gate"
@@ -53,27 +71,28 @@ export default function OverviewPage() {
                     />
                   )}
                   <Stat
-                    label="Chains"
-                    value={formatInt(r.receipts.length)}
+                    label="On chain"
+                    value={r.receipts.length === 2 ? "Mainnet and testnet" : formatInt(r.receipts.length)}
+                    size="sm"
                     note={r.receipts.map((x) => `${x.chainName} (chain ${x.chainId})`).join(" and ")}
                   />
-                  <Stat label="Late seal" value="Refused" tone="refused" size="sm" note={`${late.secondsAfterGate} s after the gate, on both chains`} />
+                  <Stat label="Late commit" value="Refused" tone="refused" size="sm" note={`Simulated ${late.secondsAfterGate} s after the gate, on both chains`} />
                 </StatRow>
               </Section>
 
               <Section
-                title="What happens next"
-                lede="The record's own times: the plan's timestamp, each commit's block, the gate the contract computes."
-                source="Times in market time (CT) with yours beside them. Calculation and display: Wattness."
+                title="What Happens Next"
+                lede="The record's own times in order, in market time (CT) with yours beside them. What lies below the line has not happened yet."
+                source={`${SOURCE_LINE} ${CHAIN_SOURCE}`}
               >
-                <WeekendStrip day={day} receipts={r} late={late} />
+                <Timeline day={day} receipts={r} late={late} nowMs={nowMs} />
               </Section>
             </>
           );
         }}
       </Ready>
 
-      <Section title="Where to look">
+      <Section title="Where to Look" lede="Every tab, in the order a plan moves: made, sealed, checked.">
         <div className="ov-paths">
           {PATHS.map((s) => (
             <div key={s.group.id} className="ov-paths__group">
@@ -94,5 +113,30 @@ export default function OverviewPage() {
         </div>
       </Section>
     </div>
+  );
+}
+
+/** The lead: ERCOT's next day-ahead gate, counted down in market time with the reader's own beside it. */
+function NextGate({ nowMs }: { nowMs: number }) {
+  const gate = nextGate(nowMs);
+  const left = Math.max(0, gate.unix - Math.floor(nowMs / 1000));
+  const at = dualTime(gate.unix, { seconds: false });
+  const closing = left <= 600;
+  return (
+    <section className="ov-gate" aria-labelledby="ov-gate-title">
+      <h2 id="ov-gate-title" className="ov-gate__label">
+        Next gate
+      </h2>
+      <p className={`ov-gate__digits num${closing ? " ov-gate__digits--closing" : ""}`} role="timer" aria-live="off" aria-label={`${formatCountdown(left)} to the gate`}>
+        {formatCountdown(left)}
+      </p>
+      <p className="ov-gate__meta">
+        <span className="ov-gate__at">
+          <b className="num">{at.ct}</b>
+          {at.yours && <span className="muted num"> · {at.yours}</span>}
+        </span>
+        <span className="ov-gate__what">ERCOT's day-ahead market closes for bids on {formatOperatingDay(gate.operatingDay)}.</span>
+      </p>
+    </section>
   );
 }

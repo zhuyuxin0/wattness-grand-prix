@@ -1,145 +1,237 @@
-/* Overview. The day's timeline (strip) came from the old race weekend page. */
+/* Overview. The countdown leads; the record, the timeline and the paths follow
+   on one surface, divided by rules. */
 
-/* ---------------------------------------------------------------- strip */
+.ov-flow {
+  display: block;
+  margin-top: var(--t-space-2);
+  font-size: var(--t-fs-sm);
+}
 
-.strip {
+/* ---------------------------------------------------------------- the lead */
+
+.ov-gate {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "label label" "digits meta";
+  gap: var(--t-space-1) var(--gp-space-7);
+  align-items: end;
+  justify-items: start;
+}
+.ov-gate__label {
+  grid-area: label;
+}
+.ov-gate__digits {
+  grid-area: digits;
+}
+.ov-gate__meta {
+  grid-area: meta;
+  max-width: 56ch;
+  padding-bottom: 6px;
+}
+@media (max-width: 899px) {
+  .ov-gate {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "label" "digits" "meta";
+  }
+  .ov-gate__meta {
+    padding-bottom: 0;
+  }
+}
+.ov-gate__label {
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+/* The view's one hero figure. It ticks, so its digits are tabular. */
+.ov-gate__digits {
+  font-family: var(--w-font-sans);
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--w-fg);
+}
+.ov-gate__digits--closing {
+  color: var(--s-bad);
+}
+.ov-gate__meta {
+  font-size: var(--t-fs);
+  color: var(--w-fg);
+}
+.ov-gate__meta b {
+  font-weight: 600;
+}
+.ov-gate__at,
+.ov-gate__what {
+  display: block;
+}
+.ov-gate__at {
+  font-size: var(--t-fs-title);
+}
+.ov-gate__what {
+  margin-top: 2px;
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+@media (max-width: 767px) {
+  .ov-gate__digits {
+    font-size: 40px;
+  }
+}
+
+.ov-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+}
+
+/* The two worded stats sit at the title step; the counts at the stat step. */
+.ov-stats {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+
+/* ---------------------------------------------------------------- timeline */
+
+.tl {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--t-rule);
 }
-.strip__step {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-6) var(--space-6) var(--space-2) 0;
+.tl__row {
+  display: grid;
+  grid-template-columns: 13rem minmax(0, 1fr) 11rem 6.5rem;
+  gap: var(--t-space-1) var(--t-space-6);
+  align-items: baseline;
+  padding: var(--t-space-4) 0;
+  border-bottom: 1px solid var(--t-rule);
+}
+.tl__when {
+  display: grid;
+  gap: 1px;
   min-width: 0;
 }
-.strip__step + .strip__step {
-  padding-left: var(--space-6);
-  border-left: 1px solid var(--rule);
+.tl__clock {
+  font-size: var(--t-fs);
+  font-weight: 600;
+  white-space: nowrap;
 }
-/* Only the sealed step wears the seal's edge; a state is a word and its mark. */
-.strip__step--sealed {
-  box-shadow: inset 0 2px 0 var(--seal);
-}
-.strip__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-.strip__n {
-  font-size: var(--t-fs-sm);
+.tl__date,
+.tl__yours {
+  font-size: var(--t-fs-xs);
   color: var(--w-muted);
 }
-.strip__status {
+.tl__what {
+  min-width: 0;
+}
+.tl__title {
+  font-size: var(--t-fs);
+  font-weight: 600;
+}
+.tl__detail {
+  margin-top: 2px;
+  max-width: 80ch;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.tl__detail code {
+  overflow-wrap: anywhere;
+}
+.tl__state {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: var(--t-fs-xs);
   font-weight: 600;
   white-space: nowrap;
+  color: var(--w-fg);
 }
-.strip__status--done {
-  color: var(--muted);
-}
-.strip__status--sealed {
-  color: var(--seal-text);
-}
-.strip__status--live {
-  color: var(--s-ok);
-}
-.strip__status--next {
-  color: var(--text);
-}
-.strip__term {
-  margin-top: var(--space-3);
-  font-size: var(--t-fs-title);
-  font-weight: 600;
-}
-.strip__what {
-  color: var(--muted);
-  font-size: var(--text-sm);
-}
-.strip__time {
-  display: grid;
-  gap: 2px;
-  margin: var(--space-4) 0 var(--space-2);
-}
-.strip__clock {
-  font-weight: 600;
-  font-size: var(--t-fs-stat);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  color: var(--text-strong);
-  white-space: nowrap;
-}
-.strip__from {
-  font-size: var(--t-fs-sm);
-  font-weight: 400;
+.tl__state--done,
+.tl__state--closed {
   color: var(--w-muted);
 }
-.strip__dash {
-  color: var(--faint);
-  margin: 0 0.08em;
+.tl__state--sealed {
+  color: var(--seal-text);
 }
-.strip__zone {
-  font-size: var(--text-xs);
-  color: var(--text);
+.tl__state .seal-mark {
+  margin: 0 2px 0 0;
 }
-.strip__alt {
-  font-size: var(--text-xs);
-  color: var(--faint);
-}
-.strip__detail {
-  font-size: var(--text-sm);
-  color: var(--muted);
-  max-width: 34ch;
-}
-.strip__link {
-  margin-top: auto;
-  padding-top: var(--space-3);
+.tl__go {
+  justify-self: end;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  font-size: var(--t-fs);
-  align-self: start;
+  gap: 6px;
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
 }
-.strip__link:hover {
-  color: var(--text-strong);
+/* Rows still to come read in ink; rows done step back. */
+.tl__row--done .tl__clock,
+.tl__row--done .tl__title,
+.tl__row--closed .tl__clock,
+.tl__row--closed .tl__title {
+  color: var(--w-muted);
+}
+.tl__detail .num,
+.ov-gate__meta .num {
+  white-space: nowrap;
+}
+.tl__now {
+  position: relative;
+  height: 0;
+  margin: 14px 0;
+  border-top: 2px solid var(--w-fg);
+}
+.tl__now-label {
+  position: absolute;
+  top: -10px;
+  right: 0;
+  padding-left: var(--t-space-3);
+  background: var(--t-pane);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  line-height: 18px;
+  color: var(--w-fg);
 }
 @media (max-width: 1023px) {
-  .strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .tl__row {
+    grid-template-columns: 11rem minmax(0, 1fr) auto;
   }
-  .strip__step:nth-child(3) {
-    padding-left: 0;
-    border-left: 0;
-  }
-  .strip__step:nth-child(n + 3) {
-    margin-top: var(--space-6);
-    border-top: 1px solid var(--border);
+  .tl__go {
+    grid-column: 2 / -1;
+    justify-self: start;
   }
 }
-@media (max-width: 559px) {
-  .strip {
-    grid-template-columns: minmax(0, 1fr);
+@media (max-width: 599px) {
+  .tl__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--t-space-2) var(--t-space-4);
   }
-  .strip__step,
-  .strip__step + .strip__step {
-    padding: var(--space-5) 0 var(--space-4);
-    border-left: 0;
+  .tl__when {
+    grid-column: 1;
+    grid-template-columns: auto auto;
+    justify-content: start;
+    gap: 0 var(--t-space-3);
   }
-  .strip__step + .strip__step {
-    margin-top: 0;
-    border-top: 1px solid var(--border);
+  .tl__yours {
+    grid-column: 1 / -1;
   }
-  .strip__detail {
-    max-width: none;
+  .tl__state {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .tl__what,
+  .tl__go {
+    grid-column: 1 / -1;
+  }
+  .tl__now-label {
+    left: 0;
+    right: auto;
+    padding: 0 var(--t-space-3) 0 0;
   }
 }
 
@@ -147,7 +239,7 @@
 
 .ov-paths {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: var(--t-space-6) var(--gp-space-7);
 }
 .ov-paths__group ul {
@@ -159,6 +251,8 @@
 }
 .ov-paths__head {
   margin-bottom: var(--t-space-3);
+  padding-bottom: var(--t-space-2);
+  border-bottom: 1px solid var(--t-rule);
   font-size: var(--t-fs-xs);
   font-weight: 600;
   letter-spacing: 0.04em;
