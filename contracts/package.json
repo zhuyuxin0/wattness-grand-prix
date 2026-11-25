@@ -1,0 +1,27 @@
+{
+  "name": "@gatelock/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "hardhat build",
+    "test": "hardhat test",
+    "typecheck": "tsc -p tsconfig.json",
+    "abi": "node scripts/export-abi.ts",
+    "chain:balance": "node scripts/balance.ts",
+    "chain:deploy": "node scripts/deploy.ts",
+    "chain:verify": "node scripts/verify-sourcify.ts",
+    "chain:anchor": "node scripts/anchor.ts",
+    "chain:commit": "node scripts/commit.ts"
+  },
+  "dependencies": {
+    "@gatelock/core": "workspace:*",
+    "viem": "2.57.17"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-node-test-runner": "3.1.2",
+    "@nomicfoundation/hardhat-viem": "3.1.0",
+    "@nomicfoundation/hardhat-viem-assertions": "3.1.5",
+    "hardhat": "3.21.2"
+  }
+}
