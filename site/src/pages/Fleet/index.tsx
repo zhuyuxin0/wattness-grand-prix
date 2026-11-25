@@ -165,7 +165,13 @@ function Fleet({ day }: { day: DayIndex }) {
                   ))}
               </span>
             }
-            note={(["C", "B", "A"] as ArmName[]).map((a) => `${a} ${armMeta[a].label.toLowerCase()}${fleet.arms[a] === 0 ? ": none" : ""}`).join(" · ")}
+            note={(() => {
+              // The key to the letters shown, then any plan no battery sealed, said once in words.
+              const order = ["C", "B", "A"] as ArmName[];
+              const shown = order.filter((a) => fleet.arms[a] > 0).map((a) => `${a} ${armMeta[a].label.toLowerCase()}`);
+              const none = order.filter((a) => fleet.arms[a] === 0).map((a) => `${a} (${armMeta[a].label.toLowerCase()})`);
+              return `${shown.join(" · ")}${none.length ? `; no battery sealed ${none.join(" or ")}` : ""}`;
+            })()}
           />
         </StatRow>
         <p className="fl-source">
