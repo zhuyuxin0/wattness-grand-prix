@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "resolveJsonModule": true
+  },
+  "include": ["hardhat.config.ts", "test", "scripts", "artifacts/**/*.d.ts"]
+}
