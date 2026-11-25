@@ -30,15 +30,7 @@ export default function OverviewPage() {
     <div className="page page--overview">
       <PageHeader
         title="Overview"
-        lede={
-          <>
-            Where the day stands: ERCOT's next day-ahead gate, the latest sealed record and what happens next.
-            <span className="ov-flow">
-              Start here. The plans themselves are in <Link to="/fleet">Fleet</Link> and <Link to={batteryPath("/battery", battery)}>Battery</Link>, and the record
-              on chain is in <Link to="/seal">Seal</Link>.
-            </span>
-          </>
-        }
+        lede="Where the day stands: ERCOT's next day-ahead gate, the latest sealed record and what happens next."
       />
 
       <NextGate nowMs={nowMs} />

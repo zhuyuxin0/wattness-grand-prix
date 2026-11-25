@@ -1,12 +1,6 @@
 /* How It Works. One surface: sections divided by rules, no frames, no
    numbered tiles. Blocks: hw-*, arch. */
 
-.hw-flow {
-  display: block;
-  margin-top: var(--t-space-2);
-  font-size: var(--t-fs-sm);
-}
-
 /* A link that leaves the site carries the popout glyph. */
 .hw-out {
   display: inline-flex;

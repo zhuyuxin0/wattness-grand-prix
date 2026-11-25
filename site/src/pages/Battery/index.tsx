@@ -6,7 +6,7 @@ import { useDesk, useDeskCommon, type Desk } from "../../data/plan";
 import { formatOperatingDay } from "../../lib/time";
 import { useSelectedBattery } from "../../shell/battery";
 import { BATTERY_NAMES, BatteryPicker, ErrorNote, Glyph, Loading, PageHeader, Section } from "../../ui";
-import { ColumnsChart, FanChart, Flow, HourContext, HOURS, Key, Legend, PlanSeg, planLabel, SocChart, TabLink, useHourState } from "./kit";
+import { ColumnsChart, FanChart, HourContext, HOURS, Key, Legend, PlanSeg, planLabel, SocChart, useHourState } from "./kit";
 import { allFigures, ARM_ORDER, differences, startSocMwh, tailPercent } from "./model";
 import { Asset, Compare, Differences, HourReadout, HourTable, Lead, Record } from "./panels";
 import "./styles.css";
@@ -102,15 +102,7 @@ export default function BatteryPage() {
               <span className="bt-code bt-code--title">{desk.resource}</span>
             )
           }
-          lede={
-            <>
-              This battery's plan for {day0}: three ways to run it against the same prices, and the one that was sealed.
-              <Flow>
-                Picked from <TabLink to="/fleet">Fleet</TabLink>. <TabLink to="/agents/forecast">Forecast</TabLink> through <TabLink to="/agents/risk">Risk</TabLink> show how
-                each part was made; <TabLink to="/seal">Seal</TabLink> shows it committed.
-              </Flow>
-            </>
-          }
+          lede={`This battery's plan for ${day0}: three ways to run it against the same prices, and the one that was sealed.`}
         />
 
         <div className="pk-toolbar bt-toolbar" role="group" aria-label="Battery and plan">

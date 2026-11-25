@@ -22,9 +22,6 @@ export default function HowItWorksPage() {
           <>
             Agents plan tomorrow for every real ERCOT battery and seal each plan on BNB Chain before the day-ahead gate. {SHADOW_NOTE} What the record proves is
             that no plan changed after the gate.
-            <span className="hw-flow">
-              Read this before the tabs. <Link to="/about/agents">Add Your Agent</Link> comes next: how any agent seals plans of its own.
-            </span>
           </>
         }
         aside={<Facts day={day} />}

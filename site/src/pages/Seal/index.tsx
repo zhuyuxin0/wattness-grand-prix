@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { SOURCE_LINE } from "../../config";
 import { combine, useDay, useLateSeal, useReceipts, type DayIndex, type LateSeal, type Receipts } from "../../data";
 import { minSec } from "../../lib/clock";
@@ -21,15 +20,7 @@ export default function SealPage() {
     <div className="page page--seal">
       <PageHeader
         title="Seal"
-        lede={
-          <>
-            The record on BNB Chain: one root over every plan for the operating day, committed to GateRecord before ERCOT's 10:00 CT day-ahead gate.
-            <span className="seal-flow">
-              It seals the plans in <Link to="/fleet">Fleet</Link> and <Link to="/battery">Battery</Link>. Next, <Link to="/verify">Verify</Link> checks any plan
-              against it, and <Link to="/files">Files</Link> holds the day's files.
-            </span>
-          </>
-        }
+        lede="The record on BNB Chain: one root over every plan for the operating day, committed to GateRecord before ERCOT's 10:00 CT day-ahead gate."
       />
       <Ready state={all}>{([day, r, late]) => <Record day={day} receipts={r} late={late} />}</Ready>
     </div>
@@ -126,13 +117,6 @@ function Record({ day, receipts, late }: { day: DayIndex; receipts: Receipts; la
         </div>
       </Section>
 
-      <p className="seal-next">
-        <Link to="/verify" className="seal-next__link">
-          Verify a plan against this record
-          <Glyph name="next" />
-        </Link>
-        <span className="muted">The check runs in your browser and reads the record from BNB Smart Chain.</span>
-      </p>
     </>
   );
 }

@@ -1,11 +1,6 @@
 /* Add Your Agent. One surface: steps and reference tables divided by rules,
    code on chrome below the pane, no cards. Blocks: ag-*. */
 
-.ag-flow {
-  display: block;
-  margin-top: var(--t-space-2);
-  font-size: var(--t-fs-sm);
-}
 .ag-label {
   font-size: var(--t-fs-xs);
   font-weight: 600;
