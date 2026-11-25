@@ -39,11 +39,43 @@ describe("Atlas payload and authentication", () => {
     const changed = { data: { ...body.data, payload: payload(now - 1) } };
     await expect(verifyAtlasResponse(changed, { "633": "BNB" }, now, account.address)).rejects.toThrow("signer");
   });
+  // A report recorded from the production Pull endpoint at 2026-11-25 15:54:38 UTC.
+  const recorded = {
+    data: {
+      payload: "0x00000279001d22cd94418e07a0e600006b0704be0000028900000ddc4a7d8ed9ff1b00006b0704be02",
+      signature: "0x3357f2ae8f26dd55019da14cd0c43febdc9ed637a8ce9e83d69c29f2684250527e85556449483c986c2c1e1967a5754b3d2aaf217cb703cefdd4f151115114191b",
+      magicMarker: "0x7096",
+    },
+  };
+  const recordedAt = 1_795_622_078;
+  const pair = { "633": "BNB", "649": "USDT" } as const;
+  it("verifies a recorded production report against the published signer", async () => {
+    const prices = await verifyAtlasResponse(recorded, pair, recordedAt + 1);
+    expect(prices.map(x => [x.asset, x.sourceId, x.observedAtSeconds])).toEqual([["BNB", "633", recordedAt], ["USDT", "649", recordedAt]]);
+    expect(prices[0]?.priceUsd).toBeCloseTo(537.46340171, 8);
+    expect(prices[1]?.priceUsd).toBeCloseTo(0.99875512, 8);
+    await expect(verifyAtlasResponse(recorded, pair, recordedAt + 1, privateKeyToAccount(generatePrivateKey()).address)).rejects.toThrow("signer");
+    await expect(verifyAtlasResponse(recorded, pair, recordedAt + 181)).rejects.toThrow("Stale");
+  });
+  it("rejects a wrong marker or a malformed signature", async () => {
+    await expect(verifyAtlasResponse({ data: { ...recorded.data, magicMarker: "0x0000" } }, pair, recordedAt)).rejects.toThrow("marker");
+    await expect(verifyAtlasResponse({ data: { ...recorded.data, signature: recorded.data.signature.slice(0, -2) } }, pair, recordedAt)).rejects.toThrow("signature");
+    await expect(verifyAtlasResponse({ data: { ...recorded.data, signature: undefined } }, pair, recordedAt)).rejects.toThrow("signature");
+  });
   it("rejects HTTP200 business failures and redacts credentials", async () => {
     const audit: unknown[] = [];
     const transport = (async () => new Response(JSON.stringify({ status: { error_code: "500" }, message: "example-secret" }), { status: 200 })) as typeof fetch;
     const client = new AtlasClient("example-secret", x => audit.push(x), transport);
     await expect(client.latest(now)).rejects.toThrow("business");
+    expect(JSON.stringify(audit)).not.toContain("example-secret");
+  });
+  it("fails on an HTTP error without exposing the credential", async () => {
+    const audit: unknown[] = [];
+    const transport = (async () => new Response(JSON.stringify({ status: { error_code: 1002, error_message: "rejected example-secret" } }), { status: 401 })) as typeof fetch;
+    const error = await new CmcClient("example-secret", x => audit.push(x), transport).quotes(now).catch((e: unknown) => e);
+    expect(String(error)).toContain("HTTP 401");
+    expect(String(error)).not.toContain("example-secret");
+    expect(audit).toHaveLength(1);
     expect(JSON.stringify(audit)).not.toContain("example-secret");
   });
   it.each(["Atlas latest", "CMC quotes", "CMC security"] as const)("keeps %s credentials off a redirect target", async route => {
@@ -105,6 +137,13 @@ describe("price and coverage controls", () => {
   it("parses v3 CMC arrays and checks USD asset identity", () => {
     const result = parseCmcQuotes({ data: [{ id: 1839, quote: [quote] }, { id: 825, quote: [{ ...quote, price: 1 }] }] }, now);
     expect(result.map(x => x.asset)).toEqual(["BNB", "USDT"]);
+    expect(() => parseCmcQuotes({ data: [{ id: 1839, quote: [{ ...quote, id: 2790 }] }, { id: 825, quote: [quote] }] }, now)).toThrow("Missing CMC USD quote");
+    expect(() => parseCmcQuotes({ data: [{ id: 1839, quote: [quote] }] }, now)).toThrow("Missing CMC quote 825");
+    expect(() => parseCmcQuotes({ data: { "1839": { quote: { USD: quote } } } }, now)).toThrow("v3 data array");
+  });
+  it("rejects stale CMC quotes", () => {
+    const old = { ...quote, last_updated: new Date((now - 301) * 1000).toISOString() };
+    expect(() => parseCmcQuotes({ data: [{ id: 1839, quote: [old] }, { id: 825, quote: [quote] }] }, now)).toThrow("Stale");
   });
   it("keeps a missing CMC volume unknown", () => {
     const result = parseCmcQuotes({ data: [{ id: 1839, quote: [{ ...quote, volume_24h: null }] }, { id: 825, quote: [quote] }] }, now);
@@ -144,12 +183,29 @@ describe("funding decision", () => {
     expect(d.evaluationCount).toBe(0);
     expect(d.reasons.length).toBeGreaterThan(0);
   });
+  it("pauses allocations on source divergence", () => {
+    const d = fundingDecision({ treasuryBnb: .25, atlas: [{ ...p, priceUsd: 700 }, atlas[1]!], cmc, security, now });
+    expect(d).toMatchObject({ state: "review", evaluationBudgetUsdCents: 0, evaluationCount: 0 });
+    expect(d.reasons).toContain("BNB source deviation exceeds 5%");
+  });
+  it("pauses allocations when USDT leaves its reference", () => {
+    const d = fundingDecision({ treasuryBnb: .25, atlas: [p, { ...atlas[1]!, priceUsd: .98 }], cmc, security, now });
+    expect(d).toMatchObject({ state: "review", evaluationBudgetUsdCents: 0, evaluationCount: 0 });
+    expect(d.reasons).toContain("USDT reference deviation exceeds 1%");
+  });
+  it("caps the reserve at half the value", () => {
+    const d = fundingDecision({ treasuryBnb: .25, atlas, cmc: [{ ...cmc[0]!, percentChange24h: 30 }], security, now });
+    expect(d.reserveFraction).toBe(.5);
+    expect(d.evaluationBudgetUsdCents).toBe(7500);
+    expect(d.evaluationCount).toBe(37);
+  });
   it("refuses non-finite inputs instead of pricing them", () => {
     expect(() => fundingDecision({ treasuryBnb: .25, atlas, cmc: [{ ...cmc[0]!, priceUsd: Infinity }], security, now })).toThrow("Non-finite");
     expect(() => fundingDecision({ treasuryBnb: .25, atlas, cmc: [{ ...cmc[0]!, percentChange24h: NaN }], security, now })).toThrow("24-hour change");
   });
-  it("pauses allocations on source divergence", () => {
-    const d = fundingDecision({ treasuryBnb: .25, atlas: [{ ...p, priceUsd: 700 }, atlas[1]!], cmc, security, now });
-    expect(d.reasons).toContain("BNB source deviation exceeds 5%");
+  it("refuses stale or out-of-range inputs", () => {
+    expect(() => fundingDecision({ treasuryBnb: .25, atlas: [{ ...p, observedAtSeconds: now - 181 }, atlas[1]!], cmc, security, now })).toThrow("Stale");
+    expect(() => fundingDecision({ treasuryBnb: -1, atlas, cmc, security, now })).toThrow("treasury");
+    expect(() => fundingDecision({ treasuryBnb: .25, atlas, cmc, security, now, evaluationPriceUsdCents: 0 })).toThrow("evaluation price");
   });
 });
