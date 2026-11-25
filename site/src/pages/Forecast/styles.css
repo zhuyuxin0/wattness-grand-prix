@@ -1,0 +1,22 @@
+/* Forecast: the node's fan leads with its readout; the hub's side and the
+   method sit side by side on wide screens; the table closes the page. */
+
+@media (min-width: 768px) {
+  .fc-readout {
+    position: sticky;
+    top: var(--gp-masthead-h);
+    z-index: 5;
+    background: var(--t-pane);
+  }
+}
+.fc-readout .pk-readout {
+  padding-top: var(--t-space-3);
+}
+.fc-method .pk-fact dd {
+  font-size: var(--t-fs);
+}
+@media (min-width: 1000px) {
+  .fc-method {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
