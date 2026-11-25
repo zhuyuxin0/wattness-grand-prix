@@ -36,7 +36,6 @@ const tuple =
     if (!Array.isArray(v) || v.length !== rules.length) return void o.push(`${p}: expected ${rules.length}-tuple`);
     rules.forEach((r, i) => r(v[i], `${p}[${i}]`, o));
   };
-const any: Rule = () => {};
 const obj =
   (fields: Record<string, Rule>): Rule =>
   (v, p, o) => {
@@ -57,6 +56,36 @@ const perArm = (rule: Rule): Rule => obj({ A: nullable(rule), B: nullable(rule),
 
 const fileRef = obj({ route: str, sha256: sha });
 const stamp = obj({ unix: nonNeg, local: str });
+
+// outside_inputs: null in every manifest before the risk officer read Cournot.
+const weatherRule = obj({
+  id: str,
+  stress_if_event_ppm: nonNeg,
+  stress_if_no_event_ppm: nonNeg,
+  prior_event_ppm: nonNeg,
+  base_hedge_limit_kwh: nonNeg,
+  hedge_cut_ppm: nonNeg,
+  stress_hours: arr(nonNeg),
+  stress_share: tuple(nonNeg, nonNeg),
+  max_age_seconds: nonNeg,
+  stations: arr(str),
+  measure: str,
+  comparator: str,
+  event_day_offsets: arr(int),
+});
+const cournotInput = obj({
+  status: lit("applied", "not_applied"),
+  reason: nullable(str),
+  rule: weatherRule,
+  claim: nullable(obj({ market_id: str, title: str, station: str, measure: str, comparator: str, threshold_f: int, date: day })),
+  probability_ppm: nullable(nonNeg),
+  basis: arr(obj({ source: str, time: nullable(str), summary: str, url: nullable(str) })),
+  observed: nullable(stamp),
+  response: nullable(fileRef),
+  stress: nullable(obj({ days: arr(day), scenarios: nonNeg })),
+  before: obj({ stress_weight_ppm: nullable(nonNeg), max_contracts_per_hour: nonNeg }),
+  after: nullable(obj({ stress_weight_ppm: nonNeg, hedge_limit_kwh: nonNeg, max_contracts_per_hour: nonNeg })),
+});
 
 const manifestRule = obj({
   schema: lit(MANIFEST_SCHEMA),
@@ -150,7 +179,7 @@ const manifestRule = obj({
   selection_rule: str,
   engine: obj({ repo: str, commit: str, tree: re(/^[0-9a-f]{40}$/, "40 lowercase hex digits"), solver: str, solver_package: str }),
   agent: obj({ wallet: address, erc8004_id: nullable(str) }),
-  outside_inputs: any,
+  outside_inputs: nullable(obj({ cournot: cournotInput })),
   salt: hex32,
 });
 
