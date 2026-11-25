@@ -1,10 +1,245 @@
-/* Files. */
+/* Files: the sealed day's files in the Terminal's table grammar. The page
+   scrolls, never the table; on a phone each file is one stacked row. */
 
-.files-link {
+.fs-lead {
+  margin-top: calc(var(--t-space-3) - var(--gp-space-8));
+}
+@media (max-width: 767px) {
+  .fs-lead {
+    margin-top: calc(var(--t-space-3) - var(--gp-space-7));
+  }
+}
+.fs-stats.stat-row {
+  border-top: 0;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+}
+.fs-lead {
+  display: grid;
+  gap: var(--t-space-3);
+}
+.fs-source {
+  max-width: 110ch;
+  font-size: var(--t-fs-xs);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.fs-bucket {
+  font-family: var(--t-font-code);
+  font-size: var(--t-fs);
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.fs-link {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
 }
-.files-link .glyph {
+.fs-link .glyph {
+  flex: none;
   color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- controls */
+
+.fs-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-3);
+}
+.fs-search input {
+  width: 200px;
+  max-width: 100%;
+  height: var(--t-ctl-h);
+  padding: 0 var(--t-space-3);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+}
+.fs-search input::placeholder {
+  color: var(--w-muted);
+}
+.fs-search input:focus {
+  outline: none;
+  border-color: var(--t-accent-text);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--t-accent-text) 22%, transparent);
+}
+.fs-n {
+  margin-left: 2px;
+  color: var(--w-muted);
+  font-weight: 400;
+}
+
+/* ---------------------------------------------------------------- the table */
+
+.fs-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--t-fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+.fs-table th,
+.fs-table td {
+  text-align: left;
+  white-space: nowrap;
+}
+.fs-table .r {
+  text-align: right;
+}
+.fs-table thead th {
+  position: sticky;
+  top: var(--gp-masthead-h);
+  z-index: 2;
+  height: var(--t-hdr-h);
+  padding: 0;
+  background: var(--t-chrome);
+  border-bottom: 1px solid var(--w-border);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.fs-table thead th > span {
+  display: flex;
+  align-items: center;
+  height: var(--t-hdr-h);
+  padding: 0 10px;
+}
+.fs-sort {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: var(--t-hdr-h);
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.fs-table th.r .fs-sort {
+  justify-content: flex-end;
+}
+.fs-sort:hover {
+  color: var(--w-fg);
+}
+.fs-sort:focus-visible {
+  outline-offset: -2px;
+}
+.fs-sort__glyph {
+  opacity: 0;
+}
+.fs-sort:is(:hover, :focus-visible) .fs-sort__glyph {
+  opacity: 0.45;
+}
+.fs-table th.is-sorted {
+  color: var(--w-fg);
+}
+.fs-table th.is-sorted .fs-sort__glyph,
+[data-capture="1"] .fs-sort__glyph {
+  opacity: 1;
+}
+.fs-table td {
+  height: var(--t-row);
+  padding: 0 10px;
+  border-bottom: 1px solid var(--t-rule);
+}
+.fs-table tbody tr:hover > td {
+  background: var(--t-hover);
+}
+.fs-c-path .fs-link {
+  font-size: var(--t-fs-xs);
+}
+.fs-c-kind {
+  color: var(--w-muted);
+}
+.fs-c-hash {
+  width: 1%;
+}
+.fs-c-hash .hash {
+  font-size: var(--t-fs-xs);
+}
+.fs-empty {
+  padding: var(--gp-space-7) 10px !important;
+  text-align: center;
+  color: var(--w-muted);
+}
+.fs-more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-3) var(--t-space-4);
+  padding-top: var(--t-space-4);
+  font-size: var(--t-fs-sm);
+}
+
+/* ---------------------------------------------------------------- phones */
+
+@media (max-width: 767px) {
+  #fs-files .section__actions,
+  .fs-controls {
+    width: 100%;
+    min-width: 0;
+  }
+  .fs-controls .seg button {
+    padding: 0 6px;
+  }
+  .fs-search,
+  .fs-search input {
+    width: 100%;
+  }
+  .fs-controls .seg {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .fs-table thead {
+    display: none;
+  }
+  .fs-table table,
+  .fs-table tbody {
+    display: block;
+  }
+  .fs-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px var(--t-space-3);
+    padding: var(--t-space-3) 0;
+    border-bottom: 1px solid var(--t-rule);
+  }
+  .fs-table td {
+    display: block;
+    height: auto;
+    padding: 0;
+    border: 0;
+  }
+  .fs-c-path {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+  .fs-c-path .fs-link {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .fs-c-kind {
+    grid-column: 1;
+    font-size: var(--t-fs-xs);
+  }
+  .fs-c-size {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: var(--t-fs-xs);
+  }
+  .fs-c-hash {
+    grid-column: 1 / -1;
+    width: auto;
+  }
+  .fs-table tbody tr:hover > td {
+    background: none;
+  }
 }
