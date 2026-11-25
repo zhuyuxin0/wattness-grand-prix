@@ -1,0 +1,23 @@
+/* State of Charge: the three plans as small multiples on one scale, the
+   readout pinned above them; limits and cycles side by side; tables close. */
+
+@media (min-width: 768px) {
+  .soc-readout {
+    position: sticky;
+    top: var(--gp-masthead-h);
+    z-index: 5;
+    background: var(--t-pane);
+  }
+}
+.soc-readout .pk-readout {
+  padding-top: var(--t-space-3);
+}
+.soc-multiples {
+  margin-top: var(--t-space-2);
+}
+.soc-multiples .pk-figure__title {
+  font-size: var(--t-fs-sm);
+}
+.soc-multiples .pk-plan__label {
+  font-weight: 400;
+}
