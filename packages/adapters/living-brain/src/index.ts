@@ -4,6 +4,8 @@ export interface Brain { id: string; name: string; createdAt: string }
 export interface Source {
   id: string; brainId: string; status: SourceStatus; createdAt: string;
   compiledAt: string | null; affectedPageIds?: string[]; lastError?: string | null;
+  /** The capture's stable origin reference, when the API returns it. */
+  originRef?: string;
 }
 export interface Page {
   id: string; brainId: string; slug: string; title: string; body: string;
@@ -50,6 +52,7 @@ function source(value: unknown): Source {
     compiledAt: typeof x.compiledAt === "string" ? x.compiledAt : null,
     ...(Array.isArray(x.affectedPageIds) ? { affectedPageIds: x.affectedPageIds.filter((v): v is string => typeof v === "string") } : {}),
     ...(typeof x.lastError === "string" ? { lastError: x.lastError } : {}),
+    ...(typeof x.originRef === "string" && x.originRef ? { originRef: x.originRef } : {}),
   };
 }
 function page(value: unknown): Page {
@@ -88,8 +91,9 @@ export function redact(value: unknown, secrets: readonly string[] = []): unknown
   }
   return value;
 }
+const PLAIN_ID = /^[A-Za-z0-9_-]+$/;
 function safePathPart(value: string): string {
-  if (!/^[A-Za-z0-9_-]+$/.test(value)) throw new MemoryError("Invalid API identifier");
+  if (!PLAIN_ID.test(value)) throw new MemoryError("Invalid API identifier");
   return encodeURIComponent(value);
 }
 export class LivingBrain {
@@ -205,12 +209,14 @@ export class LivingBrain {
     const pages: CitedPage[] = [], exclusions: Array<{ slug: string; reason: string }> = [];
     for (const hit of hits) {
       if (hit.status !== "active") { exclusions.push({ slug: hit.slug, reason: "Page is not active" }); continue; }
+      if (!PLAIN_ID.test(hit.slug)) { exclusions.push({ slug: hit.slug, reason: "Page slug is not a plain identifier" }); continue; }
       const p = await this.readPage(brainId, hit.slug);
       const ids = p.sources.map(s => s.ingestSourceId);
       const sources = await this.sources(brainId, ids);
       const check = pageAvailableAt(p, sources, cutoff);
       if (!check.ok) { exclusions.push({ slug: p.slug, reason: check.reason }); continue; }
-      pages.push({ page: p, citation: { slug: p.slug, version: p.version, availableAt: check.availableAt, sourceIds: ids } });
+      const originRefs = ids.flatMap(id => sources.find(x => x.id === id)?.originRef ?? []);
+      pages.push({ page: p, citation: { slug: p.slug, version: p.version, availableAt: check.availableAt, sourceIds: ids, originRefs } });
     }
     return { cutoff, pages, exclusions };
   }
@@ -233,7 +239,7 @@ export function pageAvailableAt(page: Page, sources: readonly Source[], cutoff: 
     return { ok: true, availableAt: new Date(available).toISOString() };
   } catch { return { ok: false, reason: "Availability timestamp is invalid or missing" }; }
 }
-export interface Citation { slug: string; version: number; availableAt: string; sourceIds: string[] }
+export interface Citation { slug: string; version: number; availableAt: string; sourceIds: string[]; originRefs: string[] }
 export interface CitedPage { page: Page; citation: Citation }
 export interface Retrieval { cutoff: string; pages: CitedPage[]; exclusions: Array<{ slug: string; reason: string }> }
 export interface ReviewDecision {
@@ -241,8 +247,15 @@ export interface ReviewDecision {
   requireExecutableQuoteForTradingClaim: boolean;
   explanation: string; citations: Citation[];
 }
-export function reviewFromMemory(retrieval: Retrieval): ReviewDecision {
-  const supported = retrieval.pages.filter(x => /assumed|fair[ -]?value/i.test(x.page.body) && /scenario|execut/i.test(x.page.body));
+/**
+ * Classifies the hedge entry from memory. A page supports the classification only
+ * when it was compiled from the reviewed capture (its originRef) and still states
+ * the rule; wording alone, from any other page, does not.
+ */
+export function reviewFromMemory(retrieval: Retrieval, reviewedOrigin: string): ReviewDecision {
+  if (typeof reviewedOrigin !== "string" || !reviewedOrigin) throw new MemoryError("A reviewed capture's originRef is required");
+  const supported = retrieval.pages.filter(x => x.citation.originRefs.includes(reviewedOrigin) &&
+    /assumed|fair[ -]?value/i.test(x.page.body) && /scenario|execut/i.test(x.page.body));
   if (supported.length === 0) return {
     classification: "needs-supported-review", requireExecutableQuoteForTradingClaim: true,
     explanation: "The available memory does not support an entry classification; request a cited review.",

@@ -72,8 +72,10 @@ async function run(): Promise<void> {
   const query = asset + " assumed model fair value hedge entry scenario comparison";
   const cutoff = new Date().toISOString();
   const current = await reader.retrieveAt(brainId, query, cutoff);
-  const before = reviewFromMemory({ cutoff, pages: [], exclusions: [] });
-  const after = reviewFromMemory(current);
+  // The reader knows only the reviewed rule's public origin reference, never its text.
+  const reviewedOrigin = captures[1]!.origin;
+  const before = reviewFromMemory({ cutoff, pages: [], exclusions: [] }, reviewedOrigin);
+  const after = reviewFromMemory(current, reviewedOrigin);
   const historical = await reader.retrieveAt(brainId, query, "2026-11-25T15:12:46.000Z");
   const graph = await reader.graph(brainId);
   save("handover.json", {
