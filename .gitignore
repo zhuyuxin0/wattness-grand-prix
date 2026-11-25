@@ -8,5 +8,4 @@ coverage/
 .env
 .env.*
 !.env.example
-CLAUDE.local.md
 .DS_Store
