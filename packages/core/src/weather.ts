@@ -18,11 +18,14 @@ import { PPM } from "./int.js";
 //
 // The stress bucket comes from the plan's own scenario matrix, so it uses only
 // prices published before plan time: every history day is scored by the sum
-// of its hub settlement prices over ERCOT's two winter peaks (hour ending 7
-// to 10 and 18 to 21, Central), the price a short hedge pays when a cold
-// morning lifts heating load. The top quarter of history days (rounded up,
-// ties to the later day) are the stress days; every scenario built on one is
-// in the bucket. Those scenarios share the weight w equally, the others share
+// of its scenarios' hub settlements (hub_sum4: the operating day's hub
+// forecast plus that history day's real-time error against its own forecast,
+// clipped to the contract's range) over ERCOT's two winter peaks (hour ending
+// 7 to 10 and 18 to 21, Central), the price a short hedge pays when a cold
+// morning lifts heating load. The forecast is the same for every history day,
+// so the score ranks days by how far real time ran above forecast at those
+// peaks. The top quarter of history days (rounded up, ties to the later day)
+// are the stress days; every scenario built on one is in the bucket. Those scenarios share the weight w equally, the others share
 // 1 - w equally. The same weights set the fair-value entry, the mean and the
 // CVaR, so the three arms stay comparable.
 
