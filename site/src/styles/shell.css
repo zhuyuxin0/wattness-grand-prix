@@ -282,10 +282,14 @@
   text-decoration: none;
   white-space: nowrap;
 }
-.sidenav-item:hover {
-  background: var(--t-hover);
-  border-left-color: var(--t-accent-mark);
-  color: var(--w-fg);
+/* Hover only where there is a pointer: on a touch screen a tap leaves :hover on
+   the row under the finger, and the drawer opens a row right there. */
+@media (hover: hover) {
+  .sidenav-item:hover {
+    background: var(--t-hover);
+    border-left-color: var(--t-accent-mark);
+    color: var(--w-fg);
+  }
 }
 .sidenav-item[aria-current="page"] {
   background: var(--t-selected);
