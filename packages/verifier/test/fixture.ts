@@ -1,6 +1,7 @@
 import {
   assumedEntryCents,
   canonicalJson,
+  codeHashFromCommit,
   fileSha256,
   gateTs,
   leafHash,
@@ -15,6 +16,7 @@ import {
   splitKw,
   type Arm,
   type FileRef,
+  type FleetIndex,
   type Manifest,
   type ScenarioMatrix,
 } from "@gatelock/core";
@@ -35,9 +37,9 @@ const KWH = 206_438;
 const enc = (s: string) => new TextEncoder().encode(s);
 
 /** A small data site: one release (manifest, catalogs, payloads by route) and a live tier. */
-export function fakeSite(payloads: Record<string, string>, live: Record<string, string>) {
+export function fakeSite(payloads: Record<string, string>, live: Record<string, string>, releaseId = RELEASE_ID) {
   const files = new Map<string, Uint8Array>();
-  const display = `/data/terminal-display/v1/releases/${RELEASE_ID}`;
+  const display = `/data/terminal-display/v1/releases/${releaseId}`;
   const buckets = new Map<string, { route: string; path: string; sha256: string }[]>();
   const routes: FileRef[] = [];
   for (const [route, body] of Object.entries(payloads)) {
@@ -55,7 +57,7 @@ export function fakeSite(payloads: Record<string, string>, live: Record<string, 
     trail.push({ route: `${display}/catalogs/${bucket}.json`, sha256: fileSha256(body) });
     return { bucket, path: `catalogs/${bucket}.json`, sha256: fileSha256(body) };
   });
-  const manifestBody = JSON.stringify({ release: RELEASE_ID, catalogs });
+  const manifestBody = JSON.stringify({ release: releaseId, catalogs });
   files.set(`${SITE}${display}/manifest.json`, enc(manifestBody));
   trail.unshift({ route: `${display}/manifest.json`, sha256: fileSha256(manifestBody) });
 
@@ -252,6 +254,15 @@ export class FakeChain implements ChainReader {
     const key = recordKey(m.agent.wallet, scope, od);
     const codeHash: Hex = `0x${COMMIT}${"0".repeat(24)}`;
     this.records.set(key, { root, codeHash, scope, committer: m.agent.wallet, od, leafCount: 1, committedAt: at, blockNumber: 1234 });
+    return key;
+  }
+
+  /** A day's record as the plan CLI commits it: one root over every leaf, under the index's scope. */
+  commitFleet(index: FleetIndex, wallet: Address, at: number, blockNumber = 1234): Hex {
+    const od = odFromIso(index.operating_day);
+    const scope = scopeId(index.scope_label);
+    const key = recordKey(wallet, scope, od);
+    this.records.set(key, { root: index.root, codeHash: codeHashFromCommit(index.code_tree), scope, committer: wallet, od, leafCount: index.leaf_count, committedAt: at, blockNumber });
     return key;
   }
 

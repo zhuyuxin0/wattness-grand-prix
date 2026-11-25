@@ -6,13 +6,15 @@ import type { Address, Hex } from "viem";
 import { resolveNetwork, rpcReader } from "./chain.js";
 import { formatReport } from "./report.js";
 import { httpFetcher } from "./sources.js";
-import { FLEET_SCHEMA, fleetIndexErrors, leafOf, type FleetIndex } from "@gatelock/core";
+import { FLEET_SCHEMA, fleetIndexErrors, leafOf, outcomeDocumentPath, type FleetIndex, type OutcomeIndex } from "@gatelock/core";
 import { verify, type Inclusion, type OutcomeFile, type RecordFile } from "./verify.js";
 
 const USAGE = `usage: pnpm verify <manifest.json> | --manifest FILE | --od YYYY-MM-DD [options]
 
   <manifest.json> is a battery's manifest or a day's index (out/od-YYYYMMDD/manifest.json)
-  --battery R                   with an index: check R's leaf and its Merkle proof (default: the showcase)
+  --battery R                   with an index: check R's leaf and its Merkle proof (default: the showcase),
+                                and R's outcome at each stage under outcomes/
+  --outcomes DIR                with an index: where the stages' outcomes are (default: outcomes/ beside the index)
 
   --network local|bsc-testnet   chain to read (default bsc-testnet)
   --rpc URL                     try this RPC first
@@ -24,7 +26,8 @@ const USAGE = `usage: pnpm verify <manifest.json> | --manifest FILE | --od YYYY-
   --no-fetch                    read the chain but do not fetch inputs (skips V7)
   --no-chain                    fetch inputs but do not read the chain (skips V2, V3)
 
-record.json, scenarios.json and outcome-<stage>.json are read from the manifest's directory.`;
+record.json and scenarios.json are read from the manifest's directory. Outcomes: for a day's index,
+outcomes/stage-<n>/index.json and the battery's document it lists; for a single manifest, outcome-<n>.json.`;
 
 function readJson(path: string): unknown {
   return JSON.parse(readFileSync(path, "utf8"));
@@ -37,6 +40,24 @@ function findRepoRoot(from: string): string | null {
   }
 }
 
+/** Each stage's index under outcomes/, with the battery's document when the index lists one. */
+function readStageOutcomes(root: string, resource: string): OutcomeFile[] {
+  const found: OutcomeFile[] = [];
+  for (const stage of [1, 2, 3]) {
+    const stageDir = join(root, `stage-${stage}`);
+    const indexPath = join(stageDir, "index.json");
+    if (!existsSync(indexPath)) continue;
+    const index = readJson(indexPath) as Partial<OutcomeIndex>;
+    const listed = Array.isArray(index.leaves) && index.leaves.some((l) => l?.resource === resource);
+    // The path is fixed by name, never taken from the index, so a reader cannot be led outside the stage.
+    const docPath = join(stageDir, outcomeDocumentPath(resource));
+    const doc = listed && existsSync(docPath) ? readJson(docPath) : null;
+    console.log(`outcome   stage ${stage}: ${indexPath}${listed ? "" : ` (lists no ${resource})`}`);
+    found.push({ stage, doc, index });
+  }
+  return found;
+}
+
 async function main(): Promise<number> {
   const { values, positionals } = parseArgs({
     allowPositionals: true,
@@ -44,6 +65,7 @@ async function main(): Promise<number> {
       od: { type: "string" },
       manifest: { type: "string" },
       battery: { type: "string" },
+      outcomes: { type: "string" },
       scope: { type: "string" },
       network: { type: "string", default: "bsc-testnet" },
       rpc: { type: "string" },
@@ -75,8 +97,11 @@ async function main(): Promise<number> {
   let inclusion: Inclusion | undefined;
   let scenariosOverride: string | undefined;
   let indexScope: string | undefined;
+  let fleet: FleetIndex | undefined;
+  let fleetOutcomes: OutcomeFile[] | undefined;
   if ((manifest as { schema?: unknown }).schema === FLEET_SCHEMA) {
     const index = manifest as FleetIndex;
+    fleet = index;
     const problems = fleetIndexErrors(index);
     if (problems.length > 0) throw new Error(`index ${manifestPath}:\n  ${problems.join("\n  ")}`);
     const resource = values.battery ?? index.showcase ?? index.leaves[0]?.resource;
@@ -91,8 +116,9 @@ async function main(): Promise<number> {
     manifest = readJson(leafPath);
     scenariosOverride = join(dir, entry.scenarios);
     manifestPath = leafPath;
-  } else if (values.battery) {
-    throw new Error("--battery needs a day's index, not a single manifest");
+    fleetOutcomes = readStageOutcomes(values.outcomes ? resolve(cwd, values.outcomes) : join(dir, "outcomes"), resource);
+  } else if (values.battery || values.outcomes) {
+    throw new Error(`--${values.battery ? "battery" : "outcomes"} needs a day's index, not a single manifest`);
   }
   const od = (manifest as { operating_day?: unknown }).operating_day;
   const canonicalDir = repo && typeof od === "string" && /^\d{4}-\d{2}-\d{2}$/.test(od) ? join(repo, "records", od) : null;
@@ -109,10 +135,12 @@ async function main(): Promise<number> {
   const record = recordPath ? (readJson(recordPath) as RecordFile) : undefined;
   const scenariosPath = scenariosOverride && existsSync(scenariosOverride) ? scenariosOverride : beside("scenarios.json");
   const scenarios = scenariosPath ? readJson(scenariosPath) : undefined;
-  const outcomes: OutcomeFile[] = [1, 2, 3]
-    .map((stage) => ({ stage, path: join(dir, `outcome-${stage}.json`) }))
-    .filter((o) => existsSync(o.path))
-    .map((o) => ({ stage: o.stage, doc: readJson(o.path) }));
+  const outcomes: OutcomeFile[] =
+    fleetOutcomes ??
+    [1, 2, 3]
+      .map((stage) => ({ stage, path: join(dir, `outcome-${stage}.json`) }))
+      .filter((o) => existsSync(o.path))
+      .map((o) => ({ stage: o.stage, doc: readJson(o.path) }));
 
   const network = resolveNetwork(values.network as string, values.rpc);
   let contract = (values.contract ?? record?.contract) as Address | undefined;
@@ -145,6 +173,7 @@ async function main(): Promise<number> {
     key: values.key as Hex | undefined,
     ...(values.scope ?? indexScope ? { scopeLabel: (values.scope ?? indexScope) as string } : {}),
     ...(inclusion ? { inclusion } : {}),
+    ...(fleet ? { fleet } : {}),
     chain: values.offline || values["no-chain"] ? null : { reader: rpcReader(network), network, contract },
     sources: values.offline || values["no-fetch"] ? null : { fetcher: httpFetcher, mirror },
   });
