@@ -69,16 +69,21 @@ function page(value: unknown): Page {
     }),
   };
 }
+const CONTACT = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/;
+// Credentials and the identities of accounts, people and subjects. API object ids
+// (brain, page, source) are kept for reproducibility.
+const IDENTITY_KEY = /^(authorization|x-api-key|x-subject-id|apiKey|subjectId|tenantId|createdBy|lastEditedBy|contributorIds|people|email)$|(user|account|organization|org|owner)Ids?$/i;
 export function redact(value: unknown, secrets: readonly string[] = []): unknown {
   if (typeof value === "string") {
     let clean = value;
     for (const secret of secrets) if (secret.length > 0) clean = clean.split(secret).join("[REDACTED]");
-    return clean.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[CONTACT REDACTED]");
+    return clean.replace(new RegExp(CONTACT.source, "g"), "[CONTACT REDACTED]");
   }
   if (Array.isArray(value)) return value.map(v => redact(v, secrets));
   if (typeof value === "object" && value !== null) {
+    // A null or empty identity field reveals nothing and stays as returned.
     return Object.fromEntries(Object.entries(value).map(([key, v]) => [
-      key, /^(authorization|x-api-key|x-subject-id|apiKey|subjectId|tenantId)$/i.test(key) ? "[REDACTED]" : redact(v, secrets),
+      key, IDENTITY_KEY.test(key) && v !== null && !(Array.isArray(v) && v.length === 0) ? "[REDACTED]" : redact(v, secrets),
     ]));
   }
   return value;
@@ -98,6 +103,8 @@ export class LivingBrain {
   constructor(options: ClientOptions) {
     this.#key = text(options.apiKey, "API key");
     this.#subject = text(options.subjectId, "subject");
+    // The subject travels in a header on every request, outside the body check below.
+    if (CONTACT.test(this.#subject)) throw new MemoryError("The subject id must not be a contact address");
     this.#auth = options.authMode ?? "bearer";
     this.#fetch = options.fetch ?? globalThis.fetch;
     this.#onEvidence = options.onEvidence;
@@ -112,7 +119,7 @@ export class LivingBrain {
     else headers.set("x-api-key", this.#key);
     if (body !== undefined) headers.set("Content-Type", "application/json");
     const serialized = body === undefined ? undefined : JSON.stringify(body);
-    if (serialized && /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(serialized)) {
+    if (serialized && CONTACT.test(serialized)) {
       throw new MemoryError("Contact addresses are not permitted in external captures");
     }
     let response: Response;

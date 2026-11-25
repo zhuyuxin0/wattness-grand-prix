@@ -106,4 +106,26 @@ describe("capture protocol and safety", () => {
   it("redacts nested identity fields and credential echoes", () => {
     expect(redact({ subjectId: "a", nested: ["unit-key"], tenantId: "t" }, ["unit-key"])).toEqual({ subjectId: "[REDACTED]", nested: ["[REDACTED]"], tenantId: "[REDACTED]" });
   });
+  it("redacts account and person identifiers but keeps API object ids", () => {
+    const graph = {
+      nodes: [{ id: "n1", slug: "dswl-ess-esr1", createdByUserId: "u-7", lastEditedByUserId: null, contributorIds: ["u-7"], lastEditedBy: { name: "A Person" } }],
+      people: [{ name: "A Person" }], storageBillingAccountId: "acct-1", organizationId: "org-1", brainId: "b1", pageId: "p1", ingestSourceId: "s1", affectedPageIds: ["p1"],
+    };
+    expect(redact(graph)).toEqual({
+      nodes: [{ id: "n1", slug: "dswl-ess-esr1", createdByUserId: "[REDACTED]", lastEditedByUserId: null, contributorIds: "[REDACTED]", lastEditedBy: "[REDACTED]" }],
+      people: "[REDACTED]", storageBillingAccountId: "[REDACTED]", organizationId: "[REDACTED]", brainId: "b1", pageId: "p1", ingestSourceId: "s1", affectedPageIds: ["p1"],
+    });
+  });
+  it("refuses a contact address as the subject id", () => {
+    expect(() => new LivingBrain({ apiKey: "unit-key", subjectId: "someone@example.invalid" })).toThrow("contact address");
+  });
+  it("rejects redirects and calls only the fixed API origin", async () => {
+    const { c, calls } = client([json([]), json({ items: [] })]);
+    await c.search("b1", "anything");
+    await c.sources("b1", ["s1"]);
+    for (const call of calls) {
+      expect(call.options?.redirect).toBe("error");
+      expect(call.url.startsWith("https://api.livingbrain.com/v1/")).toBe(true);
+    }
+  });
 });
