@@ -40,6 +40,34 @@ importers:
         specifier: 3.21.2
         version: 3.21.2
 
+  modules/flap:
+    dependencies:
+      '@gatelock/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@gatelock/flap':
+        specifier: workspace:*
+        version: link:../../packages/adapters/flap
+      viem:
+        specifier: 2.57.17
+        version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+    devDependencies:
+      '@gatelock/contracts':
+        specifier: workspace:*
+        version: link:../../contracts
+      '@nomicfoundation/hardhat-node-test-runner':
+        specifier: 3.1.2
+        version: 3.1.2(hardhat@3.21.2)
+      '@nomicfoundation/hardhat-viem':
+        specifier: 3.1.0
+        version: 3.1.0(hardhat@3.21.2)(viem@2.57.17(typescript@5.9.3)(zod@3.25.76))
+      '@nomicfoundation/hardhat-viem-assertions':
+        specifier: 3.1.5
+        version: 3.1.5(@nomicfoundation/hardhat-viem@3.1.0(hardhat@3.21.2)(viem@2.57.17(typescript@5.9.3)(zod@3.25.76)))(hardhat@3.21.2)(viem@2.57.17(typescript@5.9.3)(zod@3.25.76))
+      hardhat:
+        specifier: 3.21.2
+        version: 3.21.2
+
   modules/openfour:
     dependencies:
       viem:
