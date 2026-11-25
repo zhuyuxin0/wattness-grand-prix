@@ -81,8 +81,8 @@ export function buildCard(id: RoleId, ctx: CardContext): AgentCard {
     type: REGISTRATION_TYPE,
     name: `${PRODUCT} ${r.title}`,
     description:
-      `${r.summary} One of six roles in the ${PRODUCT} day plan for every real ERCOT battery, ` +
-      "sealed on BNB Chain before ERCOT's 10:00 CT day-ahead gate.",
+      `${r.summary} One of six roles in the ${PRODUCT}, which plans tomorrow for real ERCOT batteries ` +
+      "and seals each plan on BNB Chain before ERCOT's 10:00 CT day-ahead gate.",
     image: "",
     services: [{ name: "web", endpoint: SITE }],
     x402Support: false,

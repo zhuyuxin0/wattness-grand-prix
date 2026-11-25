@@ -29,7 +29,8 @@ export interface AgentRecord {
 }
 
 export interface JobStep extends SentTx {
-  step: "createJob" | "registerJob" | "setBudget" | "approve" | "fund" | "submit" | "settle" | "faucet";
+  /** "gas": tBNB from the record wallet for a call the relay would not sponsor; "faucet": test U for the budget. */
+  step: "gas" | "faucet" | "createJob" | "registerJob" | "setBudget" | "approve" | "fund" | "submit" | "settle";
 }
 
 export interface JobRecord {

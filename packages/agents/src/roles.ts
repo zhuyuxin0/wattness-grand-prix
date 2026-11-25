@@ -62,7 +62,7 @@ export const ROLES: readonly Role[] = [
     key: "FORECASTER",
     summary: "Forecasts tomorrow's hourly day-ahead price at each battery's hub and node, and builds the price scenarios every plan is scored over.",
     method:
-      "Day-type persistence: a 4-3-2-1 weighted mean of the newest same-type day-ahead hub prices, plus the node's mean day-ahead basis. Each scenario adds one history day's day-ahead and real-time hub errors against the same rule to the forecast, crossed with one basis day's node-minus-hub basis; equally weighted, no random numbers.",
+      "Day-type persistence: a 4-3-2-1 weighted mean of the newest same-type day-ahead hub prices, plus the node's mean day-ahead basis. Each scenario adds one history day's day-ahead and real-time hub errors against the same rule to the forecast, crossed with one basis day's node-minus-hub basis; equally weighted, no random numbers. The planner hires it for a battery's scenarios as an ERC-8183 job.",
     reads: ["day-ahead and real-time hub prices, and day-ahead node prices, from the market reader"],
     writes: [
       "forecast: hub_da_cents, node_da_cents, the reference days and weights",
