@@ -26,7 +26,7 @@ import {
 import { fromData, gateUnix, plan, type ArmId, type Manifest, type RecordKind } from "@gatelock/engine";
 import type { Address, Hex } from "viem";
 
-export const ENGINE_REPO = "https://github.com/zhuyuxin0/wattness-bnb-bangkok";
+export const ENGINE_REPO = "https://github.com/zhuyuxin0/wattness-grand-prix";
 /** The showcase leaf: the one battery whose identity comes from the hedging walkthrough. */
 export const SHOWCASE = "DSWL_ESS_ESR1";
 /** Node prices must exist on at least one day of this window (days before the operating day). */
