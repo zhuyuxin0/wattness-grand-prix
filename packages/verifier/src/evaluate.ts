@@ -50,18 +50,61 @@ export function cvarOfLossUusd(revenues: readonly bigint[], alphaPpm: number): b
   return floorDiv(acc, tail);
 }
 
+/**
+ * CVaR at alpha of loss over scenarios with integer weights: the worst
+ * (1 - alpha) of the total weight, the boundary scenario taken by its
+ * fraction. With every weight 1 this is cvarOfLossUusd. Floored.
+ */
+export function cvarOfLossWeightedUusd(revenues: readonly bigint[], weights: readonly number[], alphaPpm: number): bigint {
+  const rows = revenues.map((r, i) => ({ loss: -r, mass: BigInt(weights[i] as number) * BigInt(PPM) }));
+  rows.sort((a, b) => (a.loss > b.loss ? -1 : a.loss < b.loss ? 1 : 0));
+  const total = weights.reduce((a, w) => a + BigInt(w), 0n);
+  const tail = total * BigInt(PPM - alphaPpm);
+  if (tail <= 0n) throw new Error("alpha leaves no tail");
+  let left = tail;
+  let acc = 0n;
+  for (const { loss, mass } of rows) {
+    if (left === 0n) break;
+    const w = left < mass ? left : mass;
+    acc += w * loss;
+    left -= w;
+  }
+  return floorDiv(acc, tail);
+}
+
 export interface ArmRisk {
   expected: bigint;
   cvar: bigint;
 }
 
-export function armRisk(m: Manifest, arm: Arm, matrix: ScenarioMatrix): ArmRisk {
+/** Expected revenue and CVaR; `weights` (one integer per scenario) when the scenarios are not equally weighted. */
+export function armRisk(m: Manifest, arm: Arm, matrix: ScenarioMatrix, weights?: readonly number[]): ArmRisk {
   const revenues = matrix.node_cents.map((node, i) => scenarioRevenueUusd(m, arm, node, matrix.hub_sum4[i] as number[]));
+  if (weights) {
+    const total = weights.reduce((a, w) => a + BigInt(w), 0n);
+    const expected = floorDiv(revenues.reduce((a, r, i) => a + BigInt(weights[i] as number) * r, 0n), total);
+    return { expected, cvar: cvarOfLossWeightedUusd(revenues, weights, m.risk.alpha_ppm) };
+  }
   const expected = floorDiv(
     revenues.reduce((a, b) => a + b, 0n),
     BigInt(revenues.length),
   );
   return { expected, cvar: cvarOfLossUusd(revenues, m.risk.alpha_ppm) };
+}
+
+/** The fair-value entry for one hour under integer weights, rounded half up to the tick. */
+export function weightedEntryCents(sum4: readonly number[], weights: readonly number[], range: readonly [number, number], tick: number): number {
+  const [lo, hi] = range;
+  let acc = 0n;
+  let total = 0n;
+  sum4.forEach((v, i) => {
+    const w = BigInt(weights[i] as number);
+    acc += w * BigInt(Math.min(Math.max(v, 4 * lo), 4 * hi));
+    total += w;
+  });
+  const den = 4n * total * BigInt(tick);
+  const ticks = Number((acc + den / 2n) / den);
+  return Math.min(Math.max(ticks * tick, lo), hi);
 }
 
 /** floor((mean x 10^6 - lambda x CVaR) / 10^6). */

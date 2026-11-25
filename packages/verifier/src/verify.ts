@@ -40,7 +40,8 @@ import { getAddress, isAddressEqual, type Address, type Hex } from "viem";
 import type { ChainReader, NetworkInfo } from "./chain.js";
 import { daysIn, isExcludedDay, EXCLUDED_FROM, EXCLUDED_TO } from "./excluded-days.js";
 import { diffJson, formatChanges } from "./diff.js";
-import { armRisk, objectiveUusd } from "./evaluate.js";
+import { checkCournotResponse, checkCournotRule, cournotOf, scenarioWeightsFor } from "./cournot.js";
+import { armRisk, objectiveUusd, weightedEntryCents } from "./evaluate.js";
 import { fail, judge, pass, skip, type CheckResult } from "./report.js";
 import { checkSources, type SourceCheck, type SourceOptions } from "./sources.js";
 
@@ -78,6 +79,8 @@ export interface VerifyInput {
   sources?: SourceOptions | null;
   /** When the record's root covers several leaves: this manifest's place in the tree and its RFC 6962 audit path. */
   inclusion?: Inclusion;
+  /** Files published beside the record (an outside input's saved response), by the route the manifest gives. */
+  outsideFile?: (route: string) => Uint8Array | null;
 }
 
 export interface Inclusion {
@@ -150,6 +153,9 @@ export async function verify(input: VerifyInput): Promise<CheckResult[]> {
   }
   const m = input.manifest as Manifest;
   const od = odFromIso(m.operating_day);
+  // The shape holds; the risk officer's input must also agree with its rule and with the plan.
+  const rule = checkCournotRule(m, input.scenarios);
+  put(judge("V8", TITLES.V8, rule.problems, rule.notes));
 
   const { result: v2, commitment } = await checkChain(input, m, od, root, tamper);
   put(v2);
@@ -353,10 +359,20 @@ function checkAccounting(m: Manifest, scenarios: unknown): CheckResult {
   if (ins.size_kwh !== 1_000) problems.push(`contract size ${ins.size_kwh} kWh; the accounting here assumes 1 MWh`);
   // Fair-value entry needs the scenario matrix; without it the entry prices are taken as stated.
   const sum4 = scenarios !== undefined && scenarioShapeErrors(scenarios).length === 0 ? (scenarios as ScenarioMatrix).hub_sum4 : null;
+  // An applied weather reading weights the scenarios; the weights come from the matrix and the rule, not from the engine.
+  let weights: number[] | undefined;
+  if (sum4 && cournotOf(m)?.status === "applied") {
+    try {
+      weights = scenarioWeightsFor(m, scenarios as ScenarioMatrix);
+    } catch (err) {
+      problems.push(`scenario weights: ${(err as Error).message}`);
+    }
+  }
   if (sum4 && sum4.length > 0) {
     ins.entry_cents.forEach((e, h) => {
-      const fair = assumedEntryCents(sum4.map((s) => s[h] ?? 0), ins.range_cents, ins.tick_cents);
-      if (e !== fair) problems.push(`hour ${h}: entry ${e}, the scenario mean gives ${fair}`);
+      const hour = sum4.map((s) => s[h] ?? 0);
+      const fair = weights ? weightedEntryCents(hour, weights, ins.range_cents, ins.tick_cents) : assumedEntryCents(hour, ins.range_cents, ins.tick_cents);
+      if (e !== fair) problems.push(`hour ${h}: entry ${e}, the ${weights ? "weighted " : ""}scenario mean gives ${fair}`);
     });
   } else {
     notes.push("entry prices not re-derived: no scenarios.json beside the manifest");
@@ -383,11 +399,13 @@ function checkAccounting(m: Manifest, scenarios: unknown): CheckResult {
     if (matrixProblems.length === 0) {
       const matrix = scenarios as ScenarioMatrix;
       for (const [id, arm] of solvedArms(m)) {
-        const { expected, cvar } = armRisk(m, arm, matrix);
+        const { expected, cvar } = armRisk(m, arm, matrix, weights);
         if (BigInt(arm.expected_uusd) !== expected) problems.push(`arm ${id}: expected_uusd ${arm.expected_uusd}, scenarios give ${expected}`);
         if (BigInt(arm.cvar_uusd) !== cvar) problems.push(`arm ${id}: cvar_uusd ${arm.cvar_uusd}, scenarios give ${cvar}`);
       }
-      notes.push(`expected value and CVaR re-derived over ${matrix.node_cents.length} scenarios (digest ${m.scenarios.digest_sha256.slice(0, 12)}...)`);
+      notes.push(
+        `expected value and CVaR re-derived over ${matrix.node_cents.length} ${weights ? "stress-weighted " : ""}scenarios (digest ${m.scenarios.digest_sha256.slice(0, 12)}...)`,
+      );
     }
   }
   notes.push("collateral and objective recomputed; the LP itself is not re-solved here");
@@ -436,7 +454,14 @@ function checkExcluded(m: Manifest, outcomes: readonly OutcomeFile[]): CheckResu
 }
 
 async function checkInputs(input: VerifyInput, m: Manifest): Promise<CheckResult> {
-  if (!input.sources) return skip("V7", TITLES.V7, ["inputs not fetched (--offline or --no-fetch)"]);
+  // The saved response sits beside the record, so it is checked even when nothing is fetched.
+  const outside = checkCournotResponse(m, input.outsideFile);
+  if (!input.sources) {
+    if (outside.problems.length > 0) {
+      return fail("V7", TITLES.V7, [...outside.problems, ...outside.missing, "release inputs not fetched (--offline or --no-fetch)"]);
+    }
+    return skip("V7", TITLES.V7, ["inputs not fetched (--offline or --no-fetch)", ...outside.missing, ...outside.notes]);
+  }
   const r = await checkSources(
     { releaseId: m.inputs.release_id, manifestSha256: m.inputs.manifest_sha256, files: [m.battery.source, ...m.inputs.files], live: m.inputs.live },
     input.sources,
@@ -450,10 +475,12 @@ async function checkInputs(input: VerifyInput, m: Manifest): Promise<CheckResult
     );
     merge(r, ro, `outcome ${o.stage}: `);
   }
+  r.problems.push(...outside.problems);
+  r.missing.push(...outside.missing);
   const note = `${r.checked} files hashed against release ${m.inputs.release_id}${r.mirrored > 0 ? `, ${r.mirrored} of them from the mirror` : ""}`;
   if (r.problems.length > 0) return fail("V7", TITLES.V7, [...r.problems.slice(0, 20), ...r.missing.slice(0, 5), note]);
-  if (r.missing.length > 0) return skip("V7", TITLES.V7, [`${r.missing.length} files could not be checked`, ...r.missing.slice(0, 10), note]);
-  return pass("V7", TITLES.V7, [note]);
+  if (r.missing.length > 0) return skip("V7", TITLES.V7, [`${r.missing.length} files could not be checked`, ...r.missing.slice(0, 10), note, ...outside.notes]);
+  return pass("V7", TITLES.V7, [note, ...outside.notes]);
 }
 
 function merge(into: SourceCheck, from: SourceCheck, prefix: string): void {

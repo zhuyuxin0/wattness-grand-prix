@@ -1,5 +1,6 @@
 export { verify, armCollateralCents, outcomeArm, scopeFor, type VerifyInput, type Inclusion, type RecordFile, type OutcomeFile } from "./verify.js";
-export { armRisk, cvarOfLossUusd, objectiveUusd, scenarioRevenueUusd } from "./evaluate.js";
+export { armRisk, cvarOfLossUusd, cvarOfLossWeightedUusd, objectiveUusd, scenarioRevenueUusd, weightedEntryCents } from "./evaluate.js";
+export { checkCournotResponse, checkCournotRule, cournotOf, scenarioWeightsFor } from "./cournot.js";
 export { formatReport, type CheckResult, type Status } from "./report.js";
 export { diffJson, formatChanges, type Change } from "./diff.js";
 export { checkSources, httpFetcher, SITE, type Fetcher, type SourceList, type SourceOptions } from "./sources.js";

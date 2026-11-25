@@ -72,6 +72,7 @@ async function main(): Promise<number> {
 
   let manifest = readJson(manifestPath);
   let dir = dirname(resolve(manifestPath));
+  const recordDir = dir;
   let inclusion: Inclusion | undefined;
   let scenariosOverride: string | undefined;
   let indexScope: string | undefined;
@@ -131,6 +132,15 @@ async function main(): Promise<number> {
     return p ? new Uint8Array(readFileSync(p)) : null;
   };
 
+  // Files published beside the record (an outside input's saved response): the record's directory first,
+  // then the manifest's own directory and its parent, then the reference's.
+  const outsideFile = (route: string): Uint8Array | null => {
+    const leafDir = dirname(resolve(manifestPath as string));
+    const dirs = [recordDir, leafDir, dirname(leafDir), ...(referencePath ? [dirname(referencePath), dirname(dirname(referencePath))] : [])];
+    const p = dirs.map((d) => join(d, route)).find((x) => existsSync(x));
+    return p ? new Uint8Array(readFileSync(p)) : null;
+  };
+
   console.log(`manifest  ${manifestPath}`);
   if (referencePath) console.log(`reference ${referencePath}`);
   console.log(values.offline || values["no-chain"] ? "network   not read" : `network   ${network.name} (chain ${network.chainId})`);
@@ -145,6 +155,7 @@ async function main(): Promise<number> {
     key: values.key as Hex | undefined,
     ...(values.scope ?? indexScope ? { scopeLabel: (values.scope ?? indexScope) as string } : {}),
     ...(inclusion ? { inclusion } : {}),
+    outsideFile,
     chain: values.offline || values["no-chain"] ? null : { reader: rpcReader(network), network, contract },
     sources: values.offline || values["no-fetch"] ? null : { fetcher: httpFetcher, mirror },
   });
