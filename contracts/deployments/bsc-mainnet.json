@@ -1,0 +1,14 @@
+{
+  "contract": "GateRecord",
+  "chainId": 56,
+  "network": "bsc-mainnet",
+  "address": "0x2922c68cE15EB3e83B7f43b136e981dDc4262876",
+  "txHash": "0x7596979bf55c3f8afc4ebd961b10595bd5d46b137735a5cc7c80e14a1daa32f1",
+  "blockNumber": "135676594",
+  "deployer": "0xfa22C29C4c3d975FCC617D899B1B695eFF2d94b8",
+  "gasUsed": "864782",
+  "deployedAt": 1795619499,
+  "buildInfoId": "solc-0_8_28-4dd6626de9d54ad748b22c3e7d76f637286e1c14",
+  "compiler": "0.8.28+commit.7893614a",
+  "runtimeCodeHash": "0xc8178702202aeec04079f1b1554663ff4e9b976318e9d9f2dff40e0d301551cb"
+}
