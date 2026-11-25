@@ -72,9 +72,8 @@ export const WEATHER_RULE_V1: WeatherRule = {
 };
 
 export const WEIGHTING_EQUAL = "equal";
-export const WEIGHTING_STRESS =
-  "stress-weighted (gate-record.weather-stress.v1): the scenarios of outside_inputs.cournot.stress.days share " +
-  "after.stress_weight_ppm equally, the rest share the remainder equally";
+/** The scenarios of outside_inputs.cournot.stress.days share after.stress_weight_ppm equally, the rest the remainder. */
+export const WEIGHTING_STRESS = "stress-weighted";
 export const OBJECTIVE_EQUAL = "mean revenue - lambda * CVaR_alpha(loss), over the equally weighted scenarios";
 export const OBJECTIVE_STRESS = "mean revenue - lambda * CVaR_alpha(loss), over the stress-weighted scenarios";
 
