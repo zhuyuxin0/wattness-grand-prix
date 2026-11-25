@@ -39,7 +39,7 @@ export function Dumbbell({ rows, active, onActive, label }: { rows: Bell[]; acti
   return (
     <div ref={ref} className="rk-bell">
       {width > 0 && (
-        <svg className="pk-chart rk-bell__svg" width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label} onPointerLeave={() => onActive(null)}>
+        <svg className="pk-chart rk-bell__svg" width={width} height={height} viewBox={`0 0 ${width} ${height}`} role="group" aria-label={label} onPointerLeave={() => onActive(null)}>
           <g className="pk-grid">
             {ticks.map((t) => (
               <g key={t} transform={`translate(${Math.round(x(t)) + 0.5},0)`}>
@@ -59,7 +59,7 @@ export function Dumbbell({ rows, active, onActive, label }: { rows: Bell[]; acti
                 className={`rk-bell__row${on ? " is-on" : ""}`}
                 style={{ "--plan": planColor(r.plan) } as CSSProperties}
                 tabIndex={0}
-                role="button"
+                role="img"
                 aria-label={`Plan ${r.plan}${r.sealed ? ", sealed" : ""}: worst 10% ${money(r.tail)}, mean ${money(r.mean)}, score ${money(r.score)}`}
                 onPointerEnter={() => onActive(r.plan)}
                 onFocus={() => onActive(r.plan)}
