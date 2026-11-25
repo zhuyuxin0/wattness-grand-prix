@@ -129,7 +129,10 @@
   --t-accent-text: #0b6b58; /* 6.45:1 */
   --t-link: #1a1a1a; /* ink, with a teal underline */
 
-  --s-ok: #2e7d32;
+  /* One step darker than the Terminal's #2e7d32, which measures 4.43:1 on its
+     own ground: the ok pill's 11px words need 4.5. Now 4.80:1 there, 5.56:1 on
+     the pane. */
+  --s-ok: #2a772e;
   --s-ok-bg: #e4f2e5;
   --s-bad: #9f1d35;
   --s-bad-bg: #f9e5ea;

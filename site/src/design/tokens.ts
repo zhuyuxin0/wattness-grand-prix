@@ -22,7 +22,7 @@ export const palette = {
     border: "#e5e7eb",
     accent: "#2ec7a6",
     accentText: "#0b6b58",
-    ok: "#2e7d32",
+    ok: "#2a772e",
     bad: "#9f1d35",
     info: "#1565c0",
     seal: "#f0b90b",
