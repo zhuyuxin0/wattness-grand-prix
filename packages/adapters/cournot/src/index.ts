@@ -216,17 +216,41 @@ export interface ConditionalWeatherPolicy {
   informationCutoff: string;
   appliedAt: string;
 }
+/** A committed record the review sits beside: its label and the commit's block time. */
+export interface CommittedRecord { label: string; committedAt: string }
+export interface RecordRelation {
+  label: string;
+  committedAt: string;
+  observedAfterCommit: boolean;
+  statement: string;
+}
 export interface WeatherRecommendation {
   policy: ConditionalWeatherPolicy;
   oracleEvent: { marketId: MarketId; claim: string; probability: number; observedAt: string };
   before: { eventProbability: number; stressScenarioWeight: number; hedgeLimitMWh: number };
   after: { eventProbability: number; stressScenarioWeight: number; hedgeLimitMWh: number };
   explanation: string;
-  relationToExistingSeal: string;
+  /** Derived from the two times; null when no record is given, so nothing is asserted. */
+  relationToRecord: RecordRelation | null;
+}
+
+function relation(observedAt: string, record: CommittedRecord): RecordRelation {
+  if (typeof record.label !== "string" || !record.label.trim() || !iso(record.committedAt)) {
+    throw new CournotError("input", "A committed record needs a label and an ISO commit time.");
+  }
+  const after = Date.parse(observedAt) > Date.parse(record.committedAt);
+  return {
+    label: record.label,
+    committedAt: new Date(record.committedAt).toISOString(),
+    observedAfterCommit: after,
+    statement: after
+      ? "Observed after the " + record.label + " record was committed: a later review, not part of that record."
+      : "Observed before the " + record.label + " record was committed.",
+  };
 }
 
 /** A disclosed sensitivity policy; the assumed conditional model is not an oracle electricity forecast. */
-export function applyWeatherPolicy(assessment: Assessment, policy: ConditionalWeatherPolicy): WeatherRecommendation {
+export function applyWeatherPolicy(assessment: Assessment, policy: ConditionalWeatherPolicy, record?: CommittedRecord): WeatherRecommendation {
   for (const x of [policy.baselineEventProbability, policy.conditionalStressIfEvent, policy.conditionalStressIfNotEvent, policy.scenarioHedgeLimitReduction]) {
     if (!probability(x)) throw new CournotError("input", "Policy probability/fraction is outside [0, 1].");
   }
@@ -248,6 +272,6 @@ export function applyWeatherPolicy(assessment: Assessment, policy: ConditionalWe
     before: compute(policy.baselineEventProbability),
     after: compute(assessment.pointEstimate),
     explanation: "Cournot assesses the stated weather event. Wattness's explicitly assumed conditional model maps that event to a scenario weight and hedge-limit sensitivity; it is not a calibrated electricity-price forecast.",
-    relationToExistingSeal: "This assessment was requested after the OD26 record was sealed. It is a later review/sensitivity and is not included in, or an amendment to, that immutable record.",
+    relationToRecord: record ? relation(assessment.observedAt, record) : null,
   };
 }

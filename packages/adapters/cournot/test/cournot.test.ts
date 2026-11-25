@@ -88,7 +88,18 @@ describe("declared weather sensitivity", () => {
     expect(result.after.hedgeLimitMWh).toBeLessThan(result.before.hedgeLimitMWh);
     expect(result.oracleEvent.probability).toBe(.7);
     expect(result.explanation).toContain("assumed conditional model");
-    expect(result.relationToExistingSeal).toContain("not included");
+    expect(result.relationToRecord).toBeNull();
+  });
+  it("derives its relation to a committed record from the two times", () => {
+    const a = parseAssessment(market, record({ code: 0, data: { probability: .7, markets: [{ id: 77 }] } }));
+    // The assessment was received at 15:00:01Z.
+    const later = applyWeatherPolicy(a, policy, { label: "2026-11-26", committedAt: "2026-11-25T14:15:17Z" }).relationToRecord;
+    expect(later).toMatchObject({ observedAfterCommit: true, committedAt: "2026-11-25T14:15:17.000Z" });
+    expect(later?.statement).toContain("not part of that record");
+    const earlier = applyWeatherPolicy(a, policy, { label: "2026-11-27", committedAt: "2026-11-25T15:15:17Z" }).relationToRecord;
+    expect(earlier?.observedAfterCommit).toBe(false);
+    expect(earlier?.statement).not.toContain("later review");
+    expect(() => applyWeatherPolicy(a, policy, { label: "", committedAt: "2026-11-25T15:15:17Z" })).toThrow("label");
   });
   it("blocks later observations from an earlier cutoff and prevents time travel", () => {
     const a = parseAssessment(market, record({ code: 0, data: { probability: .7, markets: [{ id: 77 }] } }));
