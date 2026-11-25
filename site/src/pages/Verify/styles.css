@@ -464,15 +464,20 @@
   display: grid;
   gap: 2px;
   align-content: start;
-  padding: var(--t-space-4) 0;
-  border-bottom: 1px solid var(--t-rule);
+  padding: var(--t-space-4) 0 0;
+}
+.vf-gate > div + div {
+  margin-top: var(--t-space-4);
+  border-top: 1px solid var(--t-rule);
 }
 @media (min-width: 900px) {
   .vf-gate {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
   .vf-gate > div + div {
+    margin-top: 0;
     padding-left: var(--t-space-4);
+    border-top: 0;
     border-left: 1px solid var(--t-rule);
   }
 }
