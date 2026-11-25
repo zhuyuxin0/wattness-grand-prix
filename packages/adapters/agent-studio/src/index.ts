@@ -35,23 +35,58 @@ export function parseRequest(input: unknown): EvaluationRequest {
   if (doc.chain !== undefined && doc.chain !== "bsc-testnet" && doc.chain !== "offline") throw new Error("Only BSC testnet or offline evaluation is allowed");
   return { resource: doc.resource as Resource, chain: doc.chain === "offline" ? "offline" : "bsc-testnet" };
 }
+/** Fixture files by their path inside the fixture directory, already parsed. */
+export type FixtureFiles = Readonly<Record<string, unknown>>;
+export interface EvaluateOptions {
+  fixtureDir?: string;
+  /** Embedded fixture: a bundled runtime has no fixture directory to read. */
+  fixture?: FixtureFiles;
+  checks?: typeof verify;
+  now?: () => Date;
+}
+
 async function json(path: string): Promise<unknown> { return JSON.parse(await readFile(path, "utf8")); }
 function inside(root: string, path: string): string {
   const target = resolve(root, path);
   if (!target.startsWith(resolve(root) + sep)) throw new Error("Fixture path escapes its approved directory");
   return target;
 }
-export async function evaluate(request: EvaluationRequest, options: { fixtureDir?: string; checks?: typeof verify; now?: () => Date } = {}): Promise<EvaluationReport> {
-  const checked = parseRequest(request);
+function fixtureReader(options: EvaluateOptions): (path: string) => Promise<unknown> {
+  const files = options.fixture;
+  if (files) {
+    return async (path) => {
+      if (!Object.hasOwn(files, path)) throw new Error("Fixture file is not embedded: " + path);
+      return structuredClone(files[path]);
+    };
+  }
   const root = options.fixtureDir ?? DEFAULT_FIXTURE;
-  const rawIndex = await json(resolve(root, "manifest.json"));
+  return (path) => json(inside(root, path));
+}
+/** The files an evaluation of `resources` reads, for embedding in a bundle. */
+export async function fixtureFiles(fixtureDir: string = DEFAULT_FIXTURE, resources: readonly Resource[] = RESOURCES): Promise<Record<string, unknown>> {
+  const read = fixtureReader({ fixtureDir });
+  const index = await read("manifest.json");
+  const errors = fleetIndexErrors(index);
+  if (errors.length) throw new Error("Invalid fleet index: " + errors.join("; "));
+  const files: Record<string, unknown> = { "manifest.json": index, "record.bsc-testnet.json": await read("record.bsc-testnet.json") };
+  for (const resource of resources) {
+    const { entry } = leafOf(index as FleetIndex, resource);
+    files[entry.manifest] = await read(entry.manifest);
+    files[entry.scenarios] = await read(entry.scenarios);
+  }
+  return files;
+}
+export async function evaluate(request: EvaluationRequest, options: EvaluateOptions = {}): Promise<EvaluationReport> {
+  const checked = parseRequest(request);
+  const read = fixtureReader(options);
+  const rawIndex = await read("manifest.json");
   const errors = fleetIndexErrors(rawIndex);
   if (errors.length) throw new Error("Invalid fleet index: " + errors.join("; "));
   const index = rawIndex as FleetIndex;
   const leaf = leafOf(index, checked.resource);
-  const manifest = await json(inside(root, leaf.entry.manifest));
-  const scenarios = await json(inside(root, leaf.entry.scenarios));
-  const record = await json(resolve(root, "record.bsc-testnet.json")) as RecordFile;
+  const manifest = await read(leaf.entry.manifest);
+  const scenarios = await read(leaf.entry.scenarios);
+  const record = await read("record.bsc-testnet.json") as RecordFile;
   if (record.chainId !== 97 || record.root !== index.root) throw new Error("Fixture receipt does not match the testnet fleet root");
   const network = resolveNetwork("bsc-testnet");
   const checks = await (options.checks ?? verify)({

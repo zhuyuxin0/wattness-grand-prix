@@ -1,6 +1,8 @@
 # Wattness evaluation adapter
 
-An isolated technical spike for BNB Agent Studio, built against the approved sealed fixture.
+Evaluates a committed shadow plan in the sealed 2026-11-26 record (`fixtures/od-20261126`) through the public exports of `@gatelock/core` and `@gatelock/verifier`. It returns a `wattness.evaluation-report.v1` report that keeps passed, failed and skipped checks apart and keeps the fair-value hedge assumption.
+
+`WattnessEvaluator/` is the BNB Agent Studio seller agent that sells this evaluation as an ERC-8183 job. See [its README](WattnessEvaluator/README.md).
 
 ## Run
 
@@ -13,20 +15,16 @@ From the repository root:
     pnpm --filter @gatelock/adapter-agent-studio evidence
     pnpm --filter @gatelock/adapter-agent-studio serve
 
-The standalone HTTP spike listens only on 127.0.0.1:15192. It exposes GET /health, GET /agent-card and POST /evaluate. Requests must name CLO_ESR1 or DSWL_ESS_ESR1; arbitrary paths, extra fields and mainnet evaluation are rejected.
+`evaluate(request, options)` reads the fixture directory, or an embedded copy passed as `options.fixture` (see `fixtureFiles`). A bundled runtime uses the embedded copy because it has no fixture directory to read.
+
+The standalone HTTP server listens only on 127.0.0.1, on the port in `WATTNESS_EVALUATOR_PORT` (15191 to 15199, default 15192). It exposes GET /health, GET /agent-card and POST /evaluate. Requests must name CLO_ESR1 or DSWL_ESS_ESR1; arbitrary paths, extra fields and mainnet evaluation are rejected.
 
 POST body:
 
     {"resource":"DSWL_ESS_ESR1","chain":"bsc-testnet"}
 
-The report separates passed, failed and skipped checks and retains the fair-value hedge assumption.
-
 ## Studio
 
-Published packages checked: @bnbagent/studio-cli 0.0.16 (Apache-2.0), @bnbagent/studio-runtime 0.0.16 and @bnbagent/sdk 0.6.1 (MIT).
+Published packages: @bnbagent/studio-cli 0.0.16 (Apache-2.0), @bnbagent/studio-runtime 0.0.16 and @bnbagent/sdk 0.6.1 (MIT).
 
-The actual CLI supports:
-
-    bag init WattnessEvaluator --network bsc-testnet --llm-provider none --rails 8183 --protocols A2A --seller-price-usd 0.10 --destination platform --storage-provider local --no-auto-topup --no-onboard --no-install
-
-For managed hosting, create a dedicated disposable testnet wallet. Do not import the existing GATE_PRIVATE_KEY, which was also used on mainnet, into the hosted runtime.
+For managed hosting, use a dedicated disposable testnet wallet. Never import a key that has been used on mainnet into the hosted runtime.
