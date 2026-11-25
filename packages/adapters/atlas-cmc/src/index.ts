@@ -67,6 +67,7 @@ export function sanitize(value: unknown, secrets: readonly string[]): unknown {
 async function jsonRequest(endpoint: string, method: string, headers: Record<string, string>, request: unknown, key: string, audit: AuditSink, transport: typeof fetch): Promise<unknown> {
   const response = await transport(endpoint, {
     method, headers, ...(method === "POST" ? { body: JSON.stringify(request) } : {}),
+    redirect: "error",
     signal: AbortSignal.timeout(20_000),
   });
   const text = await response.text();
@@ -159,12 +160,16 @@ export function parseSecurity(body: unknown): SecurityCoverage {
   });
   if (!first || obj(first).exist === false) return { state: "unknown", flagged: null, verifiedContract: null, source: null, reason: "No indexed vendor record" };
   const extra = obj(obj(first).extra ?? {});
+  const flagged = typeof extra.isFlaggedByVendor === "boolean" ? extra.isFlaggedByVendor : null;
+  const verifiedContract = typeof extra.isVerified === "boolean" ? extra.isVerified : null;
+  const source = typeof extra.source === "string" && extra.source.trim() ? extra.source.trim() : null;
+  const complete = flagged !== null && verifiedContract !== null && source !== null;
   return {
-    state: "available",
-    flagged: typeof extra.isFlaggedByVendor === "boolean" ? extra.isFlaggedByVendor : null,
-    verifiedContract: typeof extra.isVerified === "boolean" ? extra.isVerified : null,
-    source: typeof extra.source === "string" ? extra.source : null,
-    reason: "Specific vendor fields, not an investment-safety certification",
+    state: complete ? "available" : "unknown",
+    flagged,
+    verifiedContract,
+    source,
+    reason: complete ? "Specific vendor fields, not an investment-safety certification" : "Incomplete vendor fields",
   };
 }
 export class CmcClient {
@@ -203,7 +208,11 @@ export function fundingDecision(input: { treasuryBnb: number; atlas: readonly Pr
   if (deviation > .05) reasons.push("BNB source deviation exceeds 5%");
   if (Math.abs(u.priceUsd - 1) > .01) reasons.push("USDT reference deviation exceeds 1%");
   if (security.state === "unknown") reasons.push("USDT vendor coverage unknown");
-  else if (security.flagged) reasons.push("USDT vendor flag requires review");
+  else {
+    if (security.flagged !== false) reasons.push("USDT vendor flag unresolved or requires review");
+    if (security.verifiedContract !== true) reasons.push("USDT vendor contract verification unresolved or negative");
+    if (!security.source?.trim()) reasons.push("USDT vendor source missing");
+  }
   const state = reasons.length ? "review" : "priced";
   // Observed daily movement sets a disclosed reserve rule, not a forecast of volatility.
   const baselineReserveFraction = .10;

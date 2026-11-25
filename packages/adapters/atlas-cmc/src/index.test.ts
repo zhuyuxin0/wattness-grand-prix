@@ -1,13 +1,24 @@
 import { describe, expect, it } from "vitest";
+import { createServer } from "node:http";
+import type { Server } from "node:http";
+import type { AddressInfo } from "node:net";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { keccak256 } from "viem";
 import type { Hex } from "viem";
-import { AtlasClient, BSC_USDT, checkPrice, decodeAtlasPayload, fundingDecision, parseCmcQuotes, parseSecurity, sanitize, verifyAtlasResponse } from "./index.js";
+import { AtlasClient, CmcClient, BSC_USDT, checkPrice, decodeAtlasPayload, fundingDecision, parseCmcQuotes, parseSecurity, sanitize, verifyAtlasResponse } from "./index.js";
+import type { SecurityCoverage } from "./index.js";
 
 const now = 1_795_000_000;
 const p = { asset: "BNB" as const, priceUsd: 600, observedAtSeconds: now, source: "test", sourceId: "633" };
 function payload(ts = now): Hex {
   return ("0x" + BigInt(633).toString(16).padStart(8, "0") + (600n * 10n ** 18n).toString(16).padStart(20, "0") + BigInt(ts).toString(16).padStart(12, "0") + "01") as Hex;
+}
+async function listen(server: Server): Promise<string> {
+  await new Promise<void>(resolve => server.listen(0, "127.0.0.1", resolve));
+  return "http://127.0.0.1:" + (server.address() as AddressInfo).port;
+}
+async function close(server: Server): Promise<void> {
+  await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
 }
 describe("Atlas payload and authentication", () => {
   it("decodes raw 1e18 prices and six-byte timestamps", () => {
@@ -35,6 +46,39 @@ describe("Atlas payload and authentication", () => {
     await expect(client.latest(now)).rejects.toThrow("business");
     expect(JSON.stringify(audit)).not.toContain("example-secret");
   });
+  it.each(["Atlas latest", "CMC quotes", "CMC security"] as const)("keeps %s credentials off a redirect target", async route => {
+    let targetRequests = 0;
+    const target = createServer((_request, response) => {
+      targetRequests++;
+      response.end("{}");
+    });
+    const targetOrigin = await listen(target);
+    const source = createServer((_request, response) => {
+      response.writeHead(307, { Location: targetOrigin + "/capture" });
+      response.end();
+    });
+    const sourceOrigin = await listen(source);
+    const options: RequestInit[] = [];
+    const transport = (async (_url, init) => {
+      options.push(init ?? {});
+      return fetch(sourceOrigin + "/redirect", init);
+    }) as typeof fetch;
+    try {
+      const request = route === "Atlas latest"
+        ? new AtlasClient("local-test-credential", () => {}, transport).latest(now)
+        : route === "CMC quotes"
+          ? new CmcClient("local-test-credential", () => {}, transport).quotes(now)
+          : new CmcClient("local-test-credential", () => {}, transport).security();
+      await expect(request).rejects.toThrow();
+      expect(options).toHaveLength(1);
+      expect(options[0]?.redirect).toBe("error");
+      expect(Object.values(options[0]?.headers ?? {})).toContain("local-test-credential");
+      expect(targetRequests).toBe(0);
+    } finally {
+      await close(source);
+      await close(target);
+    }
+  });
 });
 describe("price and coverage controls", () => {
   it("rejects stale, future and non-positive prices", () => {
@@ -47,6 +91,13 @@ describe("price and coverage controls", () => {
     expect(parseSecurity([{ exist: false }]).flagged).toBeNull();
     expect(parseSecurity([{ platformName: "bsc", tokenContractAddress: BSC_USDT, exist: true, extra: { isFlaggedByVendor: false, isVerified: true, source: "test" } }])).toMatchObject({ state: "available", flagged: false });
     expect(parseSecurity([{ platformName: "ethereum", tokenContractAddress: BSC_USDT, extra: { isFlaggedByVendor: false } }]).state).toBe("unknown");
+  });
+  it.each([
+    { isFlaggedByVendor: null, isVerified: true, source: "test" },
+    { isFlaggedByVendor: false, isVerified: null, source: "test" },
+    { isFlaggedByVendor: false, isVerified: true, source: " " },
+  ])("does not treat an indexed row with incomplete vendor fields as available", extra => {
+    expect(parseSecurity([{ platformName: "bsc", tokenContractAddress: BSC_USDT, exist: true, extra }])).toMatchObject({ state: "unknown", reason: "Incomplete vendor fields" });
   });
   it("parses v3 CMC arrays and checks USD asset identity", () => {
     const quote = { id: 2781, price: 600, percent_change_24h: -4, last_updated: new Date(now * 1000).toISOString(), volume_24h: 10_000 };
@@ -72,6 +123,20 @@ describe("funding decision", () => {
     const d = fundingDecision({ treasuryBnb: .25, atlas, cmc, security: { ...security, state: "unknown" }, now });
     expect(d.state).toBe("review");
     expect(d.evaluationCount).toBe(0);
+  });
+  it.each([
+    ["unresolved flag", { flagged: null }],
+    ["vendor flag", { flagged: true }],
+    ["unresolved verification", { verifiedContract: null }],
+    ["negative verification", { verifiedContract: false }],
+    ["missing source", { source: null }],
+    ["empty source", { source: " " }],
+  ] satisfies [string, Partial<SecurityCoverage>][])("pauses allocations for %s even if the row says available", (_name, fields) => {
+    const d = fundingDecision({ treasuryBnb: .25, atlas, cmc, security: { ...security, ...fields }, now });
+    expect(d.state).toBe("review");
+    expect(d.evaluationBudgetUsdCents).toBe(0);
+    expect(d.evaluationCount).toBe(0);
+    expect(d.reasons.length).toBeGreaterThan(0);
   });
   it("pauses allocations on source divergence", () => {
     const d = fundingDecision({ treasuryBnb: .25, atlas: [{ ...p, priceUsd: 700 }, atlas[1]!], cmc, security, now });
