@@ -12,7 +12,7 @@ import { parseArgs } from "node:util";
 import { readSnapshot, type Snapshot } from "@gatelock/data";
 import { centralClock, gateUnix } from "@gatelock/engine";
 import { getAddress, type Hex } from "viem";
-import { describeReading, readLive, readSavedCall } from "../cournot.js";
+import { RESPONSE_ROUTE, describeReading, lastKeptCopy, readLive, readSavedCall } from "../cournot.js";
 import { planDay, SHOWCASE } from "../plan-day.js";
 import { sourceState } from "../source.js";
 import { committerAddress, parseNetwork } from "../wallet.js";
@@ -114,6 +114,10 @@ async function main(): Promise<number> {
   if (values.cournot !== "live" && (values["cournot-resolve"] || values["cournot-market"])) {
     throw new Error("--cournot-resolve and --cournot-market go with --cournot live");
   }
+  // Free probability calls are few: a record that already holds a response reuses it rather than calling again.
+  if (values.cournot === "live" && existsSync(join(out, RESPONSE_ROUTE))) {
+    throw new Error(`${join(out, RESPONSE_ROUTE)} already holds a Cournot response; plan with --cournot ${join(out, RESPONSE_ROUTE)} to reuse it`);
+  }
 
   const snapshots = new Map<string, Snapshot>();
   if (values.offline) {
@@ -139,10 +143,13 @@ async function main(): Promise<number> {
           marketId: values["cournot-market"] as string,
           operatingDay: od,
           recordDir: out,
+          // Outside out/, so removing the day's directory never loses a call.
+          keepDir: join(process.env.GATE_EVIDENCE_DIR ?? join(repo, "cache"), "cournot"),
         })
       : readSavedCall(resolve(cwd, values.cournot), out)
     : undefined;
   if (cournot) console.log(`cournot       ${describeReading(cournot)}`);
+  if (lastKeptCopy) console.log(`              a copy of the response is at ${lastKeptCopy}; a re-plan reuses it with --cournot <that file>`);
   console.log("");
 
   const started = performance.now();

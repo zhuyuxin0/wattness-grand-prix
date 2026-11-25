@@ -79,7 +79,20 @@ export interface LiveOptions {
   marketId: string;
   operatingDay: string;
   recordDir: string;
+  /** A second copy of whatever comes back goes here, outside the record, so a re-plan reuses it instead of calling again. */
+  keepDir?: string;
   client?: CournotClient;
+}
+
+/** Where the kept copy of a live call went, when it was kept. */
+export let lastKeptCopy: string | null = null;
+
+function keep(dir: string | undefined, operatingDay: string, evidence: CallEvidence): void {
+  if (!dir) return;
+  mkdirSync(dir, { recursive: true });
+  const stamp = evidence.receivedAt.replace(/[:.]/g, "-");
+  lastKeptCopy = join(dir, `probability-od${operatingDay.replaceAll("-", "")}-${stamp}.json`);
+  writeFileSync(lastKeptCopy, savedCallBytes(evidence));
 }
 
 /**
@@ -110,12 +123,14 @@ export async function readLive(o: LiveOptions): Promise<CournotReading> {
   } catch (err) {
     const kept = err instanceof CournotError ? err.evidence : undefined;
     if (!kept) return failed(`the call failed: ${message(err)}`, claim);
+    keep(o.keepDir, o.operatingDay, kept);
     const received = Date.parse(kept.receivedAt);
     return failed(`the call failed: ${message(err)}`, claim, {
       response: publish(o.recordDir, savedCallBytes(kept)),
       observedUnix: Number.isFinite(received) ? Math.ceil(received / 1000) : null,
     });
   }
+  keep(o.keepDir, o.operatingDay, evidence);
   return fromEvidence(evidence, publish(o.recordDir, savedCallBytes(evidence)));
 }
 

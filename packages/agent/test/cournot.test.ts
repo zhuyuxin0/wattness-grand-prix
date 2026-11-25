@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { fileSha256 } from "@gatelock/core";
 import { CournotClient, savedCallBytes, type CallEvidence, type Json } from "@gatelock/cournot";
 import { describe, expect, it, vi } from "vitest";
-import { RESPONSE_ROUTE, readLive, readSavedCall } from "../src/cournot.js";
+import { RESPONSE_ROUTE, lastKeptCopy, readLive, readSavedCall } from "../src/cournot.js";
 
 const market = {
   id: 77,
@@ -73,12 +73,19 @@ describe("--cournot live", () => {
   it("makes exactly one call, publishes the response and reads it", async () => {
     const dir = tmp();
     const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify(body(0.35)), { status: 200 }));
-    const r = await readLive({ resolveFile: resolveFile(dir), marketId: "77", operatingDay: "2026-11-27", recordDir: dir, client: client(fetch) });
+    const keepDir = join(dir, "kept");
+    const r = await readLive({ resolveFile: resolveFile(dir), marketId: "77", operatingDay: "2026-11-27", recordDir: dir, keepDir, client: client(fetch) });
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(JSON.parse(String(fetch.mock.calls[0]![1].body))).toEqual({ message: "synthetic", market_ids: [77] });
     expect(r.failure).toBeNull();
     expect(r.probabilityPpm).toBe(350_000);
     expect(r.response?.sha256).toBe(fileSha256(published(dir)));
+    // The kept copy outside the record is the same bytes, and a re-plan from it reads the same.
+    expect(lastKeptCopy).toMatch(/kept\/probability-od20261127-.*\.json$/);
+    expect(readFileSync(lastKeptCopy!)).toEqual(published(dir));
+    const again = readSavedCall(lastKeptCopy!, join(dir, "replan"));
+    expect({ ...again, response: null }).toEqual({ ...r, response: null });
+    expect(again.response?.sha256).toBe(r.response?.sha256);
   });
 
   it("spends no call on a market the rule would not read", async () => {
