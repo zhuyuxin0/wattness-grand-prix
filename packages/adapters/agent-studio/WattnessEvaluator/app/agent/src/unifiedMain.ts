@@ -88,7 +88,10 @@ import {
   type B402RunWork,
   B402Seller,
 } from "@bnbagent/studio-runtime/b402";
-import { resolveStorageMode } from "@bnbagent/studio-runtime/storage";
+import {
+  resolveStorageMode,
+  storageProviderFromConfig,
+} from "@bnbagent/studio-runtime/storage";
 import express from "express";
 import { buildAgentCard } from "./agentCard.js";
 import { SellerAgentExecutor } from "./executor.js";
@@ -458,6 +461,28 @@ async function main(): Promise<void> {
   // submit) in the background. Reporting HEALTHY_BUSY tells AgentCore the
   // runtime is still working, so the scale-to-zero runtime is NOT reaped on
   // idle before delivery lands (bounded by the session max-lifetime; ≤8h).
+  // With local deliverable storage the SDK publishes
+  // `{ERC8183_AGENT_URL}/job/{id}/response` on chain, so the agent serves the
+  // stored manifest there. Managed and BYOS storage return their own URLs.
+  const localStorage = String(asTable(cfg.storage)?.kind ?? "local") === "local";
+  if (rails.erc8183 && localStorage && process.env.ERC8183_AGENT_URL) {
+    const storage = storageProviderFromConfig(cfg, true);
+    app.get("/erc8183/job/:jobId/response", async (req, res) => {
+      const jobId = req.params.jobId;
+      if (!/^[1-9][0-9]{0,15}$/.test(jobId)) {
+        res.status(404).json({ error: "unknown job" });
+        return;
+      }
+      try {
+        res.set("cache-control", "no-store").json(
+          await storage.download(`erc8183-job-${jobId}.json`),
+        );
+      } catch {
+        res.status(404).json({ error: "no deliverable for this job" });
+      }
+    });
+  }
+
   app.get("/ping", (_req, res) => {
     res.json({ status: executor.isBusy() ? "HEALTHY_BUSY" : "HEALTHY" });
   });
