@@ -13,7 +13,8 @@
     "./schema": {
       "types": "./dist/schema.d.ts",
       "default": "./dist/schema.js"
-    }
+    },
+    "./deployments/bsc-testnet.json": "./deployments/bsc-testnet.json"
   },
   "scripts": {
     "build": "hardhat build --quiet && tsc -p tsconfig.json",
