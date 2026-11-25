@@ -22,9 +22,9 @@ From the repository root:
     pnpm --filter @gatelock/cournot typecheck
     pnpm --filter @gatelock/cournot test
 
-The package exports CournotClient, parseAssessment, applyWeatherPolicy and clientWithConfiguredKey.
+The package index exports CournotClient, parseAssessment and applyWeatherPolicy, and reads no secrets.
 
-Instantiate CournotClient for anonymous access. The optional clientWithConfiguredKey reads only COURNOT_API_KEY through the approved @gatelock/core/secrets export.
+Instantiate CournotClient for anonymous access. For a prepaid account, clientWithConfiguredKey from @gatelock/cournot/server reads only COURNOT_API_KEY through the approved @gatelock/core/secrets export; it runs on a server only.
 
 For a deliberate new live assessment, run from the repository root:
 

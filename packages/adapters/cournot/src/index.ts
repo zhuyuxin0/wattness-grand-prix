@@ -1,5 +1,3 @@
-import { loadSecrets } from "@gatelock/core/secrets";
-
 export const COURNOT_ORIGIN = "https://interface.cournot.ai";
 export type MarketId = string | number;
 export type Json = null | boolean | number | string | Json[] | { [key: string]: Json };
@@ -194,12 +192,6 @@ export class CournotClient {
     const evidence = await this.call("probability", { message, market_ids: [market.id] });
     return parseAssessment(market, evidence);
   }
-}
-
-/** Call only when a prepaid account has been provisioned; missing names fail without revealing values. */
-export function clientWithConfiguredKey(): CournotClient {
-  const secrets = loadSecrets(["COURNOT_API_KEY"]);
-  return new CournotClient({ apiKey: secrets.COURNOT_API_KEY });
 }
 
 export interface ConditionalWeatherPolicy {

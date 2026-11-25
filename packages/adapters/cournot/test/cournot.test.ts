@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
+import * as index from "../src/index.js";
 import { CournotClient, applyWeatherPolicy, parseAssessment, sanitize } from "../src/index.js";
 import type { CallEvidence, ConditionalWeatherPolicy } from "../src/index.js";
 
@@ -52,6 +54,13 @@ describe("Cournot event assessment", () => {
   it("does not treat HTTP200 business errors as successful assessments", async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: 4100, msg: "invalid argument" }), { status: 200 }));
     await expect(new CournotClient({ fetch: fetcher as typeof fetch }).assess("Dallas temperature", market)).rejects.toMatchObject({ kind: "api_error" });
+  });
+});
+
+describe("package entries", () => {
+  it("keeps the secrets loader out of the browser-safe index", () => {
+    expect(readFileSync(new URL("../src/index.ts", import.meta.url), "utf8")).not.toContain("@gatelock/core/secrets");
+    expect("clientWithConfiguredKey" in index).toBe(false);
   });
 });
 
