@@ -20,13 +20,15 @@ interface MastheadProps {
 export function Masthead({ tab, menuOpen, onMenu, menuRef }: MastheadProps) {
   const now = useSecondClock();
   const group = tab ? groupOf(tab) : null;
+  // The Overview leads with this same countdown; a second one in the masthead would only repeat it.
+  const gate = tab?.id !== "overview";
   return (
     <header className="masthead">
       <div className="masthead__row">
         <Brand />
         <div className="masthead__end">
           <MarketClock now={now} />
-          <GateTag now={now} />
+          {gate && <GateTag now={now} />}
           <ThemeToggle />
         </div>
       </div>
@@ -45,7 +47,7 @@ export function Masthead({ tab, menuOpen, onMenu, menuRef }: MastheadProps) {
           <span className="page-menu__label">{tab?.label ?? "Pages"}</span>
           <Glyph name="caret" />
         </button>
-        <GateTag now={now} compact />
+        {gate && <GateTag now={now} compact />}
       </div>
     </header>
   );

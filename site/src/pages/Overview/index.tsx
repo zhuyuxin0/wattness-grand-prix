@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { SOURCE_LINE } from "../../config";
 import { combine, useDay, useLateSeal, useReceipts } from "../../data";
-import { minSec, usePageClock } from "../../lib/clock";
+import { minSec } from "../../lib/clock";
 import { formatInt } from "../../lib/format";
 import { dualTime, formatCountdown, formatOperatingDay, nextGate } from "../../lib/time";
 import { batteryPath, useSelectedBattery } from "../../shell/battery";
+import { useSecondClock } from "../../shell/MarketClock";
 import { panelSections, type PanelGroup } from "../../shell/tabs";
 import { Glyph, PageHeader, Ready, Section, Stat, StatRow } from "../../ui";
 import { Timeline } from "./Timeline";
@@ -24,7 +25,8 @@ const PATHS = panelSections()
 export default function OverviewPage() {
   const all = combine(useDay(), useReceipts(), useLateSeal());
   const [battery] = useSelectedBattery();
-  const nowMs = usePageClock(1000);
+  // The masthead's clock, ticking on the second, so the countdown and the market clock turn together.
+  const nowMs = useSecondClock();
 
   return (
     <div className="page page--overview">
