@@ -1,3 +1,4 @@
+// Derived from the @bnbagent/studio-cli 0.0.16 scaffold (Apache-2.0) and modified; see ../../../NOTICE.
 /**
  * Deterministic signing — the Agent is the SOLE key-holder/signer.
  *

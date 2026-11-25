@@ -25,6 +25,6 @@ POST body:
 
 ## Studio
 
-Published packages: @bnbagent/studio-cli 0.0.16 (Apache-2.0), @bnbagent/studio-runtime 0.0.16 and @bnbagent/sdk 0.6.1 (MIT).
+Published packages: @bnbagent/studio-cli 0.0.16 and @bnbagent/studio-runtime 0.0.16 (Apache-2.0), @bnbagent/sdk 0.6.1 (MIT). The files `bag init` generated in `WattnessEvaluator/` keep the scaffold's Apache-2.0 license; its `NOTICE` lists them.
 
 For managed hosting, use a dedicated disposable testnet wallet. Never import a key that has been used on mainnet into the hosted runtime.

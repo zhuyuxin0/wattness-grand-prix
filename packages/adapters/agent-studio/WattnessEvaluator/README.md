@@ -2,7 +2,7 @@
 
 A BNB Agent Studio seller agent that sells one thing: the evaluation of a sealed Wattness record. A buyer opens an ERC-8183 job on BSC testnet for a battery's shadow plan in the 2026-11-26 record. The agent runs the evaluator against that record and its GateRecord commitment on chain 97, then submits the report as the job's deliverable.
 
-Scaffolded with `bag init` from `@bnbagent/studio-cli` 0.0.16, with `@bnbagent/sdk` 0.6.1 and `@bnbagent/studio-runtime` 0.0.16 pinned.
+Scaffolded with `bag init` from `@bnbagent/studio-cli` 0.0.16, with `@bnbagent/sdk` 0.6.1 and `@bnbagent/studio-runtime` 0.0.16 pinned. The generated files are Apache-2.0 and listed in `NOTICE`; the work hook and the evaluator are MIT.
 
 - `app/agent/`: the agent and its only signer. This directory is the deploy codeLocation.
   - `src/evaluationWork.ts`: the work hook. It parses the task, runs the evaluator and builds the deliverable.
