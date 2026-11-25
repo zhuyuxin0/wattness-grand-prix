@@ -120,21 +120,37 @@ describe("a three-leaf fleet on the in-process chain", () => {
     expect(Number(onChain.committedAt)).toBeLessThan(gateTs(OD));
   });
 
-  it("writes stage 1 beside the record, every leaf in plan order, and links its root after the gate", async () => {
+  it("writes stage 1 beside the record, every leaf in plan order, and links the reviewed root after the gate", async () => {
     await chain.travelTo(gateTs(OD) + 26 * 3_600);
     const lines: string[] = [];
-    const r = await runOutcome({
-      repo: REPO,
-      operatingDay: DAY,
-      stage: 1,
-      network: "local",
-      dir,
-      send: true,
-      prices: releasePrices({ origin: release.origin, fetcher: release.fetcher, cacheDir }),
-      lib: chain.lib,
-      log: (l) => lines.push(l),
-    });
+    const run = (extra: { send?: boolean; expectRoot?: Hex }) =>
+      runOutcome({
+        repo: REPO,
+        operatingDay: DAY,
+        stage: 1,
+        network: "local",
+        dir,
+        prices: releasePrices({ origin: release.origin, fetcher: release.fetcher, cacheDir }),
+        lib: chain.lib,
+        log: (l) => lines.push(l),
+        ...extra,
+      });
+    const dry = await run({});
+    expect(dry.code, lines.join("\n")).toBe(0);
+    expect(lines.join("\n")).toMatch(/dry run {3}simulated linkOutcome; nothing sent/);
+
+    // A send whose documents give another root than the one reviewed writes and sends nothing.
+    const before = readFileSync(join(stageDir(), "index.json"), "utf8");
+    const other = await run({ send: true, expectRoot: `0x${"77".repeat(32)}` });
+    expect(other.code).toBe(1);
+    expect(lines.join("\n")).toContain(`root      ${dry.root} from release ${release.releaseId} is not the reviewed 0x${"77".repeat(32)}`);
+    expect(readFileSync(join(stageDir(), "index.json"), "utf8")).toBe(before);
+    const unlinked = (await chain.reader.readContract({ address: chain.contract, abi: chain.abi, functionName: "outcomeOf", args: [record.key!, 1] })) as { linkedAt: bigint };
+    expect(unlinked.linkedAt).toBe(0n);
+
+    const r = await run({ send: true, expectRoot: dry.root! });
     expect(r.code, lines.join("\n")).toBe(0);
+    expect(r.root).toBe(dry.root);
     expect(r.outDir).toBe(stageDir());
     expect(existsSync(join(dir, "record.json"))).toBe(true);
     const index = readJson<OutcomeIndex>(join(stageDir(), "index.json"));

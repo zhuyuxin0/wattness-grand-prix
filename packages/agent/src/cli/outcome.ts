@@ -8,7 +8,7 @@
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
-import type { Address } from "viem";
+import type { Address, Hex } from "viem";
 import { loadContractsLib } from "../contracts-lib.js";
 import { parseStage } from "../outcome.js";
 import { releasePrices } from "../outcome-prices.js";
@@ -20,6 +20,8 @@ const USAGE = `usage: pnpm outcome --od YYYY-MM-DD --stage 1|2|3 [options]
   --mainnet              required with --network bsc-mainnet
   --dry-run              simulate linkOutcome only (the default)
   --send                 sign and send the link
+  --root 0x...           send only if the stage's root is this one: the root the dry run printed and the
+                         checks verified (required with --send on bsc-mainnet)
   --dir DIR              the planned day (default: out/od-YYYYMMDD, out/od-YYYYMMDD-<network>, or out/local/... for local)
   --out DIR              where this stage's documents go (default: <dir>/outcomes/stage-<n>)
   --contract 0x...       GateRecord address (default: record.json, then contracts/deployments)
@@ -46,6 +48,7 @@ async function main(): Promise<number> {
       dir: { type: "string" },
       out: { type: "string" },
       contract: { type: "string" },
+      root: { type: "string" },
       rpc: { type: "string" },
       help: { type: "boolean", short: "h", default: false },
     },
@@ -56,6 +59,14 @@ async function main(): Promise<number> {
   }
   if (values.send && values["dry-run"]) {
     console.error("--send and --dry-run contradict each other");
+    return 2;
+  }
+  if (values.root !== undefined && !/^0x[0-9a-fA-F]{64}$/.test(values.root)) {
+    console.error(`--root must be 32 bytes of 0x-prefixed hex, got ${values.root}`);
+    return 2;
+  }
+  if (values.send && values.network === "bsc-mainnet" && !values.root) {
+    console.error("--send on bsc-mainnet needs --root: the root the dry run printed and the checks verified");
     return 2;
   }
   let stage;
@@ -78,6 +89,7 @@ async function main(): Promise<number> {
     ...(values.dir ? { dir: resolve(cwd, values.dir) } : {}),
     ...(values.out ? { out: resolve(cwd, values.out) } : {}),
     ...(values.contract ? { contract: values.contract as Address } : {}),
+    ...(values.root ? { expectRoot: values.root as Hex } : {}),
     prices: releasePrices(),
     lib: await loadContractsLib(repo),
   });

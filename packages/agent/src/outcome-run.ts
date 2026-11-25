@@ -45,6 +45,11 @@ export interface OutcomeRunOptions {
   mainnet?: boolean;
   /** Without it the link is only simulated. */
   send?: boolean;
+  /**
+   * The root a dry run printed and the checks verified. When given, a run whose documents give any other
+   * root (say, because a newer release was published in between) writes nothing and sends nothing.
+   */
+  expectRoot?: Hex;
   /** The planned day's directory; defaults by network as the commit script does. */
   dir?: string;
   /** Where to write this stage's documents (default: <dir>/outcomes/stage-<n>). */
@@ -211,6 +216,11 @@ export async function runOutcome(o: OutcomeRunOptions): Promise<OutcomeRunResult
     doc: buildOutcome(m, index.root, stage, prices.leaf(m.battery.settlement_point, m.battery.hub)),
   }));
   const tree = outcomeTree(docs);
+  if (o.expectRoot && tree.root !== o.expectRoot.toLowerCase()) {
+    log(`root      ${tree.root} from release ${prices.releaseId} is not the reviewed ${o.expectRoot}`);
+    log("nothing written, nothing sent: dry-run and check this release, then send with its root");
+    return { code: EXIT.refused, root: tree.root };
+  }
 
   // Documents a chain already links are never rewritten with another root.
   for (const f of existsSync(outDir) ? readdirSync(outDir).filter((n) => /^link\..+\.json$/.test(n)) : []) {
