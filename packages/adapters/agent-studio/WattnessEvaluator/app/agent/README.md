@@ -1,6 +1,6 @@
 # WattnessEvaluator agent
 
-The deploy codeLocation and the only key-holder for the WattnessEvaluator seller. It is configured for the BNB Chain managed platform (`[deploy].destination = "platform"`), a 48-hour testnet trial. The managed runtime ships one esbuild bundle of `src/unifiedMain.ts`, so everything the work needs is imported, including the vendored evaluator and the sealed record.
+The deploy codeLocation and the only key-holder for the WattnessEvaluator seller. It is configured for the BNB Chain managed platform (`[deploy].destination = "platform"`, `platform_artifact = "zip"`), a 48-hour testnet trial. A zip deploy bundles `src/unifiedMain.ts` and its imports with esbuild, so the evaluator and the sealed record are vendored as modules rather than read from disk.
 
 - `src/unifiedMain.ts`: the serving entrypoint. Hosted, it binds A2A on 9000 and Foundry invocations on 8088. On loopback with `--port`, it binds that port only.
 - `src/evaluationWork.ts`: the work hook and the task format.

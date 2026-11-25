@@ -1,8 +1,8 @@
 // Bundles the Wattness evaluator and the sealed 2026-11-26 record into
 // vendor/wattness-evaluator.js, inside this deploy codeLocation.
 //
-// The managed platform ships one esbuild bundle of src/unifiedMain.ts and
-// nothing else from disk, so the evaluator and its fixture have to be
+// A zip deploy ships an esbuild bundle of src/unifiedMain.ts, not this
+// repository's files, so the evaluator and its fixture have to be
 // importable modules here, not files read at run time. Run from the
 // repository after `pnpm install` and building @gatelock/core and
 // @gatelock/verifier.

@@ -51,7 +51,7 @@ The agent card is at `http://127.0.0.1:15194/.well-known/agent-card.json`. A loo
     {"skill":"negotiate","task_description":"<task JSON as a string>","terms":{"deliverables":"...","quality_standards":"...","currency":"<payment token address>"}}
     {"skill":"notify_funded","job_id":<id>}
 
-The buyer funds only a quote whose request names its payment token, so send `terms.currency` (testnet U is `0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565`). With local deliverable storage, the SDK publishes `{ERC8183_AGENT_URL}/job/{id}/response` on chain, and the agent serves the stored manifest there. Hosted on the managed platform, deliverables go to its managed storage instead, so leave `ERC8183_AGENT_URL` unset there.
+`terms.currency` is the payment token (testnet U is `0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565`). On a local run the agent serves each stored deliverable at `{ERC8183_AGENT_URL}/job/{id}/response`, the URL its `submit` publishes. Leave `ERC8183_AGENT_URL` unset in a hosted deploy.
 
 ## Deploy
 
@@ -59,19 +59,21 @@ The buyer funds only a quote whose request names its payment token, so send `ter
     pnpm exec bag deploy --provider bnb
     pnpm exec bag deploy verify --provider bnb
 
-`bag deploy verify` probes the hosted endpoint and records it in the agent's ERC-8004 identity.
-
 ## Buy one evaluation
 
 From a second project that holds the buyer's wallet, against the hosted agent:
 
     bag erc8183 buy --agent-id <id> --protocol A2A --task '<task JSON>' --budget-usd 0.10
+    bag erc8183 status <job_id>
+    bag erc8183 fetch <job_id>
+    bag erc8183 settle <job_id>     # after the policy's dispute window
 
 Against a local agent, negotiate over A2A yourself, save the data part of the reply, then fund it and send `notify_funded`:
 
     bag erc8183 buy --provider <seller address> --quote-json quote.json --task '<task JSON>' --budget-usd 0.10
     bag erc8183 status <job_id>
-    bag erc8183 fetch <job_id>      # downloads an https, ipfs or file deliverable and checks its on-chain hash
     bag erc8183 settle <job_id>     # after the policy's dispute window
+
+The deliverable a local agent serves is a manifest; keccak256 of its canonical JSON is the job's on-chain `deliverable`.
 
 The evaluation covers shadow plans for real ERCOT batteries. It checks the commitment, the inputs' days and the model constraints. It does not check plant operation or trading profit. Every skipped check stays visible in the report.
