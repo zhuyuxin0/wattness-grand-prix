@@ -130,7 +130,7 @@ export function differences(desk: Desk, common: DeskCommon, figs: Partial<Record
     const restText = rest.map((a) => `${money(figs[a]!.arm.objectiveUsd)} for ${a}`).join(" and ");
     lines.push(
       tied.length
-        ? `Plan ${sel} was sealed: its score, ${money(S.arm.objectiveUsd)}, ties ${tied.map((a) => `plan ${a}'s`).join(" and ")}, and a tie goes to the earlier plan${restText ? `; ${restText}` : ""}.`
+        ? `Plan ${sel} was sealed: its score, ${money(S.arm.objectiveUsd)}, ties ${tied.map((a) => `plan ${a}'s`).join(" and ")}, and a tie goes to the earlier plan.${rest.length ? ` ${rest.map((a) => `Plan ${a} scores ${money(figs[a]!.arm.objectiveUsd)}`).join("; ")}.` : ""}`
         : `Plan ${sel} was sealed because it has the highest score, ${money(S.arm.objectiveUsd)}${restText ? `, against ${restText}` : ""}.`,
     );
   }
