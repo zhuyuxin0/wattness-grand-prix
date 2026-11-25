@@ -1,0 +1,85 @@
+/* The starting grid's closing lockup: the two names under the two marks, then
+   one plain line. Hung from the marks' foot in the scene's label layer, sized
+   from the stage's height (the scene is a size container) so it keeps to the
+   marks at any aspect. The stage holds its own dark, so these are dark tokens. */
+
+.scene-label.sg-lockup {
+  display: grid;
+  justify-items: center;
+  gap: clamp(4px, 1.2cqh, 14px);
+  text-align: center;
+}
+
+.sg-lockup__names {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4em;
+  font-family: var(--t-font-display);
+  font-weight: 600;
+  font-size: clamp(15px, 3.1cqh, 34px);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--w-fg);
+}
+
+.sg-lockup__x {
+  font-weight: 300;
+  color: var(--w-muted);
+}
+
+.sg-lockup__line {
+  font-family: var(--w-font-sans);
+  font-size: clamp(11px, 1.5cqh, 16px);
+  line-height: 1.4;
+  letter-spacing: 0;
+  color: var(--w-muted);
+}
+
+/* Without WebGL the stage shows the same last frame, flat: the Wattness mark
+   (the W's visual height is 0.955 of the box) and the symbol at 0.9 of it, the
+   gap 0.68 of the symbol's height, as in the scene. */
+.sg-still {
+  --sg-mark: clamp(56px, 24cqh, 240px);
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: clamp(4px, 1.2cqh, 14px);
+  text-align: center;
+  color: var(--w-fg);
+}
+
+.sg-still__marks {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--sg-mark) * 0.58);
+  margin-bottom: clamp(8px, 5cqh, 56px);
+}
+
+.sg-still__mark {
+  display: block;
+  height: var(--sg-mark);
+  width: auto;
+}
+
+.sg-still__symbol {
+  display: block;
+  height: calc(var(--sg-mark) * 0.86);
+  width: auto;
+}
+
+.sg-still__caption {
+  margin-top: clamp(8px, 3cqh, 32px);
+  max-width: 60ch;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--w-muted);
+}
+
+.sg-still__hash {
+  font-family: var(--t-font-code);
+}
+
+/* The flat still sits on the stage's own ground, as the canvas does. */
+.scene__fallback:has(> .sg-still) {
+  background: var(--t-chrome);
+}
