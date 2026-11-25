@@ -1,0 +1,495 @@
+/* Shared components in the Terminal's grammar: one surface level, hairline
+   rules, sentence-case heads, tabular figures. Page-only styles live in each
+   page folder. */
+
+/* ---------------------------------------------------------------- section */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--t-space-5);
+  min-width: 0;
+}
+/* A framed pane: one frame, never a frame inside a frame. */
+.section--panel {
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  padding: var(--t-space-5);
+}
+.section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--t-space-4);
+  padding-bottom: var(--t-space-3);
+  border-bottom: 1px solid var(--t-rule);
+}
+.section--panel > .section__head,
+.section--flush > .section__head {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.section__titles {
+  min-width: 0;
+  display: grid;
+  gap: var(--t-space-1);
+}
+.section__kicker {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.section__title {
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+  letter-spacing: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--t-space-3);
+}
+.section__lede {
+  color: var(--w-muted);
+  max-width: 80ch;
+  line-height: var(--t-lh-prose);
+}
+.section__actions {
+  display: flex;
+  gap: var(--t-space-3);
+  align-items: center;
+}
+.section__body {
+  min-width: 0;
+}
+.section__source {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  max-width: 96ch;
+}
+
+/* ---------------------------------------------------------------- stat */
+
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  border-top: 1px solid var(--t-rule);
+}
+.stat-row > .stat {
+  padding: var(--t-space-4) var(--t-space-4) var(--t-space-4) 0;
+  border-bottom: 1px solid var(--t-rule);
+}
+@media (min-width: 720px) {
+  .stat-row > .stat + .stat {
+    padding-left: var(--t-space-4);
+    border-left: 1px solid var(--t-rule);
+  }
+}
+.stat {
+  display: grid;
+  gap: var(--t-space-1);
+  align-content: start;
+  min-width: 0;
+}
+.stat__label {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.stat__value {
+  font-family: var(--w-font-sans);
+  font-weight: 600;
+  font-size: var(--t-fs-stat);
+  font-variant-numeric: tabular-nums;
+  color: var(--w-fg);
+  line-height: 1.15;
+  display: flex;
+  align-items: baseline;
+  gap: 0.3em;
+  flex-wrap: wrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.stat--sm .stat__value {
+  font-size: var(--t-fs-title);
+}
+.stat--lg .stat__value {
+  font-size: var(--gp-fs-hero);
+  letter-spacing: -0.01em;
+}
+.stat__unit {
+  font-size: var(--t-fs-sm);
+  font-weight: 400;
+  color: var(--w-muted);
+}
+.stat__note {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.stat--sealed .stat__value {
+  color: var(--seal-text);
+}
+.stat--refused .stat__value {
+  color: var(--s-bad);
+}
+.stat__value .hash {
+  font-size: var(--t-fs);
+}
+
+/* ---------------------------------------------------------------- hash */
+
+.hash {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--t-space-2);
+  max-width: 100%;
+  font-family: var(--t-font-code);
+  font-size: var(--t-fs-sm);
+  color: var(--w-fg);
+  vertical-align: middle;
+}
+.hash--full .hash__text {
+  word-break: break-all;
+}
+.hash__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  color: inherit;
+}
+.hash__link .glyph {
+  color: var(--w-muted);
+}
+/* "Copy", then "Copied": a word, as on the Terminal. */
+.hash__copy {
+  flex: none;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-xs);
+  background: transparent;
+  color: var(--w-muted);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs-xs);
+  line-height: 18px;
+  cursor: pointer;
+}
+.hash__copy:hover {
+  background: var(--t-hover);
+  color: var(--w-fg);
+}
+
+/* ---------------------------------------------------------------- the seal */
+
+/* The sealed state's mark: a dot, built like the Terminal's Ness dot. */
+.seal-mark {
+  display: inline-block;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-inline: 3px;
+  vertical-align: 1px;
+  border-radius: 50%;
+  background: var(--seal);
+  box-shadow:
+    0 0 0 1px var(--seal-keyline),
+    0 0 0 4px color-mix(in srgb, var(--seal) 16%, transparent);
+}
+
+/* A state as a word with its mark. */
+.pf {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--t-radius);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pf--sm {
+  height: 20px;
+  padding: 0 6px;
+}
+.pf--sealed {
+  padding-left: 4px;
+  color: var(--seal-text);
+}
+.pf--open {
+  color: var(--w-muted);
+  background: var(--t-chrome);
+}
+.pf--refused {
+  color: var(--s-bad);
+  background: var(--s-bad-bg);
+}
+
+/* ---------------------------------------------------------------- countdown */
+
+.countdown {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
+}
+.countdown__label {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.countdown__digits {
+  font-family: var(--w-font-sans);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--w-fg);
+  line-height: 1.1;
+}
+.countdown--sm {
+  grid-auto-flow: column;
+  align-items: baseline;
+  gap: var(--t-space-3);
+}
+.countdown--sm .countdown__digits {
+  font-size: var(--t-fs);
+}
+.countdown--md .countdown__digits {
+  font-size: var(--t-fs-stat);
+}
+.countdown--lg .countdown__digits {
+  font-size: var(--gp-fs-hero);
+}
+.countdown__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--t-space-3);
+  margin-top: var(--t-space-1);
+  font-size: var(--t-fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+.countdown--closed .countdown__digits {
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- receipt */
+
+.receipt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: var(--t-space-5);
+}
+.receipt {
+  position: relative;
+  min-width: 0;
+  padding: var(--t-space-4) var(--t-space-5) var(--t-space-2);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  box-shadow: var(--seal-edge);
+}
+.receipt__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--t-space-4);
+  margin-bottom: var(--t-space-3);
+}
+.receipt__chain {
+  margin-top: 2px;
+  font-size: var(--t-fs-title);
+}
+.receipt__rows {
+  margin: 0;
+  display: grid;
+}
+.receipt__rows > div {
+  display: grid;
+  grid-template-columns: 9em minmax(0, 1fr);
+  gap: var(--t-space-4);
+  align-items: baseline;
+  padding: 6px 0;
+  border-top: 1px solid var(--t-rule);
+}
+.receipt__rows dt {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.receipt__rows dd {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--t-fs-sm);
+}
+.receipt__time {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--t-space-3);
+}
+.receipt__scope {
+  font-size: var(--t-fs-sm);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 479px) {
+  .receipt {
+    padding: var(--t-space-4);
+  }
+  .receipt__rows > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------- table */
+
+.gp-table {
+  overflow: auto;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+.gp-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-fs-sm);
+  font-variant-numeric: tabular-nums;
+}
+.gp-table caption {
+  text-align: left;
+  padding: 0 0 var(--t-space-3);
+  color: var(--w-muted);
+  font-size: var(--t-fs-xs);
+}
+/* Heads on chrome, below the pane: 11px, 600, sentence case. */
+.gp-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--t-chrome);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+  padding: 0;
+  border-bottom: 1px solid var(--w-border);
+  white-space: nowrap;
+}
+.gp-table thead th > span,
+.gp-table__sort {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: var(--t-hdr-h);
+  padding: 0 10px;
+}
+.gp-table__sort {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+.gp-table th.align-right .gp-table__sort,
+.gp-table th.align-right > span {
+  justify-content: flex-end;
+}
+.gp-table th.align-center .gp-table__sort,
+.gp-table th.align-center > span {
+  justify-content: center;
+}
+.gp-table__sort:hover {
+  color: var(--w-fg);
+}
+/* The arrow's slot is always there, so a sort never moves the column's edge. */
+.gp-table__sort-glyph {
+  opacity: 0;
+}
+.gp-table__sort:is(:hover, :focus-visible) .gp-table__sort-glyph {
+  opacity: 0.45;
+}
+.is-sorted .gp-table__sort-glyph {
+  opacity: 1;
+}
+.gp-table th.is-sorted {
+  color: var(--w-fg);
+}
+.gp-table td {
+  height: var(--t-row);
+  padding: 0 10px;
+  border-bottom: 1px solid var(--t-rule);
+  white-space: nowrap;
+  color: var(--w-fg);
+}
+.gp-table--dense td {
+  height: 24px;
+}
+.gp-table .align-right {
+  text-align: right;
+}
+.gp-table .align-center {
+  text-align: center;
+}
+.gp-table tbody tr:hover {
+  background: var(--t-hover);
+}
+.gp-table tr.is-clickable {
+  cursor: pointer;
+}
+.gp-table tr.is-highlighted {
+  background: var(--t-selected);
+}
+.gp-table tr.is-highlighted td:first-child {
+  box-shadow: var(--t-mark-edge);
+}
+.gp-table__pos {
+  color: var(--w-muted);
+  text-align: right;
+}
+.gp-table thead .gp-table__pos {
+  padding: 0 10px;
+}
+.gp-table__empty {
+  color: var(--w-muted);
+  text-align: center;
+  padding: var(--gp-space-7) !important;
+}
+
+/* ---------------------------------------------------------------- states */
+
+.state {
+  display: flex;
+  align-items: center;
+  gap: var(--t-space-4);
+  color: var(--w-muted);
+  font-size: var(--t-fs);
+  padding: var(--t-space-6) 0;
+}
+.state__bar {
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--t-accent-mark) 0 40%, var(--w-border) 40% 100%);
+  background-size: 200% 100%;
+  animation: state-run 1.1s var(--m-ease-out) infinite;
+}
+@keyframes state-run {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .state__bar {
+    animation: none;
+  }
+}
+.state--error {
+  color: var(--s-bad);
+}
+
+/* Recording mode: no hover-only reveals, no looping motion. */
+[data-capture="1"] .state__bar {
+  animation: none;
+}
+[data-capture="1"] .gp-table__sort-glyph {
+  opacity: 1;
+}

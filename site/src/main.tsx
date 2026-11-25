@@ -1,0 +1,21 @@
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { createHashRouter, RouterProvider } from "react-router-dom";
+import { chooseTheme } from "./lib/theme";
+import { routes } from "./routes";
+import "./styles/fonts.css";
+import "./styles/tokens.css";
+import "./styles/base.css";
+import "./styles/shell.css";
+import "./styles/components.css";
+
+// Before React mounts, so the first frame and native controls take the saved theme.
+chooseTheme();
+
+const router = createHashRouter(routes);
+
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <RouterProvider router={router} />
+  </StrictMode>,
+);

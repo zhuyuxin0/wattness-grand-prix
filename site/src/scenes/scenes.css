@@ -1,0 +1,457 @@
+/* The 3D scenes: a canvas, an HTML label layer projected from world space, and
+   corner annotations. Sizes are set by the container; the scene fills it. */
+
+.scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 240px;
+  overflow: hidden;
+  background: var(--bg);
+  isolation: isolate;
+  contain: layout paint;
+  container: scene / size;
+}
+
+.scene__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scene__labels,
+.scene__hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.scene__fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+}
+
+/* ------------------------------------------------------------- labels */
+
+.scene-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  white-space: nowrap;
+  will-change: transform, opacity;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  line-height: 1.3;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.scene-label .mono {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0;
+}
+
+.scene-label .timing {
+  font-family: var(--font-timing);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.scene-label .muted {
+  color: var(--muted);
+}
+
+.scene-label .faint {
+  color: var(--faint);
+}
+
+/* A label hung off a point by a short leader. */
+.scene-tag {
+  display: grid;
+  gap: 1px;
+  padding: 0 0 0 10px;
+  border-left: 1px solid var(--border-strong);
+}
+
+.scene-tag--teal {
+  border-left-color: var(--teal);
+}
+
+.scene-tag--bnb {
+  border-left-color: var(--bnb);
+}
+
+.scene-tag__head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-strong);
+  letter-spacing: -0.005em;
+}
+
+.scene-tag__pos {
+  font-family: var(--font-timing);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--text-strong);
+}
+
+/* ------------------------------------------------------------- HUD */
+
+.scene-hud {
+  position: absolute;
+  display: grid;
+  gap: 6px;
+  max-width: min(44ch, 46%);
+  font-variant-numeric: tabular-nums;
+}
+
+.scene-hud--tl {
+  top: clamp(16px, 4.2%, 40px);
+  left: clamp(16px, 3.4%, 48px);
+}
+
+.scene-hud--tr {
+  top: clamp(16px, 4.2%, 40px);
+  right: clamp(16px, 3.4%, 48px);
+  justify-items: end;
+  text-align: right;
+}
+
+.scene-hud--bl {
+  bottom: clamp(16px, 4.2%, 40px);
+  left: clamp(16px, 3.4%, 48px);
+}
+
+.scene-hud--br {
+  bottom: clamp(16px, 4.2%, 40px);
+  right: clamp(16px, 3.4%, 48px);
+  justify-items: end;
+  text-align: right;
+  text-wrap: balance;
+}
+
+.scene-kicker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-timing);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scene-kicker::before {
+  content: "";
+  width: 18px;
+  height: 2px;
+  background: var(--teal);
+  transform: skewX(-24deg);
+}
+
+.scene-kicker[data-sealed="1"]::before {
+  background: var(--bnb);
+}
+
+.scene-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(22px, 3.1vw, 40px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--text-strong);
+}
+
+.scene-sub {
+  font-size: clamp(11px, 1.05vw, 13px);
+  line-height: 1.5;
+  color: var(--muted);
+  max-width: 46ch;
+}
+
+.scene-clock {
+  font-family: var(--font-timing);
+  font-weight: 600;
+  font-size: clamp(26px, 3.4vw, 46px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.scene-clock small {
+  font-size: 0.42em;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-left: 0.4em;
+}
+
+.scene-clock[data-sealed="1"] {
+  color: var(--seal-text);
+}
+
+.scene-meta {
+  font-family: var(--font-timing);
+  font-weight: 500;
+  font-size: clamp(11px, 1vw, 13px);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.scene-meta b {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.scene-meta[data-sealed="1"] b {
+  color: var(--seal-text);
+}
+
+.scene-source {
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--faint);
+}
+
+.scene-legend {
+  display: grid;
+  gap: 6px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.scene-legend__ramp {
+  width: 168px;
+  height: 6px;
+  border-radius: 1px;
+}
+
+.scene-legend__scale {
+  display: flex;
+  justify-content: space-between;
+  width: 168px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--faint);
+}
+
+.scene-legend__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.scene-legend__swatch {
+  width: 16px;
+  height: 2px;
+  flex: none;
+}
+
+.scene-legend__grid {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 4px 16px;
+}
+
+/* ------------------------------------------------------------- receipt */
+
+.scene-receipt {
+  display: grid;
+  gap: 5px;
+  min-width: 300px;
+  padding: 14px 16px 13px;
+  background: rgba(16, 19, 21, 0.86);
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--bnb);
+  backdrop-filter: blur(6px);
+}
+
+.scene-receipt__row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  font-size: 11px;
+}
+
+.scene-receipt__row > span:first-child {
+  font-family: var(--font-timing);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.scene-receipt__row > span:last-child {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text);
+  white-space: pre;
+}
+
+.scene-receipt__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 6px;
+  margin-bottom: 2px;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-timing);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--seal-text);
+}
+
+.scene-receipt__head span:last-child {
+  color: var(--muted);
+}
+
+.scene-receipt__lead {
+  color: var(--seal-text) !important;
+}
+
+/* A tag hung to the left of its point: the rule sits on the right. */
+.scene-tag--right {
+  padding: 0 10px 0 0;
+  border-left: 0;
+  border-right: 1px solid var(--border-strong);
+  text-align: right;
+}
+
+.scene-tag--right .scene-tag__head {
+  justify-content: flex-end;
+}
+
+.scene-tag--right.scene-tag--teal {
+  border-right-color: var(--teal);
+}
+
+.scene-tag--right.scene-tag--bnb {
+  border-right-color: var(--bnb);
+}
+
+.scene-hud--receipt {
+  right: clamp(16px, 3.4%, 48px);
+  bottom: clamp(72px, 14%, 140px);
+  max-width: none;
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------- label parts */
+
+.scene-plane-label__num {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+}
+
+.scene-plane-label__name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-strong);
+}
+
+.scene-plane-label__count {
+  font-size: 10.5px;
+}
+
+.scene-node-label__name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--text-strong);
+}
+
+.scene-node-label__sub {
+  font-size: 10px;
+}
+
+.scene-star-label__name {
+  font-size: 11px;
+  color: #cfe9e2;
+}
+
+.scene-star-label__name.is-whole {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.scene-tag--above {
+  padding: 0 0 4px;
+  border-left: 0;
+  border-bottom: 1px solid var(--bnb);
+  text-align: center;
+}
+
+/* ------------------------------------------------------------- narrow stage */
+
+@container scene (max-width: 640px) {
+  .scene-hud--tl {
+    max-width: 62%;
+  }
+  .scene-hud--tr {
+    max-width: 36%;
+  }
+  .scene-title {
+    font-size: 22px;
+  }
+  .scene-sub,
+  .scene-hud--bl,
+  .scene-source__scope,
+  .scene-plane-label__name,
+  .scene-plane-label__count,
+  .scene-node-label,
+  .scene-receipt__row--extra {
+    display: none;
+  }
+  .scene-clock {
+    font-size: 24px;
+  }
+  .scene-meta {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+  .scene-hud--receipt {
+    left: 16px;
+    right: 16px;
+    bottom: 52px;
+  }
+  .scene-receipt {
+    min-width: 0;
+    padding: 10px 12px;
+  }
+  .scene-receipt__row {
+    grid-template-columns: 52px 1fr;
+    gap: 8px;
+  }
+  .scene-receipt__row > span:last-child {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .scene-star-label__name {
+    font-size: 10px;
+  }
+  .scene-tag__head {
+    font-size: 12px;
+  }
+}
