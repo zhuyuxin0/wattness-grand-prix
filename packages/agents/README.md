@@ -35,14 +35,18 @@ forecaster delivered. A job's request says whether the scenarios were sealed bef
 `src/read.ts` is browser-safe (eth_call and fetch only):
 
 ```ts
-import { jsonRpcCaller, readAgents, readJob, checkDeliverable, TESTNET_RPCS } from "@gatelock/agents";
+import { jsonRpcCaller, readAgents, readJobs, readJob, checkDeliverable, TESTNET_RPCS } from "@gatelock/agents";
 import deployment from "../../contracts/deployments/agents.bsc-testnet.json";
 
 const call = jsonRpcCaller(TESTNET_RPCS);
 const agents = await readAgents(call, deployment);   // identity, card and five checks per role
+const jobs = await readJobs(call, deployment);       // each job, checked against the record
 const job = await readJob(call, deployment.jobs[0].jobId);
 const { matches } = checkDeliverable(job, await (await fetch(deployment.jobs[0].deliverableUrl)).text());
 ```
+
+The Greenfield storage provider answers cross-origin requests from the site, and the BSC testnet RPCs answer
+`eth_call` from a browser. `test/testnet.test.ts` replays recorded live answers for agent 2925 and job 1872.
 
 The runners that create the wallets, register the agents, publish the cards and run a job are in `scripts/agents`.
 

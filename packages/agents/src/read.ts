@@ -229,3 +229,34 @@ export async function readAgents(call: EthCall, d: AgentsDeployment, fetchImpl: 
     }),
   );
 }
+
+export interface JobView {
+  jobId: number;
+  job: JobRead | null;
+  /** The chain agrees with the deployment record on the parties, the deliverable and the status. */
+  checks: { parties: boolean; deliverable: boolean; status: boolean };
+  error: string | null;
+}
+
+/** Every job in a deployment record, read back from the chain. */
+export async function readJobs(call: EthCall, d: AgentsDeployment): Promise<JobView[]> {
+  return Promise.all(
+    d.jobs.map(async (r): Promise<JobView> => {
+      try {
+        const job = await readJob(call, r.jobId, d.erc8183);
+        return {
+          jobId: r.jobId,
+          job,
+          checks: {
+            parties: job.client === getAddress(r.client.address) && job.provider === getAddress(r.provider.address),
+            deliverable: r.deliverable !== null && job.deliverable.toLowerCase() === r.deliverable.toLowerCase(),
+            status: job.status === r.status,
+          },
+          error: null,
+        };
+      } catch (e) {
+        return { jobId: r.jobId, job: null, checks: { parties: false, deliverable: false, status: false }, error: (e as Error).message };
+      }
+    }),
+  );
+}
