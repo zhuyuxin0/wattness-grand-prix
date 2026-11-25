@@ -1,0 +1,4 @@
+# Standalone project: not part of the repository's workspace.
+# protobufjs 6 runs only a version notice on install; nothing here needs it.
+allowBuilds:
+  protobufjs: false
