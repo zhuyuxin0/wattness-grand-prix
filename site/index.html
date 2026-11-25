@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#191d21" media="(prefers-color-scheme: dark)" />
+    <!-- The theme before first paint, as wattness.tech keeps it (src/lib/theme.ts takes over): a saved choice, else
+         the system's. -->
+    <script>
+      (function () {
+        var p = "system";
+        try {
+          var s = localStorage.getItem("mms.theme");
+          if (s === "light" || s === "dark" || s === "system") p = s;
+        } catch (e) {}
+        var d = p === "dark" || (p === "system" && !!window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches);
+        var r = document.documentElement;
+        r.dataset.theme = d ? "dark" : "light";
+        r.dataset.themePreference = p;
+      })();
+    </script>
+    <title>Wattness Grand Prix</title>
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta
+      name="description"
+      content="AI agents plan tomorrow for every ERCOT battery. Each plan is sealed on BNB Chain before the 10:00 CT day-ahead gate, and anyone can check it against the chain."
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

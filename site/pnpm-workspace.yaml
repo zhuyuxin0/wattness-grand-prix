@@ -1,0 +1,3 @@
+# Standalone project: not part of the repository's workspace.
+allowBuilds:
+  esbuild: true

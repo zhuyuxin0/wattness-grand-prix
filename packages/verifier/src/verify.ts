@@ -12,6 +12,7 @@ import {
   gateTs,
   gateTsFromTimeZone,
   hoursInOperatingDay,
+  inclusionProof,
   leafHash,
   manifestShapeErrors,
   merkleRoot,
@@ -20,6 +21,8 @@ import {
   mul,
   odFromIso,
   operatingDayEndTs,
+  OUTCOME_SCHEMA,
+  outcomeIndexErrors,
   outcomeShapeErrors,
   planScopeLabel,
   PPM,
@@ -31,9 +34,11 @@ import {
   sum,
   type Arm,
   type ArmId,
+  type FleetIndex,
   type Manifest,
   type Outcome,
   type OutcomeArm,
+  type OutcomeIndex,
   type ScenarioMatrix,
 } from "@gatelock/core";
 import { getAddress, isAddressEqual, type Address, type Hex } from "viem";
@@ -43,7 +48,8 @@ import { diffJson, formatChanges } from "./diff.js";
 import { checkCournotResponse, checkCournotRule, cournotOf, scenarioWeightsFor } from "./cournot.js";
 import { armRisk, objectiveUusd, weightedEntryCents } from "./evaluate.js";
 import { fail, judge, pass, skip, type CheckResult } from "./report.js";
-import { checkSources, type SourceCheck, type SourceOptions } from "./sources.js";
+import { parsePublishedDay } from "./published.js";
+import { checkSources, readCited, type SourceCheck, type SourceOptions } from "./sources.js";
 
 /** record.json beside a manifest: where and how it was committed. */
 export interface RecordFile {
@@ -61,7 +67,13 @@ export interface RecordFile {
 
 export interface OutcomeFile {
   stage: number;
+  /** The battery's gate-record.outcome.v1; null when the stage's index lists none for it. */
   doc: unknown;
+  /**
+   * For a record over several leaves: the stage's outcomes/stage-<n>/index.json. Its leaves give the
+   * document's audit path to the root GateRecord links for the stage. A one-leaf record needs none.
+   */
+  index?: unknown;
 }
 
 export interface VerifyInput {
@@ -81,6 +93,8 @@ export interface VerifyInput {
   inclusion?: Inclusion;
   /** Files published beside the record (an outside input's saved response), by the route the manifest gives. */
   outsideFile?: (route: string) => Uint8Array | null;
+  /** The day's index the manifest is a leaf of; V10 then checks that each outcome index settles every plan leaf in order. */
+  fleet?: FleetIndex;
 }
 
 export interface Inclusion {
@@ -510,7 +524,8 @@ function checkSelected(m: Manifest): CheckResult {
   return judge("V9", TITLES.V9, problems, [`objective µUSD: ${listing || "no arms"}; selected ${m.selected_arm}`]);
 }
 
-export function outcomeArm(m: Manifest, o: Outcome, arm: Arm): OutcomeArm {
+/** V10's formula: the arm valued at the outcome's prices. The agent's outcome writer computes the same. */
+export function outcomeArm(m: Manifest, o: Pick<Outcome, "prices">, arm: Arm): OutcomeArm {
   const energy = sum(arm.kw.map((kw, h) => energyMicroUsd(kw, o.prices.da_node_cents[h] ?? 0)));
   const wear = energyMicroUsd(sum(arm.kw.map((kw) => splitKw(kw).dischargeKwh)), m.assumptions.wear_cents_per_mwh);
   const fees = mul(sum(arm.contracts.map(Math.abs)), m.instrument.fee_cents_per_contract, MICRO_USD_PER_CENT);
@@ -544,9 +559,41 @@ async function checkOutcomes(
   const contract = input.chain?.contract ?? input.record?.contract;
   const onChain = input.chain && contract && c?.key && c.writeOnce ? { reader: input.chain.reader, contract, key: c.key } : null;
   const hours = hoursInOperatingDay(od);
+  const resource = m.battery.resource;
+  const size = input.inclusion?.size ?? 1;
+  const planPosition = input.inclusion?.index ?? 0;
+  const planLeaf = leafHash(m);
 
   for (const o of outcomes) {
     const p = (s: string) => problems.push(`outcome ${o.stage}: ${s}`);
+    const note = (s: string) => notes.push(`stage ${o.stage}: ${s}`);
+
+    // Where the battery's outcome sits: one leaf of the stage's tree, or the whole outcome of a one-leaf record.
+    let tree: { position: number; size: number; proof: Hex[]; leaf: Hex; root: Hex } | null = null;
+    if (o.index !== undefined) {
+      const errs = outcomeIndexErrors(o.index, input.fleet);
+      if (errs.length > 0) {
+        p(`index: ${errs.slice(0, 5).join("; ")}${errs.length > 5 ? `; ... ${errs.length - 5} more` : ""}`);
+        continue;
+      }
+      const ix = o.index as OutcomeIndex;
+      const before = problems.length;
+      if (ix.stage !== o.stage) p(`index is for stage ${ix.stage}`);
+      if (ix.record_root !== root) p(`index settles ${ix.record_root}, this record's root is ${root}`);
+      if (ix.leaf_count !== size) p(`index has ${ix.leaf_count} outcome leaves, the record ${size}`);
+      const at = ix.leaves.findIndex((l) => l.resource === resource);
+      if (at < 0) p(`${resource} has no outcome in the index`);
+      else {
+        if (at !== planPosition) p(`${resource} is outcome leaf ${at + 1}, plan leaf ${planPosition + 1}`);
+        if (ix.leaves[at]!.plan_leaf !== planLeaf) p(`the index says ${resource} settles plan leaf ${ix.leaves[at]!.plan_leaf}, this manifest is ${planLeaf}`);
+      }
+      if (problems.length > before) continue;
+      tree = { position: at, size: ix.leaf_count, proof: inclusionProof(ix.leaves.map((l) => l.leaf), at), leaf: ix.leaves[at]!.leaf, root: ix.root };
+    } else if (size > 1) {
+      p(`the record holds ${size} leaves; ${resource}'s outcome needs the stage's index.json for its audit path`);
+      continue;
+    }
+
     const shape = outcomeShapeErrors(o.doc);
     if (shape.length > 0) {
       p(`schema: ${shape.slice(0, 5).join("; ")}`);
@@ -558,33 +605,35 @@ async function checkOutcomes(
     if (doc.operating_day !== m.operating_day) p(`operating day ${doc.operating_day}`);
     if (doc.prices.da_node_cents.length !== hours) p(`${doc.prices.da_node_cents.length} DA prices, the day has ${hours}`);
     if (doc.prices.rt_hub_cents && doc.prices.rt_hub_cents.length !== hours) p(`${doc.prices.rt_hub_cents.length} RT hours, the day has ${hours}`);
-    for (const id of ARM_IDS) {
-      const arm = m.arms[id];
-      const got = doc.arms[id];
-      if (!arm) {
-        if (got) p(`arm ${id} was not solved but has an outcome`);
-        continue;
-      }
-      if (!got) {
-        p(`arm ${id} missing`);
-        continue;
-      }
-      const want = outcomeArm(m, doc, arm);
-      for (const k of Object.keys(want) as (keyof OutcomeArm)[]) {
-        if (got[k] !== want[k]) p(`arm ${id}: ${k} ${got[k]}, recomputed ${want[k]}`);
-      }
-    }
-    const hash = merkleRoot([leafHash(doc)]);
+
+    // The document V10 expects: the stage's published prices, the arms valued at them by the formula above.
+    const published = await publishedPrices(input, m, doc, o.stage, hours);
+    published.problems.forEach(p);
+    published.notes.forEach(note);
+    const want = expectedOutcome(m, root, o.stage, doc, published.prices);
+    outcomeDifferences(doc, want, published.reread).forEach(p);
+
+    const leaf = leafHash(want);
+    const given = leafHash(doc);
+    const walked = tree ? rootFromProof(leaf, tree.position, tree.size, tree.proof) : merkleRoot([leaf]);
+    if (tree) {
+      if (given !== tree.leaf) p(`${resource}'s document hashes to ${given}, the index lists ${tree.leaf}`);
+      if (walked !== tree.root) p(`the recomputed leaf walks its audit path to ${walked}, the index's root is ${tree.root}`);
+      note(`${resource} is leaf ${tree.position + 1} of ${tree.size}; the recomputed leaf ${leaf} walks an audit path of ${tree.proof.length} hash${tree.proof.length === 1 ? "" : "es"} to ${walked}`);
+    } else note(`one leaf; the recomputed outcome hashes to root ${walked}`);
+    const claimed = tree ? tree.root : merkleRoot([given]);
+
     if (onChain) {
       const linked = await onChain.reader.outcome(onChain.contract, onChain.key, o.stage);
       if (!linked) p("not linked on chain");
       else {
-        if (linked.hash !== hash) p(`on-chain hash ${linked.hash}, recomputed ${hash}`);
+        if (linked.hash !== walked) p(`on-chain hash ${linked.hash}, recomputed ${walked}`);
+        else if (linked.hash !== claimed) p(`on-chain hash ${linked.hash}, the given ${tree ? "index" : "document"} gives ${claimed}`);
         const opens = o.stage === 1 ? gateTs(od) : operatingDayEndTs(od);
         if (linked.linkedAt < opens) p(`linked at ${linked.linkedAt}, before the stage opened at ${opens}`);
-        notes.push(`stage ${o.stage} linked ${formatInZone(linked.linkedAt)}`);
+        note(`GateRecord links ${linked.hash}, ${formatInZone(linked.linkedAt)} = ${formatInZone(linked.linkedAt, "Asia/Bangkok")}`);
       }
-    } else notes.push(`stage ${o.stage} hash ${hash} (not checked on chain)`);
+    } else note(`root ${walked} (not checked on chain)`);
   }
 
   if (onChain) {
@@ -592,9 +641,127 @@ async function checkOutcomes(
     for (const stage of [1, 2, 3]) {
       if (present.has(stage)) continue;
       const linked = await onChain.reader.outcome(onChain.contract, onChain.key, stage);
-      if (linked) problems.push(`stage ${stage} is linked on chain (${linked.hash}) but no outcome-${stage}.json was given`);
+      if (linked) {
+        const file = size > 1 ? `outcomes/stage-${stage}/index.json` : `outcome-${stage}.json`;
+        problems.push(`stage ${stage} is linked on chain (${linked.hash}) but no ${file} was given`);
+      }
     }
   }
   if (outcomes.length === 0 && problems.length === 0) return skip("V10", TITLES.V10, ["no outcomes yet"]);
   return judge("V10", TITLES.V10, problems, notes);
+}
+
+interface PublishedPrices {
+  prices: Outcome["prices"];
+  /** True when the prices were read from the release files the outcome cites, not taken from the document. */
+  reread: boolean;
+  problems: string[];
+  notes: string[];
+}
+
+/**
+ * The stage's published prices for this battery: the settlement point's day-ahead SPPs and, at stage 3, the
+ * hub's first-published real-time 15-minute SPPs, read from the release files the outcome cites. Offline, or
+ * when a cited file is neither served nor mirrored, the document's own prices stand, and the note says so.
+ * Stage 2's provisional hub prices come from SCED runs the live tier keeps for two days; they are taken as stated.
+ */
+async function publishedPrices(input: VerifyInput, m: Manifest, doc: Outcome, stage: number, hours: number): Promise<PublishedPrices> {
+  const stated = (why: string, problems: string[] = []): PublishedPrices => ({ prices: doc.prices, reread: false, problems, notes: [`prices as the document states them: ${why}`] });
+  if (!input.sources) return stated("not re-read (no fetch)");
+  const day = m.operating_day;
+  const node = `/api/prices/${m.battery.settlement_point}/${day}`;
+  const hub = `/api/prices/${m.battery.hub}/${day}`;
+  if (!doc.inputs.files.some((f) => f.route === node)) return stated(`the document cites no price file for ${m.battery.settlement_point}`);
+  const routes = stage === 3 ? [node, hub] : [node];
+  const got = await readCited(
+    { releaseId: doc.inputs.release_id, manifestSha256: doc.inputs.manifest_sha256, files: doc.inputs.files, live: [] },
+    routes,
+    input.sources,
+  );
+  if (got.problems.length > 0) return stated("a cited price file could not be read", got.problems.map((x) => `published prices: ${x}`));
+  if (got.missing.length > 0) return stated(got.missing.join("; "));
+
+  const problems: string[] = [];
+  const read = (route: string, point: string) => {
+    try {
+      const d = parsePublishedDay(got.bytes.get(route)!, point, day);
+      if (d.hours !== hours) problems.push(`${route}: ${d.hours} hours, the day has ${hours}`);
+      return d;
+    } catch (err) {
+      problems.push(`${route}: ${(err as Error).message}`);
+      return null;
+    }
+  };
+  const nodeDay = read(node, m.battery.settlement_point);
+  const da = nodeDay?.daCents ?? [];
+  const daOpen = da.flatMap((v, h) => (v === null ? [h] : []));
+  if (nodeDay && daOpen.length > 0) problems.push(`${node}: hours ${daOpen.join(", ")} hold no published day-ahead price`);
+
+  let rt: Outcome["prices"]["rt_hub_cents"] = null;
+  const notes = [`prices re-read from release ${doc.inputs.release_id}: ${routes.join(", ")}`];
+  if (stage === 2) {
+    rt = doc.prices.rt_hub_cents;
+    notes.push("real-time provisional hub prices as the document states them; they are not rebuilt from SCED runs here");
+  } else if (stage === 3) {
+    const hubDay = read(hub, m.battery.hub);
+    if (hubDay) {
+      const open = hubDay.rt15Cents.filter((v) => v === null).length;
+      if (open > 0) problems.push(`${hub}: ${open} of ${hubDay.rt15Cents.length} real-time intervals are not yet published`);
+      rt = Array.from({ length: hubDay.hours }, (_, h) => {
+        const q = hubDay.rt15Cents.slice(4 * h, 4 * h + 4);
+        return q.every((v): v is number => v !== null) ? (q as [number, number, number, number]) : null;
+      });
+    }
+  }
+  if (problems.length > 0) return stated("the cited files do not hold every published price", problems.map((x) => `published prices: ${x}`));
+  return { prices: { da_node_cents: da as number[], rt_hub_cents: rt }, reread: true, problems: [], notes };
+}
+
+/** The outcome document V10 expects for this battery and stage, given the prices it settles at. */
+function expectedOutcome(m: Manifest, root: Hex, stage: number, doc: Outcome, prices: Outcome["prices"]): Outcome {
+  const arms = Object.fromEntries(ARM_IDS.map((id) => [id, m.arms[id] ? outcomeArm(m, { prices }, m.arms[id]!) : null])) as Outcome["arms"];
+  return {
+    schema: OUTCOME_SCHEMA,
+    stage: stage as Outcome["stage"],
+    operating_day: m.operating_day,
+    manifest_root: root,
+    // The cited files are checked against the release by V7; they are carried over as cited.
+    inputs: doc.inputs,
+    prices,
+    arms,
+  };
+}
+
+/** Each priced hour and arm field where the document differs from the recomputed one, by name. */
+function outcomeDifferences(doc: Outcome, want: Outcome, reread: boolean): string[] {
+  const out: string[] = [];
+  const source = reread ? "published" : "stated";
+  want.prices.da_node_cents.forEach((v, h) => {
+    if (doc.prices.da_node_cents[h] !== v) out.push(`prices.da_node_cents[${h}] ${doc.prices.da_node_cents[h]}, ${source} ${v}`);
+  });
+  const rtGot = doc.prices.rt_hub_cents;
+  const rtWant = want.prices.rt_hub_cents;
+  if ((rtGot === null) !== (rtWant === null)) out.push(`prices.rt_hub_cents ${rtGot === null ? "null" : "present"}, ${source} ${rtWant === null ? "null" : "present"}`);
+  else if (rtGot && rtWant) {
+    rtWant.forEach((q, h) => {
+      const g = rtGot[h] ?? null;
+      if (JSON.stringify(g) !== JSON.stringify(q)) out.push(`prices.rt_hub_cents[${h}] ${JSON.stringify(g)}, ${source} ${JSON.stringify(q)}`);
+    });
+  }
+  for (const id of ARM_IDS) {
+    const got = doc.arms[id];
+    const w = want.arms[id];
+    if (!w) {
+      if (got) out.push(`arm ${id} was not solved but has an outcome`);
+      continue;
+    }
+    if (!got) {
+      out.push(`arm ${id} missing`);
+      continue;
+    }
+    for (const k of Object.keys(w) as (keyof OutcomeArm)[]) {
+      if (got[k] !== w[k]) out.push(`arm ${id}: ${k} ${got[k]}, recomputed ${w[k]}`);
+    }
+  }
+  return out;
 }

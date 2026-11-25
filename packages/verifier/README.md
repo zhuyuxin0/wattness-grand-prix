@@ -24,7 +24,7 @@ Exit 0 when nothing failed, 1 when a check failed, 2 on a usage or I/O error.
 | V7 | release manifest by its pinned SHA-256, then each catalog, then each payload; release and live-tier files by path; the local mirror only for files no longer served; a Cournot response beside the record by its SHA-256, then its claim, probability, basis and receipt time against the manifest's (checked even offline) |
 | V8 | the manifest's exact shape: every field, no extras, integers only; for a Cournot input, the weather rule recomputed: observed before the plan time and the gate, the market one the rule reads, the stress weight, hedge limit and contract cap from the probability, the stress bucket from scenarios.json |
 | V9 | the selected arm was solved and wins by the declared rule; null arms are listed as unsolved |
-| V10 | each outcome-<stage>.json: links to this root, arm P&L recomputed, linked on chain after its stage opened; no stage linked on chain without its file |
+| V10 | per stage, the battery's outcome rebuilt: prices re-read from the release files it cites (stated prices offline), each arm valued at them, the rebuilt document hashed as a leaf; for a fleet, that leaf's audit path from `outcomes/stage-<n>/index.json` walked to the stage root, which must be the hash `outcomeOf(key, stage)` holds, linked after the stage opened; any field that differs is named; no stage linked on chain without its file |
 
 The LP is not re-solved: V5 checks that the committed schedule scores what the
 manifest says over the committed scenarios, not that it is optimal.
@@ -43,7 +43,13 @@ manifest says over the committed scenarios, not that it is optimal.
   `mode: "anchor"` with `txHash` reads a GATEREC1 calldata anchor instead: the
   time is proven, write-once is not, and the report says so.
 - `outcome-1.json` .. `outcome-3.json`: day-ahead settled, real-time provisional,
-  real-time settled (`gate-record.outcome.v1`).
+  real-time settled (`gate-record.outcome.v1`), for a one-leaf record.
+- For a day's index: `outcomes/stage-<n>/index.json` (`gate-record.outcome-index.v1`:
+  the stage, the plan root, one outcome leaf per plan leaf in plan order, their
+  root) and `outcomes/stage-<n>/leaves/<resource>.json`, as `pnpm outcome` writes
+  them. `--battery` picks the leaf for every check, V10 included; `--outcomes DIR`
+  reads the stages from elsewhere. [docs/outcomes.md](../../docs/outcomes.md)
+  says how the three stages settle.
 - `cournot/probability.json`, when `outside_inputs.cournot.response` names it:
   the saved probability call, looked for beside the day's index, then beside
   the leaf and its parent directory.

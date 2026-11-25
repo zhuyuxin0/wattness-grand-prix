@@ -1,0 +1,81 @@
+import { Component, Suspense, lazy, useEffect, useState, type ComponentType, type ReactNode } from "react";
+
+// The starting-grid scene lives in src/scenes/, built on its own lane. It is
+// found by glob rather than a static import so this page builds, and renders
+// nothing in the slot, whether or not the scene is there. The glob is lazy, so
+// three.js stays in the scene's own chunk.
+type SceneModule = Record<string, unknown>;
+
+const found = import.meta.glob<SceneModule>([
+  "../../scenes/**/StartingGrid.{ts,tsx}",
+  "../../scenes/**/StartingGridScene.{ts,tsx}",
+  "../../scenes/StartingGrid/index.{ts,tsx}",
+  "../../scenes/starting-grid/index.{ts,tsx}",
+  "../../scenes/index.{ts,tsx}",
+]);
+
+// The most specific file first, so the page never pulls in other scenes.
+const loader = Object.entries(found).sort(([a], [b]) => rank(a) - rank(b))[0]?.[1];
+
+function rank(path: string): number {
+  if (/StartingGrid(Scene)?\.tsx?$/.test(path)) return 0;
+  if (/starting-?grid\/index/i.test(path)) return 1;
+  return 2;
+}
+
+interface SceneProps {
+  hud?: boolean;
+}
+
+function Nothing() {
+  return null;
+}
+
+const Scene = loader
+  ? lazy(async () => {
+      const mod = await loader();
+      const candidate = mod.StartingGrid ?? mod.StartingGridScene ?? mod.default;
+      return { default: (typeof candidate === "function" || (typeof candidate === "object" && candidate !== null) ? candidate : Nothing) as ComponentType<SceneProps> };
+    })
+  : null;
+
+/** A scene that fails (no WebGL, a lost context) takes its slot with it. */
+class Contain extends Component<{ children: ReactNode }, { failed: boolean }> {
+  override state = { failed: false };
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  override render() {
+    return this.state.failed ? null : this.props.children;
+  }
+}
+
+const WIDE = "(min-width: 720px)";
+
+// On a phone the scene's corner annotations crowd the grid, and the hero and
+// the record board below already carry the same facts and source lines.
+function useWide(): boolean {
+  const [wide, setWide] = useState(() => typeof window === "undefined" || window.matchMedia(WIDE).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(WIDE);
+    const on = () => setWide(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return wide;
+}
+
+export function SceneSlot() {
+  const wide = useWide();
+  if (!Scene) return null;
+  return (
+    <Contain>
+      {/* The stage keeps its own dark in either theme, as wattness.tech's intro does. */}
+      <div className="rw-scene" data-atmosphere="dark" role="region" aria-label="The starting grid: every sealed plan for the operating day">
+        <Suspense fallback={<div className="rw-scene__hold" />}>
+          <Scene hud={wide} />
+        </Suspense>
+      </div>
+    </Contain>
+  );
+}

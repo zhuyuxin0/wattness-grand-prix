@@ -1,0 +1,306 @@
+/* App shell: top bar, page frame, footer. */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.skip {
+  position: absolute;
+  left: var(--gutter);
+  top: 0;
+  transform: translateY(-150%);
+  z-index: 100;
+  padding: var(--space-2) var(--space-3);
+  background: var(--raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.skip:focus {
+  transform: translateY(var(--space-2));
+}
+
+/* ---------------------------------------------------------------- top bar */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--chrome) 92%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+}
+
+.topbar__inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  height: var(--bar-height);
+  padding: 0 var(--gutter);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+/* The lockup: the mark and "Wattness" on one middle line, the product name
+   beside it. The mark draws itself on in teal under the pointer or focus, left
+   to right as the trace is read, ending on its node (wattness.tech's gesture). */
+.brand-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--w-fg);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.brand:hover {
+  color: var(--w-fg);
+}
+.brand-mark {
+  display: block;
+  flex: none;
+  width: 24px;
+  height: auto;
+}
+.brand-word {
+  display: block;
+  font: 600 15px/18px var(--t-font-display);
+  letter-spacing: -0.025em;
+}
+.brand-product {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+  white-space: nowrap;
+}
+.brand-trace {
+  stroke: var(--t-brand-trace);
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset var(--gp-trace) ease-in-out;
+}
+.brand-trace-node {
+  fill: var(--t-brand-trace);
+  opacity: 0;
+  transition: opacity 160ms ease-out 0ms;
+}
+.brand:is(:hover, :focus-visible) .brand-trace {
+  stroke-dashoffset: 0;
+}
+.brand:is(:hover, :focus-visible) .brand-trace-node {
+  opacity: 1;
+  transition-delay: 660ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-trace,
+  .brand-trace-node {
+    transition: none;
+  }
+}
+
+.nav {
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent);
+}
+.nav::-webkit-scrollbar {
+  display: none;
+}
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--space-1);
+}
+.nav__link {
+  position: relative;
+  display: block;
+  padding: 18px 10px;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav__link:hover {
+  color: var(--text-strong);
+}
+.nav__link.is-active {
+  color: var(--text-strong);
+}
+.nav__link::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 2px;
+  background: var(--teal);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur) var(--ease);
+}
+.nav__link.is-active::after {
+  transform: scaleX(1);
+}
+
+.topbar__end {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* One square, the glyph at 12px (wattness.tech's theme-switch.css). */
+.btn.theme-toggle {
+  width: 28px;
+  height: 24px;
+  min-width: 0;
+  padding: 0;
+}
+
+@media (max-width: 899px) {
+  .topbar__inner {
+    grid-template-columns: auto auto;
+    grid-template-rows: var(--bar-height) 44px;
+    height: auto;
+    column-gap: var(--space-4);
+    row-gap: 0;
+  }
+  .nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0 calc(var(--gutter) * -1);
+    padding: 0 var(--gutter);
+  }
+  .nav__link {
+    padding: 12px 10px;
+  }
+  .nav ul {
+    margin-left: -10px;
+  }
+}
+
+/* ---------------------------------------------------------------- page frame */
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-12) var(--gutter) var(--space-24);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+}
+
+.page-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-8);
+  align-items: end;
+  padding-bottom: var(--space-8);
+  border-bottom: 1px solid var(--border);
+}
+@media (min-width: 900px) {
+  .page-header:has(.page-header__aside) {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+.page-header__kicker {
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--t-accent-text);
+  margin-bottom: var(--space-4);
+}
+.page-header__title {
+  text-wrap: balance;
+  font-size: var(--text-4xl);
+  font-weight: 200;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  max-width: 18ch;
+}
+.page-header__lede {
+  margin-top: var(--space-5);
+  max-width: 62ch;
+  font-size: var(--text-lg);
+  line-height: 1.5;
+  color: var(--muted);
+}
+.page-header__aside {
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------- footer */
+
+.footer {
+  border-top: 1px solid var(--border);
+  background: var(--chrome);
+}
+.footer__inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--space-10) var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  font-size: var(--text-sm);
+}
+@media (min-width: 900px) {
+  .footer__inner {
+    grid-template-columns: 220px minmax(0, 1fr) auto;
+    gap: var(--space-10);
+  }
+}
+.footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--w-fg);
+  align-self: start;
+}
+.footer__mark {
+  width: 16px;
+  height: auto;
+}
+.footer__word {
+  font: 600 13px/16px var(--t-font-display);
+  letter-spacing: -0.025em;
+  margin-right: 9px;
+}
+.footer__lines {
+  display: grid;
+  gap: var(--space-2);
+  max-width: 68ch;
+}
+.footer__source {
+  color: var(--text);
+}
+.footer__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+.footer__links a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.footer__links a:hover {
+  color: var(--text-strong);
+}

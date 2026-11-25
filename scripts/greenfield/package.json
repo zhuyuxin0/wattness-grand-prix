@@ -1,0 +1,16 @@
+{
+  "name": "@gatelock/greenfield-publish",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "status": "node publish.mjs status",
+    "fund": "node publish.mjs fund",
+    "publish": "node publish.mjs publish",
+    "check": "node publish.mjs check"
+  },
+  "dependencies": {
+    "@bnb-chain/greenfield-js-sdk": "2.2.2",
+    "@bnb-chain/reed-solomon": "1.1.4",
+    "viem": "2.57.17"
+  }
+}

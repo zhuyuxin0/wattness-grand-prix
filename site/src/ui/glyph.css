@@ -1,0 +1,35 @@
+/* The Terminal's drawn glyphs (wattness-site apps/mms/src/ui/glyph.css, plan of record C20), the subset the Grand Prix
+   site uses, copied byte for byte. One glyph per control, drawn in the text's color at one size, never a font's character
+   (▾ ▼ ► ✕ × ⤢ ‹ › ☰). The control that holds a glyph carries the name (words, aria-label or title) and the state
+   (aria-expanded, aria-pressed, aria-sort); the glyph is aria-hidden. */
+.glyph {
+  display: inline-block; flex: none; width: 10px; height: 10px; vertical-align: -1px;
+  background-color: currentColor;
+  -webkit-mask: var(--g) center / contain no-repeat; mask: var(--g) center / contain no-repeat;
+}
+.glyph-caret { margin-left: 4px; }
+.glyph-sort-up, .glyph-sort-down { margin-left: 3px; }
+.glyph.g12 { width: 12px; height: 12px; }
+.glyph-caret { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-fold { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M4.5 3l3 3-3 3' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-fold-open { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-next { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M4.5 3l3 3-3 3' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-prev { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M7.5 3l-3 3 3 3' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-up { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 7.5l3-3 3 3' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-down { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5l3 3 3-3' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-close { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 2l6 6M8 2l-6 6' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.glyph-check { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.4 6.3l2.3 2.3 4.9-5.1' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-popout { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Crect x='1.75' y='3.75' width='6.5' height='6.5' rx='1.2' fill='none' stroke='black' stroke-width='1.2'/%3E%3Cpath d='M6 6l4.25-4.25M7.25 1.75h3v3' fill='none' stroke='black' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-sort-up { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 10V2.5M3 5.5l3-3 3 3' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-sort-down { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 2v7.5M3 6.5l3 3 3-3' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-sun { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Ccircle cx='6' cy='6' r='2.2' fill='none' stroke='black' stroke-width='1.1'/%3E%3Cpath d='M6 1v1M6 10v1M1 6h1M10 6h1M2.5 2.5l.7.7M8.8 8.8l.7.7M2.5 9.5l.7-.7M8.8 3.2l.7-.7' stroke='black' stroke-width='1.1' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.glyph-moon { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M8.7 8.8A4.4 4.4 0 0 1 3.2 2a4.4 4.4 0 1 0 5.5 6.8Z' fill='none' stroke='black' stroke-width='1.1' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-refresh { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M9.5 4.5A3.8 3.8 0 1 0 9.8 7M9.5 1.5v3h-3' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-plus { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M6 2.25v7.5M2.25 6h7.5' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.glyph-minus { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.25 6h7.5' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.glyph-expand { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M7.25 1.75h3v3M10.25 1.75l-3.5 3.5M4.75 10.25h-3v-3M1.75 10.25l3.5-3.5' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-collapse { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M10.25 5.25h-3.5v-3.5M6.75 5.25l3.5-3.5M1.75 6.75h3.5v3.5M5.25 6.75l-3.5 3.5' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.glyph-clock { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Ccircle cx='6' cy='6' r='4.5' fill='none' stroke='black' stroke-width='1.2'/%3E%3Cpath d='M6 3v3l2 1' fill='none' stroke='black' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.glyph-more { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Ccircle cx='2.5' cy='6' r='1.1' fill='black'/%3E%3Ccircle cx='6' cy='6' r='1.1' fill='black'/%3E%3Ccircle cx='9.5' cy='6' r='1.1' fill='black'/%3E%3C/svg%3E"); }
+.glyph-docs { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.75 1.5h4.5l2 2v7h-6.5z' fill='none' stroke='black' stroke-width='1.2' stroke-linejoin='round'/%3E%3Cpath d='M4.5 6h3M4.5 8.25h3' stroke='black' stroke-width='1.1' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.glyph-menu { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 3h8M2 6h8M2 9h8' stroke='black' stroke-width='1.4' stroke-linecap='round'/%3E%3C/svg%3E"); }
