@@ -17,14 +17,14 @@ const USAGE = `usage: pnpm verify <manifest.json> | --manifest FILE | --od YYYY-
                                 and R's outcome at each stage under outcomes/
   --outcomes DIR                with an index: where the stages' outcomes are (default: outcomes/ beside the index)
 
-  --network local|bsc-testnet   chain to read (default bsc-testnet)
+  --network local|bsc-testnet|bsc-mainnet   chain to read (default bsc-testnet)
   --rpc URL                     try this RPC first
   --contract 0x...              GateRecord address (default: record.json, then contracts/deployments)
   --key 0x...                   record key (default: computed from the manifest)
   --scope LABEL                 scope label (default: record.json, then "<resource>/da-energy")
   --reference FILE              trusted copy to name changed fields (default: records/<day>/manifest.json)
   --offline                     no chain reads and no fetches
-  --no-fetch                    read the chain but do not fetch inputs (skips V7)
+  --no-fetch                    read the chain but do not fetch inputs (V7 checks only a Cournot response beside the record)
   --no-chain                    fetch inputs but do not read the chain (skips V2, V3)
 
 record.json and scenarios.json are read from the manifest's directory. Outcomes: for a day's index,

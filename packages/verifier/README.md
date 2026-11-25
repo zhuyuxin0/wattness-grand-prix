@@ -5,10 +5,10 @@ by `eth_call`, re-derives the arithmetic from the manifest, and re-hashes every
 input on the data site.
 
 ```sh
-pnpm verify records/2026-11-26/manifest.json                # BSC testnet, inputs fetched
-pnpm verify --od 2026-11-26 --network local                 # a local node on 127.0.0.1:15191
-pnpm verify --manifest /tmp/copy.json                       # a copy, diffed against records/<day>/
-pnpm verify records/2026-11-26/manifest.json --offline      # no chain, no fetches
+pnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet                          # the sealed day's showcase leaf, inputs fetched
+pnpm verify fixtures/od-20261126/manifest.json --network bsc-testnet --battery CLO_ESR1 --no-fetch   # another leaf by its audit path
+pnpm verify out/od-20261127/manifest.json --no-chain                                           # a planned day before its commit
+pnpm verify fixtures/od-20261126/manifest.json --offline                                       # no chain, no fetches
 ```
 
 Exit 0 when nothing failed, 1 when a check failed, 2 on a usage or I/O error.
