@@ -48,6 +48,7 @@ const finite = (x: unknown, label: string): number => {
   return n;
 };
 export function checkPrice(price: Price, now: number, maxAge = 180, futureDrift = 60): void {
+  if (!Number.isFinite(price.priceUsd)) throw new Error("Non-finite price");
   if (!(price.priceUsd > 0)) throw new Error("Non-positive price");
   if (!Number.isInteger(price.observedAtSeconds) || price.observedAtSeconds <= 0) throw new Error("Invalid price timestamp");
   if (price.observedAtSeconds > now + futureDrift) throw new Error("Future price");
@@ -145,7 +146,7 @@ export function parseCmcQuotes(body: unknown, now: number): CmcQuote[] {
       source: "CoinMarketCap Pro v3",
       sourceId: id,
       percentChange24h: finite(q.percent_change_24h, "CMC 24-hour change"),
-      volume24hUsd: q.volume_24h === undefined ? null : finite(q.volume_24h, "CMC turnover"),
+      volume24hUsd: q.volume_24h == null ? null : finite(q.volume_24h, "CMC turnover"),
     };
     checkPrice(price, now, 300);
     return price;
@@ -200,7 +201,10 @@ export function fundingDecision(input: { treasuryBnb: number; atlas: readonly Pr
   const { treasuryBnb, atlas, cmc, security, now } = input;
   if (!Number.isFinite(treasuryBnb) || treasuryBnb < 0 || treasuryBnb > 1000) throw new Error("Invalid treasury quantity");
   for (const p of atlas) checkPrice(p, now);
-  for (const p of cmc) checkPrice(p, now, 300);
+  for (const p of cmc) {
+    checkPrice(p, now, 300);
+    if (!Number.isFinite(p.percentChange24h)) throw new Error("Invalid CMC 24-hour change");
+  }
   const a = atlas.find(x => x.asset === "BNB"), u = atlas.find(x => x.asset === "USDT"), c = cmc.find(x => x.asset === "BNB");
   if (!a || !u || !c) throw new Error("Missing funding data");
   const reasons: string[] = [];

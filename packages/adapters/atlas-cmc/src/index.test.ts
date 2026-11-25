@@ -81,10 +81,12 @@ describe("Atlas payload and authentication", () => {
   });
 });
 describe("price and coverage controls", () => {
-  it("rejects stale, future and non-positive prices", () => {
+  it("rejects stale, future, non-positive and non-finite prices", () => {
     expect(() => checkPrice({ ...p, observedAtSeconds: now - 181 }, now)).toThrow("Stale");
     expect(() => checkPrice({ ...p, observedAtSeconds: now + 61 }, now)).toThrow("Future");
     expect(() => checkPrice({ ...p, priceUsd: -1 }, now)).toThrow("Non-positive");
+    expect(() => checkPrice({ ...p, priceUsd: Infinity }, now)).toThrow("Non-finite");
+    expect(() => checkPrice({ ...p, priceUsd: NaN }, now)).toThrow("Non-finite");
   });
   it("keeps missing vendor data unknown", () => {
     expect(parseSecurity({ data: [] }).state).toBe("unknown");
@@ -99,10 +101,14 @@ describe("price and coverage controls", () => {
   ])("does not treat an indexed row with incomplete vendor fields as available", extra => {
     expect(parseSecurity([{ platformName: "bsc", tokenContractAddress: BSC_USDT, exist: true, extra }])).toMatchObject({ state: "unknown", reason: "Incomplete vendor fields" });
   });
+  const quote = { id: 2781, price: 600, percent_change_24h: -4, last_updated: new Date(now * 1000).toISOString(), volume_24h: 10_000 };
   it("parses v3 CMC arrays and checks USD asset identity", () => {
-    const quote = { id: 2781, price: 600, percent_change_24h: -4, last_updated: new Date(now * 1000).toISOString(), volume_24h: 10_000 };
     const result = parseCmcQuotes({ data: [{ id: 1839, quote: [quote] }, { id: 825, quote: [{ ...quote, price: 1 }] }] }, now);
     expect(result.map(x => x.asset)).toEqual(["BNB", "USDT"]);
+  });
+  it("keeps a missing CMC volume unknown", () => {
+    const result = parseCmcQuotes({ data: [{ id: 1839, quote: [{ ...quote, volume_24h: null }] }, { id: 825, quote: [quote] }] }, now);
+    expect(result[0]?.volume24hUsd).toBeNull();
   });
   it("sanitizes nested secret values and sensitive headers", () => {
     expect(sanitize({ key: "example-secret", headers: { Authorization: "Bearer example-secret" } }, ["example-secret"])).toEqual({ key: "[REDACTED]", headers: { Authorization: "[REDACTED]" } });
@@ -137,6 +143,10 @@ describe("funding decision", () => {
     expect(d.evaluationBudgetUsdCents).toBe(0);
     expect(d.evaluationCount).toBe(0);
     expect(d.reasons.length).toBeGreaterThan(0);
+  });
+  it("refuses non-finite inputs instead of pricing them", () => {
+    expect(() => fundingDecision({ treasuryBnb: .25, atlas, cmc: [{ ...cmc[0]!, priceUsd: Infinity }], security, now })).toThrow("Non-finite");
+    expect(() => fundingDecision({ treasuryBnb: .25, atlas, cmc: [{ ...cmc[0]!, percentChange24h: NaN }], security, now })).toThrow("24-hour change");
   });
   it("pauses allocations on source divergence", () => {
     const d = fundingDecision({ treasuryBnb: .25, atlas: [{ ...p, priceUsd: 700 }, atlas[1]!], cmc, security, now });
