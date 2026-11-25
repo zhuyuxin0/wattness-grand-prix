@@ -185,7 +185,7 @@ export default function StateOfChargePage() {
                         soc={figs[x]!.socMwh}
                         ghosts={plans.filter((o) => o !== x).map((o) => figs[o]!.socMwh)}
                         limits={limits}
-                        height={210}
+                        height={narrow ? 180 : 210}
                         label={`Plan ${x} state of charge in MWh at the end of each hour, the other plans in gray`}
                         tableId={TABLE_ID}
                       />
