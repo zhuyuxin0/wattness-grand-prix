@@ -54,8 +54,8 @@ export default function MemoryPage() {
         title="What the agents remember"
         lede={
           <>
-            The agents' memory of the Wattness Terminal, where every plan's inputs come from, kept in Living Brain: one page per part of the Terminal, and the
-            connections between pages, each with Living Brain's reasoning. It follows <Link to="/agents/risk">Risk</Link>, the last step of a plan; next,{" "}
+            The agents' memory of the Wattness Terminal, where every plan's inputs come from, kept in Living Brain: pages on the Terminal's parts, and the connections
+            between pages, each with Living Brain's reasoning. It follows <Link to="/agents/risk">Risk</Link>, the last step of a plan; next,{" "}
             <Link to="/seal">Seal</Link> commits every plan on chain.
           </>
         }
@@ -123,7 +123,7 @@ function Memory({ ctx }: { ctx: Ctx }) {
     { key: "title", label: "Page", kind: "text", value: (p) => p.title, className: "mem-c-page" },
     { key: "part", label: "Part of the Terminal", title: "The layer of the Terminal the page describes", kind: "text", value: (p) => partOf(p)?.layerName ?? null, className: "mem-c-part" },
     { key: "degree", label: "Connections", title: "Connections that touch the page", kind: "number", value: (p) => degree.get(p.slug) ?? 0, className: "r" },
-    { key: "links", label: "Links", title: "Pages and parts its text links to", kind: "number", value: (p) => links(p).length, className: "r mem-wide" },
+    { key: "links", label: "Cites", title: "Pages and parts of the Terminal its text links to", kind: "number", value: (p) => links(p).length, className: "r mem-wide" },
     { key: "sources", label: "Sources", title: "Source documents Living Brain compiled the page from", kind: "number", value: sourcesOf, className: "r mem-wide" },
   ];
   const pages = useMemo(() => {
@@ -161,7 +161,13 @@ function Memory({ ctx }: { ctx: Ctx }) {
     <>
       <section className="mem-lead" aria-label="The memory at a glance">
         <StatRow className="mem-stats">
-          <Stat label="Pages" value={formatInt(brain.pages.length)} note="one per part of the Terminal, and one for the whole" />
+          <Stat
+            label="Pages"
+            value={formatInt(brain.pages.length)}
+            note={`${formatInt(brain.pages.filter((p) => (partOf(p)?.layer ?? -1) >= 0).length)} on parts of the Terminal, ${formatInt(
+              brain.pages.filter((p) => partOf(p)?.layer === -1).length,
+            )} on the whole`}
+          />
           <Stat
             label="Connections"
             value={formatInt(all)}
@@ -238,6 +244,17 @@ function Memory({ ctx }: { ctx: Ctx }) {
           pickedPage ? (
             <>
               {formatInt(inView)} of the {formatInt(all)} connections touch this page.{" "}
+              {links(pickedPage).length > 0 && (
+                <>
+                  Its text cites{" "}
+                  {links(pickedPage).map((l, i, list) => (
+                    <span key={l}>
+                      <code>{l}</code>
+                      {i < list.length - 2 ? ", " : i === list.length - 2 ? " and " : ". "}
+                    </span>
+                  ))}
+                </>
+              )}
               <button type="button" className="mem-clear" onClick={() => setPicked(null)}>
                 Show all {formatInt(all)}
               </button>
