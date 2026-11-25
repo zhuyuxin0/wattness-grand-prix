@@ -37,7 +37,7 @@ The GateRecord address and the V2 factory are constructor arguments of the imple
 | `graduate()` | anyone | Asks Core to migrate now; reverts with the missing condition (`LiquidityNotReady`, `EvidenceMissing`, `EvidenceRootMismatch`, …) |
 | `status()`, `params()`, `evidence()` | anyone | Reads for the launch tower |
 
-Outside `graduate()`, `evaluate()` answers false until both conditions hold, so a missing record never reverts the buy that sells out the sale. When the record is bound first, that buy graduates the launch in the same transaction.
+Outside `graduate()`, `evaluate()` answers false until both conditions hold, so a missing record never reverts the buy that sells out the sale.
 
 Events: `EvidenceBound(token, agent, key, od, root, boundBy)` and `Graduated(token, pair, evidenceKey, tokenAmount, quoteAmount, liquidity)`.
 
