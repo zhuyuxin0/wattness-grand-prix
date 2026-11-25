@@ -33,6 +33,8 @@ export function Timeline({ day, receipts, late, nowMs }: { day: DayIndex; receip
   const run = operatingWindow(day.operatingDay);
   const next = nextGate(nowMs);
   const past = (t: number) => now >= t;
+  // Each state reads as a phrase of its own: "Starts in 6 h 42 min", "Closes in 16 h 42 min".
+  const due = (verb: string, t: number) => `${verb} ${until(t - now)}`;
 
   const events: Event[] = [
     {
@@ -46,7 +48,7 @@ export function Timeline({ day, receipts, late, nowMs }: { day: DayIndex; receip
         </>
       ),
       state: past(day.planUnix) ? "done" : "next",
-      stateText: past(day.planUnix) ? "Done" : until(day.planUnix - now),
+      stateText: past(day.planUnix) ? "Done" : due("Due", day.planUnix),
       link: { to: "/fleet", label: "Fleet" },
     },
     {
@@ -67,7 +69,7 @@ export function Timeline({ day, receipts, late, nowMs }: { day: DayIndex; receip
         </>
       ),
       state: past(main.blockTime) ? "sealed" : "next",
-      stateText: past(main.blockTime) ? "Sealed" : until(main.blockTime - now),
+      stateText: past(main.blockTime) ? "Sealed" : due("Due", main.blockTime),
       link: { to: "/seal", label: "Seal" },
     },
     {
@@ -81,7 +83,7 @@ export function Timeline({ day, receipts, late, nowMs }: { day: DayIndex; receip
         </>
       ),
       state: past(day.gateUnix) ? "closed" : "next",
-      stateText: past(day.gateUnix) ? "Closed" : until(day.gateUnix - now),
+      stateText: past(day.gateUnix) ? "Closed" : due("Closes", day.gateUnix),
       link: { to: "/verify", label: "Verify" },
     },
     {
@@ -91,7 +93,7 @@ export function Timeline({ day, receipts, late, nowMs }: { day: DayIndex; receip
       what: "The operating day",
       detail: <>The day the plans are for: each battery's schedule runs hour by hour at its own settlement point, 00:00 to 24:00 CT.</>,
       state: now < run.start ? "next" : now < run.end ? "running" : "done",
-      stateText: now < run.start ? `Starts ${until(run.start - now)}` : now < run.end ? "Running" : "Done",
+      stateText: now < run.start ? due("Starts", run.start) : now < run.end ? "Running" : "Done",
       link: { to: "/battery", label: "Battery" },
     },
   ];
@@ -102,7 +104,7 @@ export function Timeline({ day, receipts, late, nowMs }: { day: DayIndex; receip
       what: "Next gate",
       detail: <>ERCOT's day-ahead market closes for {formatOperatingDay(next.operatingDay)}.</>,
       state: "next",
-      stateText: until(next.unix - now),
+      stateText: due("Closes", next.unix),
     });
   }
   events.sort((a, b) => a.at - b.at);
