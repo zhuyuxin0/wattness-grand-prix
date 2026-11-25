@@ -35,7 +35,7 @@ For an actual recorded Launcher, use `readGraduationLens(rpcRead, snapshot, para
 
 ## Season client
 
-`season.ts` is a typed read client for a season screen. It covers the round launched by `modules/flap` (`@gatelock/flap-season`): the round itself, the contributions, the vault's balances and each contributor's verified-skill weight. It takes any client with viem's `getChainId` and `readContract`, and it refuses any chain but 97.
+`season.ts` is a typed read client for a season screen. It covers the round launched by `modules/flap` (`@gatelock/flap-season`): the round itself, the contributions, the vault's balances and each contributor's earned-pool weight. `skill` counts the season days on which the backed agent sealed a plan in GateRecord before the gate; it records commitment timing, not plan quality. It takes any client with viem's `getChainId` and `readContract`, and it refuses any chain but 97.
 
 ```ts
 import { createPublicClient, http } from 'viem';

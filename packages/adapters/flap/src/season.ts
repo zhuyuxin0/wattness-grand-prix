@@ -167,6 +167,7 @@ export interface SeasonReadClient {
   }): Promise<unknown>;
 }
 
+/** Season days sealed in GateRecord before the gate, of the season's total: commitment timing, not plan quality. */
 export interface Skill {
   verified: number;
   total: number;
@@ -237,9 +238,10 @@ export function weightBps(deposit: bigint, totalDeposit: bigint, skill: Skill): 
 }
 
 /**
- * Everything the season screen shows, read at one block: the round, the
- * milestone, each contributor's deposit and backed agent, and once launched the
- * vault's balances and each contributor's verified-skill weight.
+ * Everything the season screen shows: the round, the milestone, each
+ * contributor's deposit and backed agent, and once launched the vault's
+ * balances and each contributor's earned-pool weight. Pass `blockNumber` to
+ * read every call at that one block.
  */
 export async function readSeason(client: SeasonReadClient, launcher: Address, blockNumber?: bigint): Promise<SeasonView> {
   if (!isAddress(launcher)) throw new Error('Invalid Launcher address');
@@ -303,7 +305,7 @@ export async function readSeason(client: SeasonReadClient, launcher: Address, bl
   };
 }
 
-/** Verified-skill weights for a list of agents, read from the vault (which reads GateRecord). */
+/** Season days each agent sealed before the gate, read from the vault (which reads GateRecord). */
 export async function readSkills(client: SeasonReadClient, vault: Address, agents: readonly Address[]): Promise<Map<Address, Skill>> {
   const out = new Map<Address, Skill>();
   for (const agent of agents) {
