@@ -1,0 +1,2039 @@
+{
+  "schema": "gate-record.fleet.v1",
+  "operating_day": "2026-11-26",
+  "scope_label": "gate-record/ercot-da-energy",
+  "gate_unix": 1795622400,
+  "plan_unix": 1795619566,
+  "code_tree": "b83af42225f0ac312b05c5dd269f6c35502ec6b4",
+  "root": "0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7",
+  "leaf_count": 316,
+  "showcase": "DSWL_ESS_ESR1",
+  "leaves": [
+    {
+      "resource": "ABINDUST_ESR1",
+      "leaf": "0xab8f0646b27a9aada60abf42f177175023aace06b21356911f28624315c23d11",
+      "manifest": "leaves/ABINDUST_ESR1.json",
+      "scenarios": "leaves/ABINDUST_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ADL_ESR1",
+      "leaf": "0x3a99c1d567d5fb63b61de1ab93ffe98d5037bf822fd3f86c53fb9caf3c7d81ef",
+      "manifest": "leaves/ADL_ESR1.json",
+      "scenarios": "leaves/ADL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "AE_ESR1",
+      "leaf": "0x38359ae13d3d4969af3b8c3eda1bbe91c4f3e07397411ed454b27ea73cf8d4d5",
+      "manifest": "leaves/AE_ESR1.json",
+      "scenarios": "leaves/AE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ALAMO_ST_ESR1",
+      "leaf": "0xc04ba00ddc827c3a7583ddb683862c073e514a2f82597a373fbeba3c2c1b3969",
+      "manifest": "leaves/ALAMO_ST_ESR1.json",
+      "scenarios": "leaves/ALAMO_ST_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ALP_BESS_ESR1",
+      "leaf": "0x967d5a83350c8d2a839361f1a18d35b4edc1badd4ffa25124560e77cdcb7b9a1",
+      "manifest": "leaves/ALP_BESS_ESR1.json",
+      "scenarios": "leaves/ALP_BESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ALVIN_ESR1",
+      "leaf": "0x32b0534896186155fdf2de3d299f573eae3721116a537b7193ee9368f79f264f",
+      "manifest": "leaves/ALVIN_ESR1.json",
+      "scenarios": "leaves/ALVIN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ANCHOR_ESR1",
+      "leaf": "0xfbe3d69f99ba1c99536683ebdc07d89ee022aa8795ee1c975fe81858bd61a2c6",
+      "manifest": "leaves/ANCHOR_ESR1.json",
+      "scenarios": "leaves/ANCHOR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ANCHOR_ESR2",
+      "leaf": "0x4b2a2d8bd8ebc58de47805c1dca3dd25ddca2ef4afa04427a788d2532e277b93",
+      "manifest": "leaves/ANCHOR_ESR2.json",
+      "scenarios": "leaves/ANCHOR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "ANDMDSLR_ESR1",
+      "leaf": "0xac872d4fa1d945e859aa868bb063c8e308874603deadb43265154205d260e4d3",
+      "manifest": "leaves/ANDMDSLR_ESR1.json",
+      "scenarios": "leaves/ANDMDSLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ANDMDSLR_ESR2",
+      "leaf": "0x25e6cb42f57eac11d2e373982de876d9686139559819bc1be82eab485bdbd872",
+      "manifest": "leaves/ANDMDSLR_ESR2.json",
+      "scenarios": "leaves/ANDMDSLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "ANEM_ESS_ESR1",
+      "leaf": "0x4cb0a9c47fe666d52fb143ff5dc2502c65d549018e5a3d4f1d3c43f6461422ad",
+      "manifest": "leaves/ANEM_ESS_ESR1.json",
+      "scenarios": "leaves/ANEM_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ANGLETON_ESR1",
+      "leaf": "0x57bab4faaf805927241b36c9c074dcc8fba980156d0b07faf2f30ccada7bd99e",
+      "manifest": "leaves/ANGLETON_ESR1.json",
+      "scenarios": "leaves/ANGLETON_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ANG_SLR_ESR1",
+      "leaf": "0x5474c7c7a0c28dd9744904598462917ef1975168fb28fbed6140d16d7ad61995",
+      "manifest": "leaves/ANG_SLR_ESR1.json",
+      "scenarios": "leaves/ANG_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ANOL_ESS_ESR1",
+      "leaf": "0xcf2b0cb895fd8f7709c57b770a6d70bb823f558578a682e3dfa8c1bdb5fa94b3",
+      "manifest": "leaves/ANOL_ESS_ESR1.json",
+      "scenarios": "leaves/ANOL_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ANTL_ESS_ESR1",
+      "leaf": "0xadf52d823ada3309a3bb58ca14a30be152ca2c046c427ff8585ab123160fc79b",
+      "manifest": "leaves/ANTL_ESS_ESR1.json",
+      "scenarios": "leaves/ANTL_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ARY_BESS_ESR1",
+      "leaf": "0x72694c39f14c7641be3a9e30d5a885ede1371d8e6d98f4a717c739a89af3ac9d",
+      "manifest": "leaves/ARY_BESS_ESR1.json",
+      "scenarios": "leaves/ARY_BESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "AVIL_ESS_ESR1",
+      "leaf": "0xe4f4b1029826018b2d9940426e1e5019c2c4b1e18d9da8e0fab177f970495c4d",
+      "manifest": "leaves/AVIL_ESS_ESR1.json",
+      "scenarios": "leaves/AVIL_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "AZURE_ESR1",
+      "leaf": "0x6ded502c393d84c51ad123187c4fed72e4d5b2433cf00450097df628810be49b",
+      "manifest": "leaves/AZURE_ESR1.json",
+      "scenarios": "leaves/AZURE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BATCAVE_ESR1",
+      "leaf": "0x16dd249f401b9e7aeb37f32d2eb7cc645239003d8015ccbfe9535d3e416dc4f5",
+      "manifest": "leaves/BATCAVE_ESR1.json",
+      "scenarios": "leaves/BATCAVE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BAY_CITY_ESR1",
+      "leaf": "0x8bf75e4d9c128095493e024b1415009589cc206f0c232d40570640c1cd4d07bb",
+      "manifest": "leaves/BAY_CITY_ESR1.json",
+      "scenarios": "leaves/BAY_CITY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BCK_ESR1",
+      "leaf": "0x9380fb418b7fe367e636705bb2f71ecb3c02ab32a66ab01dd277450e521480b7",
+      "manifest": "leaves/BCK_ESR1.json",
+      "scenarios": "leaves/BCK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BCK_ESR2",
+      "leaf": "0xb527839bfec1cff0c86bd11b86dd5fbf786cb5c9abdf37038a4d372fde37c930",
+      "manifest": "leaves/BCK_ESR2.json",
+      "scenarios": "leaves/BCK_ESR2.scenarios.json"
+    },
+    {
+      "resource": "BCNV2_ES_ESR1",
+      "leaf": "0x473d844c39cb13a0f1cebedce6c11c72d821b76fe883dec6e97aa0097e3b093b",
+      "manifest": "leaves/BCNV2_ES_ESR1.json",
+      "scenarios": "leaves/BCNV2_ES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BCNV_ESS_ESR1",
+      "leaf": "0x560596b036e69f333ce86a61946fc8ecd241582a2da6e498f88eac8771ae4444",
+      "manifest": "leaves/BCNV_ESS_ESR1.json",
+      "scenarios": "leaves/BCNV_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BELD_ESR1",
+      "leaf": "0xdaf23f0b02685510d2a61ad07438705ce78d0ef4092da1649fc5c5ae129891e6",
+      "manifest": "leaves/BELD_ESR1.json",
+      "scenarios": "leaves/BELD_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BEXAR_ES_ESR1",
+      "leaf": "0x45a414c08a703cf092ec65628db9f8f22d5264123348bbc00c6fd5a39b49018d",
+      "manifest": "leaves/BEXAR_ES_ESR1.json",
+      "scenarios": "leaves/BEXAR_ES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BIG_STAR_ESR1",
+      "leaf": "0x3347742cb4f649355d90912099c450c27f51a9ffcfa8c301469bd67aede8ac22",
+      "manifest": "leaves/BIG_STAR_ESR1.json",
+      "scenarios": "leaves/BIG_STAR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BKSL_ESS_ESR1",
+      "leaf": "0x2a6fc18e0cfd04545328fee94559f72b8099b72137363704d2dfaf9b2402b2e6",
+      "manifest": "leaves/BKSL_ESS_ESR1.json",
+      "scenarios": "leaves/BKSL_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BLACKSPR_ESR1",
+      "leaf": "0x898968d539820934064e2fa1519d4c5308aa999ab68fcea2c5267c0a695aa6e6",
+      "manifest": "leaves/BLACKSPR_ESR1.json",
+      "scenarios": "leaves/BLACKSPR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BLSUMMIT_ESR1",
+      "leaf": "0x32ad3c6c0c1b1b507f784849d70b4e1ed5d5355dc62ad3c3736e9be9a4d2157a",
+      "manifest": "leaves/BLSUMMIT_ESR1.json",
+      "scenarios": "leaves/BLSUMMIT_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BLSUMMIT_ESR2",
+      "leaf": "0x772811f24f93894899e36c4f9aaeeb700f61fd322836ab7e94c2dc6f96f9b506",
+      "manifest": "leaves/BLSUMMIT_ESR2.json",
+      "scenarios": "leaves/BLSUMMIT_ESR2.scenarios.json"
+    },
+    {
+      "resource": "BLUEJAY_ESR1",
+      "leaf": "0x4869fc3ecbe9356fe1b3d9d38ff859f07b34426c3c97039a61d04ebd2f3513c9",
+      "manifest": "leaves/BLUEJAY_ESR1.json",
+      "scenarios": "leaves/BLUEJAY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BLVN_SLR_ESR1",
+      "leaf": "0xd3661dfaacddba59ed1bbb21258fdd1e257f581b09b9acf759e5bf5878212703",
+      "manifest": "leaves/BLVN_SLR_ESR1.json",
+      "scenarios": "leaves/BLVN_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BOCO_ESS_ESR1",
+      "leaf": "0x38ecfb6991450cf2528760761975c0c8826be548493f901a490de9dfd378b299",
+      "manifest": "leaves/BOCO_ESS_ESR1.json",
+      "scenarios": "leaves/BOCO_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BRAN_ESS_ESR1",
+      "leaf": "0xc8ac2b8d5cac1fdee16adeb77b0dd6b1af30cff4946589235c66caed6447bd50",
+      "manifest": "leaves/BRAN_ESS_ESR1.json",
+      "scenarios": "leaves/BRAN_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BRAN_ESS_ESR2",
+      "leaf": "0xa552e66f30916a279a21bd7155b50208c672af7e212320df651c8fb8d0599d59",
+      "manifest": "leaves/BRAN_ESS_ESR2.json",
+      "scenarios": "leaves/BRAN_ESS_ESR2.scenarios.json"
+    },
+    {
+      "resource": "BRAZORIA_ESR1",
+      "leaf": "0x3dc59349d65b997451f59ad17bfd87760ae40d87f753dc013a61f249fd8040c0",
+      "manifest": "leaves/BRAZORIA_ESR1.json",
+      "scenarios": "leaves/BRAZORIA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BR_ARROW_ESR1",
+      "leaf": "0x5cd5a1eb2c4cf0b3644ae164564620d4f9fcccf489e867f6fbc873e06b806684",
+      "manifest": "leaves/BR_ARROW_ESR1.json",
+      "scenarios": "leaves/BR_ARROW_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BR_ARROW_ESR2",
+      "leaf": "0x2a13d70a01c41ea131edd65a570f9e5b38b59105757d9a2102b5debc33029a37",
+      "manifest": "leaves/BR_ARROW_ESR2.json",
+      "scenarios": "leaves/BR_ARROW_ESR2.scenarios.json"
+    },
+    {
+      "resource": "BUDA_ESR1",
+      "leaf": "0xe999d24be9365d17879af82cdeeaae74c52944b0c9b897cf9b7a56b887db302f",
+      "manifest": "leaves/BUDA_ESR1.json",
+      "scenarios": "leaves/BUDA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BYP_ESR1",
+      "leaf": "0x310bcaf6add58b20e83fc776277298db1f138e546f5bb6da11c91418b9360b30",
+      "manifest": "leaves/BYP_ESR1.json",
+      "scenarios": "leaves/BYP_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BYRDR_ES_ESR1",
+      "leaf": "0xe9f57a1a0a626884a838a10894c25d4b5f909e09d4b82bd7332742b8b3b00984",
+      "manifest": "leaves/BYRDR_ES_ESR1.json",
+      "scenarios": "leaves/BYRDR_ES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "BY_ESR1",
+      "leaf": "0x29a18128758e76b4e6695b04c86fef2e06b115af0c618792773914d2c98edc5e",
+      "manifest": "leaves/BY_ESR1.json",
+      "scenarios": "leaves/BY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "C5_ESR1",
+      "leaf": "0xb688a387b2efb8e043f7f29d58af5ce9f00a05f5a3ca4d1c1a17705a1a940773",
+      "manifest": "leaves/C5_ESR1.json",
+      "scenarios": "leaves/C5_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CACH_ESS_ESR1",
+      "leaf": "0xdf3075d989829d6f29de6c72529cfcd7464be122d6ce8f2ddc33bfa23d8d4623",
+      "manifest": "leaves/CACH_ESS_ESR1.json",
+      "scenarios": "leaves/CACH_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CAMWIND_ESR1",
+      "leaf": "0xa9d7481413a28800574423565a85e6cd559e667759ad15073b2fe7173b397403",
+      "manifest": "leaves/CAMWIND_ESR1.json",
+      "scenarios": "leaves/CAMWIND_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CARA_ESS_ESR1",
+      "leaf": "0xaf6304fce65e94c4da405654150174459d54e635cc860f8d78616e526aedbe87",
+      "manifest": "leaves/CARA_ESS_ESR1.json",
+      "scenarios": "leaves/CARA_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CARN_ESS_ESR1",
+      "leaf": "0xc72601e0911a8a65e2f1dc47ac659c2d55114cf8c4ef4b2b8a8f790594f38bbe",
+      "manifest": "leaves/CARN_ESS_ESR1.json",
+      "scenarios": "leaves/CARN_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CARRIZO_ESR1",
+      "leaf": "0x885b6f2ccdca7f8e56f7ef24f8b81e8b233a2686f3b3b6c08a532b587bce7cb5",
+      "manifest": "leaves/CARRIZO_ESR1.json",
+      "scenarios": "leaves/CARRIZO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CARTWHL_ESR1",
+      "leaf": "0x541868d6da26d1dde22876051e58fd530b91c1776222e7f34da3950492c7b6ee",
+      "manifest": "leaves/CARTWHL_ESR1.json",
+      "scenarios": "leaves/CARTWHL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CASL_GAP_ESR1",
+      "leaf": "0x8c30d68b5a189ba916a7b308a6333bfef5a8272d0dae288bee59adc3bfe4db8f",
+      "manifest": "leaves/CASL_GAP_ESR1.json",
+      "scenarios": "leaves/CASL_GAP_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CAST_ESS_ESR1",
+      "leaf": "0x24ef23c74c5b9fa341d05e28cf0404c2d2c2de5af3ff640699d7dd112fb6e13a",
+      "manifest": "leaves/CAST_ESS_ESR1.json",
+      "scenarios": "leaves/CAST_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CATARINA_ESR1",
+      "leaf": "0x3855cded429458f410e45be483924078fb222a85cf166a54007b9d5aceb60b29",
+      "manifest": "leaves/CATARINA_ESR1.json",
+      "scenarios": "leaves/CATARINA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CEDRVALE_ESR1",
+      "leaf": "0x3a7247452a797c78ff6c625db55614b860161e014f9d5f00bd307d9ec93bddf3",
+      "manifest": "leaves/CEDRVALE_ESR1.json",
+      "scenarios": "leaves/CEDRVALE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CFLAT_ES_ESR1",
+      "leaf": "0xeb74c9122386568b571bf7d5fbd7e9f1bacfc2afeb035439183365f32395c043",
+      "manifest": "leaves/CFLAT_ES_ESR1.json",
+      "scenarios": "leaves/CFLAT_ES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CHERRYCR_ESR1",
+      "leaf": "0xabe50df4df9b7a4776a41a2e16949c19a44559f4827f6134032be0ac4de82f0f",
+      "manifest": "leaves/CHERRYCR_ESR1.json",
+      "scenarios": "leaves/CHERRYCR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CHIL_SLR_ESR1",
+      "leaf": "0xf5ed639031ea4abb685ef79cff8238031f612fdcd9cca9c315175bc81fc54409",
+      "manifest": "leaves/CHIL_SLR_ESR1.json",
+      "scenarios": "leaves/CHIL_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CISC_ESR1",
+      "leaf": "0x2e8ccf1bc15bb8c2d3c192900b597468b4c5f96bd3d0334ef9f852796c23b298",
+      "manifest": "leaves/CISC_ESR1.json",
+      "scenarios": "leaves/CISC_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CITRUSCY_ESR1",
+      "leaf": "0x4fdb7a146ca4295ad15f6ec284167f661c24ecc02f211929fdfc1a421eead64c",
+      "manifest": "leaves/CITRUSCY_ESR1.json",
+      "scenarios": "leaves/CITRUSCY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CLO_ESR1",
+      "leaf": "0x4826375c415ec4c921b9ca9ae0b84e0312b46f725b0b4c5aac8ee71ed9dbfec3",
+      "manifest": "leaves/CLO_ESR1.json",
+      "scenarios": "leaves/CLO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CLO_ESR2",
+      "leaf": "0x5a98ade0b7ee06c582a66bc2b74c4187142c42c460379a4ee2e185c65d64ecf0",
+      "manifest": "leaves/CLO_ESR2.json",
+      "scenarios": "leaves/CLO_ESR2.scenarios.json"
+    },
+    {
+      "resource": "CNLY_ESS_ESR1",
+      "leaf": "0xe82e889d365852b761b85cb6adfd9fbf6a069042048f83e38b266f658f08914c",
+      "manifest": "leaves/CNLY_ESS_ESR1.json",
+      "scenarios": "leaves/CNLY_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CNTRY_ESR1",
+      "leaf": "0xdcd27f5eddaeafd9abe1ad29591858711bcc12ae53b1cf23916c6ebf493017ed",
+      "manifest": "leaves/CNTRY_ESR1.json",
+      "scenarios": "leaves/CNTRY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CNTYRDS_ESR1",
+      "leaf": "0xdabc047c173a1b4e895601455467666a38e1876770f163b4b4e3e499cd078691",
+      "manifest": "leaves/CNTYRDS_ESR1.json",
+      "scenarios": "leaves/CNTYRDS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CONTINEN_ESR1",
+      "leaf": "0x198e575917a7a3c7a535f1ecbd1d5be5ab36469964f8fbc6f27da97d04f72578",
+      "manifest": "leaves/CONTINEN_ESR1.json",
+      "scenarios": "leaves/CONTINEN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CORALSLR_ESR1",
+      "leaf": "0x292acca754307067b907d0a4c9adafe86b2c4aff7810ef29ee18bdbe07ec39b6",
+      "manifest": "leaves/CORALSLR_ESR1.json",
+      "scenarios": "leaves/CORALSLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CORALSLR_ESR2",
+      "leaf": "0xfe037a0934055be6893a8543053b0db4c24a22da80ec6c00b06e7d16a901e832",
+      "manifest": "leaves/CORALSLR_ESR2.json",
+      "scenarios": "leaves/CORALSLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "CORAZON_ESR1",
+      "leaf": "0x584a5c1dd4d76c1527d685ab4b7be85bb6327857304d607e7df862789b19e0b1",
+      "manifest": "leaves/CORAZON_ESR1.json",
+      "scenarios": "leaves/CORAZON_ESR1.scenarios.json"
+    },
+    {
+      "resource": "COTULLA_ESR1",
+      "leaf": "0x5f6117908a6f1dd0e299bf38ba68e0ea8336a30563e2fd0417e855ac1c304990",
+      "manifest": "leaves/COTULLA_ESR1.json",
+      "scenarios": "leaves/COTULLA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "COYOTSPR_ESR1",
+      "leaf": "0x36e2b29cc9346445307118b7903bdd50b278022b26a13e4529b3a9e9dc2acefe",
+      "manifest": "leaves/COYOTSPR_ESR1.json",
+      "scenarios": "leaves/COYOTSPR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CROSSETT_ESR1",
+      "leaf": "0x6c59f82f790234aa8df695ba4c7571353127183e17d536124c89aebf1706aa41",
+      "manifest": "leaves/CROSSETT_ESR1.json",
+      "scenarios": "leaves/CROSSETT_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CROSSETT_ESR2",
+      "leaf": "0x24af6a5457cc3aeaedb28794b76e5cca82d43ab830b2feae6db6656d1bb35832",
+      "manifest": "leaves/CROSSETT_ESR2.json",
+      "scenarios": "leaves/CROSSETT_ESR2.scenarios.json"
+    },
+    {
+      "resource": "CROSSTRL_ESR1",
+      "leaf": "0x8e389f48240feff868777fa478b705d9585b675902ba1f28adcfc609195f1907",
+      "manifest": "leaves/CROSSTRL_ESR1.json",
+      "scenarios": "leaves/CROSSTRL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CR_ESR1",
+      "leaf": "0x6d1334582db69eac2cdc6c2057f443c0e03822a4c76616c574d1822fdfc88681",
+      "manifest": "leaves/CR_ESR1.json",
+      "scenarios": "leaves/CR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CS_ESR1",
+      "leaf": "0x6b5ee95af681e6328cb1097d63556dc616e82cdaefd6da47e30e34698cc30693",
+      "manifest": "leaves/CS_ESR1.json",
+      "scenarios": "leaves/CS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "CTW_ESR1",
+      "leaf": "0xe7248a47859d6f2757e4361b8eeba0462c8721ae3e5a6635779cf2457f71dd57",
+      "manifest": "leaves/CTW_ESR1.json",
+      "scenarios": "leaves/CTW_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DAN_ESR1",
+      "leaf": "0xf891f4f32e66a4fde35af097dda62b6792a9260c965b51e3bbfcc785f5068278",
+      "manifest": "leaves/DAN_ESR1.json",
+      "scenarios": "leaves/DAN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DAN_ESR2",
+      "leaf": "0xebb51e15c9418fca549a4aa98cc0be2bb0b47a35246fa4b883e239fda379e944",
+      "manifest": "leaves/DAN_ESR2.json",
+      "scenarios": "leaves/DAN_ESR2.scenarios.json"
+    },
+    {
+      "resource": "DA_ESR1",
+      "leaf": "0x9a806740529c2f3076a3313e840b3d7a9d7a0fc95ab922f3e420a4ec86014b50",
+      "manifest": "leaves/DA_ESR1.json",
+      "scenarios": "leaves/DA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DA_ESR3",
+      "leaf": "0xab9c96a5202f72198ce49ed4cb7c47e6a09dc47049594d6e0d75d676b89227ff",
+      "manifest": "leaves/DA_ESR3.json",
+      "scenarios": "leaves/DA_ESR3.scenarios.json"
+    },
+    {
+      "resource": "DCSES_ESR1",
+      "leaf": "0x1d07369c0df7f6326bf78550d18e6c1cd40c2997a316782b5c74ead0a7d83b53",
+      "manifest": "leaves/DCSES_ESR1.json",
+      "scenarios": "leaves/DCSES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DCSES_ESR2",
+      "leaf": "0x70b83fdcc3dd352bc694ed55d8b9e6d02ca785cdad03ddd597d23a87d9233700",
+      "manifest": "leaves/DCSES_ESR2.json",
+      "scenarios": "leaves/DCSES_ESR2.scenarios.json"
+    },
+    {
+      "resource": "DCSES_ESR3",
+      "leaf": "0x62adb12ffbc3acacbddfab131afe2000c6b26d2144e882d3e633297a21c5f82d",
+      "manifest": "leaves/DCSES_ESR3.json",
+      "scenarios": "leaves/DCSES_ESR3.scenarios.json"
+    },
+    {
+      "resource": "DCSES_ESR4",
+      "leaf": "0x6552b343b8d31531f8d5f427687a885023de3bcadc194f48db1491f00ad769f1",
+      "manifest": "leaves/DCSES_ESR4.json",
+      "scenarios": "leaves/DCSES_ESR4.scenarios.json"
+    },
+    {
+      "resource": "DESN_ESS_ESR1",
+      "leaf": "0x450c7b93b98c162b74968472de97c02309c3d332f30e32322dece48f46d159d2",
+      "manifest": "leaves/DESN_ESS_ESR1.json",
+      "scenarios": "leaves/DESN_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DGFS_ESR_ESR1",
+      "leaf": "0x0552ebeadcfe9efd1f826dac971028e4c0a4813ef09a5ce5cf26b217742b99eb",
+      "manifest": "leaves/DGFS_ESR_ESR1.json",
+      "scenarios": "leaves/DGFS_ESR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DIBOL_ESR1",
+      "leaf": "0x71b2375589fc1702f920ada4dd388fcd382674d41e6583bf4172718aebdc9d75",
+      "manifest": "leaves/DIBOL_ESR1.json",
+      "scenarios": "leaves/DIBOL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DICKNSON_ESR1",
+      "leaf": "0x1fc1f0098ace1715c5a5dc7ee7945e3ba9062e4fb300bb59ee442cd0731bd8eb",
+      "manifest": "leaves/DICKNSON_ESR1.json",
+      "scenarios": "leaves/DICKNSON_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DKNS_ESS_ESR1",
+      "leaf": "0x1005df9513cbc597bfacf56e9485f4f4e7768ceeeceaa209960e9123b07b5b1f",
+      "manifest": "leaves/DKNS_ESS_ESR1.json",
+      "scenarios": "leaves/DKNS_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DKNS_ESS_ESR2",
+      "leaf": "0xc9ff043ddd46cc69ed17a7245d8d271e5619c6f3b2122d6f9de70e80b6719931",
+      "manifest": "leaves/DKNS_ESS_ESR2.json",
+      "scenarios": "leaves/DKNS_ESS_ESR2.scenarios.json"
+    },
+    {
+      "resource": "DKNS_ESS_ESR3",
+      "leaf": "0xb5d455aeb56441a07f02f722afd6d96840be0d10b1c5a7bd071e87f79aba3508",
+      "manifest": "leaves/DKNS_ESS_ESR3.json",
+      "scenarios": "leaves/DKNS_ESS_ESR3.scenarios.json"
+    },
+    {
+      "resource": "DKNS_ESS_ESR4",
+      "leaf": "0x2f2c901eff04df61b6192d62e0868c80a757a6727878e73303afafec593948ee",
+      "manifest": "leaves/DKNS_ESS_ESR4.json",
+      "scenarios": "leaves/DKNS_ESS_ESR4.scenarios.json"
+    },
+    {
+      "resource": "DPCRK_ESR1",
+      "leaf": "0xaace303832c0ad35a4d008fcdc0ba5736929614800a52e08109a3a3ce43b915c",
+      "manifest": "leaves/DPCRK_ESR1.json",
+      "scenarios": "leaves/DPCRK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "DSWL_ESS_ESR1",
+      "leaf": "0x067e4a612ccfd5976b66d561a40bd26256590c57eab24763fd5f9f48b76db2b1",
+      "manifest": "leaves/DSWL_ESS_ESR1.json",
+      "scenarios": "leaves/DSWL_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "EBNY_ESS_ESR1",
+      "leaf": "0x12346479bd459227f1c57de8164992359c3714c0a1393ac9979df40233c50698",
+      "manifest": "leaves/EBNY_ESS_ESR1.json",
+      "scenarios": "leaves/EBNY_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ELMCRK_ESR1",
+      "leaf": "0x22f04dcda855b28871441a595548c9e6d9d970620050e7875d8b120aff9a19a4",
+      "manifest": "leaves/ELMCRK_ESR1.json",
+      "scenarios": "leaves/ELMCRK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ELM_ST_ESR1",
+      "leaf": "0x34e987e7596adcd75597deb7561908f4e293954b7579cf64d460f0181ac4f399",
+      "manifest": "leaves/ELM_ST_ESR1.json",
+      "scenarios": "leaves/ELM_ST_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ELM_ST_ESR2",
+      "leaf": "0x60c3caefea1669e0f8de2a62314640bdb1c386a00f31af11043d1b3e20c98936",
+      "manifest": "leaves/ELM_ST_ESR2.json",
+      "scenarios": "leaves/ELM_ST_ESR2.scenarios.json"
+    },
+    {
+      "resource": "ELSA_ESR1",
+      "leaf": "0xeda754b449a795263b6a3d6ddfbd998fe854fa1493e2280eb220a967a815e7c6",
+      "manifest": "leaves/ELSA_ESR1.json",
+      "scenarios": "leaves/ELSA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ELZA_SLR_ESR1",
+      "leaf": "0xde1e819fbcfe07aa592532dabac5b01ac3d5b52e99b42a257f06299d1718ef8a",
+      "manifest": "leaves/ELZA_SLR_ESR1.json",
+      "scenarios": "leaves/ELZA_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "EMPCT_ESR1",
+      "leaf": "0x1aa002ed3d8e7352f29d38827c58d69cecf086f05da9f71e09c941d1b457aad4",
+      "manifest": "leaves/EMPCT_ESR1.json",
+      "scenarios": "leaves/EMPCT_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ENDPARKS_ESR1",
+      "leaf": "0x8a47f56d558fd9dabf4dccf29db282fb787131f6237191f2a656c5dcd6263276",
+      "manifest": "leaves/ENDPARKS_ESR1.json",
+      "scenarios": "leaves/ENDPARKS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ESCONDID_ESR1",
+      "leaf": "0x21741fed6a28c14afe8c8edad0317cebaf87cab2fbcf6a8b87f13d2740b1d9cb",
+      "manifest": "leaves/ESCONDID_ESR1.json",
+      "scenarios": "leaves/ESCONDID_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ESTONIAN_ESR1",
+      "leaf": "0xbff197ad7b75a770d086bb21f69c1e277bd1c6ea5f5aaa4b2728e2c43429ec99",
+      "manifest": "leaves/ESTONIAN_ESR1.json",
+      "scenarios": "leaves/ESTONIAN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "EUNICE_ESR1",
+      "leaf": "0x43ef6bd11cccd95a8dee8437b76bb13d34c2bb810ffb07af0aa87813faef00f3",
+      "manifest": "leaves/EUNICE_ESR1.json",
+      "scenarios": "leaves/EUNICE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "EVLN_ESS_ESR1",
+      "leaf": "0x9ea2444ab20441a3eb711155b47f853561330bfd7cf8cde816e35e1c068db996",
+      "manifest": "leaves/EVLN_ESS_ESR1.json",
+      "scenarios": "leaves/EVLN_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "E_HARRIS_ESR1",
+      "leaf": "0x6296171892e0ee8684f289d7bc394337751f60ff1bfae0218626a42206423462",
+      "manifest": "leaves/E_HARRIS_ESR1.json",
+      "scenarios": "leaves/E_HARRIS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FALFUR_ESR1",
+      "leaf": "0x53c015f8c819a551575ff72991fb63105acd86417d6a17673e8b07e03cfe061c",
+      "manifest": "leaves/FALFUR_ESR1.json",
+      "scenarios": "leaves/FALFUR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FALFUR_ESR2",
+      "leaf": "0x3f7d630b3b0e727134372d0cfe557a9e9af7a4fda4944b59e0038f5daf4a7f2e",
+      "manifest": "leaves/FALFUR_ESR2.json",
+      "scenarios": "leaves/FALFUR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "FAULKNER_ESR1",
+      "leaf": "0xace21b8f1899a1262a9886093f47befc5d998c65e4428f833ab00ea9394f6515",
+      "manifest": "leaves/FAULKNER_ESR1.json",
+      "scenarios": "leaves/FAULKNER_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FENCESLR_ESR1",
+      "leaf": "0x427a65206bbaa9560782d483c23aead41d7b52a8bf7c32dbe3f234da2a66edc4",
+      "manifest": "leaves/FENCESLR_ESR1.json",
+      "scenarios": "leaves/FENCESLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FERD_ESS_ESR1",
+      "leaf": "0x34ec5a039e50618856d551893ae0dc9a89edbe8ed36de0854991dd70139cf409",
+      "manifest": "leaves/FERD_ESS_ESR1.json",
+      "scenarios": "leaves/FERD_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FIVEWSLR_ESR1",
+      "leaf": "0xb56bc45ea10b62dc5c79232fe5c02cde94fa38a5295b5bc71b43cf5dcf014316",
+      "manifest": "leaves/FIVEWSLR_ESR1.json",
+      "scenarios": "leaves/FIVEWSLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FLAT_TOP_ESR1",
+      "leaf": "0x322398230bd917d4be1f4cb023e34a9618b86663c2ee23f909bab0b2b56236c1",
+      "manifest": "leaves/FLAT_TOP_ESR1.json",
+      "scenarios": "leaves/FLAT_TOP_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FLAT_TOP_ESR2",
+      "leaf": "0x873156d1944c6068a8249cf3888187533ac5a3bb08e1d20ff23d7fcec2c6082e",
+      "manifest": "leaves/FLAT_TOP_ESR2.json",
+      "scenarios": "leaves/FLAT_TOP_ESR2.scenarios.json"
+    },
+    {
+      "resource": "FLOWERII_ESR1",
+      "leaf": "0x7233327202305ff1d8778bcdc692ccdadc966cb1ba16076cd2db8c685c656fd1",
+      "manifest": "leaves/FLOWERII_ESR1.json",
+      "scenarios": "leaves/FLOWERII_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FORTMA_ESR1",
+      "leaf": "0x80602d50f263ef307e5779cdd20b4b1892d58895764626d0ef060c7ea26bf3d2",
+      "manifest": "leaves/FORTMA_ESR1.json",
+      "scenarios": "leaves/FORTMA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FRMRSVLW_ESR1",
+      "leaf": "0xaae692c5fb19c2cb49f74e8349925bdc1eab8ca89ba5c12749ce4b4751a79a30",
+      "manifest": "leaves/FRMRSVLW_ESR1.json",
+      "scenarios": "leaves/FRMRSVLW_ESR1.scenarios.json"
+    },
+    {
+      "resource": "FRMRSVLW_ESR2",
+      "leaf": "0x54f339288bb6d769ec18501c6e5022ea72fa767eef18f4ff8d4cc336e46b9bf9",
+      "manifest": "leaves/FRMRSVLW_ESR2.json",
+      "scenarios": "leaves/FRMRSVLW_ESR2.scenarios.json"
+    },
+    {
+      "resource": "FTDUNCAN_ESR1",
+      "leaf": "0x81cba7290719d4d95b417d78ebbd3cb2279195ce6656b360a27f6c85b3ed2d37",
+      "manifest": "leaves/FTDUNCAN_ESR1.json",
+      "scenarios": "leaves/FTDUNCAN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GAIA_SLR_ESR1",
+      "leaf": "0xed8af77fcf82ec11ab0f1a7b0f4ddfebd95f58a15428a3cec23160d1ec8e5a94",
+      "manifest": "leaves/GAIA_SLR_ESR1.json",
+      "scenarios": "leaves/GAIA_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GAMBIT_ESR1",
+      "leaf": "0xaa4d8c4895b4c13008389b26dd25a130851ff6a586c3158d086a2fbbf74efc5c",
+      "manifest": "leaves/GAMBIT_ESR1.json",
+      "scenarios": "leaves/GAMBIT_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GARCENO_ESR1",
+      "leaf": "0xe30c248577d07daa1fde1be96a935e24a750110c8037234500deefc7ea2d3e26",
+      "manifest": "leaves/GARCENO_ESR1.json",
+      "scenarios": "leaves/GARCENO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GEORSO_ESR1",
+      "leaf": "0x58f3666a338485c48fb57d2cebd8f07bce8333c9ff217edb87a1291861e2ffe4",
+      "manifest": "leaves/GEORSO_ESR1.json",
+      "scenarios": "leaves/GEORSO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GIGA_ESS_ESR1",
+      "leaf": "0xea357ce6a1a8343277d6bf19103b5550f314740465a0645f785bbecf7e00cd8e",
+      "manifest": "leaves/GIGA_ESS_ESR1.json",
+      "scenarios": "leaves/GIGA_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GKS_BESS_ESR1",
+      "leaf": "0x83f279bf4abfee56cf7e042d13f074dbd24e81b518ca8b724d9b723e4d3f908f",
+      "manifest": "leaves/GKS_BESS_ESR1.json",
+      "scenarios": "leaves/GKS_BESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GODY_SLR_ESR1",
+      "leaf": "0x315e9a6d434aa2ce900bfdb8c9af02dea732c93102e10e270ae38db8805706a3",
+      "manifest": "leaves/GODY_SLR_ESR1.json",
+      "scenarios": "leaves/GODY_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GOMZ_ESR1",
+      "leaf": "0xcacdbad2f076e0ab1664238cd738c5514f6bf814cde7054d20920b0ea81dc633",
+      "manifest": "leaves/GOMZ_ESR1.json",
+      "scenarios": "leaves/GOMZ_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GOODWIN_ESR1",
+      "leaf": "0x1e970ddba7891c5b1fb0609afefe9f427277bce0b476258d2959288cd2fff56c",
+      "manifest": "leaves/GOODWIN_ESR1.json",
+      "scenarios": "leaves/GOODWIN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GRDNE_ESR1",
+      "leaf": "0xe1d90ea5189f233599710b45aa3bab37c5d7e40a78735cae4bc025cfff5c116c",
+      "manifest": "leaves/GRDNE_ESR1.json",
+      "scenarios": "leaves/GRDNE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GREGORY_ESR1",
+      "leaf": "0x8af2e1eaa19cbcba5d99cd8b24aa438cf2ee21f2bf0055827c19b083c2c8e85f",
+      "manifest": "leaves/GREGORY_ESR1.json",
+      "scenarios": "leaves/GREGORY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GRIZZLY_ESR1",
+      "leaf": "0xee35ab9d88925a98dcb1185f4293e9f22e19679a4e2db1789ccfc2ad7751536b",
+      "manifest": "leaves/GRIZZLY_ESR1.json",
+      "scenarios": "leaves/GRIZZLY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GZ_ESR1",
+      "leaf": "0x130133003dcb7dbf5c29488eca49839e9e0eac2ed79acbfafeea80da02093710",
+      "manifest": "leaves/GZ_ESR1.json",
+      "scenarios": "leaves/GZ_ESR1.scenarios.json"
+    },
+    {
+      "resource": "GZ_ESR2",
+      "leaf": "0x70a5c0878ce8246437c2298970b583cc9b8aa7e43d6b349dc32d28100f5beb89",
+      "manifest": "leaves/GZ_ESR2.json",
+      "scenarios": "leaves/GZ_ESR2.scenarios.json"
+    },
+    {
+      "resource": "HAMILTON_ESR1",
+      "leaf": "0xa24ffaa89482384710ec5efe30d292acd100932ee1378ca58752749add31a93a",
+      "manifest": "leaves/HAMILTON_ESR1.json",
+      "scenarios": "leaves/HAMILTON_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HEADCAMP_ESR1",
+      "leaf": "0x0fb1638462aef8a64b12623b26ce6884b951567b3e49399f0c33f58de728f0e1",
+      "manifest": "leaves/HEADCAMP_ESR1.json",
+      "scenarios": "leaves/HEADCAMP_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HEARN_RD_ESR1",
+      "leaf": "0x2ff7a4e9086390b592ed5e7ce18abd1e5394993ce11cb4047cc29edc3d45ce01",
+      "manifest": "leaves/HEARN_RD_ESR1.json",
+      "scenarios": "leaves/HEARN_RD_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HEIGHTTN_ESR1",
+      "leaf": "0x3e92aed1974cff229f2d986cc4f14c89f6ff2b79c3afb14d0e43faab77f8f7c8",
+      "manifest": "leaves/HEIGHTTN_ESR1.json",
+      "scenarios": "leaves/HEIGHTTN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HEN_ESR1",
+      "leaf": "0xc0dad9f32179b894b0f1484993e12487c9d837faa9f01bed84e4c7e157747659",
+      "manifest": "leaves/HEN_ESR1.json",
+      "scenarios": "leaves/HEN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HEN_ESR2",
+      "leaf": "0xcc8f3e30988a28fc171846150d1519491df5016c081f5e3e25f1c27337bcf905",
+      "manifest": "leaves/HEN_ESR2.json",
+      "scenarios": "leaves/HEN_ESR2.scenarios.json"
+    },
+    {
+      "resource": "HI_LONEB_ESR1",
+      "leaf": "0x7ba38c701e87c63d5c4d5ee686d5153e1208bd99ce924b6bad34e8715e40e268",
+      "manifest": "leaves/HI_LONEB_ESR1.json",
+      "scenarios": "leaves/HI_LONEB_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HLY_ESR1",
+      "leaf": "0x1ab8c8400a11da6c8aee25c10780014b44b4177b094ab8f708fe816dfad572db",
+      "manifest": "leaves/HLY_ESR1.json",
+      "scenarios": "leaves/HLY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HLY_ESR2",
+      "leaf": "0x68100a1115d6cb6c33bcba3c4ef6a3291fe4628e9535ecde23e2beda59f16cd5",
+      "manifest": "leaves/HLY_ESR2.json",
+      "scenarios": "leaves/HLY_ESR2.scenarios.json"
+    },
+    {
+      "resource": "HMNG_ESS_ESR1",
+      "leaf": "0xe1a8c0b2d9aee58a094fa71642d100804c996f61ab1078f603f2e2285b888aca",
+      "manifest": "leaves/HMNG_ESS_ESR1.json",
+      "scenarios": "leaves/HMNG_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HOLCOMB_ESR1",
+      "leaf": "0x2104b77e0318dcea8de494eb307a9ae9c14b0d0d4fb7e1da10532251b93222ae",
+      "manifest": "leaves/HOLCOMB_ESR1.json",
+      "scenarios": "leaves/HOLCOMB_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HOUSEMTN_ESR1",
+      "leaf": "0x2bfa7392240f13290e9619200b69416a350089327d593e9cff1208811ed0e8ac",
+      "manifest": "leaves/HOUSEMTN_ESR1.json",
+      "scenarios": "leaves/HOUSEMTN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HRMS_SLR_ESR1",
+      "leaf": "0x34ddd5488bf138117ad5e657e2d1aa453c328723433965b88ac13903254a7e30",
+      "manifest": "leaves/HRMS_SLR_ESR1.json",
+      "scenarios": "leaves/HRMS_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HV_ESR1",
+      "leaf": "0xca33263900517027cfb25565d5b311165300a5b2232903c38778ec37d5c98d40",
+      "manifest": "leaves/HV_ESR1.json",
+      "scenarios": "leaves/HV_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HWY6_ESR1",
+      "leaf": "0xcd0a4ed9eab094738203ca6242ad0fb5ae9d4e8f5b1ff0e135f5874049b33369",
+      "manifest": "leaves/HWY6_ESR1.json",
+      "scenarios": "leaves/HWY6_ESR1.scenarios.json"
+    },
+    {
+      "resource": "HYDR_ESS_ESR1",
+      "leaf": "0x6e5a813d1f27ebf57acda909e8596e32492ec6941ccc7291e4990eaee88b365f",
+      "manifest": "leaves/HYDR_ESS_ESR1.json",
+      "scenarios": "leaves/HYDR_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "INDL_ESR1",
+      "leaf": "0xe68bb4c274e119d84feced17fcc2d81d46d6a88c6308c75f11f1e51898ee8d3e",
+      "manifest": "leaves/INDL_ESR1.json",
+      "scenarios": "leaves/INDL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "INRT_W_ESR1",
+      "leaf": "0xd58117eb312073371496c1bbc1d961173f7594218e76b816b95120695c1fb29b",
+      "manifest": "leaves/INRT_W_ESR1.json",
+      "scenarios": "leaves/INRT_W_ESR1.scenarios.json"
+    },
+    {
+      "resource": "JADE_SLR_ESR1",
+      "leaf": "0x5c6983ea9037830506685107185562c7305733b102d9884279aa1b6b80f45f0b",
+      "manifest": "leaves/JADE_SLR_ESR1.json",
+      "scenarios": "leaves/JADE_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "JADE_SLR_ESR2",
+      "leaf": "0xdeb071fadff3d1ae79079e70aebfba912962acebc10bce945fdce29057be8fe1",
+      "manifest": "leaves/JADE_SLR_ESR2.json",
+      "scenarios": "leaves/JADE_SLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "JAG_SLR_ESR1",
+      "leaf": "0xdacd81a3863245110f5dba30e2d53ebf0cb7001d6e5c5d47f44ccbe58714f8d9",
+      "manifest": "leaves/JAG_SLR_ESR1.json",
+      "scenarios": "leaves/JAG_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "JAG_SLR_ESR2",
+      "leaf": "0xd8631c0ebd400d31f7b45d48c954ebe07f7a2a8bb6b123df819bd1bdaddb166a",
+      "manifest": "leaves/JAG_SLR_ESR2.json",
+      "scenarios": "leaves/JAG_SLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "JAR_ESR1",
+      "leaf": "0x260e7b0273d5477636defdaac35713429e6433af18e21b8dc4fffc60087f60dd",
+      "manifest": "leaves/JAR_ESR1.json",
+      "scenarios": "leaves/JAR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "JAR_ESR2",
+      "leaf": "0x7c08606b20d9188cad885930a0b1f9c56fb33172b659dfc101e1672f1f615844",
+      "manifest": "leaves/JAR_ESR2.json",
+      "scenarios": "leaves/JAR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "JDKNS_ESR1",
+      "leaf": "0x8dad2087d75ff19018c9baaede11a45d236b21068e13772e8992a51c26bb5f4d",
+      "manifest": "leaves/JDKNS_ESR1.json",
+      "scenarios": "leaves/JDKNS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "JOHNCI_ESR1",
+      "leaf": "0x13865f9fbec811f97066356d23619d88132913ed682f4b87b60d68e7a1dac0d1",
+      "manifest": "leaves/JOHNCI_ESR1.json",
+      "scenarios": "leaves/JOHNCI_ESR1.scenarios.json"
+    },
+    {
+      "resource": "JUNCTION_ESR1",
+      "leaf": "0x25a7aa39ca88d46514a2c4b1b3cbe9548a736a2a8fc3c561c87f6c3a0a2f0270",
+      "manifest": "leaves/JUNCTION_ESR1.json",
+      "scenarios": "leaves/JUNCTION_ESR1.scenarios.json"
+    },
+    {
+      "resource": "JUNORTH_ESR1",
+      "leaf": "0xf4e81328d8158c3ab55094e7335bf203b475d8562667738d49c993cad46ea2a3",
+      "manifest": "leaves/JUNORTH_ESR1.json",
+      "scenarios": "leaves/JUNORTH_ESR1.scenarios.json"
+    },
+    {
+      "resource": "K0_ESR1",
+      "leaf": "0xca6217a91520bce1beb0cf632000ff64dbb7fbef9bb629a2e1c9b2ece9a62d2c",
+      "manifest": "leaves/K0_ESR1.json",
+      "scenarios": "leaves/K0_ESR1.scenarios.json"
+    },
+    {
+      "resource": "KEG_ESR1",
+      "leaf": "0x93029dbeb6535cf4201d2f08c22130955d5e71a2e00694d9fc30ea052d7090c2",
+      "manifest": "leaves/KEG_ESR1.json",
+      "scenarios": "leaves/KEG_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LANTANA_ESR1",
+      "leaf": "0x05837e72cb2a9816bca57efc214a0e330f3952a1a472ffaff89aa79c998e61d6",
+      "manifest": "leaves/LANTANA_ESR1.json",
+      "scenarios": "leaves/LANTANA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LAURELES_ESR1",
+      "leaf": "0x1bb11b39cf6e19e9613ed6832419caa0d2090a4cb422ef62237b6eb9fd297059",
+      "manifest": "leaves/LAURELES_ESR1.json",
+      "scenarios": "leaves/LAURELES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LBRA_ESS_ESR1",
+      "leaf": "0x6660aa92a8a4775905e597cd12fbbbdda818b1b53f63a73391aefb2767d8e869",
+      "manifest": "leaves/LBRA_ESS_ESR1.json",
+      "scenarios": "leaves/LBRA_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LEAKEY_ESR1",
+      "leaf": "0x23d8838044387543f47a59cb0093eb1d8d0b15eae138dc7195a5614dae120ec9",
+      "manifest": "leaves/LEAKEY_ESR1.json",
+      "scenarios": "leaves/LEAKEY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LFSTH_ESR1",
+      "leaf": "0xd05b0cd5ca68ba7b16c5cbfd68ff7344667cf64b3b7474b6bc05bf3031220ccb",
+      "manifest": "leaves/LFSTH_ESR1.json",
+      "scenarios": "leaves/LFSTH_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LIGSW_ESR1",
+      "leaf": "0xc795ce6066fef59f8dcf4957d44966d0422c471f01495eb837c8749358902971",
+      "manifest": "leaves/LIGSW_ESR1.json",
+      "scenarios": "leaves/LIGSW_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LILY_ESR1",
+      "leaf": "0x37940e1530fb61f0a6b81c0f7b162ad966daae8ce638609b36a8d3a69f4e63f5",
+      "manifest": "leaves/LILY_ESR1.json",
+      "scenarios": "leaves/LILY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LK_ESR1",
+      "leaf": "0x5bbb6354d09f898fe9492b387f90451ebae554f23fec2dc364ac811797473567",
+      "manifest": "leaves/LK_ESR1.json",
+      "scenarios": "leaves/LK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LMO_ESR1",
+      "leaf": "0xdf4dd7c66a900a761ab3069765b67d86aaf9ba3d4207c71bff304d5cdd5281ae",
+      "manifest": "leaves/LMO_ESR1.json",
+      "scenarios": "leaves/LMO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LONESTAR_ESR1",
+      "leaf": "0xf526c2bae2a72f38ea32c1814354e83f69b65548ba10ba1cf06dcb02d8f7ccd6",
+      "manifest": "leaves/LONESTAR_ESR1.json",
+      "scenarios": "leaves/LONESTAR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LON_ESR1",
+      "leaf": "0x7f0db744286fa9429f83fcefe72041af4d8ccffad0e03c3dd7cf77d312f84767",
+      "manifest": "leaves/LON_ESR1.json",
+      "scenarios": "leaves/LON_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LOPENO_ESR1",
+      "leaf": "0x14553c26e08de0ea25014ab6d346728df3167f4373f0d63e805e6b08235d5984",
+      "manifest": "leaves/LOPENO_ESR1.json",
+      "scenarios": "leaves/LOPENO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LOWR_ESS_ESR1",
+      "leaf": "0x2b378ec7939fb7ee687e3f93f79673ed14e95b6dd34078ad824c5fca505776b3",
+      "manifest": "leaves/LOWR_ESS_ESR1.json",
+      "scenarios": "leaves/LOWR_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LUCKYBLU_ESR1",
+      "leaf": "0x80f8fad295b52676f465445ddeaa7f7b0747fdffbdd17be215e24f0e915b8630",
+      "manifest": "leaves/LUCKYBLU_ESR1.json",
+      "scenarios": "leaves/LUCKYBLU_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LYNX_ESS_ESR1",
+      "leaf": "0xceb4ed4348627adf320c60cf1dfefd043cee786e1a84f818556496a0a9b3ef78",
+      "manifest": "leaves/LYNX_ESS_ESR1.json",
+      "scenarios": "leaves/LYNX_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "LYSSY_ESR1",
+      "leaf": "0x91ee6420bc63f4f1f4ca03e09d4383864f0a193d854abf51ca19a7d0ce6ccf9a",
+      "manifest": "leaves/LYSSY_ESR1.json",
+      "scenarios": "leaves/LYSSY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "L_463S_ESR1",
+      "leaf": "0xe97c07cf554a644204462529d96c4002e0326e1d39fc7e74c3e7392197108352",
+      "manifest": "leaves/L_463S_ESR1.json",
+      "scenarios": "leaves/L_463S_ESR1.scenarios.json"
+    },
+    {
+      "resource": "L_FRESNO_ESR1",
+      "leaf": "0xbec03c2eccd162c4823f967c6a2f5a9a0f69e9a5419475a2b1c32ebd3b619d4d",
+      "manifest": "leaves/L_FRESNO_ESR1.json",
+      "scenarios": "leaves/L_FRESNO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MADERO_ESR1",
+      "leaf": "0x17e93c8ea4c89858612d439e838cd404ff984713fe1b69ba79d183eed5935d9f",
+      "manifest": "leaves/MADERO_ESR1.json",
+      "scenarios": "leaves/MADERO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MADERO_ESR2",
+      "leaf": "0xb3abd679bcc79b25ebe6c402950b5f4f4b8a79fbf1d037215318b9c152b168be",
+      "manifest": "leaves/MADERO_ESR2.json",
+      "scenarios": "leaves/MADERO_ESR2.scenarios.json"
+    },
+    {
+      "resource": "MAGNO_TN_ESR1",
+      "leaf": "0x0584298cf6a4b63ece38547113d4129791a6fcc8ec389e1507e8d408ef4a1565",
+      "manifest": "leaves/MAGNO_TN_ESR1.json",
+      "scenarios": "leaves/MAGNO_TN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MAINLAND_ESR1",
+      "leaf": "0x13efb9147a5c2a922ecf052c3108487030d10703f2ded6b04063284b52cbe5ba",
+      "manifest": "leaves/MAINLAND_ESR1.json",
+      "scenarios": "leaves/MAINLAND_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MAYBERRY_ESR1",
+      "leaf": "0xa827802f8464c444df32f9be9df0f12382b4d21459b99bc27daeb2076c67b6b9",
+      "manifest": "leaves/MAYBERRY_ESR1.json",
+      "scenarios": "leaves/MAYBERRY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MAYBERRY_ESR2",
+      "leaf": "0xf8b59063d0a280b8b09dbe798f12a4ac5fff8b487e958fe0da64fbb3d3f46e5f",
+      "manifest": "leaves/MAYBERRY_ESR2.json",
+      "scenarios": "leaves/MAYBERRY_ESR2.scenarios.json"
+    },
+    {
+      "resource": "MEDILA_ESR1",
+      "leaf": "0x9505027257f96da42b4e06236dc314f0bb49fd6d12a525571e243e1239c74934",
+      "manifest": "leaves/MEDILA_ESR1.json",
+      "scenarios": "leaves/MEDILA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MESQUITE_ESR1",
+      "leaf": "0x6e866d80a6d533aa39ba7661ed0f5545faa11bc046f2a51012ab53c4d989f71c",
+      "manifest": "leaves/MESQUITE_ESR1.json",
+      "scenarios": "leaves/MESQUITE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MESQUITE_ESR2",
+      "leaf": "0xba8a84d12cd49259c6bd11b435e97fc98217ac225e024ae620a2c3f88d6da77d",
+      "manifest": "leaves/MESQUITE_ESR2.json",
+      "scenarios": "leaves/MESQUITE_ESR2.scenarios.json"
+    },
+    {
+      "resource": "MIDP_SLR_ESR1",
+      "leaf": "0x23fb887bfbde47d8a46e602ddc20fa888358ef9ebe2ce82fa05288022eef34ee",
+      "manifest": "leaves/MIDP_SLR_ESR1.json",
+      "scenarios": "leaves/MIDP_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MIDWY_ESR1",
+      "leaf": "0x57d01c8073fe302722b2d99c3f9ea1998b5c851ea6171762d5b91a2212601a8c",
+      "manifest": "leaves/MIDWY_ESR1.json",
+      "scenarios": "leaves/MIDWY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MILTON_ESR1",
+      "leaf": "0xe017777a59075b2bcc5b8c5f6f33ec7cdf09c4a59afd865c4092b0b2f8e7e6ee",
+      "manifest": "leaves/MILTON_ESR1.json",
+      "scenarios": "leaves/MILTON_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MNWLE_ESR1",
+      "leaf": "0x20af5080ad7c505fbfa5eff5c1d86c87784a5521878ff955b3af571c0a486c87",
+      "manifest": "leaves/MNWLE_ESR1.json",
+      "scenarios": "leaves/MNWLE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MOORE_FL_ESR1",
+      "leaf": "0x0b20c334a6cfc6d98a27d73960eea28877a8b1e53b57be28d1b4e41127669641",
+      "manifest": "leaves/MOORE_FL_ESR1.json",
+      "scenarios": "leaves/MOORE_FL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MUENSTER_ESR1",
+      "leaf": "0x4bc5c04829d71382746c453431bfbd0ae396b21d87da706933f46e038a2ef3c3",
+      "manifest": "leaves/MUENSTER_ESR1.json",
+      "scenarios": "leaves/MUENSTER_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MUSTNGCK_ESR1",
+      "leaf": "0xae7e35ffb55df6e380fef40fab7462d22ff58754f40a53dc36f731d0b9497bfb",
+      "manifest": "leaves/MUSTNGCK_ESR1.json",
+      "scenarios": "leaves/MUSTNGCK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MU_ESR1",
+      "leaf": "0x16fff7c7bf261048e0d95c591af7d0b58b856bc63e5f6091d9b86d0ef3634c6e",
+      "manifest": "leaves/MU_ESR1.json",
+      "scenarios": "leaves/MU_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MV_VALV4_ESR1",
+      "leaf": "0x5d7628965f4771651acc011802d02de98b08342a46a42ce3fb3930e85f873061",
+      "manifest": "leaves/MV_VALV4_ESR1.json",
+      "scenarios": "leaves/MV_VALV4_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MYR_ESR1",
+      "leaf": "0x0ddad8c1b8f2ad8e1775c13df20278fb8b75987b43ee435d51f03885effd2fb7",
+      "manifest": "leaves/MYR_ESR1.json",
+      "scenarios": "leaves/MYR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "MYR_ESR2",
+      "leaf": "0xa91927d7af17806ed262bbf87aef03301f49b641162e0874dbc686e9012ff617",
+      "manifest": "leaves/MYR_ESR2.json",
+      "scenarios": "leaves/MYR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "NCO_ESR1",
+      "leaf": "0x95c6373c1fd7796695d4995ccbff4de86e2afc4ddf7666584030201dd5dee4e2",
+      "manifest": "leaves/NCO_ESR1.json",
+      "scenarios": "leaves/NCO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "NF_BRP_ESR1",
+      "leaf": "0xfddc1cc9d51dd29188a6c62c1143278893594618da2abfebc9cf9266e0f92398",
+      "manifest": "leaves/NF_BRP_ESR1.json",
+      "scenarios": "leaves/NF_BRP_ESR1.scenarios.json"
+    },
+    {
+      "resource": "NOBLESLR_ESR1",
+      "leaf": "0x80a3b443ad84fd45343edcf04c4d4bdebc6999ba71fe2d50069686eba8b1a0c7",
+      "manifest": "leaves/NOBLESLR_ESR1.json",
+      "scenarios": "leaves/NOBLESLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "NOBLESLR_ESR2",
+      "leaf": "0x307960cd12e2e739e338667b6fb243e08da0e91ab80560a413a0160dda233409",
+      "manifest": "leaves/NOBLESLR_ESR2.json",
+      "scenarios": "leaves/NOBLESLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "NWF_ESR1",
+      "leaf": "0x47ad1bad8e10d91097c9e8fd6c73a79a859605d1d134a766e06545a9f4c1def1",
+      "manifest": "leaves/NWF_ESR1.json",
+      "scenarios": "leaves/NWF_ESR1.scenarios.json"
+    },
+    {
+      "resource": "N_ALAMO_ESR1",
+      "leaf": "0x61e2123e65f040433ea5855abc1327267cef17c942604759845f125e85a4ec65",
+      "manifest": "leaves/N_ALAMO_ESR1.json",
+      "scenarios": "leaves/N_ALAMO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "N_MERCED_ESR1",
+      "leaf": "0x274a7905561f6f74caaa8a9355a5411cfb6b74058481f01fefc86fe7381c0305",
+      "manifest": "leaves/N_MERCED_ESR1.json",
+      "scenarios": "leaves/N_MERCED_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ODESW_ESR1",
+      "leaf": "0x32a9e4d5d41b2776837bc09d1171c0c9058b52fe3d0900974af3c3647be6c160",
+      "manifest": "leaves/ODESW_ESR1.json",
+      "scenarios": "leaves/ODESW_ESR1.scenarios.json"
+    },
+    {
+      "resource": "OLMITO_ESR1",
+      "leaf": "0xa53f5a2cf927201d6d8ceffc149c1328ec38cc9a300aa72ebbe054e832526c6a",
+      "manifest": "leaves/OLMITO_ESR1.json",
+      "scenarios": "leaves/OLMITO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "OLNEYTN_ESR1",
+      "leaf": "0x89501397509992e51f0ac9414010fc0b1947da74f191a2443e8ba89ae7dbef02",
+      "manifest": "leaves/OLNEYTN_ESR1.json",
+      "scenarios": "leaves/OLNEYTN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PAD1_ESS_ESR1",
+      "leaf": "0x3d1b35876f9201692895c6df79afd69e7b557eb3ed80e6cd61981870be4cc7cb",
+      "manifest": "leaves/PAD1_ESS_ESR1.json",
+      "scenarios": "leaves/PAD1_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PAD2_ESS_ESR2",
+      "leaf": "0x2a2fa1af1541c3705f4f3b69e2aff40427449239e12dd82a35e6c36dd0038f3e",
+      "manifest": "leaves/PAD2_ESS_ESR2.json",
+      "scenarios": "leaves/PAD2_ESS_ESR2.scenarios.json"
+    },
+    {
+      "resource": "PAD3_ESS_ESR3",
+      "leaf": "0x78aca8ca5aacd9598e585dcc4cafbf4006ee083acaa50574a14658e3d3306c18",
+      "manifest": "leaves/PAD3_ESS_ESR3.json",
+      "scenarios": "leaves/PAD3_ESS_ESR3.scenarios.json"
+    },
+    {
+      "resource": "PALACIOS_ESR1",
+      "leaf": "0x7e27237f04ed75d911a7a2ad3bae1953414a78217a08394d8eb4dde508f2903d",
+      "manifest": "leaves/PALACIOS_ESR1.json",
+      "scenarios": "leaves/PALACIOS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PALE_ESS_ESR1",
+      "leaf": "0x7c2cacaca00d42e030cf3d25e78b0ab2d0a39f988910ef0cedf023d0624accc7",
+      "manifest": "leaves/PALE_ESS_ESR1.json",
+      "scenarios": "leaves/PALE_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PALMVIEW_ESR1",
+      "leaf": "0xfb5d86b3e056fec1e9f1cdbe514e4a95123ab56c6cf3f5c781f97db6fdb3f7ff",
+      "manifest": "leaves/PALMVIEW_ESR1.json",
+      "scenarios": "leaves/PALMVIEW_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PAULN_ESR1",
+      "leaf": "0x965f96c30a1ca085906b1a1f867869639bd964f205f5bcb95a47ff87ed1a7daf",
+      "manifest": "leaves/PAULN_ESR1.json",
+      "scenarios": "leaves/PAULN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PAVLOV_ESR1",
+      "leaf": "0x1fe3e02a052210aaa0f31cc74b8f9dafc835449204318e7308b97aedeac6d2e6",
+      "manifest": "leaves/PAVLOV_ESR1.json",
+      "scenarios": "leaves/PAVLOV_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PAVO_ESS_ESR1",
+      "leaf": "0xbdf825ff62535e8b9e25e5bc27ef5fae758e9018bd3903ccaad81845026e3567",
+      "manifest": "leaves/PAVO_ESS_ESR1.json",
+      "scenarios": "leaves/PAVO_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PAVO_ESS_ESR2",
+      "leaf": "0x698c77e65c086fce02fbbbe232948f7d579f9c34a15e01d05de9ded1c738ea7f",
+      "manifest": "leaves/PAVO_ESS_ESR2.json",
+      "scenarios": "leaves/PAVO_ESS_ESR2.scenarios.json"
+    },
+    {
+      "resource": "PEARSALL_ESR1",
+      "leaf": "0xb6f690c8d070f9b5b5928bc5b865a7bbb620da6d1d5292d6446635825ef00029",
+      "manifest": "leaves/PEARSALL_ESR1.json",
+      "scenarios": "leaves/PEARSALL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PHO_ESR1",
+      "leaf": "0x8124b8fb48ffb0a40de16f4925b34dd3db6ae04d63aeb79d48f1c36a166814f8",
+      "manifest": "leaves/PHO_ESR1.json",
+      "scenarios": "leaves/PHO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PHO_ESR2",
+      "leaf": "0x150fb6dd71d0663518e63202cfc960608791085f8471dea85affd22e31af9801",
+      "manifest": "leaves/PHO_ESR2.json",
+      "scenarios": "leaves/PHO_ESR2.scenarios.json"
+    },
+    {
+      "resource": "PINEFRST_ESR1",
+      "leaf": "0x4ee0ae22c3c9be59372029b5710eea16c14e966e817ac8c59fd0d516a7017ee6",
+      "manifest": "leaves/PINEFRST_ESR1.json",
+      "scenarios": "leaves/PINEFRST_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PIN_BESS_ESR1",
+      "leaf": "0x52771dc69bf38d617830a5ce6188531b5d835f45fc965055402db85a09ce9d8a",
+      "manifest": "leaves/PIN_BESS_ESR1.json",
+      "scenarios": "leaves/PIN_BESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PIRATE_ESR1",
+      "leaf": "0xb2ae184c2b67b065382931838fe09736496dfb0811024e94f9438620dce89106",
+      "manifest": "leaves/PIRATE_ESR1.json",
+      "scenarios": "leaves/PIRATE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PLATINUM_ESR1",
+      "leaf": "0x75f2a1b5bb26aa90813f13a8f2eaa59816a300c275b5af6c0ae8f5cd65690d4c",
+      "manifest": "leaves/PLATINUM_ESR1.json",
+      "scenarios": "leaves/PLATINUM_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PLATINUM_ESR2",
+      "leaf": "0x737224b27ce8c3c93fd935245b3628632b5fd0c3d2c6b436ae37f9d85033407f",
+      "manifest": "leaves/PLATINUM_ESR2.json",
+      "scenarios": "leaves/PLATINUM_ESR2.scenarios.json"
+    },
+    {
+      "resource": "POTEETS_ESR1",
+      "leaf": "0x7a548f6c264176f7426c82a905a3fa13c6be0985160038ef91af7602a831b1f8",
+      "manifest": "leaves/POTEETS_ESR1.json",
+      "scenarios": "leaves/POTEETS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PRCRK_ESR1",
+      "leaf": "0x3b7836cc27e75406d2c895a3eb31c0b0d454549a5150d06a3ac8df6d208b0302",
+      "manifest": "leaves/PRCRK_ESR1.json",
+      "scenarios": "leaves/PRCRK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PRTLAVS_ESR1",
+      "leaf": "0x26b1fe3c79d4fe1ce1474238049b8c55a8f48d4993334dd3127c384a61a2654b",
+      "manifest": "leaves/PRTLAVS_ESR1.json",
+      "scenarios": "leaves/PRTLAVS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PUEBLO_ESR1",
+      "leaf": "0x77d0ca56bef0897e8097e6633d2240769b325076996a68ae124b17ac6ee7ae59",
+      "manifest": "leaves/PUEBLO_ESR1.json",
+      "scenarios": "leaves/PUEBLO_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PUEBLO_ESR2",
+      "leaf": "0x4e6e2c2310b84201b360e9571b59d5e1a60496d35381b03bd07facc228f956f3",
+      "manifest": "leaves/PUEBLO_ESR2.json",
+      "scenarios": "leaves/PUEBLO_ESR2.scenarios.json"
+    },
+    {
+      "resource": "PYOTE_ESR1",
+      "leaf": "0xfc11c4e574499060bef79da0772df3839a0a09271b8bc101a7d0a5a49174a79f",
+      "manifest": "leaves/PYOTE_ESR1.json",
+      "scenarios": "leaves/PYOTE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PYR_ESR1",
+      "leaf": "0xe4e5c9ab314137aebf9e7cddeecb2b4ec01621baad7a31faa50d9e4c939cdfe9",
+      "manifest": "leaves/PYR_ESR1.json",
+      "scenarios": "leaves/PYR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "PYR_ESR2",
+      "leaf": "0xc5975e2de760791f48d63e801a96d4d4cd115532e39f300106f079a97e0daaf3",
+      "manifest": "leaves/PYR_ESR2.json",
+      "scenarios": "leaves/PYR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "PYR_ESR3",
+      "leaf": "0xe69a53a1627f26607f6549fa9f82f627cae78e46dc29f77fef1963f8e7e6d66d",
+      "manifest": "leaves/PYR_ESR3.json",
+      "scenarios": "leaves/PYR_ESR3.scenarios.json"
+    },
+    {
+      "resource": "QTUM_SLR_ESR1",
+      "leaf": "0xed208d6e4f2bfc1a8d8ad4b2cc20d310c3103a4a5962a8dd02fd8fb59bfae139",
+      "manifest": "leaves/QTUM_SLR_ESR1.json",
+      "scenarios": "leaves/QTUM_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "QTUM_SLR_ESR2",
+      "leaf": "0xea6c17be6dc81c4464206dd1d482aadccdd7bb2e24ca992d7dbbceffed22b80d",
+      "manifest": "leaves/QTUM_SLR_ESR2.json",
+      "scenarios": "leaves/QTUM_SLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "QUEEN_BA_ESR1",
+      "leaf": "0xfb98b37f0e2b1a4a9a32f859047de22e2ebaa91339dd45cc4a0a19780158b1b6",
+      "manifest": "leaves/QUEEN_BA_ESR1.json",
+      "scenarios": "leaves/QUEEN_BA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RADN_SLR_ESR1",
+      "leaf": "0x3c27444ab072c2ecf3c910124eb55a33794f268fb03696e2ab52d7753062db3c",
+      "manifest": "leaves/RADN_SLR_ESR1.json",
+      "scenarios": "leaves/RADN_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RADN_SLR_ESR2",
+      "leaf": "0x5c35b88b4c00ce5c514b305e7731e426f79e8370221d5c3f146ade35abce9079",
+      "manifest": "leaves/RADN_SLR_ESR2.json",
+      "scenarios": "leaves/RADN_SLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "RBN_ESR1",
+      "leaf": "0x756cc2e2d663e4dd50f3fb6fba7405e66248596449a6256076d163ca90714df6",
+      "manifest": "leaves/RBN_ESR1.json",
+      "scenarios": "leaves/RBN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RHA_ESR1",
+      "leaf": "0xf6353415cd74fe53ff1c0e033a8ef2c8cb6edaed4bcea1e393d83c0456950486",
+      "manifest": "leaves/RHA_ESR1.json",
+      "scenarios": "leaves/RHA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RIO_GRAN_ESR1",
+      "leaf": "0x232c4007e5f415175cae0c533bb645a502a5f9b3ab441981e3bd5fbd49f5a00b",
+      "manifest": "leaves/RIO_GRAN_ESR1.json",
+      "scenarios": "leaves/RIO_GRAN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RIO_GRAN_ESR2",
+      "leaf": "0x37e3bec2c3d4cd73a71849ee0aa6ecee847f3953a10c3141ed0a63ec0ef52ab1",
+      "manifest": "leaves/RIO_GRAN_ESR2.json",
+      "scenarios": "leaves/RIO_GRAN_ESR2.scenarios.json"
+    },
+    {
+      "resource": "ROSELAND_ESR1",
+      "leaf": "0x13a84a26d6e65759a146f43e28aac02fe46b1c83f47a819aaaf93e130b80a88e",
+      "manifest": "leaves/ROSELAND_ESR1.json",
+      "scenarios": "leaves/ROSELAND_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RPUBRDS_ESR1",
+      "leaf": "0xc438ceab771c51cf90efda7e7928bd7d62a75d36c8933e8e45a2d518f06aa5d3",
+      "manifest": "leaves/RPUBRDS_ESR1.json",
+      "scenarios": "leaves/RPUBRDS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RRANCHES_ESR1",
+      "leaf": "0x15b08949b81029863d5a42b2ee78cca8f4ccf75645a36d4106604b454a83a87b",
+      "manifest": "leaves/RRANCHES_ESR1.json",
+      "scenarios": "leaves/RRANCHES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RRANCHES_ESR2",
+      "leaf": "0x7e8e0323e0c853cb9a391ef395f747007f5472dc94a2266c29a94f1ff5805afd",
+      "manifest": "leaves/RRANCHES_ESR2.json",
+      "scenarios": "leaves/RRANCHES_ESR2.scenarios.json"
+    },
+    {
+      "resource": "RRC_WIND_ESR1",
+      "leaf": "0x4244aafd0bce337af5b502d3d0e0057b7a83a5aead2f497754ab925369119277",
+      "manifest": "leaves/RRC_WIND_ESR1.json",
+      "scenarios": "leaves/RRC_WIND_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RRC_WIND_ESR2",
+      "leaf": "0x78545e981fcbc26ff2b71ac47e512790b48b59c79218f6ddaef225d0a3845045",
+      "manifest": "leaves/RRC_WIND_ESR2.json",
+      "scenarios": "leaves/RRC_WIND_ESR2.scenarios.json"
+    },
+    {
+      "resource": "RTLSNAKE_ESR1",
+      "leaf": "0x1360587fa6f20a5ff6ec687f27b82db81c9c883ce9c3fe32ce3f4a04ff92a31d",
+      "manifest": "leaves/RTLSNAKE_ESR1.json",
+      "scenarios": "leaves/RTLSNAKE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RUSSEKST_ESR1",
+      "leaf": "0x6933d01b368eba0393e93715a732b83353fdb437f76d850bf2901f2b455cf906",
+      "manifest": "leaves/RUSSEKST_ESR1.json",
+      "scenarios": "leaves/RUSSEKST_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RVRVLYS_ESR1",
+      "leaf": "0xc2442860aa24f3f111bce0633971aee22d7c55f4e72353dec14b1d0523b7d39c",
+      "manifest": "leaves/RVRVLYS_ESR1.json",
+      "scenarios": "leaves/RVRVLYS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "RVRVLYS_ESR2",
+      "leaf": "0x286e772dc728bd3d0bd4f4046df7f9013a4003c905a441a64163b0915c46469c",
+      "manifest": "leaves/RVRVLYS_ESR2.json",
+      "scenarios": "leaves/RVRVLYS_ESR2.scenarios.json"
+    },
+    {
+      "resource": "SADLBACK_ESR1",
+      "leaf": "0xa0c9cebd43cc3521d203d9e78158427064bc4896eee191cdd600b683451bd4a8",
+      "manifest": "leaves/SADLBACK_ESR1.json",
+      "scenarios": "leaves/SADLBACK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SAH_ESR1",
+      "leaf": "0x4450fac582a6ba28e803a14085b7ad840cc7ae0fc4335e88859ec9f01f6fa2fa",
+      "manifest": "leaves/SAH_ESR1.json",
+      "scenarios": "leaves/SAH_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SAH_ESR2",
+      "leaf": "0x9cf1583d29d9e792cddd5deca79d6eac9a2985cdba7294a082411621184cdccb",
+      "manifest": "leaves/SAH_ESR2.json",
+      "scenarios": "leaves/SAH_ESR2.scenarios.json"
+    },
+    {
+      "resource": "SANDLAKE_ESR1",
+      "leaf": "0x7c22d8bb5b3cd957c7717d4c8d4372a4276c867721e471bfb8eb67c7ff58dd3c",
+      "manifest": "leaves/SANDLAKE_ESR1.json",
+      "scenarios": "leaves/SANDLAKE_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SBEAN_ESR1",
+      "leaf": "0x5697b08161a6a72c9d327044cf910f2cbeb548c8366618ba240b99c94b3ba394",
+      "manifest": "leaves/SBEAN_ESR1.json",
+      "scenarios": "leaves/SBEAN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SEVNF_ES_ESR1",
+      "leaf": "0x93ec7d59b984aea7eb72bfc3b6262286ae27822b7ee442f5cfcca8c5ab213f65",
+      "manifest": "leaves/SEVNF_ES_ESR1.json",
+      "scenarios": "leaves/SEVNF_ES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SE_EDINB_ESR1",
+      "leaf": "0xa45e8a79ec8dd1966390d77a198ea05c781a546a594a9ae4c03a1a2ebb8a516f",
+      "manifest": "leaves/SE_EDINB_ESR1.json",
+      "scenarios": "leaves/SE_EDINB_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SGAL_BES_ESR1",
+      "leaf": "0xedfefcf04af93fa69fb339fffe7b1fbd92d330f73f4ae8e085ca593922efd0ac",
+      "manifest": "leaves/SGAL_BES_ESR1.json",
+      "scenarios": "leaves/SGAL_BES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SGAL_BES_ESR2",
+      "leaf": "0x20e50c53abfe28a21cc1a14a2ffe9398682fe0dca1e6d219a5807917584c93aa",
+      "manifest": "leaves/SGAL_BES_ESR2.json",
+      "scenarios": "leaves/SGAL_BES_ESR2.scenarios.json"
+    },
+    {
+      "resource": "SGSA_ESR1",
+      "leaf": "0xda087116d2b8355e198aef07f14ae686321b3b01c370e8fbe33f941dd32a71a8",
+      "manifest": "leaves/SGSA_ESR1.json",
+      "scenarios": "leaves/SGSA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SHAMROCK_ESR1",
+      "leaf": "0x4190943fc91e6b8694d7424b8b0f9966a70ef66b0d077370d4ddca6b6519fdc4",
+      "manifest": "leaves/SHAMROCK_ESR1.json",
+      "scenarios": "leaves/SHAMROCK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SHEEPCRK_ESR1",
+      "leaf": "0x0a5c2d52611d3dff125926528bfa5c325c0ae0e0a5402221e17594f14bd6ff7d",
+      "manifest": "leaves/SHEEPCRK_ESR1.json",
+      "scenarios": "leaves/SHEEPCRK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SLCNHLS_ESR1",
+      "leaf": "0x111c67ec9ce6ee824bcdee04bb3f62604731dad7b490004b1b7564c3dc1c5c69",
+      "manifest": "leaves/SLCNHLS_ESR1.json",
+      "scenarios": "leaves/SLCNHLS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SLCNHLS_ESR2",
+      "leaf": "0xc714ba29e9365d1758f894d00c1ca690724b9f2652053904a414e6cb99fa000c",
+      "manifest": "leaves/SLCNHLS_ESR2.json",
+      "scenarios": "leaves/SLCNHLS_ESR2.scenarios.json"
+    },
+    {
+      "resource": "SLK_BESS_ESR1",
+      "leaf": "0x06653b1283609a7994103a7b63208dd1d326dbf997c4f59f060650a95649bfb1",
+      "manifest": "leaves/SLK_BESS_ESR1.json",
+      "scenarios": "leaves/SLK_BESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SMTH_ESS_ESR1",
+      "leaf": "0x4cc19d218a92f999f0c371bf7a61a5255fe4569e2fb8a994548e761fd92c45be",
+      "manifest": "leaves/SMTH_ESS_ESR1.json",
+      "scenarios": "leaves/SMTH_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SOLC_SLR_ESR1",
+      "leaf": "0x493a70fafc8c925234dd9bf71ce926b52f1da195717404acf9f912adafda6bec",
+      "manifest": "leaves/SOLC_SLR_ESR1.json",
+      "scenarios": "leaves/SOLC_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SOLC_SLR_ESR2",
+      "leaf": "0x50d7167e3279f3ba45d21438df360b7eea877c8c8730093dcd8157d6a1072b00",
+      "manifest": "leaves/SOLC_SLR_ESR2.json",
+      "scenarios": "leaves/SOLC_SLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "SPTX12B_ESR1",
+      "leaf": "0x5bbc3984adff3a6b3f5220fc80a947ec405016c4172befb89446bb12de324dfd",
+      "manifest": "leaves/SPTX12B_ESR1.json",
+      "scenarios": "leaves/SPTX12B_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SP_ESR1",
+      "leaf": "0x309de86591094b46384015a8b64b01c17f5e58b46a444f6014744316d1fb4b03",
+      "manifest": "leaves/SP_ESR1.json",
+      "scenarios": "leaves/SP_ESR1.scenarios.json"
+    },
+    {
+      "resource": "STADIUM_ESR1",
+      "leaf": "0x60c971c839a875bc261787df86f557617d6277c940c3e536e4f720f07014a2c3",
+      "manifest": "leaves/STADIUM_ESR1.json",
+      "scenarios": "leaves/STADIUM_ESR1.scenarios.json"
+    },
+    {
+      "resource": "STAM_SLR_ESR1",
+      "leaf": "0x7d0fc866e844481e711dd43df02e8613d9a836b58d95b28c2513c90fc220bad9",
+      "manifest": "leaves/STAM_SLR_ESR1.json",
+      "scenarios": "leaves/STAM_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "STRG_SLR_ESR1",
+      "leaf": "0xde694853d568c315ba6b6766deb6a922be7a757722b41e7bfb272a76bc9e85ca",
+      "manifest": "leaves/STRG_SLR_ESR1.json",
+      "scenarios": "leaves/STRG_SLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SUNVASLR_ESR1",
+      "leaf": "0x4946120564120115dc32eaf2b0024bb5187044b970441a332f97993c35d24330",
+      "manifest": "leaves/SUNVASLR_ESR1.json",
+      "scenarios": "leaves/SUNVASLR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SUNVASLR_ESR2",
+      "leaf": "0x83bcc4394c4a8453f6bdeb5d2c42439ce04673216aa8406f100d6df4d5e8fb0d",
+      "manifest": "leaves/SUNVASLR_ESR2.json",
+      "scenarios": "leaves/SUNVASLR_ESR2.scenarios.json"
+    },
+    {
+      "resource": "SWEENY_ESR1",
+      "leaf": "0x637ed3257f74107cf557058d429908abf1b49eeddbf958acaf50da0e2534a5fb",
+      "manifest": "leaves/SWEENY_ESR1.json",
+      "scenarios": "leaves/SWEENY_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SWOOSEII_ESR1",
+      "leaf": "0xbeaa1d4272b465c684ed582cd149d4af33da17da676755a2fd1bcfb087e0fdf1",
+      "manifest": "leaves/SWOOSEII_ESR1.json",
+      "scenarios": "leaves/SWOOSEII_ESR1.scenarios.json"
+    },
+    {
+      "resource": "SWTWR_ESR1",
+      "leaf": "0x64d4206d3e44ccb0cc7d2af5355f723c9b690c7ce9d326abe052b7e09f356110",
+      "manifest": "leaves/SWTWR_ESR1.json",
+      "scenarios": "leaves/SWTWR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "S_SNROSA_ESR1",
+      "leaf": "0xfaaa2367c66d63b385167594bd94d1a437f36f5567862986c2f26028589d479c",
+      "manifest": "leaves/S_SNROSA_ESR1.json",
+      "scenarios": "leaves/S_SNROSA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TANZ_ESS_ESR1",
+      "leaf": "0x945f678159a1c52cb1e09e7b32aafa31295bdafcc39c438623570a6ba3aaca52",
+      "manifest": "leaves/TANZ_ESS_ESR1.json",
+      "scenarios": "leaves/TANZ_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TANZ_ESS_ESR2",
+      "leaf": "0x3fb2aaa56c6ba0024c8e1ec40d2bc0eac9688be54da5fcf7a206b6d4c56ad18f",
+      "manifest": "leaves/TANZ_ESS_ESR2.json",
+      "scenarios": "leaves/TANZ_ESS_ESR2.scenarios.json"
+    },
+    {
+      "resource": "TBWF_ESS_ESR1",
+      "leaf": "0x68c6f5c0e15d74784c3505a6dfe7f67972475b14d2d59f9eb604299e22b348c4",
+      "manifest": "leaves/TBWF_ESS_ESR1.json",
+      "scenarios": "leaves/TBWF_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TDWLPR_1_ESR1",
+      "leaf": "0xdc88905630ae3c834bfc587d7cc11a476bffe29c790828a9d8dac45c2427a4df",
+      "manifest": "leaves/TDWLPR_1_ESR1.json",
+      "scenarios": "leaves/TDWLPR_1_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TDWLPR_1_ESR2",
+      "leaf": "0xc14dc9b34da19b0bf0be0e361d7cdbe9676b807a328155fd88b8acf7700bb1ec",
+      "manifest": "leaves/TDWLPR_1_ESR2.json",
+      "scenarios": "leaves/TDWLPR_1_ESR2.scenarios.json"
+    },
+    {
+      "resource": "TNFS_ESR1",
+      "leaf": "0xb861f0399d43153eb330252d86bf3f569f483105dec1e3fbfbebe5ec9892594d",
+      "manifest": "leaves/TNFS_ESR1.json",
+      "scenarios": "leaves/TNFS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TORT_ESS_ESR1",
+      "leaf": "0x1bda155100ccd079dd437150b49350d3ed35644319a9a74a8d74fddefe389f45",
+      "manifest": "leaves/TORT_ESS_ESR1.json",
+      "scenarios": "leaves/TORT_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TSECA_ES_ESR1",
+      "leaf": "0xf6db56bea34558a32437303952ff22ee3b3ef625e9d6c662f6c4797418350f39",
+      "manifest": "leaves/TSECA_ES_ESR1.json",
+      "scenarios": "leaves/TSECA_ES_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TURQBESS_ESR1",
+      "leaf": "0xe01ed872d61aaf02ab4cb56050819699453071f7349fc79fe62724b23d8bf3b5",
+      "manifest": "leaves/TURQBESS_ESR1.json",
+      "scenarios": "leaves/TURQBESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TV_ESR1",
+      "leaf": "0xa2128815d6a7b18f984906fa981efabc41116116a29266663e4737dceab6ad13",
+      "manifest": "leaves/TV_ESR1.json",
+      "scenarios": "leaves/TV_ESR1.scenarios.json"
+    },
+    {
+      "resource": "TYNAN_ESR1",
+      "leaf": "0x69d267ef7c33c27b5dfbdcec37ffbbfddf8c0ba16a0032b52e1a1b7cdf2a5f97",
+      "manifest": "leaves/TYNAN_ESR1.json",
+      "scenarios": "leaves/TYNAN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "UTOPIA_ESR1",
+      "leaf": "0xd229c74c8609b7095e28b91c6e2e9e08ca317806086f18f329181b767649afe1",
+      "manifest": "leaves/UTOPIA_ESR1.json",
+      "scenarios": "leaves/UTOPIA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "VERT_ESS_ESR1",
+      "leaf": "0x0405ba48053813add8dfbce042231740eada5f597ea76bee48000746d2ab0f3a",
+      "manifest": "leaves/VERT_ESS_ESR1.json",
+      "scenarios": "leaves/VERT_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "VORTEX_ESR1",
+      "leaf": "0x0179754878bd9a3b355aaf45451d5f58da0f6201535521aead2a450a78ed5408",
+      "manifest": "leaves/VORTEX_ESR1.json",
+      "scenarios": "leaves/VORTEX_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WAL_ESR1",
+      "leaf": "0x2ebe782df38c86ad0b0c295429d190fb8e8dc0da43d55f257f5527a72954decc",
+      "manifest": "leaves/WAL_ESR1.json",
+      "scenarios": "leaves/WAL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WCOLLOCL_ESR1",
+      "leaf": "0xd3cda575de2b244c31873a5d6eaf3e8a946a132e283bee9ef4a38ca192d229e3",
+      "manifest": "leaves/WCOLLOCL_ESR1.json",
+      "scenarios": "leaves/WCOLLOCL_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WEIL_TRC_ESR1",
+      "leaf": "0xfc2a982abab95a3d1032df99489e995d8244e3953ea5a6c4c5d9d73664f3858a",
+      "manifest": "leaves/WEIL_TRC_ESR1.json",
+      "scenarios": "leaves/WEIL_TRC_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WFTANK_ESR1",
+      "leaf": "0x31b54d3f100f55ccc3db3178f29b46bb8122a50d59b0ce062a4397a633bcac31",
+      "manifest": "leaves/WFTANK_ESR1.json",
+      "scenarios": "leaves/WFTANK_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WIG_ESS_ESR1",
+      "leaf": "0x969914e0e45658b79080919549f05f22f529364efa17460b6414db5dbb7e1e83",
+      "manifest": "leaves/WIG_ESS_ESR1.json",
+      "scenarios": "leaves/WIG_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WORSHAM_ESR1",
+      "leaf": "0x1be043040a10e67671377077b7f850ab37ebcf175a967bacafb9d70eb29f2197",
+      "manifest": "leaves/WORSHAM_ESR1.json",
+      "scenarios": "leaves/WORSHAM_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WOVER_ESR1",
+      "leaf": "0x4ed4ee660e80af99fba75b95adb90a6a0a818bb7fabe26cd27c47fc54b8bb469",
+      "manifest": "leaves/WOVER_ESR1.json",
+      "scenarios": "leaves/WOVER_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WR_ESR1",
+      "leaf": "0xf344445a01acb52d30bfd5e0590f03a63c1ab75159f3dcc3e741addf92d5c649",
+      "manifest": "leaves/WR_ESR1.json",
+      "scenarios": "leaves/WR_ESR1.scenarios.json"
+    },
+    {
+      "resource": "WZRD_ESS_ESR1",
+      "leaf": "0xff46742470e30bc419643e4b6daa0c2b4451375233086a72f1fdd2ca9494e6be",
+      "manifest": "leaves/WZRD_ESS_ESR1.json",
+      "scenarios": "leaves/WZRD_ESS_ESR1.scenarios.json"
+    },
+    {
+      "resource": "W_HARLIN_ESR1",
+      "leaf": "0x4b7f9f7796bcec4bedcbf1e70e763cb7a5722ea4bec846b6930580074b949ac0",
+      "manifest": "leaves/W_HARLIN_ESR1.json",
+      "scenarios": "leaves/W_HARLIN_ESR1.scenarios.json"
+    },
+    {
+      "resource": "X4_ESR1",
+      "leaf": "0x187223fe63094702a26424e6e872efc9e5dee86384611a493f7bc7b9fcb01811",
+      "manifest": "leaves/X4_ESR1.json",
+      "scenarios": "leaves/X4_ESR1.scenarios.json"
+    },
+    {
+      "resource": "Z0_ESR1",
+      "leaf": "0x17fdf2c82db68641dca6d9dc9dd378ba90adc43bc0333781dfac2eb45632835e",
+      "manifest": "leaves/Z0_ESR1.json",
+      "scenarios": "leaves/Z0_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ZAPATA_ESR1",
+      "leaf": "0x34480b79e9d37361788e4ca2b2518830f23c9608d477aa259f7ee1c4d22ab85f",
+      "manifest": "leaves/ZAPATA_ESR1.json",
+      "scenarios": "leaves/ZAPATA_ESR1.scenarios.json"
+    },
+    {
+      "resource": "ZAPATA_ESR2",
+      "leaf": "0x791751983dcf2ea379039a45d5a5cea0d0692de7a76988d620880dc612e7c98b",
+      "manifest": "leaves/ZAPATA_ESR2.json",
+      "scenarios": "leaves/ZAPATA_ESR2.scenarios.json"
+    },
+    {
+      "resource": "ZIER_SLR_ESR1",
+      "leaf": "0xcd9df3187cfb08415df9063d8ade41b4efd008e85ff6b50f066d20ea1dd9e88d",
+      "manifest": "leaves/ZIER_SLR_ESR1.json",
+      "scenarios": "leaves/ZIER_SLR_ESR1.scenarios.json"
+    }
+  ],
+  "exclusions": [
+    {
+      "resource": "AMAD_ESS_ESR1",
+      "reason": "AMAD_ESS_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "APCH_BES_ESR1",
+      "reason": "APCH_BES_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "APPLE_ESR1",
+      "reason": "APPLE_ESR1 census row: e_max_mwh"
+    },
+    {
+      "resource": "BIRD_BES_ESR1",
+      "reason": "BIRD_BES_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "BKBN_ESR_ESR1",
+      "reason": "BKBN_ESR_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "CLO_ESR3",
+      "reason": "CLO_ESR3 census row: p_max_mw"
+    },
+    {
+      "resource": "CLT_ESR1",
+      "reason": "CLT_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "CLT_ESR2",
+      "reason": "CLT_ESR2 census row: p_max_mw"
+    },
+    {
+      "resource": "DA_ESR2",
+      "reason": "DA_ESR2 census row: p_max_mw"
+    },
+    {
+      "resource": "DRAK_ESS_ESR1",
+      "reason": "DRAK_ESS_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "DRAK_ESS_ESR2",
+      "reason": "DRAK_ESS_ESR2 census row: p_max_mw"
+    },
+    {
+      "resource": "DUF_ESR1",
+      "reason": "DUF_ESR1 census row: settlement_point"
+    },
+    {
+      "resource": "EB_ESR1",
+      "reason": "EB_ESR1 census row: settlement_point"
+    },
+    {
+      "resource": "EGSP_SLR_ESR1",
+      "reason": "EGSP_SLR_ESR1 census row: settlement_point"
+    },
+    {
+      "resource": "GUNR_BES_ESR1",
+      "reason": "GUNR_BES_ESR1 census row: e_max_mwh"
+    },
+    {
+      "resource": "HARLIN_1_ESR1",
+      "reason": "HARLIN_1_ESR1 census row: e_max_mwh"
+    },
+    {
+      "resource": "HNY_COMB_ESR1",
+      "reason": "HNY_COMB_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "KLEIMA_ESR1",
+      "reason": "KLEIMA_ESR1 census row: settlement_point"
+    },
+    {
+      "resource": "KNAPP_ESR1",
+      "reason": "KNAPP_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "MEDINA1_ESR1",
+      "reason": "MEDINA1_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "NEDIN_ESR1",
+      "reason": "NEDIN_ESR1 census row: e_max_mwh"
+    },
+    {
+      "resource": "OR_ESR1",
+      "reason": "OR_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "PAVLOV_ESR2",
+      "reason": "PAVLOV_ESR2 census row: p_max_mw"
+    },
+    {
+      "resource": "PG_ESR1",
+      "reason": "PG_ESR1 census row: settlement_point"
+    },
+    {
+      "resource": "PRODVER_LD1",
+      "reason": "PRODVER_LD1 census row: settlement_point"
+    },
+    {
+      "resource": "RVN_ESR1",
+      "reason": "RVN_ESR1 census row: p_max_mw"
+    },
+    {
+      "resource": "SADLBACK_ESR2",
+      "reason": "SADLBACK_ESR2 census row: settlement_point"
+    },
+    {
+      "resource": "STAC_BES_ESR1",
+      "reason": "STAC_BES_ESR1 census row: settlement_point"
+    },
+    {
+      "resource": "STAFHI_ESR1",
+      "reason": "STAFHI_ESR1 census row: settlement_point"
+    },
+    {
+      "resource": "TDWLPR_1_ESR3",
+      "reason": "TDWLPR_1_ESR3 census row: p_max_mw"
+    },
+    {
+      "resource": "TDWLPR_1_ESR4",
+      "reason": "TDWLPR_1_ESR4 census row: p_max_mw"
+    },
+    {
+      "resource": "TORR_ESR1",
+      "reason": "TORR_ESR1 census row: p_max_mw"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "mode": "contract",
+  "chainId": 97,
+  "contract": "0x2922c68cE15EB3e83B7f43b136e981dDc4262876",
+  "key": "0xafee502d7b63d89f48434a1e9c1b73c949ca08f7189f68be54e30f2d81fdedf9",
+  "scope": "0x4ace28d1c5fc87449d9960b5d139d6667e75a42fad1082c63dc9ba3f08586bb9",
+  "scopeLabel": "gate-record/ercot-da-energy",
+  "txHash": "0x64906e00b296246f92027aff6f532c1b4917f22b80551409c9e78ac6ee9111b1",
+  "root": "0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7",
+  "leafCount": 316,
+  "codeHash": "0xb83af42225f0ac312b05c5dd269f6c35502ec6b4000000000000000000000000",
+  "blockNumber": 144810495,
+  "committedAt": 1795619820
+}
