@@ -1,0 +1,22 @@
+{
+  "name": "@gatelock/openfour",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Read-only OpenFour discovery and module encoding probes",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "probe": "node dist/probe.js"
+  },
+  "dependencies": {
+    "viem": "2.57.17"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
+  }
+}
