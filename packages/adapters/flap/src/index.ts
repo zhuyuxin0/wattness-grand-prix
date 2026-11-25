@@ -1,8 +1,9 @@
 import { decodeFunctionResult, encodeFunctionData, isAddress, parseAbi } from 'viem';
 import type { Address, Hex } from 'viem';
 
-export const CHAIN_ID = 97;
-export const PORTAL: Address = '0x000042108465206185A077Edc3F3fd2b49060000';
+import { CHAIN_ID, PORTAL } from './constants.js';
+
+export { CHAIN_ID, PORTAL };
 export const ZERO: Address = '0x0000000000000000000000000000000000000000';
 export const WAD = 10n ** 18n;
 
@@ -218,3 +219,4 @@ export async function readGraduationLens(rpc: RpcRead, snapshot: PortalSnapshot,
   const encoded = encodeFunctionData({ abi: READ_ABI, functionName: 'graduationFloorV2', args: [plan] });
   return decodeFunctionResult({ abi: READ_ABI, functionName: 'graduationFloorV2', data: hex(await rpc('eth_call', [{ to: PORTAL, data: encoded }, at])) });
 }
+export * from './season.js';
