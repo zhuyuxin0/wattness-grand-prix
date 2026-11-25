@@ -1,13 +1,14 @@
-import { CONTRACT_ADDRESS, PRODUCT_NAME, REPO_URL, SHADOW_NOTE, SOURCE_LINE, TERMINAL_URL } from "../config";
-import { Mark } from "../ui/Livery";
+import { CONTRACT_ADDRESS, REPO_URL, SHADOW_NOTE, SOURCE_LINE, TERMINAL_URL } from "../config";
+import { Logo } from "../ui/Logo";
 
 export function Footer() {
   return (
     <footer className="footer">
       <div className="footer__inner">
         <div className="footer__brand">
-          <Mark size={18} />
-          <span>{PRODUCT_NAME}</span>
+          <Logo className="footer__mark" trace={false} />
+          <span className="footer__word">Wattness</span>
+          <span className="brand-product">Grand Prix</span>
         </div>
         <div className="footer__lines">
           <p className="footer__source">{SOURCE_LINE}</p>

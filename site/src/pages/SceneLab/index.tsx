@@ -1,5 +1,6 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { BRAIN_DURATION, BrainMap, GRID_DURATION, StartingGrid, type Quality } from "../../scenes";
+import { Logo } from "../../ui/Logo";
 import "./styles.css";
 
 // The scene lab: both 3D scenes on a fixed-size stage with a time scrubber, for
@@ -140,7 +141,7 @@ export default function SceneLab() {
       {p.chrome && (
         <header className="scene-lab__bar">
           <div className="scene-lab__brand">
-            <span className="scene-lab__mark" aria-hidden="true" />
+            <Logo className="scene-lab__mark" trace={false} />
             Scene lab
           </div>
           <div className="seg" role="group" aria-label="Scene">

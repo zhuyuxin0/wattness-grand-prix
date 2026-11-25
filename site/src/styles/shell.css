@@ -1,4 +1,4 @@
-/* App shell: top bar, livery stripe, page frame, footer. */
+/* App shell: top bar, page frame, footer. */
 
 .app {
   min-height: 100vh;
@@ -43,30 +43,65 @@
   gap: var(--space-6);
 }
 
+/* The lockup: the mark and "Wattness" on one middle line, the product name
+   beside it. The mark draws itself on in teal under the pointer or focus, left
+   to right as the trace is read, ending on its node (wattness.tech's gesture). */
+.brand-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
+  color: var(--w-fg);
   text-decoration: none;
-  color: var(--text-strong);
   white-space: nowrap;
 }
-.brand .mark {
+.brand:hover {
+  color: var(--w-fg);
+}
+.brand-mark {
+  display: block;
   flex: none;
+  width: 24px;
+  height: auto;
 }
-.brand__name {
-  font-family: var(--font-display);
-  font-size: 0.9375rem;
-  letter-spacing: -0.01em;
-  display: inline-flex;
-  gap: 0.32em;
+.brand-word {
+  display: block;
+  font: 600 15px/18px var(--t-font-display);
+  letter-spacing: -0.025em;
 }
-.brand__wattness {
-  font-weight: 700;
+.brand-product {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+  white-space: nowrap;
 }
-.brand__gp {
-  font-weight: 300;
-  color: var(--text);
+.brand-trace {
+  stroke: var(--t-brand-trace);
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset var(--gp-trace) ease-in-out;
+}
+.brand-trace-node {
+  fill: var(--t-brand-trace);
+  opacity: 0;
+  transition: opacity 160ms ease-out 0ms;
+}
+.brand:is(:hover, :focus-visible) .brand-trace {
+  stroke-dashoffset: 0;
+}
+.brand:is(:hover, :focus-visible) .brand-trace-node {
+  opacity: 1;
+  transition-delay: 660ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-trace,
+  .brand-trace-node {
+    transition: none;
+  }
 }
 
 .nav {
@@ -140,56 +175,6 @@
   }
   .nav ul {
     margin-left: -10px;
-  }
-}
-
-/* The livery: a hairline across the bar with a teal run and a short BNB run,
-   both cut on the mark's slant. */
-.livery {
-  position: relative;
-  height: var(--stripe);
-  background: var(--border);
-  overflow: hidden;
-}
-.livery::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  top: auto;
-  height: 1px;
-  background: var(--border);
-}
-.livery__teal,
-.livery__bnb {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  transform: skewX(-24deg);
-}
-.livery {
-  /* The yellow run ends on the content's right edge, under the gate clock. */
-  --livery-edge: max(var(--gutter), calc((100% - var(--content-max)) / 2 + var(--gutter)));
-}
-.livery__teal {
-  right: calc(var(--livery-edge) + 48px);
-  width: 22%;
-  background: var(--teal);
-}
-.livery__bnb {
-  right: var(--livery-edge);
-  width: 40px;
-  background: var(--bnb);
-}
-/* Under the two-row bar the runs would read as a nav underline, so they
-   shrink to a short mark past the fading end of the nav. */
-@media (max-width: 899px) {
-  .livery__teal {
-    right: 36px;
-    width: 40px;
-  }
-  .livery__bnb {
-    right: 12px;
-    width: 18px;
   }
 }
 
@@ -273,11 +258,18 @@
 .footer__brand {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  font-family: var(--font-display);
-  font-weight: 600;
-  color: var(--text-strong);
+  gap: 7px;
+  color: var(--w-fg);
   align-self: start;
+}
+.footer__mark {
+  width: 16px;
+  height: auto;
+}
+.footer__word {
+  font: 600 13px/16px var(--t-font-display);
+  letter-spacing: -0.025em;
+  margin-right: 9px;
 }
 .footer__lines {
   display: grid;

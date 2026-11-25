@@ -35,10 +35,8 @@
 }
 
 .scene-lab__mark {
-  width: 16px;
-  height: 10px;
-  background: linear-gradient(90deg, var(--teal) 0 60%, transparent 60% 72%, var(--bnb) 72%);
-  transform: skewX(-24deg);
+  width: 18px;
+  height: auto;
 }
 
 .scene-lab__size {

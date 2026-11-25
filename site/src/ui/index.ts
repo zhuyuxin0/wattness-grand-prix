@@ -1,7 +1,7 @@
 export { Countdown } from "./Countdown";
 export { Glyph, type GlyphName } from "./Glyph";
 export { Hash, middle } from "./Hash";
-export { LiveryStripe, Mark } from "./Livery";
+export { Logo } from "./Logo";
 export { PageHeader } from "./PageHeader";
 export { ParcFerme, type ParcFermeState } from "./ParcFerme";
 export { Receipt } from "./Receipt";

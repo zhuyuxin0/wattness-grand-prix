@@ -1,21 +1,14 @@
 import { NavLink } from "react-router-dom";
-import { PRODUCT_NAME } from "../config";
 import { captureClock } from "../lib/capture";
 import { Countdown } from "../ui/Countdown";
-import { LiveryStripe, Mark } from "../ui/Livery";
+import { Brand } from "./Brand";
 import { NAV } from "./nav";
 
 export function TopBar() {
   return (
     <header className="topbar">
       <div className="topbar__inner">
-        <NavLink to="/" className="brand" aria-label={PRODUCT_NAME}>
-          <Mark />
-          <span className="brand__name">
-            <span className="brand__wattness">Wattness</span>
-            <span className="brand__gp">Grand Prix</span>
-          </span>
-        </NavLink>
+        <Brand />
         <nav className="nav" aria-label="Primary">
           <ul>
             {NAV.map((item) => (
@@ -29,7 +22,6 @@ export function TopBar() {
         </nav>
         <Countdown size="sm" bare now={captureClock()} className="topbar__clock" />
       </div>
-      <LiveryStripe />
     </header>
   );
 }
