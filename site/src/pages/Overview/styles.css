@@ -101,6 +101,10 @@
   padding: 0;
   border-top: 1px solid var(--t-rule);
 }
+/* The section head's rule is its top edge. */
+.section__head + .section__body > .tl:first-child {
+  border-top: 0;
+}
 .tl__row {
   display: grid;
   grid-template-columns: 13rem minmax(0, 1fr) 11rem 6.5rem;

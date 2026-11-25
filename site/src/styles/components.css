@@ -77,6 +77,10 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
   border-top: 1px solid var(--t-rule);
 }
+/* Under a section head the head's rule is the row's top edge, never a second rule. */
+.section__head + .section__body > .stat-row:first-child {
+  border-top: 0;
+}
 .stat-row > .stat {
   padding: var(--t-space-4) var(--t-space-4) var(--t-space-4) 0;
   border-bottom: 1px solid var(--t-rule);
