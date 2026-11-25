@@ -55,6 +55,12 @@ p {
   margin: 0;
 }
 
+/* The interface has one strong weight, the Terminal's 600; the browser's bold is 700. */
+b,
+strong {
+  font-weight: var(--t-fw-strong);
+}
+
 /* Links are ink with a teal underline on light ground, teal on dark. */
 a {
   color: var(--t-link);
