@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { formatInt } from "../../lib/format";
 import { dualTime, formatOperatingDay } from "../../lib/time";
 import { Glyph, Hash, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type SortKind, type SortState, type SortValue } from "../../ui";
@@ -55,14 +54,8 @@ export default function FilesPage() {
   return (
     <div className="page page--files">
       <PageHeader
-        title="The sealed day's files"
-        lede={
-          <>
-            Every file behind the day's record, in a public bucket on BNB Greenfield: the day's index and root, each plan, its price scenarios, the inputs it read and both
-            chain receipts. <Link to="/verify">Verify</Link> checks one plan in your browser; here anyone can fetch any file and compare its SHA-256, and{" "}
-            <Link to="/about">How It Works</Link> shows how the parts fit.
-          </>
-        }
+        title="Files"
+        lede="Every file behind the sealed day's record, in a public bucket on BNB Greenfield: the day's index and root, each plan, its price scenarios, the inputs it read and both chain receipts. Anyone can fetch a file and compare its SHA-256."
       />
       <Ready state={state}>{(g) => <Files g={g} />}</Ready>
     </div>

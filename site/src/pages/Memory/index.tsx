@@ -1,5 +1,4 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Link } from "react-router-dom";
 import { fetchJson, loadBrain, loadTerminalStructure, useLoad, type BrainConnection, type BrainGraph, type BrainPage, type TerminalStructure } from "../../data";
 import { formatInt } from "../../lib/format";
 import { dualTime } from "../../lib/time";
@@ -51,14 +50,8 @@ export default function MemoryPage() {
   return (
     <div className="page page--memory">
       <PageHeader
-        title="What the agents remember"
-        lede={
-          <>
-            The agents' memory of the Wattness Terminal, where every plan's inputs come from, kept in Living Brain: pages on the Terminal's parts, and the connections
-            between pages, each with Living Brain's reasoning. It follows <Link to="/agents/risk">Risk</Link>, the last step of a plan; next,{" "}
-            <Link to="/seal">Seal</Link> commits every plan on chain.
-          </>
-        }
+        title="Memory"
+        lede="What the agents remember, kept in Living Brain: a page on each part of the Wattness Terminal, where every plan's inputs come from, and the connections between pages, each with the reasoning behind it."
       />
       <Ready state={ctx}>{(c) => (c ? <Memory ctx={c} /> : <p className="muted">The Living Brain readback is not published with this build.</p>)}</Ready>
     </div>

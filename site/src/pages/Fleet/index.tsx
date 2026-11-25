@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { SOURCE_LINE } from "../../config";
 import { useDay, type BatterySummary, type DayIndex } from "../../data";
 import { arm as armMeta, type ArmName } from "../../design/tokens";
@@ -129,13 +129,8 @@ function Fleet({ day }: { day: DayIndex }) {
   return (
     <>
       <PageHeader
-        title={`All ${formatInt(day.leafCount)} sealed plans`}
-        lede={
-          <>
-            Every ERCOT battery's plan for {opDay}, made under the same rules from the same public data and sealed before the gate.{" "}
-            <Link to="/overview">Overview</Link> sums up the day; open a row here for one plan's schedule, or read it in full on <Link to="/battery">Battery</Link>.
-          </>
-        }
+        title="Fleet"
+        lede={`All ${formatInt(day.leafCount)} sealed plans for ${opDay}: every ERCOT battery's plan, made under the same rules from the same public data and sealed before the gate. Open a row for one plan's schedule.`}
         aside={
           <div className="fl-aside">
             <ParcFerme state="sealed" label="Sealed in one root" />

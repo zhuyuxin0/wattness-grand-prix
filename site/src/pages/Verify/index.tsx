@@ -88,14 +88,8 @@ function Verify({ day }: { day: DayIndex }) {
   return (
     <>
       <PageHeader
-        title="Check a plan against the chain"
-        lede={
-          <>
-            Your browser recomputes one plan's leaf, follows its proof to the day's root, reads that root back from GateRecord on BNB Smart Chain (the record{" "}
-            <Link to="/seal">Seal</Link> shows) and replays the battery's limits hour by hour. <Link to="/files">Files</Link> holds every sealed file for checking
-            offline.
-          </>
-        }
+        title="Verify"
+        lede="Check any plan against the chain. Your browser recomputes the plan's leaf, follows its proof to the day's root, reads that root back from GateRecord on BNB Smart Chain and replays the battery's limits hour by hour."
       />
 
       <div className="battery-bar vf-bar" role="group" aria-label="What to check">
