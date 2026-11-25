@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import type { RouteObject } from "react-router-dom";
+import { Navigate, useLocation, useParams, type RouteObject } from "react-router-dom";
 import { Layout } from "./shell/Layout";
 import { TABS } from "./shell/tabs";
 
@@ -14,6 +14,32 @@ const tabRoutes: RouteObject[] = TABS.map((t) =>
   t.path === "/" ? { index: true, element: <t.page /> } : { path: `${t.path.slice(1)}${t.subpaths ? "/*" : ""}`, element: <t.page /> },
 );
 
+/** An earlier address: the same subpath and query on the tab that took its place. */
+function Moved({ to }: { to: string }) {
+  const { "*": rest = "" } = useParams();
+  const { search } = useLocation();
+  return <Navigate replace to={{ pathname: rest ? `${to}/${rest}` : to, search }} />;
+}
+
+/** #/pit-wall?battery=X&arm=B&hour=17 opens #/battery/X?arm=B&hour=17. */
+function PitWallMoved() {
+  const params = new URLSearchParams(useLocation().search);
+  const battery = params.get("battery");
+  params.delete("battery");
+  const search = params.toString();
+  return <Navigate replace to={{ pathname: battery ? `/battery/${battery}` : "/battery", search: search ? `?${search}` : "" }} />;
+}
+
+// The first site's routes, so links already shared keep working.
+const movedRoutes: RouteObject[] = [
+  { path: "pit-wall/*", element: <PitWallMoved /> },
+  { path: "standings/*", element: <Moved to="/fleet" /> },
+  { path: "stewards/*", element: <Moved to="/verify" /> },
+  { path: "garage/*", element: <Moved to="/about/agents" /> },
+  { path: "paddock/*", element: <Moved to="/about" /> },
+  { path: "agents", element: <Navigate replace to="/agents/forecast" /> },
+];
+
 export const routes: RouteObject[] = [
   {
     path: "scene-lab/*",
@@ -25,6 +51,6 @@ export const routes: RouteObject[] = [
   },
   {
     element: <Layout />,
-    children: [...tabRoutes, { path: "*", element: <NotFound /> }],
+    children: [...tabRoutes, ...movedRoutes, { path: "*", element: <NotFound /> }],
   },
 ];
