@@ -6,7 +6,8 @@ import type { Address, Hex } from "viem";
 import { resolveNetwork, rpcReader } from "./chain.js";
 import { formatReport } from "./report.js";
 import { httpFetcher } from "./sources.js";
-import { FLEET_SCHEMA, fleetIndexErrors, leafOf, outcomeDocumentPath, type FleetIndex, type OutcomeIndex } from "@gatelock/core";
+import { FLEET_SCHEMA, fleetIndexErrors, leafOf, type FleetIndex } from "@gatelock/core";
+import { readLeafOutcomes, readStageOutcomes } from "./outcome-files.js";
 import { verify, type Inclusion, type OutcomeFile, type RecordFile } from "./verify.js";
 
 const USAGE = `usage: pnpm verify <manifest.json> | --manifest FILE | --od YYYY-MM-DD [options]
@@ -38,24 +39,6 @@ function findRepoRoot(from: string): string | null {
     if (existsSync(join(dir, "pnpm-workspace.yaml"))) return dir;
     if (dirname(dir) === dir) return null;
   }
-}
-
-/** Each stage's index under outcomes/, with the battery's document when the index lists one. */
-function readStageOutcomes(root: string, resource: string): OutcomeFile[] {
-  const found: OutcomeFile[] = [];
-  for (const stage of [1, 2, 3]) {
-    const stageDir = join(root, `stage-${stage}`);
-    const indexPath = join(stageDir, "index.json");
-    if (!existsSync(indexPath)) continue;
-    const index = readJson(indexPath) as Partial<OutcomeIndex>;
-    const listed = Array.isArray(index.leaves) && index.leaves.some((l) => l?.resource === resource);
-    // The path is fixed by name, never taken from the index, so a reader cannot be led outside the stage.
-    const docPath = join(stageDir, outcomeDocumentPath(resource));
-    const doc = listed && existsSync(docPath) ? readJson(docPath) : null;
-    console.log(`outcome   stage ${stage}: ${indexPath}${listed ? "" : ` (lists no ${resource})`}`);
-    found.push({ stage, doc, index });
-  }
-  return found;
 }
 
 async function main(): Promise<number> {
@@ -116,7 +99,7 @@ async function main(): Promise<number> {
     manifest = readJson(leafPath);
     scenariosOverride = join(dir, entry.scenarios);
     manifestPath = leafPath;
-    fleetOutcomes = readStageOutcomes(values.outcomes ? resolve(cwd, values.outcomes) : join(dir, "outcomes"), resource);
+    fleetOutcomes = readStageOutcomes(values.outcomes ? resolve(cwd, values.outcomes) : join(dir, "outcomes"), resource, (l) => console.log(l));
   } else if (values.battery || values.outcomes) {
     throw new Error(`--${values.battery ? "battery" : "outcomes"} needs a day's index, not a single manifest`);
   }
@@ -135,12 +118,7 @@ async function main(): Promise<number> {
   const record = recordPath ? (readJson(recordPath) as RecordFile) : undefined;
   const scenariosPath = scenariosOverride && existsSync(scenariosOverride) ? scenariosOverride : beside("scenarios.json");
   const scenarios = scenariosPath ? readJson(scenariosPath) : undefined;
-  const outcomes: OutcomeFile[] =
-    fleetOutcomes ??
-    [1, 2, 3]
-      .map((stage) => ({ stage, path: join(dir, `outcome-${stage}.json`) }))
-      .filter((o) => existsSync(o.path))
-      .map((o) => ({ stage: o.stage, doc: readJson(o.path) }));
+  const outcomes: OutcomeFile[] = fleetOutcomes ?? readLeafOutcomes(dir);
 
   const network = resolveNetwork(values.network as string, values.rpc);
   let contract = (values.contract ?? record?.contract) as Address | undefined;
