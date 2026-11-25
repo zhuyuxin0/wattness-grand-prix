@@ -45,6 +45,26 @@ export function entryCents(hubSum4: readonly (readonly number[])[]): number[] {
   });
 }
 
+/**
+ * Fair-value entry under integer scenario weights: E_h = sum_s w_s clip(S_h,s) / sum_s w_s, rounded half up
+ * to the tick. With every weight 1 it is entryCents exactly.
+ */
+export function weightedEntryCents(hubSum4: readonly (readonly number[])[], weights: readonly number[], total: number): number[] {
+  if (hubSum4.length === 0) throw new Error("entry: no scenarios");
+  if (weights.length !== hubSum4.length) throw new Error("entry: one weight per scenario");
+  const den = 4n * BigInt(total) * BigInt(T.tickCents);
+  return Array.from({ length: HOURS }, (_, h) => {
+    let acc = 0n;
+    hubSum4.forEach((s, i) => {
+      const v = s[h];
+      if (v === undefined) throw new Error(`entry: a scenario has no hour ${h}`);
+      acc += BigInt(weights[i]!) * BigInt(v);
+    });
+    const ticks = Number((acc + den / 2n) / den);
+    return clip(ticks * T.tickCents, T.floorCents, T.ceilingCents);
+  });
+}
+
 /** Four times the settlement price, in cents: exact for any four whole-cent prices. */
 export function settlementSum4(rt15: readonly number[], hour: number): number {
   const q = rt15.slice(hour * 4, hour * 4 + 4);

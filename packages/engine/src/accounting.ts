@@ -117,6 +117,39 @@ export function cvarLoss(revenues: readonly bigint[], alphaPpm: number): bigint 
   return floorDiv(acc, tail);
 }
 
+/** Integer scenario weights and their sum; absent means equal weights. */
+export interface ScenarioWeights {
+  weights: readonly number[];
+  total: number;
+}
+
+/** floor(sum w_i r_i / sum w_i). */
+export function weightedMean(revenues: readonly bigint[], w: ScenarioWeights): bigint {
+  if (w.weights.length !== revenues.length) throw new Error("weights: one per scenario");
+  return floorDiv(revenues.reduce((acc, r, i) => acc + BigInt(w.weights[i]!) * r, 0n), BigInt(w.total));
+}
+
+/**
+ * CVaR of loss over weighted scenarios: the worst (1 - alpha) of the probability mass, the boundary
+ * scenario taken fractionally. With every weight 1 it is cvarLoss exactly. Floored.
+ */
+export function cvarLossWeighted(revenues: readonly bigint[], w: ScenarioWeights, alphaPpm: number): bigint {
+  if (w.weights.length !== revenues.length) throw new Error("weights: one per scenario");
+  const order = revenues.map((r, i) => ({ loss: -r, mass: BigInt(w.weights[i]!) * BigInt(PPM) }));
+  order.sort((x, y) => (x.loss > y.loss ? -1 : x.loss < y.loss ? 1 : 0));
+  const tail = BigInt(w.total) * BigInt(PPM - alphaPpm);
+  if (tail <= 0n) throw new Error("cvar: alpha leaves no tail");
+  let left = tail;
+  let acc = 0n;
+  for (const { loss, mass } of order) {
+    if (left === 0n) break;
+    const take = left < mass ? left : mass;
+    acc += take * loss;
+    left -= take;
+  }
+  return floorDiv(acc, tail);
+}
+
 export interface Evaluation {
   socUkwh: number[];
   collateralCents: number;
@@ -133,11 +166,12 @@ export function evaluate(
   hedge: Hedge,
   entry: readonly number[],
   scenarios: readonly Scenario[],
+  weights?: ScenarioWeights,
 ): Evaluation {
   checkLimits(battery, a, s, hedge, entry);
   const revenues = scenarios.map((sc) => revenueUusd(a, s, hedge, entry, sc));
-  const mean = floorDiv(revenues.reduce((x, y) => x + y, 0n), BigInt(revenues.length));
-  const cvar = cvarLoss(revenues, risk.alphaPpm);
+  const mean = weights ? weightedMean(revenues, weights) : floorDiv(revenues.reduce((x, y) => x + y, 0n), BigInt(revenues.length));
+  const cvar = weights ? cvarLossWeighted(revenues, weights, risk.alphaPpm) : cvarLoss(revenues, risk.alphaPpm);
   const objective = floorDiv(mean * BigInt(PPM) - BigInt(risk.lambdaPpm) * cvar, BigInt(PPM));
   return {
     socUkwh: socPath(battery, a, s).map((x, h) => toSafe(x, `SOC hour ${h}`)),
