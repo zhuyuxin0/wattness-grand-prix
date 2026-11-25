@@ -1,0 +1,23 @@
+/* Hedge: the sealed plan's hedge leads; contracts by hour and the assumed
+   entry share one hour axis under a pinned readout; terms and collateral sit
+   side by side on wide screens; the table closes the page. */
+
+@media (min-width: 768px) {
+  .hg-readout {
+    position: sticky;
+    top: var(--gp-masthead-h);
+    z-index: 5;
+    background: var(--t-pane);
+  }
+}
+.hg-readout .pk-readout {
+  padding-top: var(--t-space-3);
+}
+.hg-hours-section .pk-stack {
+  padding-top: var(--t-space-2);
+}
+.hg-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
