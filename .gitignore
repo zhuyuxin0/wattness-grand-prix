@@ -9,3 +9,6 @@ coverage/
 .env.*
 !.env.example
 .DS_Store
+
+# Run evidence stays outside the repository until release.
+/evidence/
