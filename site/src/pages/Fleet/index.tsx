@@ -117,7 +117,6 @@ function Fleet({ day }: { day: DayIndex }) {
   };
 
   const opDay = formatOperatingDay(day.operatingDay);
-  const census = day.leafCount + day.exclusions.length;
   const byField = useMemo(() => {
     const m = new Map<string, string[]>();
     for (const e of day.exclusions) {
@@ -147,7 +146,7 @@ function Fleet({ day }: { day: DayIndex }) {
 
       <section className="fl-lead" aria-label="The fleet's day">
         <StatRow className="fl-stats">
-          <Stat label="Plans sealed" value={formatInt(day.leafCount)} note={`of ${formatInt(census)} batteries in ERCOT's census`} />
+          <Stat label="Plans sealed" value={formatInt(day.leafCount)} note={`${formatInt(day.exclusions.length)} more in ERCOT's census lack a field a plan needs`} />
           <Stat label="Rated power" value={formatInt(Math.round(fleet.mw))} unit="MW" note={`sum over the ${formatInt(day.leafCount)}`} />
           <Stat label="Rated energy" value={formatInt(Math.round(fleet.mwh))} unit="MWh" note={`sum over the ${formatInt(day.leafCount)}`} />
           <Stat label="Planned discharge" value={formatInt(Math.round(fleet.dis))} unit="MWh" note="sealed plans, the whole day" />
@@ -166,7 +165,7 @@ function Fleet({ day }: { day: DayIndex }) {
                   ))}
               </span>
             }
-            note={(["A", "B", "C"] as ArmName[]).filter((a) => fleet.arms[a] === 0).map((a) => `${a} (${armMeta[a].label.toLowerCase()}): none`).join("; ") || "batteries per plan"}
+            note={(["C", "B", "A"] as ArmName[]).map((a) => `${a} ${armMeta[a].label.toLowerCase()}${fleet.arms[a] === 0 ? ": none" : ""}`).join(" · ")}
           />
         </StatRow>
         <p className="fl-source">
