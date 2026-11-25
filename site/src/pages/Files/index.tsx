@@ -59,7 +59,8 @@ export default function FilesPage() {
         lede={
           <>
             Every file behind the day's record, in a public bucket on BNB Greenfield: the day's index and root, each plan, its price scenarios, the inputs it read and both
-            chain receipts. <Link to="/verify">Verify</Link> checks one plan in your browser; here anyone can fetch any file and compare its SHA-256.
+            chain receipts. <Link to="/verify">Verify</Link> checks one plan in your browser; here anyone can fetch any file and compare its SHA-256, and{" "}
+            <Link to="/about">How It Works</Link> shows how the parts fit.
           </>
         }
       />
