@@ -86,7 +86,9 @@ export function TabDrawer({ open, onClose }: { open: boolean; onClose: () => voi
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
-    sheet.current?.querySelector<HTMLElement>('[aria-current="page"], .sidenav-item')?.focus();
+    // The current tab, else the first: one selector list would match the first row in document order.
+    const rows = sheet.current;
+    (rows?.querySelector<HTMLElement>('.sidenav-item[aria-current="page"]') ?? rows?.querySelector<HTMLElement>(".sidenav-item"))?.focus();
     return () => {
       document.body.style.overflow = prior;
       document.removeEventListener("keydown", onKey);
