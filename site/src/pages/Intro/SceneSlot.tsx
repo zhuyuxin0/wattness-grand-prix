@@ -1,4 +1,5 @@
 import { Component, Suspense, lazy, useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { Glyph } from "../../ui";
 
 // The starting-grid scene lives in src/scenes/, built on its own lane. It is
 // found by glob rather than a static import so this page builds, and renders
@@ -25,6 +26,7 @@ function rank(path: string): number {
 
 interface SceneProps {
   hud?: boolean;
+  playback?: "once" | "loop";
 }
 
 function Nothing() {
@@ -65,15 +67,28 @@ function useWide(): boolean {
   return wide;
 }
 
-export function SceneSlot() {
+/**
+ * The stage: the scene, played once to its last frame and held there, over a
+ * slim bar that says what it shows and replays it (wattness.tech's "Replay the
+ * Intro").
+ */
+export function SceneSlot({ caption }: { caption?: ReactNode }) {
   const wide = useWide();
+  const [take, setTake] = useState(0);
   if (!Scene) return null;
   return (
     <Contain>
       <div className="intro-scene" role="region" aria-label="The starting grid: every sealed plan for the operating day">
         <Suspense fallback={<div className="intro-scene__hold" />}>
-          <Scene hud={wide} />
+          <Scene key={take} hud={wide} playback="once" />
         </Suspense>
+      </div>
+      <div className="intro-stagebar">
+        {caption && <p className="intro-stagebar__caption">{caption}</p>}
+        <button type="button" className="btn intro-stagebar__replay" onClick={() => setTake((t) => t + 1)}>
+          <Glyph name="refresh" />
+          Replay
+        </button>
       </div>
     </Contain>
   );
