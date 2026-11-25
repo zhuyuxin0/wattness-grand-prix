@@ -22,6 +22,7 @@ export function middle(value: string, head = 6, tail = 4): string {
   return `${value.slice(0, prefix + head)}…${value.slice(-tail)}`;
 }
 
+/** A hash, root, address or transaction id: mono, shortened in the middle, the whole value in its title and its copy. */
 export function Hash({ value, head = 6, tail = 4, full = false, href, copy = true, label = "hash", className }: HashProps) {
   const [copied, setCopied] = useState(false);
   useEffect(() => {
@@ -42,19 +43,14 @@ export function Hash({ value, head = 6, tail = 4, full = false, href, copy = tru
       {href ? (
         <a className="hash__link" href={href} target="_blank" rel="noreferrer">
           {body}
-          <Glyph name="external" size={12} />
+          <Glyph name="popout" />
         </a>
       ) : (
         body
       )}
       {copy && (
-        <button
-          type="button"
-          className="hash__copy"
-          aria-label={copied ? `Copied ${label}` : `Copy ${label}`}
-          onClick={async () => setCopied(await copyText(value))}
-        >
-          <Glyph name={copied ? "check" : "copy"} size={13} />
+        <button type="button" className="hash__copy" aria-label={copied ? `Copied the ${label}` : `Copy the ${label}`} onClick={async () => setCopied(await copyText(value))}>
+          {copied ? "Copied" : "Copy"}
         </button>
       )}
     </span>

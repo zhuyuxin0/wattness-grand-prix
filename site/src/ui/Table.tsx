@@ -136,6 +136,6 @@ export function Table<T>({
 }
 
 function formatCell(v: SortValue): ReactNode {
-  if (v == null || v === "") return <span className="muted">—</span>;
+  if (v == null || v === "") return <span className="muted">no value</span>;
   return String(v);
 }
