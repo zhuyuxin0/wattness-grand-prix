@@ -5,6 +5,7 @@ cache/
 artifacts/
 .hardhat/
 coverage/
+__pycache__/
 .env
 .env.*
 !.env.example
