@@ -6,6 +6,8 @@
 //   node publish.mjs publish [--send]       create the bucket and objects, upload them
 //   node publish.mjs check                  download every object, compare SHA-256, write published.json
 //
+// GATE_DAY=od-YYYYMMDD picks another sealed day (default od-20261126); its list goes to published-<day>.json.
+//
 // Without --send, fund and publish only simulate. Testnet only: the chain ids are fixed below and checked.
 // The key is read by name from ~/Documents/wattness-secrets/bnb-bangkok.env and never printed.
 import { createHash } from "node:crypto";
@@ -25,10 +27,12 @@ const { NodeAdapterReedSolomon } = require("@bnb-chain/reed-solomon/node.adapter
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, "..", "..");
-const DAY = "od-20261126";
+const FIRST_DAY = "od-20261126";
+const DAY = process.env.GATE_DAY ?? FIRST_DAY;
+if (!/^od-\d{8}$/.test(DAY)) throw new Error(`GATE_DAY must be od-YYYYMMDD, got ${DAY}`);
 const MAINNET_DIR = join(REPO, "out", DAY);
 const TESTNET_DIR = join(REPO, "out", `${DAY}-bsc-testnet`);
-const PUBLISHED = join(HERE, "published.json");
+const PUBLISHED = join(HERE, DAY === FIRST_DAY ? "published.json" : `published-${DAY}.json`);
 
 const GF_RPC = "https://gnfd-testnet-fullnode-tendermint-us.bnbchain.org";
 const GF_CHAIN_ID = "5600";
@@ -43,7 +47,7 @@ const FUND_AMOUNT = parseEther("0.2");
 const MIN_GF_BALANCE = parseEther("0.05");
 
 // Stored once under a name the SP's firewall refuses to serve; publish deletes them.
-const RETIRED = [`${DAY}/root.txt`];
+const RETIRED = DAY === FIRST_DAY ? [`${DAY}/root.txt`] : [];
 
 const BATCH = 20; // MsgCreateObject per transaction
 const UPLOAD_CONCURRENCY = 4;
@@ -96,6 +100,13 @@ function files() {
     { object: `${DAY}/record.bsc-mainnet.json`, path: join(MAINNET_DIR, "record.json"), kind: "receipt" },
     { object: `${DAY}/record.bsc-testnet.json`, path: join(TESTNET_DIR, "record.json"), kind: "receipt" },
   ];
+  // The Cournot response a plan read before the gate: V7 hashes it beside the record.
+  const response = join(MAINNET_DIR, "cournot", "probability.json");
+  if (existsSync(response)) {
+    const copy = join(TESTNET_DIR, "cournot", "probability.json");
+    if (!existsSync(copy) || readFileSync(response).compare(readFileSync(copy)) !== 0) stop("cournot/probability.json differs between the two output folders");
+    rows.push({ object: `${DAY}/cournot/probability.json`, path: response, kind: "outside-input" });
+  }
   for (const leaf of manifest.leaves) {
     for (const [rel, kind] of [[leaf.manifest, "leaf"], [leaf.scenarios, "scenarios"]]) {
       const a = join(MAINNET_DIR, rel);

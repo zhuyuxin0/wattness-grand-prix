@@ -1,0 +1,38 @@
+{
+  "name": "@gatelock/openfour",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "OpenFour evidence-gated migrate module, discovery probes and launch tower reads",
+  "exports": {
+    "./launch-tower": {
+      "types": "./dist/launch-tower.d.ts",
+      "default": "./dist/launch-tower.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/schema.js"
+    },
+    "./deployments/bsc-testnet.json": "./deployments/bsc-testnet.json"
+  },
+  "scripts": {
+    "build": "hardhat build --quiet && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json",
+    "test": "hardhat build --quiet && vitest run",
+    "probe": "node dist/probe.js",
+    "launch": "node scripts/launch.ts"
+  },
+  "dependencies": {
+    "@gatelock/core": "workspace:*",
+    "viem": "2.57.17"
+  },
+  "devDependencies": {
+    "@gatelock/contracts": "workspace:*",
+    "@nomicfoundation/hardhat-viem": "3.1.0",
+    "@types/node": "22.20.5",
+    "hardhat": "3.21.2",
+    "typescript": "5.9.3",
+    "vitest": "5.1.0"
+  }
+}

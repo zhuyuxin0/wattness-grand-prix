@@ -27,6 +27,9 @@ importers:
         specifier: 2.57.17
         version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
     devDependencies:
+      '@gatelock/verifier':
+        specifier: workspace:*
+        version: link:../packages/verifier
       '@nomicfoundation/hardhat-node-test-runner':
         specifier: 3.1.2
         version: 3.1.2(hardhat@3.21.2)
@@ -40,11 +43,116 @@ importers:
         specifier: 3.21.2
         version: 3.21.2
 
+  modules/flap:
+    dependencies:
+      '@gatelock/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@gatelock/flap':
+        specifier: workspace:*
+        version: link:../../packages/adapters/flap
+      viem:
+        specifier: 2.57.17
+        version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+    devDependencies:
+      '@gatelock/contracts':
+        specifier: workspace:*
+        version: link:../../contracts
+      '@nomicfoundation/hardhat-node-test-runner':
+        specifier: 3.1.2
+        version: 3.1.2(hardhat@3.21.2)
+      '@nomicfoundation/hardhat-viem':
+        specifier: 3.1.0
+        version: 3.1.0(hardhat@3.21.2)(viem@2.57.17(typescript@5.9.3)(zod@3.25.76))
+      '@nomicfoundation/hardhat-viem-assertions':
+        specifier: 3.1.5
+        version: 3.1.5(@nomicfoundation/hardhat-viem@3.1.0(hardhat@3.21.2)(viem@2.57.17(typescript@5.9.3)(zod@3.25.76)))(hardhat@3.21.2)(viem@2.57.17(typescript@5.9.3)(zod@3.25.76))
+      hardhat:
+        specifier: 3.21.2
+        version: 3.21.2
+
+  modules/openfour:
+    dependencies:
+      '@gatelock/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      viem:
+        specifier: 2.57.17
+        version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+    devDependencies:
+      '@gatelock/contracts':
+        specifier: workspace:*
+        version: link:../../contracts
+      '@nomicfoundation/hardhat-viem':
+        specifier: 3.1.0
+        version: 3.1.0(hardhat@3.21.2)(viem@2.57.17(typescript@5.9.3)(zod@3.25.76))
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
+      hardhat:
+        specifier: 3.21.2
+        version: 3.21.2
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(tsx@4.23.15))
+
+  packages/adapters/agent-studio:
+    dependencies:
+      '@gatelock/core':
+        specifier: workspace:*
+        version: link:../../core
+      '@gatelock/verifier':
+        specifier: workspace:*
+        version: link:../../verifier
+
+  packages/adapters/atlas-cmc:
+    dependencies:
+      '@gatelock/core':
+        specifier: workspace:*
+        version: link:../../core
+      viem:
+        specifier: 2.57.17
+        version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+
+  packages/adapters/cournot:
+    dependencies:
+      '@gatelock/core':
+        specifier: workspace:*
+        version: link:../../core
+
+  packages/adapters/flap:
+    dependencies:
+      viem:
+        specifier: 2.57.17
+        version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+
+  packages/adapters/living-brain:
+    dependencies:
+      '@gatelock/core':
+        specifier: workspace:*
+        version: link:../../core
+    devDependencies:
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(tsx@4.23.15))
+
   packages/agent:
     dependencies:
       '@gatelock/core':
         specifier: workspace:*
         version: link:../core
+      '@gatelock/cournot':
+        specifier: workspace:*
+        version: link:../adapters/cournot
       '@gatelock/data':
         specifier: workspace:*
         version: link:../data
@@ -54,6 +162,25 @@ importers:
       viem:
         specifier: 2.57.17
         version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+
+  packages/agents:
+    dependencies:
+      '@gatelock/core':
+        specifier: workspace:*
+        version: link:../core
+      viem:
+        specifier: 2.57.17
+        version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+    devDependencies:
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@22.20.5)(vite@8.3.8(@types/node@22.20.5)(esbuild@0.28.2)(tsx@4.23.15))
 
   packages/core:
     dependencies:
@@ -87,9 +214,16 @@ importers:
       '@gatelock/core':
         specifier: workspace:*
         version: link:../core
+      '@gatelock/cournot':
+        specifier: workspace:*
+        version: link:../adapters/cournot
       viem:
         specifier: 2.57.17
         version: 2.57.17(typescript@5.9.3)(zod@3.25.76)
+    devDependencies:
+      '@gatelock/engine':
+        specifier: workspace:*
+        version: link:../engine
 
 packages:
 

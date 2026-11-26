@@ -1,5 +1,7 @@
 packages:
   - packages/*
+  - packages/adapters/*
+  - modules/*
   - contracts
   - apps/*
 

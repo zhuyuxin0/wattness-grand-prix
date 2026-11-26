@@ -1,0 +1,22 @@
+WattnessEvaluator was scaffolded with `bag init` from @bnbagent/studio-cli
+0.0.16 (https://github.com/bnb-chain/bnbagent-studio), which is licensed under
+the Apache License, Version 2.0. A copy of that license is in
+LICENSE-APACHE-2.0.
+
+The files the scaffold generated are derived from its templates and were
+modified for Wattness:
+
+  app/agent/src/agentCard.ts
+  app/agent/src/deliveryPolicy.ts
+  app/agent/src/executor.ts
+  app/agent/src/requestLimits.ts
+  app/agent/src/sellerCore.ts
+  app/agent/src/signing.ts
+  app/agent/src/unifiedMain.ts
+  app/agent/studio.toml
+  app/agent/package.json, app/agent/pnpm-workspace.yaml, app/agent/tsconfig.json
+  app/agent/.gitignore, .gitignore, package.json, pnpm-workspace.yaml
+  agentcore/agentcore.json, agentcore/aws-targets.json
+
+The work hook (app/agent/src/evaluationWork.ts), its test, the vendoring script
+and the evaluator it bundles are original, under the repository's MIT license.

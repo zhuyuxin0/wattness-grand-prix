@@ -19,6 +19,7 @@
     "viem": "2.57.17"
   },
   "devDependencies": {
+    "@gatelock/verifier": "workspace:*",
     "@nomicfoundation/hardhat-node-test-runner": "3.1.2",
     "@nomicfoundation/hardhat-viem": "3.1.0",
     "@nomicfoundation/hardhat-viem-assertions": "3.1.5",

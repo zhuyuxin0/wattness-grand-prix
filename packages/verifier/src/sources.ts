@@ -138,6 +138,67 @@ export async function checkSources(list: SourceList, options: SourceOptions): Pr
   return out;
 }
 
+export interface CitedFiles {
+  /** Bytes by route, each matching the release catalog and the SHA-256 the document cites. */
+  bytes: Map<string, Uint8Array>;
+  problems: string[];
+  /** Files that could be neither fetched nor found in the mirror. */
+  missing: string[];
+}
+
+/**
+ * The bytes of release files a document cites, read the way V7 checks them: the release manifest by its
+ * pinned digest, the route's catalog, then the payload, whose SHA-256 must be the one cited.
+ */
+export async function readCited(list: SourceList, routes: readonly string[], options: SourceOptions): Promise<CitedFiles> {
+  const { fetcher, mirror, site = SITE } = options;
+  const out: CitedFiles = { bytes: new Map(), problems: [], missing: [] };
+  const wanted: FileRef[] = [];
+  for (const route of new Set(routes)) {
+    const f = list.files.find((x) => x.route === route);
+    if (!f) out.problems.push(`${route}: not cited`);
+    else if (!f.route.startsWith("/api/") || !PLAIN_PATH.test(f.route) || f.route.split("/").includes("..")) out.problems.push(`${route}: not a release route`);
+    else if (daysIn(f.route).some(isExcludedDay)) out.problems.push(`${route}: names an excluded day; not fetched`);
+    else wanted.push(f);
+  }
+  if (wanted.length === 0) return out;
+  if (!list.releaseId || !list.manifestSha256) {
+    out.problems.push("release routes cited without a release");
+    return out;
+  }
+  const base = `${site}${DISPLAY}${list.releaseId}`;
+  const sink: SourceCheck = { checked: 0, mirrored: 0, problems: out.problems, missing: out.missing };
+  const catalog = await loadCatalogs(base, list.manifestSha256, wanted, fetcher, sink);
+  if (!catalog) return out;
+  for (const f of wanted) {
+    const entry = catalog.entries.get(f.route);
+    if (!entry) {
+      if (!catalog.failed.has(fileSha256(f.route).slice(0, 2))) out.problems.push(`${f.route}: not in release ${list.releaseId}`);
+      continue;
+    }
+    if (entry.sha256 !== f.sha256) {
+      out.problems.push(`${f.route}: release has ${entry.sha256}, cited ${f.sha256}`);
+      continue;
+    }
+    if (daysIn(entry.path).some(isExcludedDay)) {
+      out.problems.push(`${f.route}: stored under an excluded day; not fetched`);
+      continue;
+    }
+    const bytes = (await fetcher(`${base}/${entry.path}`)) ?? mirror?.(f.sha256) ?? null;
+    if (!bytes) {
+      out.missing.push(`${f.route}: not served and not mirrored`);
+      continue;
+    }
+    const got = fileSha256(bytes);
+    if (got !== f.sha256) {
+      out.problems.push(`${f.route}: bytes hash to ${got}, cited ${f.sha256}`);
+      continue;
+    }
+    out.bytes.set(f.route, bytes);
+  }
+  return out;
+}
+
 /** Fetches the release manifest by its pinned digest and every catalog the routes fall in. */
 async function loadCatalogs(
   base: string,

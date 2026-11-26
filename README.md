@@ -39,6 +39,7 @@ A second plan for the same day, simulated 22 seconds after the gate, is refused 
    - every input against the published release.
 
    Change one number in a plan and the check fails, naming the field.
+4. **Settle.** After the gate the same plans are valued at the prices ERCOT publishes, in three stages: day-ahead settled, real-time provisional and real-time settled. Each stage's documents form one root, linked to the same GateRecord entry. The verifier rebuilds a battery's outcome from the published prices and walks its proof to that root. [How the stages settle](docs/outcomes.md).
 
 ## Run it
 
@@ -65,7 +66,7 @@ python3 -I tools/verify_hash.py fixtures/od-20261126/leaves/DSWL_ESS_ESR1.json
 | `packages/data` | Hash-checked readers for the Terminal's public release and live prices |
 | `packages/engine` | Forecast, price scenarios and the dispatch and hedge optimization (HiGHS) |
 | `packages/verifier` | The end-to-end check |
-| `packages/agent` | Plans an operating day for the fleet |
+| `packages/agent` | Plans an operating day for the fleet and links each stage's outcome |
 | `fixtures/od-20261126` | The sealed record of 26 Nov: the index, two leaves, both chain receipts |
 | `tools/verify_hash.py` | The standard-library hash check |
 

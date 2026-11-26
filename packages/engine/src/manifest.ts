@@ -1,3 +1,4 @@
+import { OBJECTIVE_EQUAL, OBJECTIVE_STRESS, WEIGHTING_EQUAL, WEIGHTING_STRESS, type CournotInput } from "@gatelock/core";
 import type { Evaluation } from "./accounting.js";
 import { ARM_METHODS, type ArmSolution } from "./arms.js";
 import { centralClock } from "./calendar.js";
@@ -28,6 +29,10 @@ export interface ManifestParts {
   entryCents: number[];
   arms: Partial<Record<ArmId, { solution: ArmSolution; evaluation: Evaluation }>>;
   unsolved: { arm: ArmId; reason: string }[];
+  /** The risk officer's record; null keeps outside_inputs null. */
+  cournot?: CournotInput | null;
+  /** True when the scenarios carry the weather rule's weights. */
+  weighted?: boolean;
 }
 
 function arm(id: ArmId, r: { solution: ArmSolution; evaluation: Evaluation }) {
@@ -115,7 +120,7 @@ export function buildManifest(p: ManifestParts): Manifest {
       history_days: scenarios.historyDays,
       basis_days: scenarios.basisDays,
       count: scenarios.scenarios.length,
-      weighting: "equal",
+      weighting: p.weighted ? WEIGHTING_STRESS : WEIGHTING_EQUAL,
       digest_sha256: p.scenarioDigest,
     },
     instrument: {
@@ -136,7 +141,7 @@ export function buildManifest(p: ManifestParts): Manifest {
     risk: {
       alpha_ppm: risk.alphaPpm,
       lambda_ppm: risk.lambdaPpm,
-      objective: "mean revenue - lambda * CVaR_alpha(loss), over the equally weighted scenarios",
+      objective: p.weighted ? OBJECTIVE_STRESS : OBJECTIVE_EQUAL,
     },
     arms: Object.fromEntries(ARM_ORDER.map((id) => [id, p.arms[id] ? arm(id, p.arms[id]) : null])),
     unsolved: p.unsolved.map((u) => ({ arm: u.arm, reason: u.reason })),
@@ -150,7 +155,7 @@ export function buildManifest(p: ManifestParts): Manifest {
       solver_package: `${SOLVER.package}@${SOLVER.version}`,
     },
     agent: { wallet: input.agent.wallet, erc8004_id: input.agent.erc8004Id },
-    outside_inputs: null,
+    outside_inputs: p.cournot ? { cournot: p.cournot } : null,
     salt: input.salt,
   };
 }

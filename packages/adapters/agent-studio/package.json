@@ -1,0 +1,17 @@
+{
+  "name": "@gatelock/adapter-agent-studio",
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "exports": { ".": "./dist/index.js" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run --dir test",
+    "serve": "node dist/server.js",
+    "evidence": "node dist/evidence.js"
+  },
+  "dependencies": {
+    "@gatelock/core": "workspace:*",
+    "@gatelock/verifier": "workspace:*"
+  }
+}

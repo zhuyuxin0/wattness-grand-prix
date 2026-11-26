@@ -1,8 +1,20 @@
-import { evaluate, type Evaluation } from "./accounting.js";
+import {
+  WEATHER_RULE_V1,
+  applyWeatherRule,
+  equalSharePpm,
+  scenarioWeights,
+  stressBucket,
+  weatherIneligibility,
+  type CournotBasis,
+  type CournotInput,
+  type StressBucket,
+  type WeatherClaim,
+} from "@gatelock/core";
+import { evaluate, type Evaluation, type ScenarioWeights } from "./accounting.js";
 import { solveJoint, solveOverlay, solveUnhedged, type ArmProblem, type ArmSolution } from "./arms.js";
-import { assertReadable, daysBetween, gateUnix, type Day } from "./calendar.js";
+import { assertReadable, centralClock, daysBetween, gateUnix, type Day } from "./calendar.js";
 import { DEFAULT_WEIGHTS, forecastHub, type HubForecast } from "./forecast.js";
-import { entryCents } from "./instrument.js";
+import { BOUNDED_FUTURE, entryCents, weightedEntryCents } from "./instrument.js";
 import { SolveError } from "./lp.js";
 import { buildManifest, type Manifest } from "./manifest.js";
 import { buildScenarios, daMap, scenarioDigest, type ScenarioSet } from "./scenarios.js";
@@ -15,9 +27,26 @@ import {
   type PriceDay,
   type Provenance,
   type Risk,
+  type SourceFile,
 } from "./types.js";
 
 export type RecordKind = "prospective" | "replay" | "test";
+
+/**
+ * Cournot's probability as the planner read it before the gate. The engine
+ * applies gate-record.weather-stress.v1 to it, or records why it could not.
+ */
+export interface CournotReading {
+  claim: WeatherClaim | null;
+  probabilityPpm: number | null;
+  basis: CournotBasis[];
+  /** The response's receipt time, rounded up to the second. */
+  observedUnix: number | null;
+  /** The saved response, relative to the record's directory. */
+  response: SourceFile | null;
+  /** Set when the call failed or its response could not be read; the plan then runs without it. */
+  failure: string | null;
+}
 
 export interface PlanInput {
   kind: RecordKind;
@@ -41,6 +70,8 @@ export interface PlanInput {
   arms?: readonly ArmId[];
   /** Seconds HiGHS may spend on arm C before C is recorded as unsolved. */
   jointTimeLimitSeconds?: number;
+  /** Absent: no outside input, and outside_inputs is null, exactly as before the risk officer. */
+  cournot?: CournotReading;
 }
 
 export interface ArmResult {
@@ -55,6 +86,51 @@ export interface Plan {
   scenarios: ScenarioSet;
   arms: Partial<Record<ArmId, ArmResult>>;
   unsolved: { arm: ArmId; reason: string }[];
+  /** The scenario weights the plan used; absent for equal weights. */
+  weights?: ScenarioWeights;
+  cournot: CournotInput | null;
+}
+
+/** What the weather rule does to one battery's plan: the record it writes, and the settings it changes. */
+export function applyCournot(
+  reading: CournotReading,
+  od: Day,
+  planUnix: number,
+  gate: number,
+  set: ScenarioSet,
+  a: Assumptions,
+): { record: CournotInput; weights?: ScenarioWeights; assumptions: Assumptions } {
+  const rule = WEATHER_RULE_V1;
+  let bucket: StressBucket | null = null;
+  try {
+    bucket = stressBucket(set.historyDays, set.basisDays.length, set.scenarios.map((s) => s.hubSum4), rule);
+  } catch {
+    bucket = null;
+  }
+  const observedUnix = reading.observedUnix;
+  const common = {
+    rule,
+    claim: reading.claim,
+    probability_ppm: reading.probabilityPpm,
+    basis: reading.basis,
+    observed: observedUnix === null ? null : { unix: observedUnix, local: centralClock(observedUnix) },
+    response: reading.response ? { route: reading.response.route, sha256: reading.response.sha256 } : null,
+    before: { stress_weight_ppm: bucket ? equalSharePpm(bucket) : null, max_contracts_per_hour: a.maxContractsPerHour },
+  };
+  const split = bucket !== null && bucket.scenarios > 0 && bucket.scenarios < bucket.flags.length;
+  const reason =
+    reading.failure ??
+    weatherIneligibility({ claim: reading.claim, probability_ppm: reading.probabilityPpm, observed_unix: observedUnix }, od, planUnix, gate, rule) ??
+    (split ? null : "the history window is too short to split into stress days and the rest");
+  if (reason !== null || !bucket) {
+    return { record: { status: "not_applied", reason: reason ?? "no stress bucket", ...common, stress: null, after: null }, assumptions: a };
+  }
+  const after = applyWeatherRule(reading.probabilityPpm as number, BOUNDED_FUTURE.sizeKwh, a.maxContractsPerHour, rule);
+  return {
+    record: { status: "applied", reason: null, ...common, stress: { days: bucket.days, scenarios: bucket.scenarios }, after },
+    weights: scenarioWeights(bucket.flags, after.stress_weight_ppm),
+    assumptions: { ...a, maxContractsPerHour: after.max_contracts_per_hour },
+  };
 }
 
 const SALT = /^0x[0-9a-f]{64}$/;
@@ -111,11 +187,23 @@ export async function plan(input: PlanInput): Promise<Plan> {
 
   const scenarios = buildScenarios(od, forecast.cents, input.hub, input.node, lagDays, weights);
   const nodeForecastCents = forecast.cents.map((p, h) => p + scenarios.meanBasisCents[h]!);
-  const entry = entryCents(scenarios.scenarios.map((s) => s.hubSum4));
-  const problem: ArmProblem = { battery: input.battery, assumptions, risk, entryCents: entry, scenarios: scenarios.scenarios };
+  // The risk officer's reading, when there is one, re-weights the scenarios and may lower the contract cap.
+  const officer = input.cournot ? applyCournot(input.cournot, od, input.planUnix, gate, scenarios, assumptions) : null;
+  const used = officer?.assumptions ?? assumptions;
+  const sw = officer?.weights;
+  const hubSum4 = scenarios.scenarios.map((s) => s.hubSum4);
+  const entry = sw ? weightedEntryCents(hubSum4, sw.weights, sw.total) : entryCents(hubSum4);
+  const problem: ArmProblem = {
+    battery: input.battery,
+    assumptions: used,
+    risk,
+    entryCents: entry,
+    scenarios: scenarios.scenarios,
+    ...(sw ? { weights: sw } : {}),
+  };
   const score = (solution: ArmSolution): ArmResult => ({
     solution,
-    evaluation: evaluate(input.battery, assumptions, risk, solution.schedule, solution.hedge, entry, scenarios.scenarios),
+    evaluation: evaluate(input.battery, used, risk, solution.schedule, solution.hedge, entry, scenarios.scenarios, sw),
   });
 
   const arms: Partial<Record<ArmId, ArmResult>> = {};
@@ -135,7 +223,7 @@ export async function plan(input: PlanInput): Promise<Plan> {
   const manifest = buildManifest({
     input,
     gateUnix: gate,
-    assumptions,
+    assumptions: used,
     risk,
     lagDays,
     forecast,
@@ -145,6 +233,8 @@ export async function plan(input: PlanInput): Promise<Plan> {
     entryCents: entry,
     arms,
     unsolved,
+    cournot: officer?.record ?? null,
+    weighted: sw !== undefined,
   });
-  return { manifest, forecast, nodeForecastCents, scenarios, arms, unsolved };
+  return { manifest, forecast, nodeForecastCents, scenarios, arms, unsolved, ...(sw ? { weights: sw } : {}), cournot: officer?.record ?? null };
 }

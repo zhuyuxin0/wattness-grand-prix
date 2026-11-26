@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@gatelock/core": "workspace:*",
+    "@gatelock/cournot": "workspace:*",
     "@gatelock/data": "workspace:*",
     "@gatelock/engine": "workspace:*",
     "viem": "2.57.17"

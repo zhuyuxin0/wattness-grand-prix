@@ -19,7 +19,11 @@
   },
   "dependencies": {
     "@gatelock/core": "workspace:*",
+    "@gatelock/cournot": "workspace:*",
     "viem": "2.57.17"
+  },
+  "devDependencies": {
+    "@gatelock/engine": "workspace:*"
   },
   "bin": {
     "gate-verify": "./dist/cli.js"

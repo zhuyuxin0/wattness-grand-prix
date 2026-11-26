@@ -1,5 +1,5 @@
 // The three arms share one formulation. Units inside the LP: MW, MWh and dollars.
-import { hedgeCollateralCents, type Hedge, type Schedule } from "./accounting.js";
+import { hedgeCollateralCents, type Hedge, type Schedule, type ScenarioWeights } from "./accounting.js";
 import { PPM } from "./ints.js";
 import { BOUNDED_FUTURE } from "./instrument.js";
 import { LpModel, solve } from "./lp.js";
@@ -12,6 +12,8 @@ export interface ArmProblem {
   risk: Risk;
   entryCents: readonly number[];
   scenarios: readonly Scenario[];
+  /** Absent: the scenarios are equally weighted. */
+  weights?: ScenarioWeights;
 }
 
 export interface ArmSolution {
@@ -114,7 +116,9 @@ function build(p: ArmProblem, shape: Shape): LpModel {
     });
   }
 
-  for (let k = 0; k < n; k++) for (const [v, coef] of terms[k]!) m.objectiveTerm(v, coef / n);
+  // Equal weights keep the original coefficients (coef / n) exactly, so an unweighted plan writes the same LP.
+  const share = scenarioShare(p);
+  for (let k = 0; k < n; k++) for (const [v, coef] of terms[k]!) m.objectiveTerm(v, share ? coef * share[k]! : coef / n);
 
   if (shape.cvar) {
     const lambda = p.risk.lambdaPpm / PPM;
@@ -124,10 +128,18 @@ function build(p: ArmProblem, shape: Shape): LpModel {
     for (let k = 0; k < n; k++) {
       // u_k >= loss_k - t, with loss_k = -(revenue terms + constant).
       m.row(`tail${k}`, [[u(k), 1], ["t", 1], ...terms[k]!], ">=", -constant[k]!);
-      m.objectiveTerm(u(k), -tailWeight);
+      // Rockafellar-Uryasev with probabilities pi_k: t + sum pi_k u_k / (1 - alpha).
+      m.objectiveTerm(u(k), share ? -(lambda / (1 - p.risk.alphaPpm / PPM)) * share[k]! : -tailWeight);
     }
   }
   return m;
+}
+
+/** Each scenario's probability, or null for equal weights. */
+function scenarioShare(p: ArmProblem): number[] | null {
+  if (!p.weights) return null;
+  if (p.weights.weights.length !== p.scenarios.length) throw new Error("weights: one per scenario");
+  return p.weights.weights.map((w) => w / p.weights!.total);
 }
 
 function readSchedule(sol: { value(v: string): number }): Schedule {
@@ -164,14 +176,18 @@ export async function solveUnhedged(p: ArmProblem): Promise<ArmSolution> {
 export async function solveOverlay(p: ArmProblem, schedule: Schedule): Promise<ArmSolution> {
   const sol = await solve(build(p, { schedule, hedge: true, cvar: true }));
   // The fixed schedule's expected revenue is a constant the LP leaves out of its objective.
-  const physical = p.scenarios.reduce((acc, sc) => {
+  const share = scenarioShare(p);
+  const revenue = p.scenarios.map((sc) => {
     let r = 0;
     for (let h = 0; h < HOURS; h++) {
       r += ((schedule.dischargeKw[h]! - schedule.chargeKw[h]!) / 1000) * (sc.nodeCents[h]! / 100);
       r -= (schedule.dischargeKw[h]! / 1000) * (p.assumptions.wearCentsPerMwh / 100);
     }
-    return acc + r;
-  }, 0) / p.scenarios.length;
+    return r;
+  });
+  const physical = share
+    ? revenue.reduce((acc, r, k) => acc + r * share[k]!, 0)
+    : revenue.reduce((acc, r) => acc + r, 0) / p.scenarios.length;
   return { arm: "B", schedule, hedge: readHedge(sol, p), lpObjectiveUsd: sol.objective + physical };
 }
 

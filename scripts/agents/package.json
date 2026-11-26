@@ -1,0 +1,20 @@
+{
+  "name": "@gatelock/agent-runners",
+  "private": true,
+  "type": "module",
+  "description": "Creates the six agents' wallets, registers them on ERC-8004, publishes their cards and runs ERC-8183 jobs between them, on BSC testnet",
+  "scripts": {
+    "wallets": "node wallets.ts",
+    "register": "node register.ts",
+    "cards": "node cards.ts",
+    "hire": "node hire.ts"
+  },
+  "dependencies": {
+    "@bnb-chain/greenfield-js-sdk": "2.2.2",
+    "@bnb-chain/reed-solomon": "1.1.4",
+    "@bnbagent/sdk": "0.6.1",
+    "@gatelock/agents": "link:../../packages/agents",
+    "@gatelock/core": "link:../../packages/core",
+    "viem": "2.57.17"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "@gatelock/flap-season",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "A season launch on Flap Pool Launch, gated by GateRecord",
+  "scripts": {
+    "build": "hardhat build",
+    "test": "hardhat test",
+    "typecheck": "tsc -p tsconfig.json",
+    "season": "node scripts/season.ts"
+  },
+  "dependencies": {
+    "@gatelock/core": "workspace:*",
+    "@gatelock/flap": "workspace:*",
+    "viem": "2.57.17"
+  },
+  "devDependencies": {
+    "@gatelock/contracts": "workspace:*",
+    "@nomicfoundation/hardhat-node-test-runner": "3.1.2",
+    "@nomicfoundation/hardhat-viem": "3.1.0",
+    "@nomicfoundation/hardhat-viem-assertions": "3.1.5",
+    "hardhat": "3.21.2"
+  }
+}

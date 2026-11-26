@@ -23,7 +23,7 @@ import {
   type ReleasePin,
   type Snapshot,
 } from "@gatelock/data";
-import { fromData, gateUnix, plan, type ArmId, type Manifest, type RecordKind } from "@gatelock/engine";
+import { fromData, gateUnix, plan, type ArmId, type CournotReading, type Manifest, type RecordKind } from "@gatelock/engine";
 import type { Address, Hex } from "viem";
 
 export const ENGINE_REPO = "https://github.com/zhuyuxin0/wattness-grand-prix";
@@ -42,7 +42,8 @@ export interface DayPlanOptions {
   kind: RecordKind;
   salt: Hex;
   wallet: Address;
-  source: { commit: string; tree: string };
+  /** repo defaults to ENGINE_REPO; a replay of a sealed record passes the record's own. */
+  source: { commit: string; tree: string; repo?: string };
   /** Resources to plan besides the showcase; empty plans the showcase alone. */
   others: readonly string[] | "census";
   /** Previous syncs by resource, for an offline replay. */
@@ -53,6 +54,10 @@ export interface DayPlanOptions {
   log?: (line: string) => void;
   /** Clock for the plan-time stamp, in milliseconds. */
   now?: () => number;
+  /** The risk officer's Cournot reading, taken before planning; every leaf applies the weather rule to it. */
+  cournot?: CournotReading;
+  /** The planner's ERC-8004 agent id, written into every leaf. */
+  erc8004Id?: string | null;
 }
 
 export interface PlannedLeaf {
@@ -78,6 +83,27 @@ function shortReason(err: unknown): string {
 }
 
 type Loaded = Awaited<ReturnType<typeof loadPlanInputs>>;
+
+/** The longest the plan-time stamp waits for a reading's second to pass. */
+export const STAMP_WAIT_MS = 2_000;
+
+/**
+ * The plan-time stamp, in unix seconds. A reading's time is rounded up to the second and the stamp down, so a
+ * reading received in the same second as the stamp would look later than the plan and the weather rule would
+ * refuse it. The stamp waits out that second first, never longer than STAMP_WAIT_MS; a reading timed further
+ * ahead than that is left for the rule to refuse.
+ */
+export async function stampPlanTime(
+  now: () => number,
+  observedUnix: number | null,
+  sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
+): Promise<number> {
+  if (observedUnix !== null) {
+    const wait = observedUnix * 1000 - now();
+    if (wait > 0 && wait <= STAMP_WAIT_MS) await sleep(wait);
+  }
+  return Math.floor(now() / 1000);
+}
 
 export async function planDay(o: DayPlanOptions): Promise<DayPlan> {
   const log = o.log ?? (() => {});
@@ -132,7 +158,7 @@ export async function planDay(o: DayPlanOptions): Promise<DayPlan> {
   }
   for (const r of others) await loadOne(r, false);
 
-  const planUnix = o.planUnix ?? Math.floor((o.now ?? Date.now)() / 1000);
+  const planUnix = o.planUnix ?? (await stampPlanTime(o.now ?? Date.now, o.cournot?.observedUnix ?? null));
   if (planUnix >= gate) throw new Error(`plan time ${planUnix} is at or after the gate ${gate}`);
 
   const leaves: PlannedLeaf[] = [];
@@ -147,8 +173,9 @@ export async function planDay(o: DayPlanOptions): Promise<DayPlan> {
         planUnix,
         ...fromData(inputs),
         salt: o.salt,
-        engine: { repo: ENGINE_REPO, commit: o.source.commit, tree: o.source.tree },
-        agent: { wallet: o.wallet, erc8004Id: null },
+        engine: { repo: o.source.repo ?? ENGINE_REPO, commit: o.source.commit, tree: o.source.tree },
+        agent: { wallet: o.wallet, erc8004Id: o.erc8004Id ?? null },
+        ...(o.cournot ? { cournot: o.cournot } : {}),
         arms,
         ...(showcase ? {} : { jointTimeLimitSeconds: o.otherJointSeconds ?? 5 }),
       });
@@ -171,7 +198,12 @@ export async function planDay(o: DayPlanOptions): Promise<DayPlan> {
       leaf: leafHash(p.manifest),
     });
     const solved = arms.filter((a) => (p.manifest.arms as Record<string, unknown>)[a] !== null).join("");
-    log(`${resource.padEnd(18)} ${inputs.battery.settlementPoint.padEnd(14)} arms ${solved.padEnd(3)} selected ${String(p.manifest.selected_arm)}`);
+    const officer = p.cournot
+      ? p.cournot.status === "applied"
+        ? ` cournot: stress ${p.cournot.after!.stress_weight_ppm} ppm, cap ${p.cournot.after!.max_contracts_per_hour}`
+        : " cournot: not applied"
+      : "";
+    log(`${resource.padEnd(18)} ${inputs.battery.settlementPoint.padEnd(14)} arms ${solved.padEnd(3)} selected ${String(p.manifest.selected_arm)}${officer}`);
   }
 
   const sorted = sortLeaves(leaves);

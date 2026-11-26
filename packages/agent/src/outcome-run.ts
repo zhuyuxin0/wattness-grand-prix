@@ -2,16 +2,20 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFile
 import { dirname, join } from "node:path";
 import {
   ARM_IDS,
+  OUTCOME_INDEX_SCHEMA,
   fleetIndexErrors,
   hoursInOperatingDay,
   leafHash,
   odFromIso,
   operatingDayStartTs,
+  outcomeDocumentPath,
+  outcomeIndexErrors,
   recordKey,
   scopeId,
   type FleetIndex,
   type Manifest,
   type Outcome,
+  type OutcomeIndex,
 } from "@gatelock/core";
 import { assertOpenDay } from "@gatelock/data";
 import { BaseError, ContractFunctionRevertedError, getAddress, isAddressEqual, zeroAddress, type Abi, type Address, type Hex } from "viem";
@@ -19,7 +23,7 @@ import type { ContractsLib } from "./contracts-lib.js";
 import { buildOutcome, hedgeDayAheadMarkUusd, outcomeTree, PROVISIONAL_RT_METHOD, STAGE_NAMES, type Stage } from "./outcome.js";
 import type { PriceSource } from "./outcome-prices.js";
 
-export const OUTCOME_INDEX_SCHEMA = "gate-record.outcome-index.v1";
+export { OUTCOME_INDEX_SCHEMA };
 export const ATTRIBUTION = "Data: ERCOT. Calculation and display: Wattness.";
 
 /** Exit codes: 3 means the stage's prices are not published yet, which is a state, not a failure. */
@@ -41,6 +45,11 @@ export interface OutcomeRunOptions {
   mainnet?: boolean;
   /** Without it the link is only simulated. */
   send?: boolean;
+  /**
+   * The root a dry run printed and the checks verified. When given, a run whose documents give any other
+   * root (say, because a newer release was published in between) writes nothing and sends nothing.
+   */
+  expectRoot?: Hex;
   /** The planned day's directory; defaults by network as the commit script does. */
   dir?: string;
   /** Where to write this stage's documents (default: <dir>/outcomes/stage-<n>). */
@@ -207,6 +216,11 @@ export async function runOutcome(o: OutcomeRunOptions): Promise<OutcomeRunResult
     doc: buildOutcome(m, index.root, stage, prices.leaf(m.battery.settlement_point, m.battery.hub)),
   }));
   const tree = outcomeTree(docs);
+  if (o.expectRoot && tree.root !== o.expectRoot.toLowerCase()) {
+    log(`root      ${tree.root} from release ${prices.releaseId} is not the reviewed ${o.expectRoot}`);
+    log("nothing written, nothing sent: dry-run and check this release, then send with its root");
+    return { code: EXIT.refused, root: tree.root };
+  }
 
   // Documents a chain already links are never rewritten with another root.
   for (const f of existsSync(outDir) ? readdirSync(outDir).filter((n) => /^link\..+\.json$/.test(n)) : []) {
@@ -307,17 +321,7 @@ function writeStage(
   liveDay: { route: string; sha256: string } | null,
   summary: (m: Manifest, doc: Outcome) => LeafSummary,
 ): void {
-  for (const d of docs) writeJson(join(outDir, "leaves", `${d.resource}.json`), d.doc);
-  writeJson(join(outDir, "summary.json"), {
-    operating_day: index.operating_day,
-    stage,
-    stage_name: STAGE_NAMES[stage],
-    root: tree.root,
-    note: "net_uusd = energy − wear + hedge − fees. hedge_da_mark_uusd marks the hedge at the day-ahead hub price; it is shown beside the result and never added to it. Shadow plans computed from public data; the hedge is a scenario comparison at an assumed entry, not an executed trade.",
-    attribution: ATTRIBUTION,
-    leaves: docs.map((d) => summary(d.manifest, d.doc)),
-  });
-  writeJson(join(outDir, "index.json"), {
+  const outcomeIndex: OutcomeIndex = {
     schema: OUTCOME_INDEX_SCHEMA,
     operating_day: index.operating_day,
     stage,
@@ -331,6 +335,21 @@ function writeStage(
     physical_basis: "the schedule's energy at the settlement point's day-ahead SPP, the plan's own basis",
     hedge_settlement: docs[0]?.manifest.instrument.settlement ?? null,
     rt_rule: RT_RULE[stage],
-    leaves: tree.leaves.map((l, i) => ({ resource: l.resource, leaf: l.leaf, plan_leaf: index.leaves[i]!.leaf, document: `leaves/${l.resource}.json` })),
+    leaves: tree.leaves.map((l, i) => ({ resource: l.resource, leaf: l.leaf, plan_leaf: index.leaves[i]!.leaf, document: outcomeDocumentPath(l.resource) })),
+  };
+  // The verifier reads a battery's outcome by this index, so it must settle exactly the plan's leaves, in order.
+  const problems = outcomeIndexErrors(outcomeIndex, index);
+  if (problems.length > 0) throw new Error(`stage ${stage} outcome index does not match the plan:\n  ${problems.slice(0, 10).join("\n  ")}`);
+  for (const d of docs) writeJson(join(outDir, outcomeDocumentPath(d.resource)), d.doc);
+  writeJson(join(outDir, "summary.json"), {
+    operating_day: index.operating_day,
+    stage,
+    stage_name: STAGE_NAMES[stage],
+    root: tree.root,
+    note: "net_uusd = energy − wear + hedge − fees. hedge_da_mark_uusd marks the hedge at the day-ahead hub price; it is shown beside the result and never added to it. Shadow plans computed from public data; the hedge is a scenario comparison at an assumed entry, not an executed trade.",
+    attribution: ATTRIBUTION,
+    leaves: docs.map((d) => summary(d.manifest, d.doc)),
   });
+  // Written last: an index on disk means every document it lists is there.
+  writeJson(join(outDir, "index.json"), outcomeIndex);
 }

@@ -1,4 +1,5 @@
 import type { Address, Hex } from "viem";
+import type { WeatherClaim, WeatherRule } from "./weather.js";
 
 // The documents that get hashed, field for field as packages/engine writes
 // them. Units are in the names: kw and kwh, cents (per MWh for prices), uusd
@@ -107,8 +108,46 @@ export interface Manifest {
   /** tree: the git tree hash of the source that produced the record; its codeHash on chain. */
   engine: { repo: string; commit: string; tree: string; solver: string; solver_package: string };
   agent: { wallet: Address; erc8004_id: string | null };
-  outside_inputs: unknown;
+  /** null, or readings from outside the data release the plan took before the gate. */
+  outside_inputs: OutsideInputs | null;
   salt: Hex;
+}
+
+/**
+ * Added after the 26 Nov record, which carries null here: a manifest without
+ * outside inputs keeps null, so every earlier manifest still validates.
+ */
+export interface OutsideInputs {
+  cournot: CournotInput;
+}
+
+/** Cournot's probability as the risk officer read it, and what the weather rule did with it. */
+export interface CournotInput {
+  /** "not_applied": the plan ran without the reading, for the reason given. */
+  status: "applied" | "not_applied";
+  reason: string | null;
+  rule: WeatherRule;
+  claim: WeatherClaim | null;
+  /** The returned probability, rounded to the nearest part per million. */
+  probability_ppm: number | null;
+  basis: CournotBasis[];
+  /** When the response was received, rounded up to the second. */
+  observed: Stamp | null;
+  /** The saved response, published beside the record; route is relative to the record's directory. */
+  response: FileRef | null;
+  /** The stress bucket of this battery's scenarios; null when not applied. */
+  stress: { days: string[]; scenarios: number } | null;
+  /** The plan without the reading: equal weights and the plan's own contract cap. */
+  before: { stress_weight_ppm: number | null; max_contracts_per_hour: number };
+  /** The plan with it; null when not applied. */
+  after: { stress_weight_ppm: number; hedge_limit_kwh: number; max_contracts_per_hour: number } | null;
+}
+
+export interface CournotBasis {
+  source: string;
+  time: string | null;
+  summary: string;
+  url: string | null;
 }
 
 export interface Arm {
