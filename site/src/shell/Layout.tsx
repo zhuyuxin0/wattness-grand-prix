@@ -8,6 +8,7 @@ import { Masthead } from "./Masthead";
 import { Pager } from "./Pager";
 import { SidePanel, TabDrawer } from "./SidePanel";
 import { tabAt } from "./tabs";
+import { AskNess } from "../ness/Launcher";
 
 /** The app: wattness.tech's masthead over a side panel of grouped tabs and the page. */
 export function Layout() {
@@ -65,6 +66,7 @@ export function Layout() {
         </main>
       </div>
       <TabDrawer open={drawer} onClose={close} />
+      <AskNess />
     </div>
   );
 }
