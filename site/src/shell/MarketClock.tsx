@@ -62,8 +62,9 @@ export function GateTag({ now, compact = false }: { now: number; compact?: boole
   const left = gate.unix - Math.floor(now / 1000);
   const late = left <= 600;
   const day = useMarketDay();
-  // The spoken name changes by the minute, not the second: a screen reader is not read a ticking label.
-  const minutes = leftWords(Math.ceil(left / 60) * 60);
+  // The spoken name changes by the minute, not the second: a screen reader is not read a ticking label. It rounds down,
+  // as the countdown beside it reads: 01:08:24 is "1 hour 8 minutes", the last minute "less than a minute".
+  const minutes = leftWords(left);
   return (
     <>
       <button

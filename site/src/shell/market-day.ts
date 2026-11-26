@@ -188,7 +188,7 @@ export interface Tick {
 }
 
 export interface MarketDay {
-  /** The start of the current minute, unix seconds: everything here holds until the next one. */
+  /** The start of the current minute, unix seconds: what has passed and what runs hold until the next one. */
   now: number;
   /** The CT date now falls on (the Day-Ahead), YYYY-MM-DD. */
   day: string;
@@ -203,7 +203,7 @@ export interface MarketDay {
     tone: Tone;
     next: string;
     end: string;
-    /** Unix seconds the phase ends, and the seconds left to it. */
+    /** Unix seconds the phase ends, and the seconds left to it from the clock's second. */
     until: number;
     left: number;
     /** True while the phase ends at the DAM deadline, which carries the one countdown. */
@@ -212,10 +212,14 @@ export interface MarketDay {
   segments: Segment[];
   ticks: Tick[];
   moments: Moment[];
-  /** The next DAM transaction deadline (the site's gate) and the Operating Day it closes bids for. */
+  /**
+   * The next DAM transaction deadline (the site's gate), the Operating Day it closes bids for, and the seconds left to
+   * it from the clock's second: the gate tag's countdown.
+   */
   deadline: { unix: number; operatingDay: string; left: number };
   /** The next Adjustment Period close: at the top of the hour, for the Operating Hour that starts an hour later. */
   adjustment: {
+    /** Unix seconds, and the seconds left to it from the clock's second. */
     closes: number;
     left: number;
     /** The hour it closes for, "HE11", and its CT date when that is not today's. */
@@ -298,29 +302,36 @@ function operatingHour(ms: number): { label: string; day: string } {
   return { label: `HE${labels[Math.min(i, labels.length - 1)]}`, day };
 }
 
-/** "1 h 09 min", "9 min": the time left to a minute boundary, counted from the start of the current minute. */
-export function leftText(seconds: number): string {
-  const s = Math.max(0, Math.round(seconds));
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  return h ? `${h} h ${pad(m)} min` : `${m} min`;
+/** A time left in whole hours and minutes, rounded down, as a countdown reads: 01:08:24 is 1 h 08 min. */
+function hoursMinutes(seconds: number): { h: number; m: number } {
+  const s = Math.max(0, Math.floor(seconds));
+  return { h: Math.floor(s / 3600), m: Math.floor((s % 3600) / 60) };
 }
 
-/** The same time in words, for a control's spoken name: "1 hour 9 minutes". */
+/** "1 h 08 min", "9 min", and "< 1 min" in the last minute: never more than is left, never 0 min before the moment. */
+export function leftText(seconds: number): string {
+  const { h, m } = hoursMinutes(seconds);
+  if (h) return `${h} h ${pad(m)} min`;
+  return m ? `${m} min` : "< 1 min";
+}
+
+/** The same time in words, for a control's spoken name: "1 hour 8 minutes", "less than a minute". */
 export function leftWords(seconds: number): string {
-  const s = Math.max(0, Math.round(seconds));
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
+  const { h, m } = hoursMinutes(seconds);
   const unit = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
-  if (!h) return unit(m, "minute");
+  if (!h) return m ? unit(m, "minute") : "less than a minute";
   return m ? `${unit(h, "hour")} ${unit(m, "minute")}` : unit(h, "hour");
 }
 
 const cite = (source: string) => source.split(/; |\. /)[0]!.trim();
 
-/** The market day at an instant (unix ms), to the minute. */
+/**
+ * The market day at an instant (unix ms). What has passed and what runs hold for the minute. Each time left counts from
+ * the clock's second, as the masthead's clock and gate tag show it, so the panel's minutes are the tag's rounded down.
+ */
 export function marketDayAt(nowMs: number): MarketDay {
   const t = Math.floor(nowMs / 60_000) * 60_000;
+  const second = Math.floor(nowMs / 1000);
   const c = central(t);
   const today: Ymd = { y: c.y, m: c.m, d: c.d };
   const start = at(today, "00:00");
@@ -331,7 +342,7 @@ export function marketDayAt(nowMs: number): MarketDay {
   const current = spans.find((s) => s.from <= t && t < s.to) ?? spans[0]!;
 
   const gate = nextGate(t);
-  const deadline = { unix: gate.unix, operatingDay: gate.operatingDay, left: gate.unix - t / 1000 };
+  const deadline = { unix: gate.unix, operatingDay: gate.operatingDay, left: gate.unix - second };
 
   const moments: Moment[] = [
     ...spans.map(
@@ -385,7 +396,7 @@ export function marketDayAt(nowMs: number): MarketDay {
       next: current.p.next,
       end: current.p.end,
       until: current.to / 1000,
-      left: (current.to - t) / 1000,
+      left: current.to / 1000 - second,
       atDeadline: current.to / 1000 === deadline.unix,
     },
     segments: spans.map(({ p, from, to }) => ({
@@ -403,10 +414,22 @@ export function marketDayAt(nowMs: number): MarketDay {
     deadline,
     adjustment: {
       closes: top / 1000,
-      left: (top - t) / 1000,
+      left: top / 1000 - second,
       hour: after.label,
       day: after.day === isoDay(today) ? null : after.day,
       current: operatingHour(t).label,
     },
   };
+}
+
+/**
+ * The instant to draw the market day for at `nowMs`. What the panel shows changes twice a minute and never between: a
+ * moment passes on its minute, and every time left (to a whole minute, from the clock's second) drops a minute one
+ * second later. So a minute's first second is drawn at its start and the rest of it one second in, and the panel
+ * redraws on those two seconds rather than on every tick.
+ */
+export function shownAt(nowMs: number): number {
+  const second = Math.floor(nowMs / 1000);
+  const minute = Math.floor(second / 60) * 60;
+  return (second === minute ? minute : minute + 1) * 1000;
 }

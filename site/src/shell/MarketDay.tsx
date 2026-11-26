@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useId, useLayoutEffect, useRef, useState,
 import { createPortal } from "react-dom";
 import { dualTime, formatOperatingDay } from "../lib/time";
 import { Glyph } from "../ui/Glyph";
-import { ADJUSTMENT_CLOSE, EDITION, PHASES, TIME_BASIS, leftText, marketDayAt, type Moment } from "./market-day";
+import { ADJUSTMENT_CLOSE, EDITION, PHASES, TIME_BASIS, leftText, marketDayAt, shownAt, type Moment } from "./market-day";
 import "./market-day.css";
 
 // The market day, opened from the masthead's clock and gate: a popover under the control on a wide screen, a sheet
@@ -52,7 +52,7 @@ const TABBABLE = 'a[href], button:not([disabled]), input:not([disabled]), select
 interface PanelProps {
   id: string;
   anchor: RefObject<HTMLElement>;
-  /** Unix ms; the panel redraws when the minute changes. */
+  /** Unix ms; the panel redraws only when what it shows changes (shownAt). */
   now: number;
   onClose: (returnFocus: boolean) => void;
 }
@@ -61,7 +61,7 @@ export function MarketDayPanel({ id, anchor, now, onClose }: PanelProps) {
   const sheet = useMedia(PHONE);
   const opened = useRef(sheet);
   const panel = useRef<HTMLDivElement>(null);
-  const minute = Math.floor(now / 60_000) * 60_000;
+  const at = shownAt(now);
   const closeBack = useCallback(() => onClose(true), [onClose]);
 
   // Under the trigger, its right edge on the trigger's, kept inside the window.
@@ -153,7 +153,7 @@ export function MarketDayPanel({ id, anchor, now, onClose }: PanelProps) {
   }, [sheet, onClose, anchor]);
 
   const titleId = `${id}-title`;
-  const body = <MarketDayBody minute={minute} titleId={titleId} onClose={closeBack} />;
+  const body = <MarketDayBody at={at} titleId={titleId} onClose={closeBack} />;
   return createPortal(
     sheet ? (
       <div className="gate-sheet">
@@ -197,8 +197,8 @@ function useFittedLabels(strip: RefObject<HTMLElement>, day: string) {
   }, [strip, day]);
 }
 
-const MarketDayBody = memo(function MarketDayBody({ minute, titleId, onClose }: { minute: number; titleId: string; onClose: () => void }) {
-  const day = marketDayAt(minute);
+const MarketDayBody = memo(function MarketDayBody({ at, titleId, onClose }: { at: number; titleId: string; onClose: () => void }) {
+  const day = marketDayAt(at);
   const strip = useRef<HTMLDivElement>(null);
   useFittedLabels(strip, day.day);
 
@@ -233,7 +233,7 @@ const MarketDayBody = memo(function MarketDayBody({ minute, titleId, onClose }: 
           {!day.phase.atDeadline && (
             <>
               {" · "}
-              <span className="num">{leftText(day.phase.left)}</span> left
+              <span className="gate-day__left num">{leftText(day.phase.left)} left</span>
             </>
           )}
         </span>
@@ -276,14 +276,14 @@ const MarketDayBody = memo(function MarketDayBody({ minute, titleId, onClose }: 
           DAM deadline for Operating Day {formatOperatingDay(day.deadline.operatingDay)}: <b className="num">{deadline.ct}</b>
           {deadline.yours && <span className="num"> · {deadline.yours}</span>}
           {" · "}
-          <b className={`num${late ? " gate-day__late" : ""}`}>{leftText(day.deadline.left)} left</b>.
+          <b className={`gate-day__left num${late ? " gate-day__late" : ""}`}>{leftText(day.deadline.left)} left</b>.
         </p>
         <p title={`“${ADJUSTMENT_CLOSE.quote}”\n— ${ADJUSTMENT_CLOSE.source}`}>
           Adjustments for {day.adjustment.hour}
           {day.adjustment.day && ` (${shortDay(day.adjustment.day)})`} close at <b className="num">{adjust.ct}</b>
           {adjust.yours && <span className="num"> · {adjust.yours}</span>}
           {" · "}
-          <b className="num">{leftText(day.adjustment.left)} left</b>. Current Operating Hour: {day.adjustment.current}.
+          <b className="gate-day__left num">{leftText(day.adjustment.left)} left</b>. Current Operating Hour: {day.adjustment.current}.
         </p>
       </div>
       <p className="gate-day__foot">

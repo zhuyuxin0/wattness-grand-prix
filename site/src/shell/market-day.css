@@ -412,6 +412,10 @@ button.gate-tag[aria-expanded="true"] {
 .gate-day__deadlines b {
   font-weight: 600;
 }
+/* A time left keeps together on one line: "< 1 min left" never breaks after its sign. */
+.gate-day__left {
+  white-space: nowrap;
+}
 .gate-day__late {
   color: var(--s-bad);
 }

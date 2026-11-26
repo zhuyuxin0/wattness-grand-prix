@@ -18,13 +18,23 @@ registerHooks({
   },
 });
 
-const { EVENTS, PHASES, hourLabels, leftText, leftWords, marketDayAt } = await import("../src/shell/market-day.ts");
-const { formatInZone, nextGate } = await import("../src/lib/time.ts");
+const { EVENTS, PHASES, hourLabels, leftText, leftWords, marketDayAt, shownAt } = await import("../src/shell/market-day.ts");
+const { formatCountdown, formatInZone, nextGate } = await import("../src/lib/time.ts");
 
 const ms = (iso) => Date.parse(iso);
 const unix = (iso) => Date.parse(iso) / 1000;
 const states = (day) => Object.fromEntries(day.moments.map((m) => [m.key, m.state]));
 const hhmm = (u, zone) => formatInZone(u, zone, { date: false, seconds: false });
+
+/** The gate tag's countdown at an instant, as the masthead prints it: "01:08:24", "1d 00:00:00". */
+const tag = (t) => formatCountdown(nextGate(t).unix - Math.floor(t / 1000));
+/** That countdown read down to the minute, in the panel's words, parsed from the tag's own text. */
+function tagInPanelWords(countdown) {
+  const [, d = "0", hh, mm] = countdown.match(/^(?:(\d+)d )?(\d\d):(\d\d):\d\d$/);
+  const h = Number(d) * 24 + Number(hh);
+  const m = Number(mm);
+  return h ? `${h} h ${mm} min` : m ? `${m} min` : "< 1 min";
+}
 
 test("the register runs 00:00 to 24:00 without a gap, each line with its Protocols section", () => {
   assert.equal(PHASES[0].start, "00:00");
@@ -93,14 +103,66 @@ test("08:51 CT on the 26th: bids for the 27th are due, the plan is posted, every
     ],
     "each moment shows its first reference",
   );
-  assert.deepEqual(day.deadline, { unix: unix("2026-11-26T16:00:00Z"), operatingDay: "2026-11-27", left: 69 * 60 });
-  assert.equal(leftText(day.deadline.left), "1 h 09 min");
+  assert.deepEqual(day.deadline, { unix: unix("2026-11-26T16:00:00Z"), operatingDay: "2026-11-27", left: 68 * 60 + 24 });
+  assert.equal(tag(ms("2026-11-26T14:51:36Z")), "01:08:24", "the gate tag above it");
+  assert.equal(leftText(day.deadline.left), "1 h 08 min", "the tag's 01:08:24 rounded down, as wattness.tech's 1h 08m");
   // The same instant on every reader's clock: CT first, the reader's own beside it.
   assert.equal(hhmm(day.deadline.unix, "America/Chicago"), "10:00");
   assert.equal(hhmm(day.deadline.unix, "Asia/Bangkok"), "23:00");
   assert.equal(hhmm(day.deadline.unix, "Europe/London"), "16:00");
-  assert.deepEqual(day.adjustment, { closes: unix("2026-11-26T15:00:00Z"), left: 9 * 60, hour: "HE11", day: null, current: "HE09" });
-  assert.equal(leftText(day.adjustment.left), "9 min");
+  assert.deepEqual(day.adjustment, { closes: unix("2026-11-26T15:00:00Z"), left: 8 * 60 + 24, hour: "HE11", day: null, current: "HE09" });
+  assert.equal(leftText(day.adjustment.left), "8 min", "8:24 to 09:00 CT");
+});
+
+test("each time left is what the gate tag reads, rounded down to the minute, and never 0 min", () => {
+  const cases = [
+    // [instant, CT, the tag, DAM deadline, the running phase, the adjustments close, the gate's spoken time]
+    ["2026-11-26T06:00:30Z", "00:00:30", "09:59:30", "9 h 59 min", null, "59 min", "9 hours 59 minutes"],
+    ["2026-11-26T14:51:36Z", "08:51:36", "01:08:24", "1 h 08 min", null, "8 min", "1 hour 8 minutes"],
+    ["2026-11-26T15:59:00Z", "09:59:00", "00:01:00", "1 min", null, "1 min", "1 minute"],
+    ["2026-11-26T15:59:30Z", "09:59:30", "00:00:30", "< 1 min", null, "< 1 min", "less than a minute"],
+    ["2026-11-26T19:29:59Z", "13:29:59", "20:30:01", "20 h 30 min", "< 1 min", "30 min", "20 hours 30 minutes"],
+    ["2026-11-27T05:59:59.999Z", "23:59:59", "10:00:01", "10 h 00 min", "< 1 min", "< 1 min", "10 hours"],
+  ];
+  for (const [iso, ct, countdown, deadline, phase, adjustment, words] of cases) {
+    const t = ms(iso);
+    const day = marketDayAt(t);
+    assert.equal(formatInZone(Math.floor(t / 1000), "America/Chicago", { date: false }), ct);
+    assert.equal(tag(t), countdown, `the tag at ${ct} CT`);
+    assert.equal(leftText(day.deadline.left), deadline, `the DAM deadline at ${ct} CT`);
+    assert.equal(leftText(day.deadline.left), tagInPanelWords(countdown));
+    if (phase) assert.equal(leftText(day.phase.left), phase, `the phase at ${ct} CT`);
+    assert.equal(leftText(day.adjustment.left), adjustment, `the adjustments close at ${ct} CT`);
+    assert.equal(leftWords(day.deadline.left), words, `the gate's spoken name at ${ct} CT`);
+  }
+});
+
+test("the panel drawn at shownAt reads the same as at the instant itself, and redraws twice a minute", () => {
+  const m = ms("2026-11-26T14:51:00Z");
+  assert.equal(shownAt(m), m, "the minute's first second is drawn at its start");
+  assert.equal(shownAt(m + 999), m);
+  assert.equal(shownAt(m + 1000), m + 1000, "the rest of it one second in");
+  assert.equal(shownAt(m + 59_999), m + 1000);
+  assert.equal(shownAt(m + 60_000), m + 60_000);
+
+  const drawn = (day) => ({
+    now: day.now,
+    x: day.x,
+    phase: [day.phase.id, leftText(day.phase.left)],
+    states: states(day),
+    deadline: [day.deadline.unix, day.deadline.operatingDay, leftText(day.deadline.left), day.deadline.left <= 600],
+    adjustment: [day.adjustment.closes, day.adjustment.hour, day.adjustment.day, day.adjustment.current, leftText(day.adjustment.left)],
+  });
+  // An ordinary day and both change days, every 23rd minute (so every minute of the hour in turn), at the edges of its
+  // first two seconds and its last.
+  for (const start of ["2026-11-26T06:00:00Z", "2026-11-01T05:00:00Z", "2027-03-14T06:00:00Z"]) {
+    for (let minute = ms(start); minute < ms(start) + 25 * 3_600_000; minute += 23 * 60_000) {
+      for (const offset of [0, 999, 1000, 1001, 30_500, 59_999]) {
+        const t = minute + offset;
+        assert.deepEqual(drawn(marketDayAt(shownAt(t))), drawn(marketDayAt(t)), `at ${new Date(t).toISOString()}`);
+      }
+    }
+  }
 });
 
 test("a moment passes on its minute, not a second before", () => {
@@ -108,7 +170,7 @@ test("a moment passes on its minute, not a second before", () => {
   assert.equal(before.phase.id, "dam-offers-due");
   assert.equal(states(before)["dam-clearing"], "ahead");
   assert.equal(before.deadline.unix, unix("2026-11-26T16:00:00Z"));
-  assert.equal(leftText(before.deadline.left), "1 min", "a countdown never reads 0 min before its moment");
+  assert.equal(leftText(before.deadline.left), "< 1 min", "a countdown never reads 0 min before its moment");
   assert.equal(before.adjustment.hour, "HE12");
 
   const at = marketDayAt(ms("2026-11-26T16:00:00Z"));
@@ -206,7 +268,9 @@ test("over two years, every minute sampled agrees with the site's gate and with 
     assert.equal(day.deadline.unix, gate.unix, `the deadline is the site's gate at ${new Date(t).toISOString()}`);
     assert.equal(day.deadline.operatingDay, gate.operatingDay);
     assert.ok(day.deadline.left > 0 && day.deadline.left <= 24 * 3600 + 3600, "the next deadline is within a day and an hour");
-    assert.ok(day.adjustment.left > 0 && day.adjustment.left <= 3600 && day.adjustment.left % 60 === 0);
+    assert.equal(leftText(day.deadline.left), tagInPanelWords(tag(t)), "the panel's DAM deadline is the gate tag's, rounded down");
+    assert.ok(day.adjustment.left > 0 && day.adjustment.left <= 3600);
+    assert.equal(day.adjustment.closes % 3600, 0, "adjustments close on the hour");
     assert.ok([23, 24, 25].includes(day.hours));
     assert.ok(day.x >= 0 && day.x < 1);
     assert.equal(day.segments[0].from, 0);
@@ -224,16 +288,26 @@ test("over two years, every minute sampled agrees with the site's gate and with 
   }
 });
 
-test("left times read in hours and minutes", () => {
+test("left times read in hours and minutes, rounded down", () => {
+  assert.equal(leftText(1), "< 1 min");
+  assert.equal(leftText(59), "< 1 min");
+  assert.equal(leftText(59.9), "< 1 min", "a part of a second rounds down too");
   assert.equal(leftText(60), "1 min");
+  assert.equal(leftText(119), "1 min");
+  assert.equal(leftText(3599.5), "59 min");
   assert.equal(leftText(9 * 60), "9 min");
+  assert.equal(leftText(3599), "59 min");
   assert.equal(leftText(3600), "1 h 00 min");
   assert.equal(leftText(69 * 60), "1 h 09 min");
+  assert.equal(leftText(68 * 60 + 24), "1 h 08 min");
   assert.equal(leftText(25 * 3600), "25 h 00 min");
   // and in words for the triggers' spoken names
+  assert.equal(leftWords(30), "less than a minute");
+  assert.equal(leftWords(59.9), "less than a minute");
   assert.equal(leftWords(60), "1 minute");
   assert.equal(leftWords(9 * 60), "9 minutes");
   assert.equal(leftWords(3600), "1 hour");
   assert.equal(leftWords(69 * 60), "1 hour 9 minutes");
+  assert.equal(leftWords(68 * 60 + 24), "1 hour 8 minutes");
   assert.equal(leftWords(24 * 3600), "24 hours");
 });
