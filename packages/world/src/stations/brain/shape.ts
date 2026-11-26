@@ -1,7 +1,9 @@
 // Our brain shape: a signed distance field of our own, sampled on its surface. Two cerebral hemispheres (egg-shaped,
-// smooth-unioned across the midline, the longitudinal fissure cut down the top), the temporal lobes below and forward,
-// a flattened base, the cerebellum under the back with fine horizontal folia, and a brainstem stub. Cracks along the
-// zero set of a gradient noise fold the cerebrum, so a shell sampled on it shows the gyri as denser streaks. No mesh
+// smooth-unioned across the midline, the longitudinal fissure cut down the top), the temporal lobes below and forward
+// under a lateral fissure deep enough to read from the side, a base on which the frontal lobe steps up from the
+// temporal pole, the cerebellum under the back with fine horizontal folia and a crease between it and the occipital
+// lobe, and a brainstem stub. Cracks along the zero set of a gradient noise fold the cerebrum, and a brain's shell keeps
+// its clumps to the gyri between them, so it reads as streaks with dark lines between, as Living Brain's mesh does. No mesh
 // file: every point comes from this field and a seed (lib/random.ts), so the film, the lab and the site draw the same
 // brain. Units are Living Brain's: centered, the longest half-extent 0.62; +y up, the front toward +z, its left -x.
 import { rng, seedOf, type Rng } from '../../lib/random';
@@ -76,10 +78,13 @@ function cerebrum(x: number, y: number, z: number) {
   // the temporal lobes, below and forward of the hemispheres' middle, wide enough that the outline from the front is
   // widest in its lower third
   d = smin(d, ell(ax - 0.31, y + 0.17, z - 0.02, 0.15, 0.14, 0.27), 0.07);
-  // the lateral fissure: a groove from the temporal pole back and up, over the temporal lobe
-  d = smax(d, -capsule(ax, y, z, 0.47, -0.08, 0.25, 0.47, 0.02, -0.18, 0.014), 0.016);
-  // a rounded base under the frontal and temporal lobes, rising toward the sides so the lower corners round off
-  d = smax(d, -0.33 + 0.55 * ax * ax - y + 0.035 * sstep(-0.05, -0.5, z), 0.09);
+  // the lateral fissure: a groove from the temporal pole back and up, over the temporal lobe, cut into the lateral
+  // surface (which stands at 0.38 to 0.44 from the midline along its line) deep and wide enough to read from the side
+  d = smax(d, -capsule(ax, y, z, 0.43, -0.08, 0.25, 0.43, 0.02, -0.18, 0.04), 0.03);
+  // the base: the frontal lobe's underside stands higher than the temporal lobe's (the step up at the temporal pole),
+  // rising toward the sides so the lower corners round off; a soft cut, so the temporal lobe keeps its curve below
+  const step = 0.07 * sstep(0.18, 0.36, z);
+  d = smax(d, -0.35 + step + 0.7 * ax * ax - y + 0.035 * sstep(-0.05, -0.5, z), 0.12);
   return d;
 }
 
@@ -97,7 +102,7 @@ export function base(x: number, y: number, z: number): number {
   return smin(cerebrum(x, y, z), hindbrain(x, y, z), 0.04);
 }
 
-const FOLD = { amp: 0.055, freq: 8.5, width: 0.14, amp2: 0.018, freq2: 19, width2: 0.16 };
+const FOLD = { amp: 0.07, freq: 8.5, width: 0.14, amp2: 0.022, freq2: 19, width2: 0.16 };
 /** The folds: narrow cracks along the zero set of the noise (sulci), deep enough that their walls hold much of the
  *  surface, the cerebrum between them left round (gyri). */
 function folds(x: number, y: number, z: number) {
@@ -106,15 +111,21 @@ function folds(x: number, y: number, z: number) {
   return FOLD.amp * Math.exp(-n * n) + FOLD.amp2 * Math.exp(-n2 * n2);
 }
 
-/** The whole field: negative inside. */
-export function field(x: number, y: number, z: number): number {
-  const cb = cerebrum(x, y, z);
-  // folds on the cerebrum's outer surface: off on the medial faces (they keep a few) and where it meets the hindbrain
+/** The folds' depth at a point of the cerebrum's outer surface: off on the medial faces (they keep a few) and where it
+ *  meets the hindbrain. */
+function foldDepth(x: number, y: number, z: number) {
   const ax = Math.abs(x);
   const outer = 0.35 + 0.65 * sstep(0.02, 0.08, ax);
   const onCerebrum = sat(sstep(-0.3, -0.2, y) + sstep(-0.2, 0.0, z) * (1 - sstep(-0.3, -0.2, y)));
-  const folded = cb + folds(x, y, z) * onCerebrum * outer;
-  return smin(folded, hindbrain(x, y, z), 0.04);
+  return folds(x, y, z) * onCerebrum * outer;
+}
+
+/** The whole field: negative inside. */
+export function field(x: number, y: number, z: number): number {
+  const cb = cerebrum(x, y, z);
+  const folded = cb + foldDepth(x, y, z);
+  // the crease between the occipital lobe and the cerebellum, along the back where they meet
+  return smax(smin(folded, hindbrain(x, y, z), 0.04), -capsule(x, y, z, -0.32, -0.14, -0.46, 0.32, -0.14, -0.46, 0.035), 0.02);
 }
 
 // ── sampling ────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -132,6 +143,8 @@ export interface SurfacePool {
   pos: Float32Array;
   /** Their outward unit normals. */
   nrm: Float32Array;
+  /** How deep each lies in a fold's crack: 0 on a gyrus, 1 at a sulcus's floor. */
+  sulc: Float32Array;
   count: number;
   /** The scale and center applied to the field's units. */
   scale: number;
@@ -152,7 +165,7 @@ export function surfacePool(): SurfacePool {
   if (pool) return pool;
   const r = rng(seedOf('brain-surface'));
   const n = POOL_SIZE, band = 0.012, reach = band * 6 + FOLD.amp + FOLD.amp2;
-  const P = new Float32Array(n * 3), N = new Float32Array(n * 3);
+  const P = new Float32Array(n * 3), N = new Float32Array(n * 3), U = new Float32Array(n);
   const g = new Float64Array(3);
   let k = 0, guard = 0;
   while (k < n && guard++ < n * 400) {
@@ -182,9 +195,11 @@ export function surfacePool(): SurfacePool {
     // the cerebellum and the stem twice as dense as the rest (in Living Brain's mesh their fine folds hold far more
     // surface than a smooth field gives them, so they read as solid as the cerebrum)
     const copies = y < -0.2 && z < -0.05 && hindbrain(x, y, z) < cerebrum(x, y, z) ? 2 : 1;
+    const sulc = sat(foldDepth(x, y, z) / (FOLD.amp + FOLD.amp2));
     for (let c = 0; c < copies && k < n; c++) {
       P[k * 3] = x; P[k * 3 + 1] = y; P[k * 3 + 2] = z;
       N[k * 3] = g[0]! / gl; N[k * 3 + 1] = g[1]! / gl; N[k * 3 + 2] = g[2]! / gl;
+      U[k] = sulc;
       k++;
     }
   }
@@ -195,7 +210,7 @@ export function surfacePool(): SurfacePool {
   const half = Math.max(hi[0]! - lo[0]!, hi[1]! - lo[1]!, hi[2]! - lo[2]!) / 2;
   const scale = 0.62 / half;
   for (let i = 0; i < k; i++) for (let j = 0; j < 3; j++) P[i * 3 + j] = (P[i * 3 + j]! - center[j]!) * scale;
-  pool = { pos: k === n ? P : P.slice(0, k * 3), nrm: k === n ? N : N.slice(0, k * 3), count: k, scale, center };
+  pool = { pos: k === n ? P : P.slice(0, k * 3), nrm: k === n ? N : N.slice(0, k * 3), sulc: k === n ? U : U.slice(0, k), count: k, scale, center };
   return pool;
 }
 
@@ -246,7 +261,9 @@ export function brainPoints(seed: number, count = 60_000, shellShare = 0.7): Bra
   for (let i = 0; i < count; i++) {
     const inShell = i < shell;
     if (!inShell || left <= 0) {
-      const j = pick[next++ % pick.length]!;
+      // the shell's clumps keep to the gyri: a sample deep in a crack is passed over 0.8 of the time at its floor
+      let j = pick[next++ % pick.length]!;
+      if (inShell) for (let tries = 0; tries < 6 && r.next() < 0.8 * S.sulc[j]!; tries++) j = pick[next++ % pick.length]!;
       cx = S.pos[j * 3]!; cy = S.pos[j * 3 + 1]!; cz = S.pos[j * 3 + 2]!;
       nx = S.nrm[j * 3]!; ny = S.nrm[j * 3 + 1]!; nz = S.nrm[j * 3 + 2]!;
       // a tangent basis

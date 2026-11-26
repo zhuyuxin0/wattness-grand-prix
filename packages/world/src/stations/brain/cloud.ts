@@ -17,7 +17,7 @@ export const DOT = '#4c8fff';
  *  brightness, the core's light whitening the particles round it only a little (the core reads as Living Brain's soft
  *  gas glow, the ray-marched core at full, not as a swarm of whitened particles), the connections' brightness, and a
  *  member's paling toward its own luminance (tintDesat). */
-export const LOOK = { desat: 0.5, gain: 1.38, white: 0.14, whiteMax: 0.5, hi: 0.25, low: 0.04, edge: 0.8, dot: 1.0, core: 1.0, tintDesat: 0.5 };
+export const LOOK = { desat: 0.5, gain: 1.38, white: 0.14, whiteMax: 0.5, hi: 0.25, low: 0.04, edge: 1.2, dot: 1.0, core: 1.0, tintDesat: 0.5 };
 
 /** The sprites' sizes are drawn for the brain station's 37 degree lens (world.ts VFOV). Under another lens a host
  *  scales sizeK by this, so the particles stay as fine against the brain's shape as the station draws them (the
