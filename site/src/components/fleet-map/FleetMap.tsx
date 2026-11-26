@@ -579,7 +579,7 @@ function MapBody({ day, points, texas, variant = "lead", hour: initialHour }: Fl
   );
 }
 
-const shadowLine = "Wattness's shadow plans, made from public data: never the operators' own dispatch.";
+const shadowLine = "Wattness's shadow plans, computed from public data.";
 
 // ---------------------------------------------------------------- the day's curve under the scrubber
 
