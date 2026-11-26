@@ -1,0 +1,53 @@
+{
+ "schema": "grand-prix.render-still.v1",
+ "what": "Chapter 14 of the introduction at its rest: the weather radar, the odds read after the Nov 26 seal.",
+ "frame": "_objects.chapter-odds",
+ "code": {
+  "base": "ab0e8ffb73fe760cc1c382a56f522d495d945859",
+  "rig": {
+   "path": "packages/world/src/stations/_objects/index.ts",
+   "git_blob": "c6fd405140bae0bc25799af53da2c2ab35fbb89b"
+  },
+  "world_tree": "6a2b350bb4f0f959cc1063391b496af5990276d4",
+  "note": "packages/world as on main (base), plus the rig named here: the stations' own builders and frames from the frame data, with the rig's camera or the chapter's own"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.chapter-odds --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
+  "lab": "lab.html?frame=_objects.chapter-odds&w=1280&h=720&theme=dark&plates=0",
+  "rendered": {
+   "bangkok": "2026-11-27 01:36",
+   "ct": "2026-11-26 12:36"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max",
+  "deterministic": "2 draws in fresh pages, byte-identical",
+  "master": {
+   "size": "2560 x 1440",
+   "sha256": "217f655a9dbd2ef4aa4957c1e192039f4aac143aa0d26dce76ca2e619e0b017b"
+  },
+  "png_1280": {
+   "size": "1280 x 720, render.mjs's Lanczos from the master",
+   "sha256": "ce46a462881ee7590ee1da6222a49883b99aa0b41dec72510d05f765cdaf1491"
+  },
+  "png_640": {
+   "size": "640 x 360, ffmpeg's Lanczos from the master",
+   "sha256": "fa8549c10e3af9d46237b2bc0bc1661d991d8cc1faf6e6db5d516628810475ab"
+  },
+  "webp": "cwebp 1.6.0 -q 86 -m 6 -sharp_yuv -metadata none"
+ },
+ "files": {
+  "chapter-odds-640.webp": {
+   "width": 640,
+   "height": 360,
+   "bytes": 11034,
+   "sha256": "0a5b6d17c4809070b4a699fdad586374d3e89cadc030aa1df7005e9e4faa2dbc"
+  },
+  "chapter-odds-1280.webp": {
+   "width": 1280,
+   "height": 720,
+   "bytes": 31860,
+   "sha256": "c0fe7df777a26e51c8e87eb9dbd8f2cb0fd8e2295fc22e5891f309901fddd63f"
+  }
+ },
+ "rerender_when": "the weather radar (stations/world/radar.ts), the rig, or the frame data changes"
+}
