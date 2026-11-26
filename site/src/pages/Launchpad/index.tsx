@@ -414,7 +414,7 @@ function cardCheck(live: Live<LaunchRead>): CheckItProps {
     how: checks
       ? bad.length
         ? `Read again from BSC testnet in your browser: ${bad.join("; ")}.`
-        : `Every transaction's receipt read again from BSC testnet in your browser, at block ${formatInt(Number(live.read!.at.number))}: ${n} of ${n} match the replay's status, block, time and token moves.`
+        : `Every transaction's receipt read again from BSC testnet in your browser, at block ${formatInt(Number(live.read!.at.number))}: all ${n} match, each frame's status, block, time and token moves and each setup transaction's status and block.`
       : "Each transaction opens on testnet.bscscan.com; the page reads every receipt again from BSC testnet once a public node answers.",
   };
 }
