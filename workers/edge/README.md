@@ -39,7 +39,7 @@ the code that produced it. Everything else hangs from that root.
 | `record.<network>.json` | every field is what GateRecord holds on that network, there are no other fields, and the transaction it names succeeded in the record's block and logged one matching `Committed` event |
 | `root.hex` | it is the root GateRecord holds |
 | `salt.txt` | it is the salt inside the showcase battery's verified leaf |
-| a file a leaf names | SHA-256 of its bytes is the digest the verified leaf records, as for an outside input's saved response (`cournot/probability.json`) |
+| a file a leaf names | SHA-256 of its bytes is the digest the showcase battery's verified leaf records, as for an outside input's saved response (`cournot/probability.json`; none on 26 Nov) |
 
 Every JSON file must also be its document's own rendering, pretty-printed with a final newline or in RFC 8785
 form. A hash covers a document, not its whitespace; this rule means no byte is served that the document does not

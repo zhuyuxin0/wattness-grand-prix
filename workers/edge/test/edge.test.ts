@@ -636,6 +636,12 @@ describe("requests", () => {
     expect.soft(body.match(/https:\/\/\S+\/$/gm) ?? [], "a URL that ends at a folder").toEqual([]);
   });
 
+  it("gives cournot/probability.json as an example of a file a leaf names, and says 26 Nov has none", async () => {
+    upstreams();
+    const page = (await (await call(freshOrigin(), "/")).text()).replace(/\s+/g, " ");
+    expect(page).toContain("(an outside input's saved response, such as cournot/probability.json; none on 26 Nov)");
+  });
+
   it("answers HEAD with the headers alone and a CORS preflight with 204", async () => {
     upstreams();
     const head = await call(freshOrigin(), LEAF, { method: "HEAD" });
