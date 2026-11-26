@@ -1,6 +1,7 @@
 // One registry of the owners' logos, as each owner publishes them (sources, hashes and every edit in SOURCES.md).
 // Every chip on the site and in the 3D reads its file, name and link from here, so there is one set and one look.
-// The files are drawn for a light ground (the white chip), except ElectronX's, which its site publishes in white only.
+// The files are drawn for a light ground (the white chip), except two drawn for a dark one, each set on a dark plate
+// inside the chip: ElectronX's, which its site publishes in white only, and Flap's in its Signal Lime.
 
 export type LogoId =
   | 'bnbchain'
@@ -57,7 +58,7 @@ export const LOGOS: Record<LogoId, LogoSpec> = {
     id: 'agentstudio', name: 'BNB Agent Studio', href: 'https://docs.bnbchain.org/developer-kit/bnbchain-studio/quickstart/',
     src: BNBCHAIN, w: 319, h: 56, ground: 'light', optical: 1, caption: 'Agent Studio',
   },
-  flap: { id: 'flap', name: 'Flap', href: 'https://flap.sh/', src: FLAP, w: 255, h: 43.7143, ground: 'light', optical: 0.95 },
+  flap: { id: 'flap', name: 'Flap', href: 'https://flap.sh/', src: FLAP, w: 255, h: 43.7143, ground: 'dark', optical: 1.1 },
   openfour: { id: 'openfour', name: 'OpenFour by Four.meme', href: 'https://four.meme/', src: FOURMEME_MARK, w: 24, h: 25, ground: 'light', optical: 1.15, caption: 'OpenFour' },
   cmc: { id: 'cmc', name: 'CoinMarketCap', href: 'https://coinmarketcap.com/', src: COINMARKETCAP, w: 239, h: 41, ground: 'light', optical: 1.05 },
   atlas: { id: 'atlas', name: 'Atlas', href: 'https://atlasoracle.io/', src: ATLAS, w: 166.78, h: 42, ground: 'light', optical: 1.1 },
