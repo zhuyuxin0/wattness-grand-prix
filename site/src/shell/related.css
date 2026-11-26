@@ -1,0 +1,62 @@
+/* The Related strip in a page's head: the eyebrow's voice for its label, and the tabs it leads to as small raised
+   chips in the Terminal's control face. A hover tints the ground and the edge only, so nothing moves under the pointer. */
+
+.related {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  margin-top: var(--t-space-4);
+}
+.related__label {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.related__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--t-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.related__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  box-shadow: var(--t-shadow-1);
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--m-dur-s) ease-out, border-color var(--m-dur-s) ease-out;
+}
+.related__item:hover {
+  background: color-mix(in srgb, var(--w-fg) 5%, var(--t-raised));
+  border-color: var(--t-accent-mark);
+  color: var(--w-fg);
+}
+/* The tab's icon, as the side panel draws it: the muted ink at rest, the label's own under the pointer. */
+.related__icon {
+  color: var(--w-muted);
+}
+.related__item:hover .related__icon {
+  color: var(--w-fg);
+}
+@media (max-width: 767px) {
+  /* A finger's reach. */
+  .related__item {
+    height: 32px;
+    padding: 0 12px;
+  }
+}

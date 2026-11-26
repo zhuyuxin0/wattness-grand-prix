@@ -118,6 +118,10 @@ carries to the rest; a link may name one with `/battery/<resource>` or `?battery
   goes to the tab, Esc closes the top pane; from 767px down a pane is a full-height sheet. This browser keeps the open
   panes (`gp.panes`, try/catch). Stacking: masthead 20, panes 25, battery list 30, market day 50, drawer 60, the
   introduction in the top layer; Ask Ness's panel goes anywhere above 25. `test/float.test.mjs` holds the model.
+- Related (`src/shell/related.ts`, one set per tab; drawn by `PageHeader` and under the Intro's hero by
+  `src/shell/RelatedStrip.tsx`): the two to four tabs each page leads to. A click previews the tab as a floating pane
+  over the page; a link held with ⌘, Ctrl or Shift, or a middle click, opens it in a new browser tab; the pane's Open
+  goes to it. `test/related.test.mjs` holds every set to the tab list.
 - New published data: add `scripts/data/<page>.mjs` whose default export takes the context documented in
   `scripts/build-data.mjs` (`day`, `batteries`, `leaf(resource)`, `writeJson`, ...). Modules run in name order;
   the size, credential and date checks cover their files too.

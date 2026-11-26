@@ -4,6 +4,7 @@ import { SHADOW_NOTE, SOURCE_LINE } from "../../config";
 import { combine, useDay, useReceipts } from "../../data";
 import { minSec } from "../../lib/clock";
 import { formatInt } from "../../lib/format";
+import { RelatedStrip } from "../../shell/RelatedStrip";
 import { dualTime, formatInZone } from "../../lib/time";
 import { CENTRAL_TZ } from "../../config";
 import { Glyph, Section } from "../../ui";
@@ -178,6 +179,7 @@ export default function IntroPage() {
       {story && <StoryOverlay onClose={closeStory} onRoute={routeFromStory} />}
 
       <div className="intro-body">
+        <RelatedStrip tabId="intro" />
         <p className="intro__source">
           {SOURCE_LINE} Commits: GateRecord on BNB Smart Chain, read from each chain's receipt. {SHADOW_NOTE}
         </p>
