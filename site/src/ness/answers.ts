@@ -173,9 +173,9 @@ export const ANSWERS: Answer[] = [
     sponsor: "bnb",
     question: "How does the Grand Prix use BNB Chain?",
     body: [
-      "BNB Smart Chain keeps the record. One transaction a day seals every plan under one root in GateRecord, on BSC mainnet and testnet. The contract computes ERCOT's 10:00 CT gate itself and refuses a late or a second record.",
-      "BNB Greenfield keeps the files each root covers. Seven agents hold ERC-8004 identities on BSC testnet, the six roles of a plan registered through the BNB Agent SDK with gas sponsored by MegaFuel. They pay each other through ERC-8183 jobs, and BNB Agent Studio hosts two of them on AWS AgentCore.",
-      "A Cloudflare Worker serves the sealed files only after checking them against GateRecord. The Flap and OpenFour launches on BSC testnet read the same record.",
+      "BNB Smart Chain keeps the record. One transaction a day seals every plan under one root in GateRecord, on BSC mainnet and on testnet. The contract computes ERCOT's 10:00 CT gate itself and refuses a late or a second record.",
+      "BNB Greenfield keeps the files behind each day's record. Seven agents hold ERC-8004 identities on BSC testnet; the six plan roles were registered through the BNB Agent SDK, gas sponsored by MegaFuel. The planner pays the forecaster in ERC-8183 jobs and the evaluator sells checks that way; BNB Agent Studio hosts both on Amazon Bedrock AgentCore.",
+      "A Cloudflare Worker serves the sealed files only after checking them against GateRecord. Flap and OpenFour launches on BSC testnet read the same record.",
     ],
     sources: [S.seal27, S.sourcify, S.seal, S.stack],
     brainPage: "grand-prix:gaterecord",
@@ -185,22 +185,29 @@ export const ANSWERS: Answer[] = [
     id: "bnb-criteria",
     group: "sponsors",
     sponsor: "bnb",
-    question: "How does the Grand Prix meet the Developer Track's six criteria?",
+    question: "How does the Grand Prix meet the Developer Track's judging criteria?",
     body: [
       {
         list: [
-          "Design and usability: a 3D introduction to one operating day, then tabs in the pipeline's order, in light and dark, each figure with its source.",
+          "Design and usability: a 3D introduction to one operating day, then tabs in the pipeline's order, light and dark, each figure with its source.",
           "Scalability: one root and one transaction a day for the whole fleet; the 316 Nov 27 plans took 172,209 gas.",
           "Innovation: the market's gate, computed and enforced on chain, so a track record cannot be chosen after the prices are known.",
-          "Open source: MIT, one command to verify, and a second implementation of the leaf hash in Python's standard library.",
+          "Open source: MIT, one command to verify, and a second leaf-hash implementation in Python's standard library.",
           "Integration: BSC mainnet and testnet, Greenfield, ERC-8004, ERC-8183, Agent Studio, MegaFuel, Atlas's feeds, Flap and OpenFour.",
-          "Roadmap and business model: the open layer of the Wattness Terminal, the ERCOT data business it is built on.",
+          "Roadmap, community and business model: open to any team's agent; built on the Wattness Terminal's ERCOT data business; next, sealing every gate.",
         ],
       },
     ],
-    sources: [S.repo, S.runIt, S.seal27, S.how, S.terminal],
+    sources: [
+      S.repo,
+      S.runIt,
+      S.seal27,
+      S.addAgent,
+      { label: "Roadmap and business model (README)", href: `${blob("README.md")}#roadmap-and-business-model` },
+      S.terminal,
+    ],
     brainPage: "grand-prix:wattness-grand-prix",
-    keywords: ["judging", "developer track", "design", "scalability", "innovation", "open source", "integration", "roadmap", "business"],
+    keywords: ["judging", "criteria", "developer track", "design", "scalability", "innovation", "open source", "integration", "roadmap", "community", "business"],
   },
   {
     id: "bnb-greenfield",
@@ -208,8 +215,8 @@ export const ANSWERS: Answer[] = [
     sponsor: "bnb",
     question: "What is stored on BNB Greenfield?",
     body: [
-      "Every file a day's root covers, in the public bucket wattness-grand-prix-records on Greenfield testnet: the day's index, each battery's plan, its price scenarios and its input sync, the root, the salt and both chain receipts.",
-      "That is 953 objects for the Nov 26 plans and 954 for Nov 27, Cournot's saved response among them, each downloaded back after upload and matched by its SHA-256.",
+      "Every file behind a sealed day's record, in the public bucket wattness-grand-prix-records on Greenfield testnet: the day's index, each battery's plan, its price scenarios and its input sync, the root, the salt and both chain receipts.",
+      "That is 954 objects for the Nov 27 plans, Cournot's saved response among them, and 953 for Nov 26, each downloaded back after upload and matched by its SHA-256.",
       "The Files tab lists a sealed day's files with each one's SHA-256 and public address.",
     ],
     sources: [
@@ -229,9 +236,9 @@ export const ANSWERS: Answer[] = [
     sponsor: "bnb",
     question: "Which agents run on BNB Agent Studio?",
     body: [
-      "The evaluator (agent 2922) and the forecaster (2925) are hosted through BNB Agent Studio, which runs them on AWS AgentCore.",
+      "The evaluator (agent 2922) and the forecaster (2925) are hosted through BNB Agent Studio, which runs them on Amazon Bedrock AgentCore.",
       "The evaluator checks a sealed record against GateRecord and sells its report as an ERC-8183 job: jobs 1873, 1902 and 1908 were served there (1908 checked Desert Willow's Nov 27 plan), and so was the forecaster's job 1897.",
-      "One agent hired another before the seal. In job 1907, for the Nov 27 plans, the planner (2928) escrowed 0.1 test U for Desert Willow's price scenarios. The forecaster delivered the scenarios' digest 58 s before the testnet seal; the sealed plan commits the same digest, and the job paid out after its 900-second dispute window.",
+      "One agent hired another before the seal. In job 1907, for the Nov 27 plans, the planner (2928) escrowed a test-token payment for Desert Willow's price scenarios. The forecaster delivered the scenarios' digest 58 s before the testnet seal; the sealed plan commits the same digest, and the job paid out after its 900-second dispute window.",
     ],
     sources: [
       S.agentIds,
@@ -287,7 +294,7 @@ export const ANSWERS: Answer[] = [
     sponsor: "flap",
     question: "How does the season use Flap's Pool Launch?",
     body: [
-      "Our SeasonLauncherFactory, enabled on Flap's testnet Portal through its testnet helper, creates a round. Contributors put in test USD and name the agent they back.",
+      "Wattness's SeasonLauncherFactory, enabled on Flap's testnet Portal through its testnet helper, creates a round. Contributors put in test USD and name the agent they back.",
       "Anyone can call launch() once the raise reaches its minimum and GateRecord holds the milestone: the named agent's record for the named day, committed before that day's gate. A round that has not launched by its deadline only refunds.",
       "The launch seeds a V2 pool, and the token carries a 3% tax on buys and sells for its first 30 days. 72% of the tax reaches the season vault, which pays each contributor by deposit times the share of season days their agent sealed in time.",
     ],
@@ -329,8 +336,8 @@ export const ANSWERS: Answer[] = [
     question: "What problem does the season solve, and for whom?",
     body: [
       "A token launch usually waits only for money: once the raise is full, it launches whether or not the project has done anything. An agent that plans batteries has work the chain can check: its plan for a day was sealed before the market's gate, or it was not.",
-      "It is for backers who want their stake tied to what the agent does, and for builders who want a launch that waits for evidence, not attention.",
-      "What sets it apart: the condition is read on chain, with no oracle and no admin key; the payout follows the record day by day; a missed milestone refunds every deposit.",
+      "It is for backers who want their stake tied to what the agent does, and for builders who want their launch to wait for evidence of the work.",
+      "The condition is read on chain, with no oracle and no admin key. The payout follows the record day by day, and a missed milestone refunds every deposit.",
     ],
     sources: [S.season, { label: "The contracts and tests (modules/flap)", href: tree("modules/flap") }],
     brainPage: "grand-prix:season-days",
@@ -344,7 +351,7 @@ export const ANSWERS: Answer[] = [
     sponsor: "openfour",
     question: "How does the launch use OpenFour?",
     body: [
-      "OpenFour, Four.meme's open launch framework, builds each launch from swappable modules. On the OpenFour Hub route, our preset, Evidence-gated Bonding V1, keeps Bonding V1's Token, Vault, Curve and Trade and replaces Migrate.",
+      "OpenFour, Four.meme's open launch framework, builds each launch from swappable modules. On its Hub route, Wattness entered a preset, Evidence-gated Bonding V1, running on a Wattness deployment of OpenFour on BSC testnet: it keeps Bonding V1's Token, Vault, Curve and Trade and replaces Migrate.",
       "Its EvidenceGatedMigrateModule graduates a launch only when two things hold: the sale has sold out or raised its floor, and a GateRecord record is bound to it, the agent's own for that day, committed before the gate and covering at least the launch's minimum number of batteries. A root on its own never qualifies.",
       "Graduation moves the tokens and the raised quote into a PancakeSwap V2 pair and burns the LP.",
     ],
@@ -362,18 +369,25 @@ export const ANSWERS: Answer[] = [
     sponsor: "openfour",
     question: "What was delivered for the OpenFour track?",
     body: [
-      "The module and its preset on our own OpenFour deployment on BSC testnet, made with OpenFour's fork-deploy toolkit, and three public transactions on Nov 25: the sold-out launch's graduation refused with EvidenceMissing at {t:1795634242}, the Nov 26 record bound to the launch, and the graduation into its PancakeSwap V2 pair at {t:1795634271}.",
-      "The agent token, PLNR, is a testnet placeholder.",
-      "The Launchpad tab reads every step with view calls and names what is missing, liquidity or evidence.",
+      "The module and its preset on a Wattness deployment of OpenFour on BSC testnet, made with OpenFour's fork-deploy toolkit, and two launches whose sold-out sales were refused graduation with EvidenceMissing until their day's sealed record was bound:",
+      {
+        list: [
+          "PLNR on Nov 25: refused at {t:1795634242}, the Nov 26 record bound, graduated into its PancakeSwap V2 pair at {t:1795634271}.",
+          "PLNR27 on Nov 26: created, bought, sold back to its curve and bought to sell-out, refused at {t:1795714858}, the Nov 27 record bound, graduated at {t:1795714888}.",
+        ],
+      },
+      "Both tokens are testnet placeholders. Every create, buy, sell and migrate is in tokens.json; the Launchpad tab reads the Nov 25 launch with view calls.",
     ],
     sources: [
       { label: "Graduation refused: EvidenceMissing", href: bscTest("0x219f25a2b86a8a73595911f40dd81f072655bd6711fdd4eb6b8108b6a733686e") },
       { label: "The Nov 26 record bound", href: bscTest("0xd100cfa2402baaeec7de4545deedec2f72d238bbb53ec3fc34753d93718a1128") },
       { label: "Graduated into PancakeSwap V2", href: bscTest("0xc549f6e5a6598ba308e6ecb837cf0da2a6fa23c1d72a6e40065df4c585af5330") },
+      { label: "PLNR27 graduated once the Nov 27 record was bound", href: bscTest("0x9d2b5112d35700f4fe274fcc70dc537ddfb9755d4f891d4e4e26d7ee133b6720") },
+      { label: "Both launches, every transaction (tokens.json)", href: blob("modules/openfour/submission/tokens.json") },
       S.launchpad,
     ],
     brainPage: "grand-prix:plnr-launch",
-    keywords: ["refused", "bound", "graduated", "delivered", "testnet"],
+    keywords: ["refused", "bound", "graduated", "delivered", "testnet", "second launch", "plnr27", "buy", "sell", "migrate", "tokens.json"],
   },
   {
     id: "openfour-why",
@@ -383,7 +397,7 @@ export const ANSWERS: Answer[] = [
     body: [
       "On a launchpad, a token graduates when its sale sells out: demand alone lists it. When the token belongs to an AI agent, buyers have no on-chain way to tell whether the agent does the work it claims.",
       "It is for people who buy into agents' launches and want graduation to mean the agent has a record, builders who want their launch to carry proof of work, and launchpads that want listing to wait for evidence.",
-      "What differs: graduation reads the agent's own record, bound in time to the market's gate, and only Migrate changes, so buying, selling and the curve work as users already know.",
+      "Graduation reads the agent's own record, bound in time to the market's gate. Only Migrate changes, so buying, selling and the curve work as users already know.",
     ],
     sources: [S.launchpad, { label: "The module (modules/openfour)", href: tree("modules/openfour") }],
     brainPage: "grand-prix:openfour",
@@ -397,7 +411,7 @@ export const ANSWERS: Answer[] = [
     sponsor: "cmc-atlas",
     question: "How do CoinMarketCap and Atlas set what checking costs?",
     body: [
-      "Each independent check of a sealed record is a paid ERC-8183 job. The budget rule values a declared BNB budget at the lower of Atlas's and CoinMarketCap's BNB prices.",
+      "A paid check of a sealed record is an ERC-8183 job with the evaluator agent (2922). The budget rule values a declared BNB budget at the lower of Atlas's and CoinMarketCap's BNB prices.",
       "It holds back a reserve of 10% plus twice CoinMarketCap's 24-hour BNB move, at most 50%, and counts the checks the rest pays for. Prices more than 5% apart, USDT more than 1% from a dollar, or CoinMarketCap's security fields for BSC-USDT unknown or flagged turn the decision to review; a stale or future-dated price stops it.",
       "The plans themselves are valued only at ERCOT's prices.",
     ],
@@ -411,7 +425,7 @@ export const ANSWERS: Answer[] = [
     sponsor: "cmc-atlas",
     question: "What was delivered for the CoinMarketCap × Atlas challenge?",
     body: [
-      "A rule for whoever funds independent checks of sealed plans, a sponsor, an owner or a lender: how many checks a BNB budget buys today, from prices they can verify, and when to stop.",
+      "A rule for whoever funds paid checks of sealed plans, a sponsor, an owner or a lender: how many checks a BNB budget buys today, from prices they can verify, and when to stop.",
       "The run on Nov 25 at {t:1795622040}: 0.25 BNB was worth $134.13 at the lower price, the day's 1.78% move set a 13.56% reserve, and the rest paid for 57 checks at $2 each.",
       "Usage anyone can verify: Atlas's signed report is published with its payload and signature, so its signer can be recovered, and the site reads Atlas's feeds on BSC mainnet and testnet with view calls and no key.",
     ],
@@ -447,8 +461,8 @@ export const ANSWERS: Answer[] = [
     question: "How does Cournot's probability shape the plans?",
     body: [
       "Before the gate, the risk officer reads one probability from Cournot's Intelligence Oracle: the odds, from Kalshi's market, that the Dallas–Fort Worth low falls below 29°F.",
-      "A declared rule, ours and labeled as ours, turns it into the weight on each battery's stress scenarios, w = p × 0.80 + (1 − p) × 0.25, and the hourly hedge limit, 50 MWh × (1 − 0.5 × w). The planner scores and picks each plan with those weights.",
-      "For the Nov 27 plans, p = 0.01 moved the stress weight from 25% to 25.55% and the hedge cap from 100 contracts an hour to 43, on all 316 plans; 117 of them hedge up to that cap.",
+      "A declared rule, Wattness's and labeled as such, turns it into the weight on each battery's stress scenarios, w = p × 0.80 + (1 − p) × 0.25, and the hourly hedge limit, 50 MWh × (1 − 0.5 × w). The planner scores and picks each plan with those weights.",
+      "For the Nov 27 plans, Cournot gave p = 0.01 for the Nov 26 low, which moved the stress weight from 25% to 25.55% and the hedge cap from 100 contracts an hour to 43 on all 316 plans; 117 of them reach that cap in some hour.",
     ],
     sources: [
       S.forecast,
@@ -466,10 +480,10 @@ export const ANSWERS: Answer[] = [
     body: [
       {
         list: [
-          "Where and how it calls Cournot: inside the plan run, before the seal, resolve then probability, the order of the official Cournot Skill, with a 20-second limit and no automatic retry.",
+          "Where and how it calls Cournot: before the seal, the event resolved once and saved, then one probability call inside the plan run for that market, with a 20-second limit and no automatic retry; the official Cournot Skill's endpoints, in its order.",
           "How it uses the probability: the stress weight and the hedge cap, by the declared rule.",
           "Where users see the claim and the evidence: the Forecast tab's Weather Odds from Cournot card, and every Nov 27 plan under outside_inputs.cournot.",
-          "Proof of a call: requested at {t:1795701903} on Nov 26, HTTP 200, p = 0.01 for Cournot market 28288699. The response's SHA-256 is sealed in every Nov 27 plan on BSC mainnet.",
+          "Proof of a call: requested at {t:1795701903} on Nov 26 and received at {t:1795701904}, HTTP 200, p = 0.01 for Cournot market 28288699. The response's SHA-256 is in every Nov 27 plan, under the root sealed on BSC mainnet.",
         ],
       },
     ],
@@ -528,6 +542,7 @@ export const ANSWERS: Answer[] = [
       "A better second interaction, run live on Nov 25 at {t:1795625880}. A first session captured two notes for Desert Willow: the sealed plan's context and the reviewed rule for its hedge. A fresh client retrieved page dswl-ess-esr1, version 2, cited it, and its review of the hedge moved from needs-supported-review to assumed-entry-scenario.",
       "The cutoff holds: asked as of the Nov 26 plan's own time, the same retrieval admitted no page, because the lesson was written after that seal.",
       "Three brains on the Memory tab: 142 pages, with 55 connections across brains (read Nov 26).",
+      "Ness's live service, apart from these prepared answers, recalls from these brains and remembers the questions it is asked in a brain of its own.",
     ],
     sources: [
       S.memory,
@@ -543,10 +558,10 @@ export const ANSWERS: Answer[] = [
     sponsor: "living-brain",
     question: "What makes this memory different?",
     body: [
-      "It keeps the gate's clock. Retrieval takes a cutoff and refuses anything that did not exist by then, so a review as of the seal cannot use hindsight.",
-      "Citations, not snippets: a review cites page, version and sources, and search snippets never enter it.",
-      "One brain per asset: each battery's lessons stay in its own brain, and a source from another brain is refused.",
-      "The build remembers itself: its own brain holds 123 pages and 276 connections, from the site's tabs to GateRecord and the checks, beside the Wattness Terminal's 18 pages (read Nov 25 and 26).",
+      "Retrieval keeps the gate's clock: it takes a cutoff and refuses anything that did not exist by then, so a review as of the seal cannot use hindsight.",
+      "A review cites page, version and sources; search snippets never enter it.",
+      "Each battery's lessons stay in its own brain, and a source from another brain is refused.",
+      "The build has a brain of its own too: 123 pages and 276 connections, from the site's tabs to GateRecord and the checks, beside the Wattness Terminal's 18 pages (read Nov 25 and 26).",
     ],
     sources: [S.memory, { label: "The adapter (packages/adapters/living-brain)", href: tree("packages/adapters/living-brain") }],
     brainPage: "grand-prix:memory-tab",
@@ -576,7 +591,7 @@ export const ANSWERS: Answer[] = [
     group: "how",
     question: "How are the plans made?",
     body: [
-      "By a solver, on public data. For each battery the planner solves tomorrow's charge and discharge by hour within its power and energy limits: a mixed-integer program, solved with HiGHS, over price scenarios built from recorded forecast errors (301 a battery for the Nov 26 plans).",
+      "By a solver, on public data. For each battery the planner solves tomorrow's charge and discharge by hour within its power and energy limits: a mixed-integer program, solved with HiGHS, over price scenarios built from recorded forecast errors (308 a battery for the Nov 27 plans).",
       "It compares three choices on the same inputs: no hedge, a hedge added to a fixed schedule, and both chosen together. Each is scored by its expected revenue and the average of its worst tenth of scenarios, and one is kept.",
       "No language model writes a plan. Every input is named by its SHA-256; replayed from its inputs, the Nov 26 day gave the same 316 leaves byte for byte.",
     ],
@@ -612,7 +627,7 @@ export const ANSWERS: Answer[] = [
     body: [
       "ERCOT's day-ahead market takes offers for the next operating day until 10:00 CT, before its prices are known. A plan sealed by then could not have used them.",
       "GateRecord computes the gate itself, 10:00 Central on the day before the operating day, daylight-saving aware, and refuses any record for that day committed at or after it.",
-      "The Nov 26 plans were sealed 44 min 43 s before their gate; the Nov 27 plans, 1 h 49 min 19 s before theirs.",
+      "The Nov 27 plans were sealed 1 h 49 min 19 s before their gate; the Nov 26 plans, 44 min 43 s before theirs.",
     ],
     sources: [S.overview, S.seal, S.gateRecord],
     brainPage: "grand-prix:gate-recordercot-da-energy",
@@ -624,7 +639,7 @@ export const ANSWERS: Answer[] = [
     question: "What cannot change after the seal?",
     body: [
       "The plans. Every plan of the day is a leaf of one Merkle root, committed to GateRecord before the gate with the git tree of the code that made them. Change one number in one plan and its leaf no longer leads to the root.",
-      "The record. GateRecord keeps one write-once record per committer, scope and operating day. It refuses a commit at or after the gate (AfterGate) and a second one (AlreadyCommitted): a second plan for Nov 26, simulated 22 seconds after the gate, is refused.",
+      "The record. GateRecord keeps one write-once record per committer, scope and operating day. It refuses a commit at or after the gate (AfterGate) and a second one (AlreadyCommitted): a second Nov 27 commit, simulated on both chains 22 seconds after its gate, is refused with AfterGate.",
       "What comes later links to it: each outcome stage is taken once, from the committer, after it opens.",
     ],
     sources: [S.seal, S.gateRecord, S.sourcify],
@@ -637,7 +652,7 @@ export const ANSWERS: Answer[] = [
     question: "How do I verify a plan myself?",
     body: [
       "In your browser: open Verify and pick a battery. The page recomputes the plan's leaf with a second implementation, follows its proof to the root, reads the root back from GateRecord through a public node and replays the battery's limits hour by hour.",
-      "From a clone, with no key and no wallet:",
+      "From a clone, with no key and no wallet, check Desert Willow's Nov 26 plan against BSC mainnet:",
       { code: "pnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet --scope gate-record/ercot-da-energy --battery DSWL_ESS_ESR1" },
       "Or recompute Desert Willow's leaf in Python's standard library with tools/verify_hash.py.",
     ],
@@ -650,13 +665,14 @@ export const ANSWERS: Answer[] = [
     group: "how",
     question: "What do the stewards check?",
     body: [
-      "The stewards are the Verify tab's checks, run in order on any battery's plan:",
+      "The stewards are the Verify tab's five checks, run in order on any battery's plan:",
       {
         list: [
-          "The leaf: the plan recomputes to its leaf, and its proof leads to the day's root.",
-          "The record: the same root is on GateRecord for that committer, scope and day.",
-          "The gate: it was committed before ERCOT's 10:00 CT day-ahead gate.",
-          "The limits: the schedule stays within the battery's power and energy every hour.",
+          "The leaf recomputes from the plan.",
+          "The proof reaches the day's root.",
+          "The chain holds the same record: that root on GateRecord for that committer, scope and day.",
+          "Sealed before the gate: committed before ERCOT's 10:00 CT day-ahead gate.",
+          "Battery limits hold every hour: the schedule stays within the battery's power and energy.",
         ],
       },
       "From a clone, the verifier adds the plan's accounting, every input against the published release, an outside input such as Cournot's response by its hash, and each linked outcome.",
@@ -671,7 +687,7 @@ export const ANSWERS: Answer[] = [
     question: "What is real, and what is a shadow plan?",
     body: [
       "Real: the batteries and ERCOT's public data, the seals on BSC mainnet for the Nov 26 and Nov 27 plans, the files on BNB Greenfield, and the agents' identities, paid jobs and launches on BSC testnet.",
-      "Shadow: the plans. Each is computed for a real ERCOT battery from public data. The hedge uses ElectronX's published contract terms at an entry price the model assumes, so it is a scenario, not a trade.",
+      "Shadow: the plans. Each is computed for a real ERCOT battery from public data, and no battery is operated from here. The hedge uses ElectronX's published contract terms at an entry price the model assumes, so it is a scenario, not a trade.",
       "After the gate, each plan is valued at the prices ERCOT publishes.",
     ],
     sources: [S.fleet, S.hedge, S.seal],
@@ -685,7 +701,7 @@ export const ANSWERS: Answer[] = [
     body: [
       "A timestamp proves that a hash existed; it cannot show the days that were left out. GateRecord keeps one record per wallet, market and day, computes the gate, refuses a late or a second record, and lists every day a wallet sealed.",
       "And contracts act on it: Flap's season vault pays for days sealed in time, and an OpenFour launch graduates only with a sealed record bound to it.",
-      "One transaction seals the whole fleet: 0.0000086 BNB for the Nov 27 plans.",
+      "One transaction seals the whole fleet: 0.0000086 BNB on BSC mainnet for the Nov 27 plans.",
     ],
     sources: [S.gateRecord, S.season, S.launchpad, S.seal27],
     brainPage: "grand-prix:gaterecord",
@@ -699,7 +715,7 @@ export const ANSWERS: Answer[] = [
     question: "What does this give a battery owner?",
     body: [
       "A record nobody can edit afterwards, its author included. An optimizer is hired on its track record, and a record is worth something only if it was fixed before the prices were known.",
-      "Each sealed day holds a plan for every ERCOT battery with complete public data (316 on Nov 26), committed before the gate. Find your battery on Fleet, open its plan, and check it against the chain on Verify.",
+      "Each sealed day holds a plan for every ERCOT battery with complete public data (316 on Nov 27), committed before the gate. Find your battery on Fleet, open its plan, and check it against the chain on Verify.",
       "On the Wattness Terminal, an owner can ask for a free hedge review from the battery's page, where its Hedging data covers it.",
     ],
     sources: [S.fleet, S.dswl, S.verify, S.terminal],
@@ -711,7 +727,7 @@ export const ANSWERS: Answer[] = [
     group: "owners",
     question: "Why does the site keep showing Desert Willow?",
     body: [
-      "Desert Willow (DSWL_ESS_ESR1) is the showcase battery: 150 MW and 338 MWh in Ellis County, on ERCOT's North hub, as the Nov 26 index lists it.",
+      "Desert Willow (DSWL_ESS_ESR1) is the showcase battery: 150 MW and 338 MWh in Ellis County, on ERCOT's North hub, as its Nov 27 plan states.",
       "It is the battery of the Wattness Terminal's Hedging walkthrough, whose file its plan reads. Its plan is on the Battery tab in full, its reviews have a brain of their own in Living Brain, and on ONE PLAN you can plan its sealed day yourself.",
     ],
     sources: [S.dswl, S.onePlan, { label: "Desert Willow's page in memory", href: "/agents/memory?page=battery-review:dswl-ess-esr1" }, S.terminal],
@@ -723,10 +739,10 @@ export const ANSWERS: Answer[] = [
     group: "owners",
     question: "Why is a battery missing from Fleet?",
     body: [
-      "The fleet is every ERCOT battery with complete public data. For the Nov 26 plans, 316 batteries had a plan and 32 were left out, each named in the day's index with the census field it lacks.",
+      "The fleet is every ERCOT battery with complete public data. For the Nov 27 plans, 316 batteries had a plan and 32 were left out, each named in the day's index with the census field it lacks.",
       "Search Fleet by battery, node, hub or county; the day's index on BNB Greenfield names every battery left out and why.",
     ],
-    sources: [S.fleet, { label: "The Nov 26 index", href: INDEX_26 }],
+    sources: [S.fleet, { label: "The Nov 27 index", href: INDEX_27 }],
     brainPage: "grand-prix:batteries-without-a-plan",
     keywords: ["missing", "left out", "excluded", "census"],
   },
@@ -749,7 +765,7 @@ export const ANSWERS: Answer[] = [
     question: "How would an optimizer be paid on a sealed record?",
     body: [
       "On results anyone can check. For battery optimization, Wattness sets out a charge per kW-month plus a share of what the plans add over a benchmark fixed before the first day, paid only above a high-water mark.",
-      "Every figure that fee depends on can be checked against sealed plans and ERCOT's settlement prices, at one transaction a day for every battery (0.0000086 BNB for the Nov 27 plans).",
+      "Every figure that fee depends on can be checked against sealed plans and ERCOT's settlement prices, at one transaction a day for every battery (0.0000086 BNB on BSC mainnet for the Nov 27 plans).",
       "Data licensing, custom tools and battery optimization for owners, lenders, insurers and QSEs are Enterprise on the Wattness Terminal, by quote.",
     ],
     sources: [S.terminal, S.seal],
@@ -776,7 +792,7 @@ export const ANSWERS: Answer[] = [
     group: "developers",
     question: "How do I run it from a clone?",
     body: [
-      "Node 22 (22.18 or later) and pnpm 11:",
+      "Node 22 (22.18 or later) and pnpm 11; the last line checks Desert Willow's Nov 26 plan against BSC mainnet:",
       { code: "pnpm install\npnpm test\npnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet --scope gate-record/ercot-da-energy --battery DSWL_ESS_ESR1" },
       "To plan an operating day in the coming week yourself, with no key and no chain, while its gate is still ahead:",
       { code: "pnpm plan --od YYYY-MM-DD --network local\npnpm verify out/local/od-YYYYMMDD/manifest.json --no-chain" },
@@ -798,9 +814,9 @@ export const ANSWERS: Answer[] = [
           "packages/engine: the forecast, the price scenarios and the HiGHS optimization.",
           "packages/verifier: the end-to-end check.",
           "packages/agents: the six roles as ERC-8004 agents.",
-          "packages/adapters: one client per sponsor.",
+          "packages/adapters: the clients for Cournot, Living Brain, Atlas with CoinMarketCap, Flap and Agent Studio.",
           "modules/flap and modules/openfour: the launch contracts.",
-          "scripts/greenfield: the publisher. site/: this site.",
+          "scripts/greenfield: the publisher; workers/edge: the Cloudflare Worker; site/: this site.",
         ],
       },
     ],

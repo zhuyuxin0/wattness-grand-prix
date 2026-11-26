@@ -192,13 +192,13 @@ test("every time is one of the build's days, Nov 24 to Nov 28, 2026", () => {
 test("the testnet tickers appear only in the Flap and OpenFour answers, each labeled testnet", () => {
   for (const a of ANSWERS) {
     const text = [allText(a), ...a.sources.map((s) => s.label)].join("\n");
-    if (!/\b(PRIX|PLNR)\b/.test(text)) continue;
+    if (!/\b(PRIX|PLNR\d*)\b/.test(text)) continue;
     assert.ok(a.sponsor === "flap" || a.sponsor === "openfour", `${a.id} names a ticker`);
     assert.match(prose(a).join(" "), /testnet/, `${a.id} names a ticker without saying testnet`);
   }
   for (const a of ANSWERS) {
     const title = a.brainPage ? BRAIN_PAGES[a.brainPage] : "";
-    if (/\b(PRIX|PLNR)\b/.test(title)) assert.ok(a.sponsor === "flap" || a.sponsor === "openfour", `${a.id} lights a ticker's page`);
+    if (/\b(PRIX|PLNR\d*)\b/.test(title)) assert.ok(a.sponsor === "flap" || a.sponsor === "openfour", `${a.id} lights a ticker's page`);
   }
 });
 
