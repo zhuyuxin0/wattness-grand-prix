@@ -1,0 +1,107 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 17 of the introduction, \"Anyone can check any plan\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "check",
+ "beat": "check",
+ "chapter": 17,
+ "name": "Anyone can check any plan",
+ "term": "the stewards",
+ "tab": "verify",
+ "frame": "grid.R03-pass",
+ "local": null,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops check --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   },
+   "crop": {
+    "x": 260,
+    "y": 30,
+    "width": 1600,
+    "height": 900
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:36",
+   "ct": "2026-11-26 12:36"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 34278,
+   "per_frame_ms": {
+    "mean": 225,
+    "p95": 287
+   },
+   "gpu_load_pct": {
+    "before": 79,
+    "after": 98
+   },
+   "load_average": "{ 38.67 45.06 52.72 }",
+   "under_load": true
+  }
+ },
+ "files": {
+  "check.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 15986,
+   "sha256": "ded680f374a206d02bfa02b7eb5660dfc6f74c37889bf98db6a9e1a6bcb83bc3"
+  },
+  "check-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 214480,
+   "sha256": "a4048b9f6adb5095e19f102851faacd19e81c162a4585e6f412a5d642d818518"
+  },
+  "check-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 226389,
+   "sha256": "aec33dd55cdb9e0526fe7b4b9097cf9ed2d93a4ab3c1dfb25e83271f4f9d25d9"
+  },
+  "check-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 92547,
+   "sha256": "2d087026c96373f3478c3ae3d052df0e34b5e859f9a49f1a2015bc5518e5f17b"
+  },
+  "check-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 114450,
+   "sha256": "7c951d1bf08c8e34e25aaada5affe31b68b24186f7a52749408bd097e8310283"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/grid/**, its kit parts or the frame data), or its place in the site's story"
+}

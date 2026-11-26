@@ -1,0 +1,113 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 21 of the introduction, \"What it is built from\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "stack-prices",
+ "beat": "stack",
+ "chapter": 21,
+ "name": "What it is built from",
+ "term": null,
+ "tab": "about",
+ "frame": "stack.rest",
+ "local": null,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops stack-prices --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   },
+   "camera": {
+    "target": [
+     170,
+     24,
+     105
+    ],
+    "dist": 0.32,
+    "shift": [
+     0,
+     0
+    ]
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:38",
+   "ct": "2026-11-26 12:38"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 18309,
+   "per_frame_ms": {
+    "mean": 120,
+    "p95": 153
+   },
+   "gpu_load_pct": {
+    "before": 94,
+    "after": 99
+   },
+   "load_average": "{ 18.45 35.44 47.95 }",
+   "under_load": true
+  }
+ },
+ "files": {
+  "stack-prices.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 16882,
+   "sha256": "472efb070c8706b177761edcd1e22c0ea336a63685e59392ebea1650056905ed"
+  },
+  "stack-prices-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 260224,
+   "sha256": "615270ffeb4ab61729e3e0b145c84e6a9e4c8b2f3ebb9f3ebbf911fa4c7182f5"
+  },
+  "stack-prices-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 261837,
+   "sha256": "9baf7316f457be72369d55510217b6a9270c7ae94f0b3fdba039ded9f0374f96"
+  },
+  "stack-prices-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 138281,
+   "sha256": "78c31e8c357f8f32c0086e1940b69713aeecae811e53e9692b90b1a7bfc04257"
+  },
+  "stack-prices-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 140800,
+   "sha256": "e75abe76abeafcf890dfccd612ba5310f936c420bb575138fba3095637ae2091"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/stack/**, its kit parts or the frame data), or its place in the site's story"
+}

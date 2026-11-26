@@ -1,0 +1,101 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 01 of the introduction, \"One real battery: Desert Willow\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "desert-willow",
+ "beat": "desert-willow",
+ "chapter": 1,
+ "name": "One real battery: Desert Willow",
+ "term": null,
+ "tab": "battery",
+ "frame": "opening.pad",
+ "local": null,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops desert-willow --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:23",
+   "ct": "2026-11-26 12:23"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 24726,
+   "per_frame_ms": {
+    "mean": 164,
+    "p95": 214
+   },
+   "gpu_load_pct": {
+    "before": 96,
+    "after": 45
+   },
+   "load_average": "{ 34.28 48.94 68.32 }",
+   "under_load": true
+  }
+ },
+ "files": {
+  "desert-willow.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 19598,
+   "sha256": "f077e780fc30b50d21270c32b1fc7c05feeb822668880ca4f525ed3c2bd88a81"
+  },
+  "desert-willow-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 212143,
+   "sha256": "47f5dfd312b3920c663fae29103fda16df368e22b3232c4b7ce8488b709bad16"
+  },
+  "desert-willow-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 211621,
+   "sha256": "8e4ce0f1e2058aa94069d65c7de1e829c95011e01e718f57806409395e53bdb2"
+  },
+  "desert-willow-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 81981,
+   "sha256": "ccdfba062ba5dc54daccb487a67d72729c9c48fb7e394791c18a205ab520c582"
+  },
+  "desert-willow-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 108381,
+   "sha256": "c1bdca40e3f44d19ad069f5eb7de34ff87971c9da6580006371d55147b6b5039"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/opening/**, its kit parts or the frame data), or its place in the site's story"
+}

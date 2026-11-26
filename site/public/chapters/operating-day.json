@@ -1,0 +1,101 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 16 of the introduction, \"The operating day runs\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "operating-day",
+ "beat": "operating-day",
+ "chapter": 16,
+ "name": "The operating day runs",
+ "term": "race day",
+ "tab": "overview",
+ "frame": "world.W03-race-day",
+ "local": null,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops operating-day --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:24",
+   "ct": "2026-11-26 12:24"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 26955,
+   "per_frame_ms": {
+    "mean": 177,
+    "p95": 340
+   },
+   "gpu_load_pct": {
+    "before": 95,
+    "after": 23
+   },
+   "load_average": "{ 30.26 46.25 66.55 }",
+   "under_load": true
+  }
+ },
+ "files": {
+  "operating-day.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 16914,
+   "sha256": "cb61b2838fff066628718a13cce140eac5456c7bc49faa94f90d34153b6f6274"
+  },
+  "operating-day-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 134099,
+   "sha256": "6a4d4fbe2595d9f7b81ff8a98b00ebc264b378a08af865c1bd3577a961064e4d"
+  },
+  "operating-day-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 200837,
+   "sha256": "6e5bebc05dc47528a086779f8bf837b5696ea7776550b85608521ad3c37efd9c"
+  },
+  "operating-day-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 74085,
+   "sha256": "5c40d630cbf612ef0039c64942f5034dd14fcdc31a2b42a644a89d237d7824fb"
+  },
+  "operating-day-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 105458,
+   "sha256": "34933f47ae5feae7a2390d9401954cf0ff35c0da09fc6066f6e9798b7239b27e"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/world/**, its kit parts or the frame data), or its place in the site's story"
+}

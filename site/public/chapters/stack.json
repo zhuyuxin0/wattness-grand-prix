@@ -1,0 +1,107 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 21 of the introduction, \"What it is built from\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "stack",
+ "beat": "stack",
+ "chapter": 21,
+ "name": "What it is built from",
+ "term": null,
+ "tab": "about",
+ "frame": "stack.rest",
+ "local": null,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops stack --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   },
+   "crop": {
+    "x": 75,
+    "y": 0,
+    "width": 1600,
+    "height": 900
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:41",
+   "ct": "2026-11-26 12:41"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 15337,
+   "per_frame_ms": {
+    "mean": 100,
+    "p95": 114
+   },
+   "gpu_load_pct": {
+    "before": 92,
+    "after": 35
+   },
+   "load_average": "{ 18.34 30.05 43.35 }",
+   "under_load": true
+  }
+ },
+ "files": {
+  "stack.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 27336,
+   "sha256": "1b2d86660d89c54ae866b2438b1f7e37c9692688fa4ae676cc95a8df4e960b3a"
+  },
+  "stack-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 40 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 263730,
+   "sha256": "7861421972c9eb10760f9c5cc938dd73a57958ed97fd751b0a3a169444314c2d"
+  },
+  "stack-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 26",
+   "bytes": 304914,
+   "sha256": "91709f40c5967ca9d962c1545d6ba5465d824c2003c895a72a34d77d43bb6a8d"
+  },
+  "stack-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 226087,
+   "sha256": "c78a04b8b57284d4a6ef880b7e8d3e602d7f3f20610504fd3044817f0369e5f1"
+  },
+  "stack-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 205626,
+   "sha256": "2e3de7997e18980ae90dfbb4e3e6ee20ac6a99a48d847ae3a8342ce1e83a7e7e"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/stack/**, its kit parts or the frame data), or its place in the site's story"
+}
