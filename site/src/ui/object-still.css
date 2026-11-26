@@ -54,13 +54,17 @@
   text-overflow: ellipsis;
 }
 
-/* ObjectLead: a tab's first view, the still and a few plain lines beside it; on a phone the still stands above them. */
+/* ObjectLead: a tab's first view, the still and a few plain lines beside it. It lays out by its own width (a container
+   query), so a tab opened in a floating pane stacks the still over the words as a phone does. */
 .object-lead {
+  container-type: inline-size;
+  margin: 0 0 var(--gp-space-7, 32px);
+}
+.object-lead__grid {
   display: grid;
   grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-  gap: var(--t-space-5) var(--gp-space-7, 28px);
+  gap: var(--t-space-5) var(--gp-space-7, 32px);
   align-items: center;
-  margin: 0 0 var(--gp-space-7, 28px);
 }
 .object-lead__text {
   display: grid;
@@ -83,8 +87,8 @@
 .object-lead__aside {
   max-width: 300px;
 }
-@media (max-width: 899px) {
-  .object-lead {
+@container (max-width: 700px) {
+  .object-lead__grid {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--t-space-3);
   }
