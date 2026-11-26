@@ -6,11 +6,13 @@
 // wallet from WattnessEvaluator's studio.toml; every step of jobs 1871 and 1873,
 // with their budgets and deliverables, from agent-jobs.json beside this file,
 // read back from BSC testnet. Where two records name a transaction they must
-// agree, or the build stops.
+// agree, or the build stops. Each job between two roles carries what its own
+// operating day's sealed record says: the scenarios digest that day's leaf
+// commits and when the day was first committed (out/od-YYYYMMDD), when on file.
 // Written to public/data/agents.json.
 
 import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { getAddress } from "viem";
 
 const lower = (s) => String(s).toLowerCase();
@@ -39,7 +41,18 @@ function roleTitles(repo) {
   return out;
 }
 
-export default function agents({ repo, readJson, writeJson }) {
+/** What a day's sealed record says about one battery's leaf, read from out/od-YYYYMMDD beside the day built. */
+function sealedLeaf(dayDir, readJson, operatingDay, resource) {
+  const dir = join(dirname(dayDir), `od-${operatingDay.replaceAll("-", "")}`);
+  const leafPath = join(dir, "leaves", `${resource}.json`);
+  if (!existsSync(leafPath)) return null;
+  const leaf = readJson(leafPath);
+  if (leaf.operating_day !== operatingDay || leaf.battery.resource !== resource) throw new Error(`agents: ${leafPath} is not ${resource}'s leaf for ${operatingDay}`);
+  const commits = [join(dir, "record.json"), join(`${dir}-bsc-testnet`, "record.json")].filter(existsSync).map((p) => readJson(p).committedAt);
+  return { operatingDay, scenariosDigest: `0x${leaf.scenarios.digest_sha256.replace(/^0x/, "")}`, firstCommitUnix: commits.length ? Math.min(...commits) : null };
+}
+
+export default function agents({ repo, dayDir, readJson, writeJson }) {
   const depPath = join(repo, "contracts", "deployments", "agents.bsc-testnet.json");
   const intPath = join(repo, "packages", "world", "src", "stations", "stack", "integrations.json");
   const tomlPath = join(repo, "packages", "adapters", "agent-studio", "WattnessEvaluator", "app", "agent", "studio.toml");
@@ -105,27 +118,31 @@ export default function agents({ repo, readJson, writeJson }) {
   const parties = new Map([...roles, evaluator].map((a) => [lower(a.wallet), { agentId: a.agentId, role: a.role, title: a.title }]));
   const party = (address) => ({ address: getAddress(address), ...(parties.get(lower(address)) ?? { agentId: null, role: null, title: null }) });
 
-  const j1872 = dep.jobs.find((j) => j.jobId === 1872);
-  if (!j1872) throw new Error("agents: the deployment record has no job 1872");
-  const jobs = [
-    {
-      jobId: 1872,
+  // Every job between two roles the deployment record holds (job 1872 for Nov 26, and each later day's).
+  if (!dep.jobs.some((j) => j.jobId === 1872)) throw new Error("agents: the deployment record has no job 1872");
+  const jobs = dep.jobs.map((j) => {
+    if (j.task !== "price-scenarios") throw new Error(`agents: job ${j.jobId} is a ${j.task} job, which the tab does not show`);
+    const sealed = sealedLeaf(dayDir, readJson, j.operatingDay, j.resource);
+    if (sealed && lower(sealed.scenariosDigest) !== lower(j.deliverable)) throw new Error(`agents: job ${j.jobId} delivered another digest than ${j.operatingDay}'s sealed leaf commits`);
+    return {
+      jobId: j.jobId,
       task: "price-scenarios",
       served: "planner",
-      client: party(j1872.client.address),
-      provider: party(j1872.provider.address),
-      token: j1872.token,
-      amountWei: j1872.budget,
-      deliverable: j1872.deliverable,
+      client: party(j.client.address),
+      provider: party(j.provider.address),
+      token: j.token,
+      amountWei: j.budget,
+      deliverable: j.deliverable,
       fingerprint: "sha256",
-      deliverableUrl: j1872.deliverableUrl,
-      resource: j1872.resource,
-      operatingDay: j1872.operatingDay,
-      timing: j1872.timing,
-      status: j1872.status,
-      transactions: j1872.transactions.map((t) => ({ step: t.step, ...tx(t) })),
-    },
-  ];
+      deliverableUrl: j.deliverableUrl,
+      resource: j.resource,
+      operatingDay: j.operatingDay,
+      timing: j.timing,
+      status: j.status,
+      sealed,
+      transactions: j.transactions.map((t) => ({ step: t.step, ...tx(t) })),
+    };
+  });
   for (const s of steps.jobs) {
     const rec = studio.jobs.find((j) => j.id === s.jobId);
     if (!rec) throw new Error(`agents: the stack records no job ${s.jobId}`);
@@ -146,9 +163,11 @@ export default function agents({ repo, readJson, writeJson }) {
       deliverable: s.deliverable,
       fingerprint: "keccak256",
       deliverableUrl: null,
+      // Jobs 1871 and 1873 evaluated Desert Willow's Nov 26 plan, the one day sealed when they ran (Nov 25).
       resource: "DSWL_ESS_ESR1",
       operatingDay: "2026-11-26",
       timing: "sealed",
+      sealed: null,
       status: rec.status === "COMPLETED" ? "Completed" : rec.status,
       transactions: s.transactions.map((t) => ({ step: t.step, ...tx(t) })),
     });

@@ -1,18 +1,32 @@
 // The sealed day's files on BNB Greenfield, from the publisher's own record
-// (scripts/greenfield/published.json): each object's path, kind, size and
-// SHA-256 as uploaded and read back. Written to public/data/greenfield.json.
-// Each URL is the bucket's base URL plus the path, so the file keeps one copy.
+// (scripts/greenfield/published-od-YYYYMMDD.json for the day built; the first
+// day's is published.json): each object's path, kind, size and SHA-256 as
+// uploaded and read back. Written to public/data/greenfield.json. Each URL is
+// the bucket's base URL plus the path, so the file keeps one copy. A day with
+// no publication record yet keeps the newest earlier one, which names its own
+// day, and the build says so.
 
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 export default function greenfield(ctx) {
-  const src = join(ctx.repo, "scripts", "greenfield", "published.json");
-  if (!existsSync(src)) {
-    console.warn("build-data: no scripts/greenfield/published.json; greenfield.json is not written");
+  const dir = join(ctx.repo, "scripts", "greenfield");
+  const od = `od-${ctx.day.operating_day.replaceAll("-", "")}`;
+  const records = existsSync(dir)
+    ? readdirSync(dir)
+        .filter((n) => n === "published.json" || /^published-od-\d{8}\.json$/.test(n))
+        .map((n) => ({ name: n, doc: ctx.readJson(join(dir, n)) }))
+        .filter((r) => r.doc.operating_day <= ctx.day.operating_day)
+        .sort((a, b) => (a.doc.operating_day < b.doc.operating_day ? 1 : -1))
+    : [];
+  const own = records.find((r) => r.name === `published-${od}.json` || (r.name === "published.json" && r.doc.operating_day === ctx.day.operating_day));
+  const chosen = own ?? records[0];
+  if (!chosen) {
+    console.warn("build-data: no Greenfield publication record in scripts/greenfield; greenfield.json is not written");
     return;
   }
-  const p = ctx.readJson(src);
+  if (!own) console.warn(`build-data: no Greenfield record for ${ctx.day.operating_day} yet; greenfield.json keeps ${chosen.doc.operating_day}'s (${chosen.name})`);
+  const p = chosen.doc;
   const prefix = `od-${p.operating_day.replaceAll("-", "")}/`;
   const files = p.files.map((f) => {
     if (!f.object.startsWith(prefix)) throw new Error(`greenfield: ${f.object} is outside ${prefix}`);
@@ -36,6 +50,6 @@ export default function greenfield(ctx) {
       allVerified: p.all_verified === true && files.every((f) => f.verified),
       files,
     },
-    "scripts/greenfield/published.json",
+    `scripts/greenfield/${chosen.name}`,
   );
 }

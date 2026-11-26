@@ -1,0 +1,53 @@
+{
+  "endpoint": "https://interface.cournot.ai/intelligence/v1/probability",
+  "request": {
+    "message": "Will the minimum temperature in Dallas be less than 29 degrees Fahrenheit on November 26, 2026? Yes means 28 degrees or below.",
+    "market_ids": [
+      28288699
+    ]
+  },
+  "requestedAt": "2026-11-26T14:05:03.091Z",
+  "receivedAt": "2026-11-26T14:05:03.451Z",
+  "httpStatus": 200,
+  "requestId": null,
+  "response": {
+    "code": 0,
+    "msg": "Success",
+    "data": {
+      "charged": false,
+      "x402": null,
+      "free_quota": {
+        "ip": "[redacted]",
+        "total": 3,
+        "used": 2,
+        "remaining": 1
+      },
+      "probability": 0.01,
+      "markets": [
+        {
+          "market_info": {
+            "id": 28288699,
+            "title": "Will the minimum temperature be <29° on Nov 26, 2026? (Yes: 28° or below)",
+            "description": "If the minimum temperature recorded at Dallas (CLIDFW) for Nov 26, 2026, is less than 29° fahrenheit according to The Weather Company, then the market resolves to Yes. Not all weather data is the same. While checking a source like AccuWeather or Google Weather may help guide your decision, the official and final value used to determine this market is the maximum/minimum temperature as reported by the Weather Company.\n\nReading weather data\nPreliminary Weather Company data may be subject to roundi…",
+            "start_time": "",
+            "end_time": "2026-11-27T07:00:00Z",
+            "market_outcome": "YES",
+            "market_outcome_price": 0.01
+          },
+          "matching_confidence": 0.912
+        }
+      ],
+      "basis": [
+        {
+          "source": "kalshi",
+          "summary": "kalshi latest YES price 0.0100 for \"Will the minimum temperature be <29° on Nov 26, 2026? (Yes: 28° or below)\", ends 2026-11-27T07:00:00Z",
+          "time": "2026-11-26T14:00:48Z",
+          "url": "https://kalshi.com/markets/kxlowtdal/kxlowtdal-26nov26?op_market_ticker=KXLOWTDAL-26NOV26-T29"
+        }
+      ],
+      "api_key_quota": null,
+      "billing": "free_quota"
+    }
+  },
+  "transactionHashes": []
+}

@@ -3,9 +3,11 @@
 //
 //   node scripts/build-data.mjs [--day <dir>] [--testnet <dir>] [--structure <file>] [--brain <file>] [--fixture]
 //
-// Reads out/od-20261126 (the full record) and falls back to
-// fixtures/od-20261126 (the index, two leaves, both receipts). Every published
-// file is listed with its SHA-256 in public/data/files.json.
+// Reads the newest sealed day under out/ (out/od-YYYYMMDD, the full record, and
+// its out/od-YYYYMMDD-bsc-testnet sibling) unless --day names one, and falls
+// back to fixtures/od-20261126 (the index, two leaves, both receipts). Earlier
+// sealed days under out/ give the Seal tab their roots and commits. Every
+// published file is listed with its SHA-256 in public/data/files.json.
 //
 // Page owners add their own data without editing this file: every module in
 // scripts/data/*.mjs is imported in name order and its default export is called
@@ -14,7 +16,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -33,8 +35,15 @@ function arg(name) {
   return i > 0 ? process.argv[i + 1] : undefined;
 }
 
-const fullDay = resolve(arg("--day") ?? join(repo, "out", "od-20261126"));
-const fullTestnet = resolve(arg("--testnet") ?? join(repo, "out", "od-20261126-bsc-testnet"));
+/** The newest out/od-YYYYMMDD that holds an index, or out/od-20261126 when there is none. */
+function newestDay() {
+  const out = join(repo, "out");
+  const days = existsSync(out) ? readdirSync(out).filter((n) => /^od-\d{8}$/.test(n) && existsSync(join(out, n, "manifest.json"))).sort() : [];
+  return join(out, days[days.length - 1] ?? "od-20261126");
+}
+
+const fullDay = resolve(arg("--day") ?? newestDay());
+const fullTestnet = resolve(arg("--testnet") ?? `${fullDay}-bsc-testnet`);
 const fixtureDay = join(repo, "fixtures", "od-20261126");
 const structurePath = resolve(arg("--structure") ?? join(sourcesDir, "terminal-structure.json"));
 const brainPath = resolve(arg("--brain") ?? join(sourcesDir, "brain-readback.json"));
@@ -245,9 +254,10 @@ if (existsSync(scenariosPath)) {
 const EXPLORER = { 56: "https://bscscan.com", 97: "https://testnet.bscscan.com" };
 const CHAIN_NAME = { 56: "BNB Smart Chain", 97: "BNB Smart Chain Testnet" };
 
-const receipts = receiptSources.filter(existsSync).map((p) => {
+/** One chain's commit receipt (record.json) for a day whose index gives the root and the gate. */
+function receiptOf(p, index) {
   const r = readJson(p);
-  if (r.root !== day.root) throw new Error(`${p}: root ${r.root} is not the index root ${day.root}`);
+  if (r.root !== index.root) throw new Error(`${p}: root ${r.root} is not the index root ${index.root}`);
   const explorer = EXPLORER[r.chainId] ?? null;
   return {
     chainId: r.chainId,
@@ -257,7 +267,7 @@ const receipts = receiptSources.filter(existsSync).map((p) => {
     txHash: r.txHash,
     blockNumber: r.blockNumber,
     blockTime: r.committedAt,
-    secondsBeforeGate: day.gate_unix - r.committedAt,
+    secondsBeforeGate: index.gate_unix - r.committedAt,
     key: r.key,
     scope: r.scope,
     scopeLabel: r.scopeLabel,
@@ -268,8 +278,27 @@ const receipts = receiptSources.filter(existsSync).map((p) => {
     contractUrl: explorer ? `${explorer}/address/${r.contract}` : null,
     source: srcLabel(p),
   };
-});
-writeJson("receipts.json", { schema: "grand-prix.receipts.v1", operatingDay: day.operating_day, receipts }, "record.json");
+}
+
+const receipts = receiptSources.filter(existsSync).map((p) => receiptOf(p, day));
+
+// Earlier sealed days beside the day built (out/od-YYYYMMDD before it, with
+// its -bsc-testnet sibling): each one's root and commits, from its own index
+// and record.json, newest first.
+const outRoot = dirname(fullDay);
+const earlier = useFull
+  ? readdirSync(outRoot)
+      .filter((n) => /^od-\d{8}$/.test(n) && n < basename(fullDay) && existsSync(join(outRoot, n, "manifest.json")) && existsSync(join(outRoot, n, "record.json")))
+      .sort()
+      .reverse()
+      .map((n) => {
+        const index = readJson(join(outRoot, n, "manifest.json"));
+        const list = [join(outRoot, n, "record.json"), join(outRoot, `${n}-bsc-testnet`, "record.json")].filter(existsSync).map((p) => receiptOf(p, index));
+        return { operatingDay: index.operating_day, root: index.root, leafCount: index.leaf_count, gateUnix: index.gate_unix, receipts: list };
+      })
+  : [];
+
+writeJson("receipts.json", { schema: "grand-prix.receipts.v1", operatingDay: day.operating_day, receipts, earlier }, "record.json");
 
 // A second commit for the same day, simulated 22 s after the gate against both
 // deployments (a call, never a transaction). GateRecord.sol reverts with

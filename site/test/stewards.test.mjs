@@ -1,6 +1,7 @@
 // The Verify tab's leaf hash, proof walk and limits check against the
-// sealed record of 2026-11-26. Run with `pnpm test` (Node 22.18 or later runs
-// the TypeScript module directly).
+// repository's fixture (the sealed record of 2026-11-26), and the published
+// pack against its own day's index. Run with `pnpm test` (Node 22.18 or later
+// runs the TypeScript module directly).
 
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
@@ -94,18 +95,31 @@ test("the leaf hash agrees with packages/core", async (t) => {
   }
 });
 
-test("the published pack rebuilds the fixture's leaves exactly", async (t) => {
-  const dir = join(here, "..", "public", "data", "stewards");
+test("the published pack rebuilds every leaf of its day, and they make the day's root", async (t) => {
+  const data = join(here, "..", "public", "data");
+  const dir = join(data, "stewards");
   if (!existsSync(join(dir, "pack.json"))) {
     t.skip("public/data/stewards is not built (pnpm data)");
     return;
   }
   const pack = readJson(join(dir, "pack.json"));
-  assert.equal(pack.root, index.root);
+  const day = readJson(join(data, "day.json"));
+  assert.equal(pack.operatingDay, day.operatingDay);
+  assert.equal(pack.root, day.root);
+  const published = new Map(day.batteries.map((b) => [b.resource, b.leaf]));
+  const rebuilt = [];
+  for (const resource of pack.resources) {
+    const doc = rebuildManifest(pack, readJson(join(dir, "leaves", `${resource}.json`)));
+    const { leaf } = await computeLeaf(doc);
+    assert.equal(leaf, published.get(resource), `${resource}'s rebuilt leaf`);
+    rebuilt.push(leaf);
+  }
+  assert.equal(rebuilt.length, day.leafCount);
+  assert.equal(await merkleRoot(rebuilt), pack.root);
+  // On the fixture's own day the pack also gives back the fixture's manifests, field for field.
+  if (pack.operatingDay !== index.operating_day) return;
   for (const entry of sealed) {
-    const packed = readJson(join(dir, "leaves", `${entry.resource}.json`));
-    const doc = rebuildManifest(pack, packed);
+    const doc = rebuildManifest(pack, readJson(join(dir, "leaves", `${entry.resource}.json`)));
     assert.deepEqual(diff(readJson(join(fixture, entry.manifest)), doc), []);
-    assert.equal((await computeLeaf(doc)).leaf, entry.leaf);
   }
 });

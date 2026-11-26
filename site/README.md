@@ -5,7 +5,7 @@ The public site for the sealed record. A static Vite + React 18 + TypeScript app
 
 ```sh
 pnpm install --ignore-workspace
-pnpm data       # out/od-20261126 -> public/data (fixtures/od-20261126 when out/ is absent)
+pnpm data       # the newest out/od-YYYYMMDD (or --day <dir>) -> public/data (fixtures/od-20261126 when out/ is absent)
 pnpm dev        # http://127.0.0.1:15191/
 pnpm build      # data, type-check, build to dist/, then the page at every path (scripts/spa-routes.mjs)
 pnpm build:app  # the same without regenerating data
@@ -13,7 +13,8 @@ pnpm preview    # http://127.0.0.1:15192/
 ```
 
 `public/data` is committed. In a clone without `out/`, `pnpm data` keeps the published record data rather than
-replacing it with the two-leaf fixture (pass `--fixture` to force it). The Terminal graph and the Living Brain
+replacing it with the two-leaf fixture (pass `--fixture` to force it). Earlier sealed days under `out/` give the
+Seal tab their roots and commits; the day's Greenfield files come from `scripts/greenfield/published-od-YYYYMMDD.json`. The Terminal graph and the Living Brain
 readback come from `cache/site-sources/` (or `GP_SOURCES`, `--structure`, `--brain`); when absent, their last
 published copies are kept. The script refuses to publish a credential from the private env file or any of the
 verifier's excluded days, and keeps `public/data` under 3 MB.
