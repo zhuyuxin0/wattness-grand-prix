@@ -3,8 +3,8 @@
    right side where it does not. Floating: a window on the Terminal's glass, moved by its header and sized from its
    corner. Full screen: the whole view, the questions at its left and the brains as the conversation's backdrop. A
    phone keeps the sheet from the bottom. Living Brain's stage holds dark in either theme.
-   Stacking: beside and floating sit over the float layer's panes (25), a battery picker's list (30) and the launcher
-   (40), and under the market day's popover and sheet (50) and the tab drawer (60); full screen and the sheet sit over
+   Stacking: beside and floating sit over the float layer's panes (25), a battery picker's list (30) and the sections
+   menu (40), and under the market day's popover and sheet (50) and the tab drawer (60); full screen and the sheet sit over
    all of them, the page under them inert, and under only the introduction's top layer.
    Corners no rounder than 7px; hovers change color only. */
 

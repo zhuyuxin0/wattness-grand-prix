@@ -1,4 +1,5 @@
 import type { RefObject } from "react";
+import { NessButton } from "../ness/Launcher";
 import { Glyph } from "../ui/Glyph";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { Brand } from "./Brand";
@@ -13,8 +14,8 @@ interface MastheadProps {
 }
 
 /**
- * wattness.tech's masthead: the lockup and the product name at the left, the market clock after them, the theme toggle
- * at the right. The clock stays on every tab, as wattness.tech's permanent row keeps it. On a phone a second band
+ * wattness.tech's masthead: the lockup and the product name at the left, the market clock after them, Ness and the
+ * theme toggle at the right. The clock stays on every tab, as wattness.tech's permanent row keeps it. On a phone a second band
  * names the page, opens the tab list as a drawer, and keeps the phase and the DAM deadline.
  */
 export function Masthead({ tab, menuOpen, onMenu, menuRef }: MastheadProps) {
@@ -28,6 +29,7 @@ export function Masthead({ tab, menuOpen, onMenu, menuRef }: MastheadProps) {
           <MarketClock now={now} />
         </div>
         <div className="masthead__end">
+          <NessButton />
           <ThemeToggle />
         </div>
       </div>
