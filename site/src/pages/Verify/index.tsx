@@ -10,6 +10,7 @@ import { BATTERY_NAMES, BatteryPicker, Glyph, PageHeader, Ready, Section } from 
 import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { Check, Verdict, type CheckState } from "./CheckCard";
 import { useStewards } from "./useStewards";
+import { VerifyObject } from "./VerifyObject";
 import { NETWORKS } from "./verify/chain";
 import type { CheckId } from "./verify/run";
 import "./styles.css";
@@ -94,6 +95,7 @@ function Verify({ day }: { day: DayIndex }) {
         title="Verify"
         lede="Check any plan against the chain. Your browser recomputes the plan's leaf, follows its proof to the day's root, reads that root back from GateRecord on BNB Smart Chain and replays the battery's limits hour by hour."
       />
+      <VerifyObject />
 
       <div className="battery-bar vf-bar" role="group" aria-label="What to check">
         <BatteryPicker
