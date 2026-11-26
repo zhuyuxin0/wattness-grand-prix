@@ -1,0 +1,433 @@
+/* The market day: the masthead's clock and gate open it. A popover under the control from 768px up, a sheet from the
+   foot of a phone. After wattness.tech's market clock (wattness-site apps/mms/src/skins/wattness.css, .mc-pop): the
+   raised plane, a hairline and the lift; one bar of the day's phases with now marked, the list of its moments, the two
+   deadlines.
+   Color follows what a battery desk can do in a phase, as on the Terminal: bids open (ok), clearing (ink), results
+   and DRUC (info), the Adjustment Period (violet). Teal stays for focus and selection; no caution amber. */
+
+/* ---------------------------------------------------------------- triggers */
+
+/* The clock keeps its place: the ground a press lands on reaches 6px past its text either side. */
+button.market-clock {
+  margin: 0 -6px;
+  padding: 3px 6px;
+  border: 0;
+  border-radius: var(--t-radius);
+  background: transparent;
+  cursor: pointer;
+  transition: background var(--m-dur-s) ease-out;
+}
+button.market-clock:hover,
+button.market-clock[aria-expanded="true"] {
+  background: var(--t-hover);
+}
+
+/* Hover and open draw a ring in the tag's own color: a darker ground would take the ok pill's 11px words under 4.5:1
+   (4.80:1 at rest). */
+button.gate-tag {
+  border: 0;
+  cursor: pointer;
+  transition: box-shadow var(--m-dur-s) ease-out;
+}
+button.gate-tag .glyph-caret {
+  margin-left: -1px;
+}
+button.gate-tag:hover,
+button.gate-tag[aria-expanded="true"] {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 55%, transparent);
+}
+
+/* ---------------------------------------------------------------- the panel */
+
+.gate-day {
+  /* The Terminal's violet state (wattness.tech's --s-violet), the Adjustment Period's alone here: its words
+     7.00:1 on their ground in light, 5.79:1 in dark. */
+  --gate-adjust: #6b2fa0;
+  --gate-adjust-bg: #f2e9f8;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--t-space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh);
+  text-align: left;
+  white-space: normal;
+}
+:root[data-theme="dark"] .gate-day {
+  --gate-adjust: #9f8cf5;
+  --gate-adjust-bg: #211e36;
+}
+
+.gate-day--pop {
+  position: fixed;
+  z-index: 50;
+  top: 0;
+  left: 0;
+  width: min(640px, calc(100vw - 24px));
+  padding: 14px 16px 12px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  box-shadow: var(--t-shadow-2);
+  animation: gate-day-in var(--m-dur-s) var(--m-ease-out);
+}
+
+/* The phone's sheet, over a scrim like the tab drawer's. */
+.gate-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+}
+.gate-sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 12, 14, 0.42);
+}
+.gate-day--sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 88vh;
+  max-height: 88dvh;
+  gap: var(--t-space-3);
+  padding: 0 var(--gp-gutter) calc(var(--t-space-5) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--w-border);
+  border-radius: var(--t-radius-paper) var(--t-radius-paper) 0 0;
+  box-shadow: var(--t-shadow-2);
+  animation: gate-sheet-in var(--m-dur-m) var(--m-ease-out);
+}
+
+@keyframes gate-day-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes gate-sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* A recording draws the open panel, not its arrival. */
+:root[data-capture="1"] .gate-day {
+  animation: none;
+}
+
+/* ---------------------------------------------------------------- head and now */
+
+.gate-day__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--t-space-4);
+}
+/* On the sheet the head stays in view while the list scrolls under it. */
+.gate-day--sheet .gate-day__head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 10px 0 var(--t-space-1);
+  background: var(--t-raised);
+}
+.gate-day__title {
+  padding-top: 3px;
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs);
+  font-weight: 600;
+  line-height: 1.35;
+}
+.gate-day__zone {
+  font-weight: 400;
+  color: var(--w-muted);
+}
+.btn.gate-day__close {
+  flex: none;
+  width: 28px;
+  height: 24px;
+  margin-right: -4px;
+  padding: 0;
+}
+
+.gate-day__now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-1) var(--t-space-3);
+}
+.gate-day__now-at {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.gate-day__muted {
+  font-weight: 400;
+  color: var(--w-muted);
+}
+.gate-day__phase {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--t-radius);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------- tones */
+
+.gate-day__tone--open {
+  color: var(--s-ok);
+  background: var(--s-ok-bg);
+}
+.gate-day__tone--clear {
+  color: var(--t-pane);
+  background: var(--w-fg);
+}
+.gate-day__tone--post {
+  color: var(--s-info);
+  background: var(--s-info-bg);
+}
+.gate-day__tone--adjust {
+  color: var(--gate-adjust);
+  background: var(--gate-adjust-bg);
+}
+
+/* ---------------------------------------------------------------- the bar */
+
+.gate-day__bar {
+  display: grid;
+  gap: 3px;
+}
+/* The now line sits in the strip's shape, clipped at its rounded ends, as wattness.tech's sits in its strip. */
+.gate-day__track {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--t-radius);
+}
+.gate-day__strip {
+  position: relative;
+  height: 26px;
+  overflow: hidden;
+  border-radius: var(--t-radius);
+  background: var(--t-chrome);
+}
+.gate-day__seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  /* With the label's own 3px, its words stand 6px in from the stretch's edge. */
+  padding: 0 3px;
+  border-right: 2px solid var(--t-raised);
+  font-size: var(--t-fs-2xs);
+  font-weight: 600;
+}
+.gate-day__seg:last-child {
+  border-right: 0;
+}
+/* A label lies over the now line on its stretch's own ground, 3px wider than its words either side: the line stops at
+   the word, shows above and below it, and never cuts it. */
+.gate-day__seg-label {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  padding: 0 3px;
+  overflow: hidden;
+  white-space: nowrap;
+  background: inherit;
+}
+/* Now: wattness.tech's red line (its .mc-now), the strip's full height and inside it. */
+.gate-day__marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--s-bad);
+}
+
+/* Every boundary's time, on two alternating rows so 13:30 and 14:30 never print over each other. */
+.gate-day__ticks {
+  position: relative;
+  height: 27px;
+  font-size: var(--t-fs-2xs);
+  line-height: 12px;
+  color: var(--w-muted);
+}
+.gate-day__ticks span {
+  position: absolute;
+  top: 2px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.gate-day__ticks span.gate-day__tick--low {
+  top: 15px;
+}
+.gate-day__ticks span:first-child {
+  transform: none;
+}
+.gate-day__ticks span:last-child {
+  transform: translateX(-100%);
+}
+.gate-day__ticks span::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -5px;
+  width: 1px;
+  height: 5px;
+  background: var(--w-border);
+}
+.gate-day__ticks span.gate-day__tick--low::before {
+  top: -18px;
+  height: 18px;
+}
+.gate-day__ticks span:first-child::before {
+  left: 0;
+}
+.gate-day__ticks span:last-child::before {
+  left: auto;
+  right: 0;
+}
+
+/* ---------------------------------------------------------------- the list */
+
+.gate-day__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--t-rule);
+  font-size: var(--t-fs-xs);
+}
+.gate-day__moment {
+  display: grid;
+  grid-template-columns: 52px 72px 44px minmax(0, 1fr) minmax(0, 150px);
+  column-gap: var(--t-space-3);
+  align-items: baseline;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--t-rule);
+}
+/* A reader on Central time has no second clock to show. */
+.gate-day__list--ct .gate-day__moment {
+  grid-template-columns: 52px 44px minmax(0, 1fr) minmax(0, 150px);
+}
+.gate-day__list--ct .gate-day__yours {
+  display: none;
+}
+.gate-day__what {
+  display: contents;
+}
+.gate-day__at {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.gate-day__swatch {
+  flex: none;
+  align-self: center;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+}
+.gate-day__swatch.gate-day__tone--open {
+  background: var(--s-ok);
+}
+.gate-day__swatch.gate-day__tone--clear {
+  background: var(--w-fg);
+}
+.gate-day__swatch.gate-day__tone--post {
+  background: var(--s-info);
+}
+.gate-day__swatch.gate-day__tone--adjust {
+  background: var(--gate-adjust);
+}
+.gate-day__swatch--event {
+  border: 1px solid var(--w-muted);
+  border-radius: 50%;
+}
+.gate-day__yours,
+.gate-day__state,
+.gate-day__cite {
+  color: var(--w-muted);
+}
+.gate-day__yours {
+  white-space: nowrap;
+}
+.gate-day__label em {
+  color: var(--w-muted);
+}
+/* Moments to come read in ink, moments passed step back, the phase that runs now stands out. */
+.gate-day__moment--passed {
+  color: var(--w-muted);
+}
+.gate-day__moment--now .gate-day__state,
+.gate-day__moment--now .gate-day__label {
+  color: var(--w-fg);
+  font-weight: 600;
+}
+@media (hover: hover) {
+  .gate-day__moment[title],
+  .gate-day__deadlines p[title] {
+    cursor: help;
+  }
+}
+
+/* On the sheet: the times and the state on one line, the moment and its reference under them. */
+.gate-day--sheet .gate-day__moment {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  row-gap: 1px;
+  padding: 4px 0;
+}
+.gate-day--sheet .gate-day__state {
+  justify-self: end;
+}
+.gate-day--sheet .gate-day__what {
+  display: block;
+  grid-column: 1 / -1;
+  padding-left: 15px;
+}
+.gate-day--sheet .gate-day__cite::before {
+  content: "· ";
+}
+
+/* ---------------------------------------------------------------- deadlines and the citation */
+
+.gate-day__deadlines {
+  display: grid;
+  gap: var(--t-space-1);
+  font-size: var(--t-fs-xs);
+}
+.gate-day__deadlines b {
+  font-weight: 600;
+}
+/* A time left keeps together on one line: "< 1 min left" never breaks after its sign. */
+.gate-day__left {
+  white-space: nowrap;
+}
+.gate-day__late {
+  color: var(--s-bad);
+}
+.gate-day__foot {
+  padding-top: var(--t-space-3);
+  border-top: 1px solid var(--t-rule);
+  font-size: var(--t-fs-2xs);
+  line-height: 1.5;
+  color: var(--w-muted);
+}
