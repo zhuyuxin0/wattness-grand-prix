@@ -140,16 +140,32 @@ const RESOURCE = /^[A-Z0-9_]+$/;
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const get = (v: unknown, ...path: string[]): unknown => path.reduce<unknown>((o, k) => (isRecord(o) ? o[k] : undefined), v);
 
+// The fields the planner writes (core's FleetIndex), and the only ones an index may hold: a field no check
+// reads would be served as verified, and x-gate-not-covered would not name it.
+const INDEX_FIELDS = ["schema", "operating_day", "scope_label", "gate_unix", "plan_unix", "code_tree", "root", "leaf_count", "showcase", "leaves", "exclusions"];
+const LEAF_FIELDS = ["resource", "leaf", "manifest", "scenarios"];
+const EXCLUSION_FIELDS = ["resource", "reason"];
+
+/** Fields beside the allowed ones, and allowed ones that are absent. */
+const fieldProblems = (where: string, o: Record<string, unknown>, allowed: readonly string[]): string[] => [
+  ...Object.keys(o)
+    .filter((k) => !allowed.includes(k))
+    .map((k) => `${where}: unknown field ${JSON.stringify(k)}`),
+  ...allowed.filter((k) => !Object.hasOwn(o, k)).map((k) => `${where}: missing field ${JSON.stringify(k)}`),
+];
+
 /** Core's fleetIndexErrors, plus the checks a reader needs before using the index to fetch files. */
 export function indexShapeErrors(doc: unknown, day: string): { problems: string[]; root: Hex | null } {
   const out: string[] = [];
   if (!isRecord(doc)) return { problems: ["index: expected object"], root: null };
+  out.push(...fieldProblems("index", doc, INDEX_FIELDS));
   const d = doc as Partial<FleetIndex>;
   if (d.schema !== FLEET_SCHEMA) out.push(`schema: expected ${FLEET_SCHEMA}`);
   if (!Array.isArray(d.leaves) || d.leaves.length === 0) return { problems: [...out, "leaves: expected a non-empty array"], root: null };
   const leaves = d.leaves as unknown[];
   if (!leaves.every(isRecord)) return { problems: [...out, "leaves: expected objects"], root: null };
   const entries = leaves as Partial<FleetLeaf>[];
+  leaves.forEach((l, i) => out.push(...fieldProblems(`leaves: ${typeof l.resource === "string" ? l.resource : `entry ${i + 1}`}`, l, LEAF_FIELDS)));
   const names = entries.map((l) => l.resource);
   if (names.some((n) => typeof n !== "string" || !RESOURCE.test(n))) out.push("leaves: bad resource name");
   for (let i = 1; i < names.length; i++) {
@@ -177,8 +193,14 @@ export function indexShapeErrors(doc: unknown, day: string): { problems: string[
     if (d.gate_unix !== gate) out.push(`gate_unix ${d.gate_unix}, the gate for ${day} is ${gate}`);
     if (!(Number.isSafeInteger(d.plan_unix) && (d.plan_unix as number) < gate)) out.push(`plan_unix ${d.plan_unix} is not before the gate ${gate}`);
   }
-  if (d.exclusions !== undefined && !(Array.isArray(d.exclusions) && d.exclusions.every((e) => isRecord(e) && typeof e.resource === "string"))) {
-    out.push("exclusions: expected a list of {resource, reason}");
+  const exclusions: unknown = d.exclusions;
+  if (!Array.isArray(exclusions) || !exclusions.every(isRecord)) out.push("exclusions: expected a list of {resource, reason}");
+  else {
+    exclusions.forEach((e, i) => {
+      const where = `exclusions: ${typeof e.resource === "string" ? e.resource : `entry ${i + 1}`}`;
+      out.push(...fieldProblems(where, e, EXCLUSION_FIELDS));
+      for (const k of EXCLUSION_FIELDS) if (Object.hasOwn(e, k) && typeof e[k] !== "string") out.push(`${where}: ${k} ${JSON.stringify(e[k])} is not a string`);
+    });
   }
   return { problems: out, root };
 }
@@ -263,7 +285,7 @@ export async function sealedIndex(day: Day, network: NetworkName): Promise<Seale
   const gate = gateTs(day.od);
   const checks: Check[] = [
     form,
-    check("index shape", "schema, leaves in resource order, leaf_count, code_tree, scope_label, operating_day, gate_unix, plan_unix before the gate, each battery's files at leaves/<R>.json and leaves/<R>.scenarios.json", [
+    check("index shape", "schema, leaves in resource order, leaf_count, code_tree, scope_label, operating_day, gate_unix, plan_unix before the gate, each battery's files at leaves/<R>.json and leaves/<R>.scenarios.json, the planner's fields and no others", [
       comparison("fields", true, { checked: `${index.leaves.length} leaves` }),
     ]),
     check("root recomputes", "the RFC 6962 root over the index's leaf hashes, in order, is the index's root", [

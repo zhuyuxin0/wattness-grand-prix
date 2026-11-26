@@ -32,7 +32,7 @@ the code that produced it. Everything else hangs from that root.
 
 | File | Served once |
 |---|---|
-| index | its shape holds (core's `fleetIndexErrors`, and battery R's files are `leaves/<R>.json` and `leaves/<R>.scenarios.json`); the RFC 6962 root over its leaf hashes, in order, is its root; `GateRecord.keyOf` returns the key computed here; `GateRecord.get(key)` holds that root, leaf count, code tree, day, scope and committer; the gate, computed as `GateRecord.gateTs` computes it, agrees with the contract's answer and the index, and the record was committed before it |
+| index | its shape holds (core's `fleetIndexErrors`; the fields the planner writes and no others, at the top level, in each leaf entry and in each exclusion; battery R's files are `leaves/<R>.json` and `leaves/<R>.scenarios.json`); the RFC 6962 root over its leaf hashes, in order, is its root; `GateRecord.keyOf` returns the key computed here; `GateRecord.get(key)` holds that root, leaf count, code tree, day, scope and committer; the gate, computed as `GateRecord.gateTs` computes it, agrees with the contract's answer and the index, and the record was committed before it |
 | `leaves/<R>.json` | SHA-256(0x00 ‖ RFC 8785 form) is the index's leaf for R, and the document is R's plan for that day by the served wallet |
 | `leaves/<R>.scenarios.json` | SHA-256 of its RFC 8785 form is the digest R's verified leaf names |
 | `record.<network>.json` | every field is what GateRecord holds on that network, there are no other fields, and the transaction it names succeeded in the record's block and logged one matching `Committed` event |

@@ -261,6 +261,40 @@ describe("each index entry names its own battery's files", () => {
   });
 });
 
+describe("the index holds the fields the planner writes, and no others", () => {
+  // A field no check reads would be served as verified, and x-gate-not-covered would not name it.
+  type Loose = Record<string, any>;
+  const refusedFor = async (change: (d: Loose) => void, reason: string) => {
+    const u = upstreams();
+    const doc = JSON.parse(text.index) as Loose;
+    change(doc);
+    u.objects.set(`${DAY}/manifest.json`, pretty(doc));
+    const origin = freshOrigin();
+    const res = await call(origin, "/day/2026-11-26/index.json");
+    expect.soft(res.status).toBe(502);
+    expect.soft(res.headers.get("cache-control")).toBe("no-store");
+    expect.soft((await res.text()).slice(0, 600)).toContain(reason);
+    expect.soft((await call(origin, LEAF)).status, "a leaf under that index").toBe(502);
+  };
+
+  it("refuses an index with a field beside the planner's at the top level", async () => {
+    await refusedFor((d) => (d.attested_by = "anything"), 'index: unknown field "attested_by"');
+  });
+
+  it("refuses an index missing one of the planner's fields", async () => {
+    await refusedFor((d) => delete d.exclusions, 'index: missing field "exclusions"');
+  });
+
+  it("refuses an index with an extra field in a leaf entry", async () => {
+    await refusedFor((d) => (d.leaves[93].label = "anything"), 'leaves: DSWL_ESS_ESR1: unknown field "label"');
+  });
+
+  it("refuses an index with an extra field in an exclusion, or a reason that is not text", async () => {
+    await refusedFor((d) => (d.exclusions[0].note = "anything"), 'exclusions: AMAD_ESS_ESR1: unknown field "note"');
+    await refusedFor((d) => (d.exclusions[0].reason = 7), "exclusions: AMAD_ESS_ESR1: reason 7 is not a string");
+  });
+});
+
 describe("an unknown day is a 404", () => {
   it("answers 404 for a day Greenfield holds no index for", async () => {
     const u = upstreams();

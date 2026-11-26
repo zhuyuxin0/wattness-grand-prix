@@ -12,11 +12,11 @@ Greenfield: ${cfg.greenfieldBase}od-YYYYMMDD/
 GET /day/<day>/index.json
     The day's index (manifest.json on Greenfield): one leaf hash per battery, in resource order.
     Checks: the bytes are the document's own rendering; the index's shape (schema, order, leaf count,
-    code tree, scope, day, gate, plan time, and battery R's files at leaves/<R>.json and
-    leaves/<R>.scenarios.json); the RFC 6962 root over its leaf hashes is its root;
-    GateRecord.keyOf gives the record key computed here; GateRecord.get(key) holds that root, leaf
-    count, code hash, day, scope and committer; the gate, computed as GateRecord.gateTs computes it,
-    agrees with the contract and the index, and the record was committed before it.
+    code tree, scope, day, gate, plan time, the planner's fields and no others, and battery R's
+    files at leaves/<R>.json and leaves/<R>.scenarios.json); the RFC 6962 root over its leaf hashes
+    is its root; GateRecord.keyOf gives the record key computed here; GateRecord.get(key) holds that
+    root, leaf count, code hash, day, scope and committer; the gate, computed as GateRecord.gateTs
+    computes it, agrees with the contract and the index, and the record was committed before it.
     Not covered by any hash, and named in x-gate-not-covered: exclusions, showcase and plan_unix.
 
 GET /day/<day>/<path>
