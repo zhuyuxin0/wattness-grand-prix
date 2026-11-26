@@ -52,6 +52,9 @@ export interface WorldStage {
   setAO(params: AOParams, denoise?: AODenoise): void;
   /** 0..1; below 0.002 both AO passes are skipped. */
   setAOStrength(k: number): void;
+  /** The share (0..1) of the scene's AO drawn while the camera travels: 1 at rest; the AO passes are skipped where the
+   *  scene's strength times it is 0.002 or less. Not part of a scene's state (the story's player sets it per picture). */
+  setAOMotion(k: number): void;
   setShadowAuto(on: boolean): void;
   requestShadow(): void;
   /** Keep the shadow map as last drawn (on) whatever auto and requests say, for a caller that knows nothing that

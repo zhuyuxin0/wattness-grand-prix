@@ -46,6 +46,14 @@ export function runAt(run: Run, s: number): number {
   return last[1];
 }
 
+/** The share of a frame's ambient occlusion drawn at a leg's progress e (0 to 1, its time) when the player draws the
+ *  camera's travel lighter (the site): whole for the first tenth, out by 28%, none through the middle, back from 72%
+ *  and whole again from 90%. The camera eases (moves.ts calm), so it is at a seventh of its top speed where the AO
+ *  starts to go and past half of it while none is drawn; it lands, and the rest is drawn, with the frame's own AO. */
+export function aoThroughLeg(e: number): number {
+  return e < 0.5 ? 1 - smooth((e - 0.1) / 0.18) : smooth((e - 0.72) / 0.18);
+}
+
 interface Draw { inst: FrameInstance; local: number; alpha: number; pose: CameraPose | 'own'; rise?: number }
 export interface Picture { draws: Draw[]; plates: { inst: FrameInstance; key: string; k: number } | null; where: Where; t: number }
 
@@ -96,6 +104,9 @@ export class StoryPlayer {
   /** Milliseconds each render took (CPU side, and to the GPU's finish when measured). */
   readonly timings: { cpu: number[]; gpu: number[] } = { cpu: [], gpu: [] };
   measureGpu = false;
+  /** Draw the camera's travel lighter (the site sets it; the films keep every picture whole): the frames' ambient
+   *  occlusion fades out through the middle of a leg (aoThroughLeg) and is whole again before the camera lands. */
+  motionLight = false;
   /** What the shadow map holds: the frame it was last drawn for, at which local time and rise, and the epoch then. */
   private shadowOf: { inst: FrameInstance; local: number; rise: number | null; epoch: number } | null = null;
   /** Counts what may move a frame's casters besides its clock: a layout (decorate), a build, a resize. */
@@ -304,6 +315,8 @@ export class StoryPlayer {
     const shown = new Set(pic.draws.map((d) => d.inst));
     for (const inst of this.insts.values()) inst.root.visible = false;
     let under = false;
+    // the camera's travel drawn lighter (the site): less AO through the middle of a leg, the frame's own at a rest
+    this.stage.setAOMotion(this.motionLight && pic.where.kind === 'leg' ? aoThroughLeg(pic.where.e) : 1);
     pic.draws.forEach((d, n) => {
       d.inst.lastUsed = t0;
       const owned = this.S.owner === d.inst;
@@ -332,6 +345,7 @@ export class StoryPlayer {
         under = true;
       }
     });
+    this.stage.setAOMotion(1);
     const top = pic.draws[pic.draws.length - 1];
     const a = top ? (pic.draws.length > 1 ? top.alpha : 1) : 1;
     this.canvas.style.opacity = a >= 1 ? '' : a.toFixed(4);

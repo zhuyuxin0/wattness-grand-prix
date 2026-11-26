@@ -226,10 +226,21 @@ export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', st
     ov();
     scene.traverse((o) => { if (o.visible && (o.userData.noAO || (o.material && (o.material.userData?.noAO)))) { o.visible = false; this._visibilityCache.push(o); } });
   };
+  // the share of a scene's ambient occlusion drawn while the camera travels (setAOMotion): 1 draws the scene's own;
+  // at its scene's strength times this share of 0.002 or less, the AO pass and its copy-back are both skipped
+  let aoMotion = 1;
+  const aoSkipped = () => gtao.blendIntensity * aoMotion <= 0.002;
   const gtaoRender = gtao.render.bind(gtao);
-  gtao.render = (...a) => { const bg = scene.background; scene.background = null; gtaoRender(...a); scene.background = bg; };
+  gtao.render = (...a) => {
+    if (aoSkipped()) return;
+    const bg = scene.background, k = gtao.blendIntensity;
+    scene.background = null; gtao.blendIntensity = k * aoMotion;
+    try { gtaoRender(...a); } finally { gtao.blendIntensity = k; scene.background = bg; }
+  };
   composer.addPass(gtao);
   const copyBack = new CopyBackPass(); copyBack.enabled = ao;
+  const copyBackRender = copyBack.render.bind(copyBack);
+  copyBack.render = (...a) => { if (!aoSkipped()) copyBackRender(...a); };
   composer.addPass(copyBack);
   const overlay = new LayerPass(scene, camera, OVERLAY);
   composer.addPass(overlay);
@@ -263,6 +274,11 @@ export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', st
     gtao.enabled = on; copyBack.enabled = on;
     gtao.blendIntensity = Math.min(1, Math.max(0, k));
   }
+  /** The share (0..1) of the scene's ambient occlusion drawn while the camera travels: 1 at rest (the scene's own
+   *  strength); a story lowers it through the middle of a camera move, where the AO and copy-back passes are about
+   *  half of a frame's GPU time, and has it back at 1 before the camera lands. It is not the scene's: setAOStrength
+   *  and the scene's state are left as they are. */
+  function setAOMotion(k) { aoMotion = Math.min(1, Math.max(0, Number.isFinite(k) ? k : 1)); }
   /** Shadow-map refresh: auto (every frame) or on request (requestShadow() before the frame that needs it). */
   function setShadowAuto(on) { shadowPass.auto = !!on; if (!on) shadowPass.pending = true; }
   function requestShadow() { shadowPass.pending = true; }
@@ -421,7 +437,7 @@ export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', st
     scene.traverse((o) => { if (o.isMesh || o.isLine || o.isPoints) { o.geometry?.dispose?.(); const ms = Array.isArray(o.material) ? o.material : [o.material]; for (const m of ms) { if (!m) continue; for (const k of Object.keys(m)) { const v = m[k]; if (v && v.isTexture) v.dispose(); } m.dispose?.(); } } });
     renderer.dispose(); renderer.forceContextLoss?.();
   }
-  return { THREE, sky, renderer, scene, camera, composer, gtao, key, rim, fill, ground, catcher, setTheme, setAO, setAOStrength, setShadowAuto, requestShadow, holdShadow, setKey, setCamera, applyProjection, setFade, setGround, setBackdrop, setLight, setSize, render, preparePrograms, dispose, frameInfo, theme: () => themeNow };
+  return { THREE, sky, renderer, scene, camera, composer, gtao, key, rim, fill, ground, catcher, setTheme, setAO, setAOStrength, setAOMotion, setShadowAuto, requestShadow, holdShadow, setKey, setCamera, applyProjection, setFade, setGround, setBackdrop, setLight, setSize, render, preparePrograms, dispose, frameInfo, theme: () => themeNow };
 }
 
 /** Put every object flagged userData.overlay (and its subtree) on the overlay layer only. */
