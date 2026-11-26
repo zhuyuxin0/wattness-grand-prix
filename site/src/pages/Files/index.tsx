@@ -6,6 +6,7 @@ import { useSelectedBattery } from "../../shell/battery";
 import { BATTERY_NAMES, Glyph, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type CheckItem, type SortKind, type SortState, type SortValue } from "../../ui";
 import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { useGreenfield, type GreenfieldIndex } from "./data";
+import { GreenfieldObject } from "./GreenfieldObject";
 import "./styles.css";
 
 // Files: the sealed day as stored on BNB Greenfield. Every object with its
@@ -61,6 +62,7 @@ export default function FilesPage() {
         title="Files"
         lede="Every file behind the sealed day's record, in a public bucket on BNB Greenfield: the day's index and root, each plan, its price scenarios, the inputs it read and both chain receipts. Anyone can fetch a file and compare its SHA-256."
       />
+      <GreenfieldObject />
       <Ready state={state}>{(g) => <Files g={g} />}</Ready>
     </div>
   );
