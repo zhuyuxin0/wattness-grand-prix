@@ -24,8 +24,5 @@
   },
   "devDependencies": {
     "@gatelock/engine": "workspace:*"
-  },
-  "bin": {
-    "gate-verify": "./dist/cli.js"
   }
 }
