@@ -119,10 +119,12 @@ against the SHA-256 the publisher recorded (`scripts/greenfield/published.json`)
 
 The free plan allows 10 ms of CPU per request. Hashing uses the runtime's native SHA-256 (`node:crypto`), and
 canonical JSON hands arrays of integers to the runtime's `JSON.stringify`; `test/jcs.test.ts` checks the result
-against the canonicalize package that core uses. In a fresh Node 22 process with the upstreams answered from
-memory, a cold request takes about 5 ms for an index, 7 ms for a leaf with its index, 9 ms for a scenario set
-with its leaf and index, and 7 ms for a verdict once the process has loaded ICU's time-zone data; warm, 1 to
-3 ms. Bundled, the Worker is 78 KiB (22 KiB gzipped).
+against the canonicalize package that core uses. CPU time of the main thread, measured in fresh Node 22.22
+processes on a 10-core Apple M1 Max at 1-minute load averages of 5.5 to 6.7, with the upstreams answered from
+memory: a cold request took 7 to 8 ms for an index, 9 to 10.5 ms for a leaf with its index, 11 to 13 ms for a
+scenario set with its leaf and index, and 8.5 to 11 ms for a verdict once the process had loaded ICU's time-zone
+data, which costs about 12 ms more the first time; warm, 0.8 to 6.5 ms. Node only stands in for workerd here.
+Bundled, the Worker is 80 KiB (22 KiB gzipped).
 
 Cloudflare's edge answers some default client signatures (Python's `urllib`, for one) with error 1010 before the
 Worker runs; setting a `User-Agent` header avoids it.
