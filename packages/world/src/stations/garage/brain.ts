@@ -1,20 +1,17 @@
 // @ts-nocheck
 // Team data: the pit under the glass floor. At the bottom the Terminal's structure (terminal_structure): its six
 // layers as stacked translucent plates (Sources lowest, Ness routing highest), its 18 parts as tiles on their layers,
-// its 48 typed connections as strands in neutral tints. Just under the glass, Living Brain's Terminal brain
-// (brain_graph): 18 pages as stars sized by their sources, placed by similarity (a spring layout on the generated
-// connections, so distance means something), its 53 connections as soft arcs (strong solid, medium thinner, weak
-// dotted), each page tied by a hairline to the part it describes. At the east end, apart, Desert Willow's own brain:
-// one page (version 2, one citation) whose thread rises to the Pit wall's C board.
+// its 48 typed connections as strands in neutral tints. Over them, Living Brain's three brains of ours as the brain
+// station draws them (stations/brain/pit.ts): the Terminal's, the Grand Prix build's and, at the east end, Desert
+// Willow's review, whose one page's thread rises to the Pit wall's C board; the 55 connections across them as arcs.
 // Everything under the glass is drawn in the opaque pass (lines and glows as transparent layer-0 draws), so the floor's
 // glass refracts it; only the thread above the floor is drawn after the glass.
 import * as THREE from 'three';
 import { exactColor } from '../../kit/tone';
 import { roundRect } from '../../kit/region/geo';
 import { line } from '../../kit/region/flows';
-import { radialTex } from '../../kit/textures';
 import { glassMaterial } from '../../kit/hedge/fields';
-import { layoutPages, PAGE_PART } from './data';
+import { pitBrains } from '../brain/pit';
 import { COLORS, outline } from './hangar';
 
 export const PIT = { floor: -8.2, layer0: -7, layerStep: 1, stars: -1.2 };
@@ -25,7 +22,7 @@ const above = (o, order = 13) => { o.traverse((c) => { c.userData.overlay = true
 
 export function buildTeamData(d, theme, grab, res, M, fp) {
   const group = new THREE.Group(); group.name = 'teamData';
-  const bg = d.brain_graph, ts = d.terminal_structure, lb = d.sponsors.living_brain;
+  const ts = d.terminal_structure;
   // ── the pit: walls down to its floor, both dark concrete ─────────────────────────────────────────────────────────
   const edge = outline(fp, 0, 8);
   const wallPos = [];
@@ -88,50 +85,14 @@ export function buildTeamData(d, theme, grab, res, M, fp) {
   }
   group.add(under(strands));
 
-  // ── the Terminal brain's pages, as stars placed by similarity ───────────────────────────────────────────────────
+  // ── Living Brain: our three brains lying in the pit, as the brain station draws them (stations/brain/pit.ts) ───
+  const pit = pitBrains(fp, res);
+  group.add(under(pit.group));
+  const { pos, dw } = pit;
   const box = { x0: span.x0 + 4, x1: span.x1 - 4, z0: fp.z0 + 8, z1: fp.z1 - 8 };
-  const P = layoutPages(bg.pages, bg.connections, box);
-  const coreMat = new THREE.MeshBasicMaterial({ color: exactColor(THREE, '#c9f7ea') });
-  const glowTex = radialTex(THREE);
-  const glowMat = new THREE.MeshBasicMaterial({ color: exactColor(THREE, '#2ec7a6'), alphaMap: glowTex, transparent: true, opacity: 0.75, depthWrite: false, blending: THREE.AdditiveBlending });
-  const stars = new THREE.Group(), pos = new Map();
-  for (const p of bg.pages) {
-    const [x, z] = P.get(p.slug), r = 0.32 + 0.24 * Math.sqrt(p.sources);
-    pos.set(p.slug, [x, PIT.stars, z]);
-    const core = new THREE.Mesh(new THREE.SphereGeometry(r * 0.42, 20, 14), coreMat); core.position.set(x, PIT.stars, z);
-    const glow = new THREE.Mesh(new THREE.PlaneGeometry(r * 3.8, r * 3.8), glowMat); glow.position.set(x, PIT.stars, z); glow.renderOrder = 2; glow.userData.billboard = true;
-    stars.add(core, glow);
-  }
-  group.add(under(stars));
-  // the 53 connections: soft arcs bowing up toward the glass
-  const arcs = new THREE.Group();
-  const look = { strong: { width: 2.2, opacity: 0.8 }, medium: { width: 1.5, opacity: 0.6 }, weak: { width: 1.3, opacity: 0.55, dash: 1.1, gap: 1.0 } };
-  for (const c of bg.connections) {
-    const a = pos.get(c.a), b = pos.get(c.b); if (!a || !b) continue;
-    const L = Math.hypot(b[0] - a[0], b[2] - a[2]), lift = Math.min(0.85, 0.12 + L * 0.012);
-    const pts = [];
-    for (let k = 0; k <= 32; k++) { const t = k / 32; pts.push([a[0] + (b[0] - a[0]) * t, a[1] + lift * 4 * t * (1 - t), a[2] + (b[2] - a[2]) * t]); }
-    arcs.add(line(pts, { color: '#5fe0c3', ...look[c.strength] }));
-  }
-  group.add(under(arcs));
-  // hairlines: each page down to the part it describes
-  const hair = new THREE.Group();
-  for (const p of bg.pages) {
-    const part = tile.get(PAGE_PART[p.slug]); const a = pos.get(p.slug);
-    if (!part || !a) continue;
-    hair.add(line([a, [part.x, part.y + 0.02, part.z]], { color: '#8a98a8', width: 1, opacity: 0.4 }));
-  }
-  group.add(under(hair));
-
-  // ── Desert Willow's brain: one page, its citation, its thread up to the Pit wall's C board ─────────────────────
-  const dw = [fp.x1 - 34, PIT.stars, cz - 8];
-  const dwStar = new THREE.Group();
-  const dwCore = new THREE.Mesh(new THREE.SphereGeometry(0.55, 20, 14), coreMat); dwCore.position.set(...dw);
-  const dwGlow = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), glowMat); dwGlow.position.set(...dw); dwGlow.renderOrder = 2; dwGlow.userData.billboard = true;
-  const ringPts = []; for (let i = 0; i <= 48; i++) { const a = (i / 48) * Math.PI * 2; ringPts.push([dw[0] + Math.cos(a) * 1.6, dw[1] + 0.02, dw[2] + Math.sin(a) * 1.6]); }
-  dwStar.add(dwCore, dwGlow, line(ringPts, { color: '#5fe0c3', width: 1.4, opacity: 0.85 }));
-  group.add(under(dwStar));
-  return { group, tiles: tile, pos, dw, layerY, span, box, P };
+  // structure: the Terminal's six layers, its parts and their connections (a frame seen from far above leaves them out,
+  // so they never read as the brain over them); brains: the clouds, whose brightness a frame may raise
+  return { group, tiles: tile, pos, dw, layerY, span, box, structure: [layers, tiles, tileEdges, strands], brains: pit };
 }
 
 /** Desert Willow's thread from its star up through the glass to a point (the C board's face): the part under the

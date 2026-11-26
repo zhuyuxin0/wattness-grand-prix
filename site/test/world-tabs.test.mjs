@@ -1,6 +1,6 @@
 // The 3D world's routes and imports, held to the side panel's list. Every tab
-// id the story or the stack can send must open a tab here, and the package
-// loads only by dynamic import from a page folder. Run with `pnpm test` (Node
+// id the story, the stack or the brain can send must open a tab here, and the
+// package loads only by dynamic import from a page folder. Run with `pnpm test` (Node
 // 22.18 or later runs the TypeScript module directly).
 
 import assert from "node:assert/strict";
@@ -29,6 +29,14 @@ function stackTabIds() {
   return [...new Set([...m[1].matchAll(/:\s*'([^']+)'/g)].map((x) => x[1]))];
 }
 
+/** The tab ids the brain's cards open (Open <tab>, Part of), read from packages/world/src/stations/brain/brain-scene.json. */
+function brainTabIds() {
+  const scene = JSON.parse(read(join(world, "stations", "brain", "brain-scene.json")));
+  const ids = Object.keys(scene.tabs ?? {});
+  for (const p of scene.pages ?? []) if (p.tab) ids.push(p.tab);
+  return [...new Set(ids)];
+}
+
 function sourceFiles(dir) {
   return readdirSync(dir).flatMap((name) => {
     const p = join(dir, name);
@@ -48,8 +56,14 @@ test("every tab the stack can open is a tab here", () => {
   for (const id of ids) assert.ok(worldTab(id), `the stack's "${id}" opens no tab`);
 });
 
+test("every tab the brain can open is a tab here", () => {
+  const ids = brainTabIds();
+  assert.ok(ids.length > 0);
+  for (const id of ids) assert.ok(worldTab(id), `the brain's "${id}" opens no tab`);
+});
+
 test("the map names only ids the package sends", () => {
-  const sent = new Set([...storyTabIds(), ...stackTabIds()]);
+  const sent = new Set([...storyTabIds(), ...stackTabIds(), ...brainTabIds()]);
   assert.deepEqual(Object.keys(WORLD_TABS).filter((id) => !sent.has(id)), []);
 });
 

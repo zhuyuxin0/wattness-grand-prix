@@ -12,6 +12,7 @@ import { TRACK_Y, PLINTH_H } from './ground';
 import { TEXAS_RING } from './texas';
 import type { FrameData } from '../types';
 import type { Layout, XZ } from './layout';
+import { pitBrains } from '../brain/pit';
 
 
 /** The venue's lit hardware: graphite clearcoat paint, galvanized steel, dark glass, from the kit's registry
@@ -264,32 +265,25 @@ export function buildBays(d: FrameData, H: Hardware) {
   return { group: g };
 }
 
-// ── Team data: the brain under the glass floor ───────────────────────────────────────────────────────────────
-export function buildTeamData(d: FrameData, H: Hardware) {
+// ── Team data: the brains under the glass floor ──────────────────────────────────────────────────────────────
+/** res: the drawing buffer's size, for the brains' lines. */
+export function buildTeamData(H: Hardware, res: THREE.Vector2) {
   const g = new THREE.Group(); g.name = 'team-data';
   const x0 = -194, x1 = 208, z0 = -94, z1 = -40, cx = (x0 + x1) / 2, cz = (z0 + z1) / 2, w = x1 - x0 - 4, dd = z1 - z0 - 4;
-  // the pit under the floor: dark walls, the Terminal's six layers as faint planes stepping down, the 18 pages of
-  // Living Brain as lit tiles at y -1.2 and their 53 connections as hairlines
+  // the pit under the floor, dark walls; in it Living Brain's three brains of ours as the brain station draws them
+  // (stations/brain/pit.ts, from brain-scene.json): the Terminal's, the Grand Prix build's and Desert Willow's review,
+  // with the connections across them, alone and brighter, as the garage's hangar sees them from above through the glass
+  // (the Terminal's layers and parts under them are the garage's G03), their sprites sized for the hub's long lens
   const pit = new THREE.Mesh(new THREE.BoxGeometry(w, 8, dd).translate(0, -4, 0), new THREE.MeshStandardMaterial({ color: '#0a0d10', roughness: 0.9, side: THREE.BackSide }));
   pit.position.set(cx, 0.1, cz); g.add(pit);
-  const layers = d.terminal_structure.layers as string[];
-  layers.forEach((_, i) => {
-    const y = -7 + i;
-    // faint: stacked additively they sum, and at full strength they flooded the pit with one flat teal
-    const plane = new THREE.Mesh(new THREE.PlaneGeometry(w - 8, dd - 6).rotateX(-Math.PI / 2), glowMat('#1d6f60', 0.25 + 0.06 * i, { additive: true, opacity: 0.09 }));
-    plane.position.set(cx, y, cz); plane.renderOrder = 2; g.add(plane);
-  });
-  const pages = d.brain_graph.pages as any[], conns = d.brain_graph.connections as any[];
-  const pos = new Map<string, [number, number, number]>();
-  // pages in a gentle wave across the box, in the order they are listed (positions illustrative; the count and the
-  // connections are the readback's)
-  pages.forEach((p, i) => {
-    const t = (i + 0.5) / pages.length, x = x0 + 10 + t * (x1 - x0 - 20), z = cz + Math.sin(i * 2.1) * 13;
-    pos.set(p.slug, [x, -1.2, z]);
-    const tile = new THREE.Mesh(new THREE.BoxGeometry(9, 0.3, 6), glowMat(HEX.teal, 1.1)); tile.position.set(x, -1.2, z); g.add(tile);
-    g.add(pool(HEX.teal, 9, 0.22, radialTex(1.4), [x, -1.0, z]));
-  });
-  for (const c of conns) { const a = pos.get(c.a), b = pos.get(c.b); if (a && b) g.add(strand([a, b], { color: HEX.teal, width: 0.8, opacity: 0.35 + 0.4 * Math.max(0, (c.similarity ?? 0.6) - 0.5), order: 3 })); }
+  // fewer particles than the garage's 20,000: a brain is some 70 px long here, and that many sum to a flat white
+  const brains = pitBrains({ x0, x1, z0, z1 }, res, { lens: true, count: 5000 });
+  brains.setBright(2.2);
+  // the garage's pit keeps its left half for the Terminal's layers and parts; this one holds the brains alone, centered
+  brains.group.position.x = (x0 + x1) / 2 - 90;
+  // drawn in the opaque pass, as the garage draws its pit, so the floor's glass lies over them
+  brains.group.traverse((c) => { delete c.userData.overlay; c.userData.noAO = true; c.layers.set(0); });
+  g.add(brains.group);
   // the glass floor over it, flush with the plinth's top
   const glass = new THREE.Mesh(new THREE.PlaneGeometry(w, dd).rotateX(-Math.PI / 2), new THREE.MeshPhysicalMaterial({ color: '#9fc7d6', roughness: 0.08, transparent: true, opacity: 0.1, clearcoat: 1, depthWrite: false }));
   glass.position.set(cx, PLINTH_H + 0.02, cz); glass.renderOrder = 6; glass.userData.noAO = true; g.add(glass);

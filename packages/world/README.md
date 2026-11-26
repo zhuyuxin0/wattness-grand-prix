@@ -6,21 +6,22 @@ ONE PLAN, an arcade cabinet where a visitor plans Desert Willow's day and seals 
 testnet, and the stack, a live map of what the entry is built from. It runs on three.js 0.187.0 and on the stage and
 kit of wattness.tech's intro, and it renders dark in either site theme, as that intro does.
 
-The package's surface is three mounts. Each takes an element, fills it, and returns a handle:
+The package's surface is four mounts. Each takes an element, fills it, and returns a handle:
 
 | Mount | What it shows | Where the site puts it |
 |---|---|---|
 | `mountStory` | The story, beat by beat, as one film on one stage | Intro (`#/`) |
 | `mountOnePlan` | ONE PLAN, playable, with the seal | Markets → ONE PLAN |
 | `mountStack` | The stack: every piece with its role and its real integration | The story's end, and an About view |
+| `mountBrain` | Living Brain as it holds our three brains: the combined view, each brain, each page's connections | Agents → Memory |
 
 ## Layout
 
 ```
 src/story/       the story player: mountStory, the beats, the two films' timings, capture mode
 src/game/        ONE PLAN, playable: mountOnePlan, the scoring model, the seal (EIP-1193, BSC testnet only)
-src/stations/    one folder per station (opening, world, grid, venue, garage, game, towers, stack): its frames;
-                 the stack's folder also holds mountStack
+src/stations/    one folder per station (opening, world, grid, venue, garage, game, towers, stack, brain): its frames;
+                 the stack's folder also holds mountStack, the brain's mountBrain
 src/words/       plain-first captions: the plain meaning as the head, the racing term as a small line under it
 src/kit/         the stage and kit of wattness.tech's intro, carried unchanged (PROVENANCE.md)
 src/lib/         the world's additions around the kit: stage options, plates, easing and camera blends,
@@ -36,7 +37,8 @@ storyboard/      the committed stills and their receipts; films and PNG sequence
 Every figure on screen comes from `src/data/frame-data.json` or from a file it cites: the sealed record for Nov 26,
 2026 (316 plans under one root), Desert Willow's 301 price scenarios and its three plans, and the fleet. The stations'
 own records sit beside their code: the garage's `ids.json` and `inputs.json`, the stack's `integrations.json` and
-`greenfield-record.json`.
+`greenfield-record.json`, the brain station's `brain-scene.json` (what Living Brain's API returned for our three brains,
+`src/stations/brain/README.md`).
 
 `frame-data.json` is built outside the repository and copied in by `sh scripts/sync-data.sh <folder>` (or the folder
 named in `.data-src`); it is not committed. `layout.json`, the venue's layout from the same storyboard, is committed:
@@ -63,7 +65,7 @@ story.dispose();
 | `theme` | `'dark'` | The site's theme, recorded on the story's root as `data-site-theme`. The 3D and its chrome stay dark. |
 | `startBeat` | `0` | A beat's index or id (`'desert-willow'`, `'the-map'`, `'stack'`, ...). In capture, the second to open on. |
 | `onRoute(tab)` | | Called by a beat's `Open <tab>` button with one of the site's tab ids: `intro`, `overview`, `fleet`, `battery`, `forecast`, `state`, `hedge`, `risk`, `memory`, `seal`, `verify`, `files`, `season`, `launchpad`, `one-plan`, `about`, `add-agent`. |
-| `cut` | `'master'` | Capture only: `'master'` (3:00) or `'90s'`. |
+| `cut` | `'master'` | Capture only: `'master'` (3:00), `'90s'`, or `'brain'` (the Living Brain cut, 69 s). |
 | `captions` | site `'frame'`, capture `'film'` | Each frame's own caption, the film's line for each row, or `'none'`. |
 | `dpr` | site `min(devicePixelRatio, 2)` | Drawing-buffer pixels per CSS pixel. |
 | `reducedMotion` | the visitor's `prefers-reduced-motion` | Rests as stills, with cross-fades between them. |
@@ -78,11 +80,15 @@ The handle:
 - `seek(t, dt?)`: capture mode. Poses the film at `t` seconds and resolves once the frame has settled.
 - `dispose()`.
 
-In site mode the wheel or trackpad scrubs through a move and snaps to the nearest rest. A click, the arrow keys, Page
-Up and Page Down, Space, Home and End, a swipe and the chapter rail along the top step through the beats. The wheel
-is the story's while the pointer is over it; the keys act while the story has focus or the pointer, or while nothing
-on the page has focus. The story fills the element and follows its size. At a rest with a still pointer nothing is
-drawn.
+In site mode the story plays the site's own stops (`beats.ts` SITE_KEYS: the master's keys from before Living Brain's
+beat, X05 "Your turn" kept, with Living Brain's one stop after the weather odds, since the brains were written after
+the seal and no plan reads them; never Living Brain's own interface, whose
+recording a site's checkout does not hold; less SITE_LEFT_OUT, the late seal's second stop on Parc fermé and the
+season and launch towers, which the Season and Launchpad tabs read live). The wheel or trackpad scrubs through a move
+and snaps to the nearest rest. A click, the arrow keys, Page Up and Page Down, Space, Home and End, a swipe and the
+chapter rail along the top step through the beats. The wheel is the story's while the pointer is over it; the keys act
+while the story has focus or the pointer, or while nothing on the page has focus. The story fills the element and
+follows its size. At a rest with a still pointer nothing is drawn.
 
 Frames are built one at a time as the story reaches them, their shaders compiled before they first draw, and released
 once the story is two keys past them (a key is a beat, or a point a move passes through).
@@ -180,6 +186,79 @@ The routes (`ROUTES` in `pieces.ts`):
 | Flap | `season` |
 | OpenFour | `launchpad` |
 
+## mountBrain
+
+```ts
+import { mountBrain, prepareBrain } from '@world/stations/brain/mount';
+
+await prepareBrain(el);                                   // the particles, made in a worker (never rejects)
+const brain = mountBrain(el, {
+  theme,                                                  // the page's theme; the 3D holds dark in both
+  tabs: TABS.map(({ id, label }) => ({ id, label })),     // which "Open <tab>" buttons may show
+  initial: { brain: 'all', page: null },                  // from the URL: ?brain=&page=
+  onRoute: (tabId) => navigate(tabId),
+  onState: ({ brain, page }, { history }) => syncUrl(brain, page, history),
+});
+brain.goTo({ brain: 'grand-prix', page: 'battery-tab' });
+brain.dispose();
+```
+
+| Option | Default | |
+|---|---|---|
+| `theme` | `'dark'` | The page's theme. The stage holds dark; the list without WebGL follows it. |
+| `tabs` | none | The host's tabs, `{ id, label }`: a page that is a tab's own shows "Open <label>", and a page a tab lists among its related pages shows "Part of: <label>". |
+| `initial` | `{ brain: 'all', page: null }` | `brain`: `'all'`, `'grand-prix'`, `'terminal'` or `'battery-review'`. A page needs its brain (slugs repeat: `wattness-terminal` is in two). Opening on a page skips the formation. |
+| `onRoute(tabId)` | | "Open <tab>" or "Part of" clicked. |
+| `onState(state, { history })` | | The visitor changed the view: focusing a brain asks for `'push'`, selecting a page `'replace'`. The mount never writes the URL. |
+| `dpr` | `min(devicePixelRatio, 2)` | 1.5 at most on phones. |
+| `quality` | `'auto'` | Full clouds (60,000 particles each) on desktop, a member on its orbit drawing 32,000 of them at 1.1 times the brightness; under 720 px or on a coarse pointer 30,000, and 16,000 drawn for a brain on its orbit. `prepareBrain` takes the same option. |
+| `reducedMotion` | the visitor's `prefers-reduced-motion` | Formed at once; no turn, twinkle, breathing, motes or orbits (the members held where the films' short clock has them at 3.0 s); moves are 200 ms. |
+| `corrections` | none | The host's corrections beside Living Brain's text where brain-scene.json has none: a page's keyed `'brain/slug'`, a connection's `'brainA/a>brainB/b'` (either order). The site passes the ones its `build-brain.json` carries. |
+
+The handle: `ready`, `state()` (`{ brain, page }`), `goTo({ brain, page })` (no `onState` for the host's own moves),
+`setTheme(theme)` (the list without WebGL follows it),
+`on('state' | 'route' | 'ready' | 'error', fn)` (returns its unsubscribe), `screenOf(brain, slug)` and `dotOf(brain,
+slug)` (where a page's tag or dot is, for checks and recordings), `brainAt(brain)`, and `dispose()`.
+
+How it plays: `prepareBrain(el, { quality })` makes the brains' particles in a module worker (the 90,000-point surface
+sample and each brain's particles and page places are pure functions of their seeds), so a host that awaits it before
+`mountBrain` opens the stage without a long task; without it the mount makes them itself. The combined view forms from
+dust once per page load (3.2 s, from the first frame that moves), the three member brains orbiting it and showing their
+profiles, as Living Brain's do; the links across brains settle to 0.6 of their brightness once formed and come back to
+full while a page is lit, and while the conflict's rose arc is drawn its two pages are tagged in rose (the HUD's
+"1 conflict" opens its page in the build's brain, whose card carries it). A member clicked (its cloud, its name, or its
+chip top right) comes to the center over 1.4 s, turning to face the camera, and its tags resolve; "All brains" or Escape
+goes back. A page's tag (or dot) hovered lights its connections, wiping out from it over 2 s, and shows a small card;
+clicked (in the all-brains view its brain comes to the center first, so the URL carries both), its card pins on the
+right (a bottom sheet in the narrow layout) and the scene is composed left of it (above the sheet): Living Brain's
+summary as it wrote it, the correction beside it where the summary misstates the repository or the chain record (the
+scene's, or the host's `corrections`), the conflict across brains where the page is in it, and its connections in its
+brain and across brains, each with its strength and match; a row selects its page, in another brain after that brain
+comes to the center. While a page is selected, hovering another shows its small card and keeps the selection's
+connections lit, and a tag that slides under a still pointer as the view moves never takes the hover. The camera never
+moves for a click (Living Brain's rule: a selection only lights things); with the pointer on the card's Across brains
+list (a row in it focused, or a Why in it opened) it eases out once for that selection until the brains the links reach
+are in the picture, turning only as far as keeps them in the stage left of the card. Drag and pinch are Living Brain's
+controls (damping, distance 1.4 to 7, or farther where a tall stage's framing needs it); the wheel zooms with Ctrl or ⌘
+held (a trackpad's pinch arrives so) or once the visitor has pressed on the stage, a notch eased over about 120 ms, and
+otherwise scrolls the page on, the hint saying how to zoom; on a phone a vertical swipe scrolls the page and a sideways
+drag turns the brain. Its slow turn pauses while the visitor moves it and for 4 s after. The keyboard's path: the HUD's
+conflict, the chips (the brains), the pinned card, then the focused brain's pages, each a button in a visually hidden
+list (focus shows its small card; Enter pins it and takes focus into its card, whose close gives focus back to the
+row); every control shows a focus ring, arrow keys turn the view when the stage has focus, and Escape closes the drawer,
+then the card, then the brain, focus staying on the stage. The narrow layout (under 800 px, or wherever the HUD and the
+chips would meet in their row) puts the chips at the bottom over the scope line and the card in a bottom sheet, and a
+"Pages" button opens the pages as a drawer with its own close (Escape, or a press outside it, closes it too); on a stage
+taller than it is wide the all-brains view is framed by the orbit, drawn in so the members and their names stay on the
+stage, and the members fade against that framing, so a focused brain shows alone. Page tags keep off the HUD, the
+chips, the scope line and the stage's edge, and a member whose center is off the stage draws no tags. Without WebGL the
+brains' pages are the view, as lists scrolling inside the host's box; a page picked there comes with its brain, as the
+deep link needs. It draws only while visible.
+
+The host gives the element its size (the Memory tab: full width, `height: clamp(480px, 70vh, 820px)`), with the tab's
+tables under it. The deep link is the host's: `#/agents/memory?brain=<all|grand-prix|terminal|battery-review>&page=<slug>`,
+read into `initial` and written back from `onState`.
+
 ## In the site
 
 The site (`site/`) is Vite with React 18 and hash routes. Each mount goes in a page component: mounted once in an
@@ -190,6 +269,7 @@ effect, disposed in its cleanup, and loaded with a dynamic import so three.js an
 | Intro | `#/` | `mountStory(el, { mode: 'site', theme, onRoute })` |
 | Markets → ONE PLAN | its tab under Markets | `mountOnePlan(el, { mode: 'play', theme, onSeal })`, with `setTheme` when the visitor switches |
 | About: How It Works | `#/about` | `mountStack(el, { theme: 'dark', onRoute })`; the story ends on the same stack |
+| Agents → Memory | `#/agents/memory` | `mountBrain(el, { theme, tabs, initial, onRoute, onState })` over the tab's tables |
 
 ```tsx
 import { useEffect, useRef } from 'react';
@@ -232,9 +312,9 @@ server: { fs: { allow: [resolve(here, '../packages/world/src')] } },
 ```
 
 The site type-checks with stricter options than this package (`noUncheckedIndexedAccess`, `noUnusedLocals`,
-`noUnusedParameters`), so it declares the three mounts' types at the boundary, in a `.d.ts` of its own
-(`declare module '@world/story/mount' { ... }`) with no `paths` entry for `@world`, rather than checking the package's
-sources. The frame data is synced into `src/data/` before the site builds.
+`noUnusedParameters`), so it declares the mounts' types at the boundary, in a `.d.ts` of its own
+(`declare module '@world/story/mount' { ... }`, and the same for `@world/stations/brain/mount`) with no `paths` entry
+for `@world`, rather than checking the package's sources. The frame data is synced into `src/data/` before the site builds.
 
 The 3D renders dark and holds dark in both site themes, as wattness.tech's intro does. `theme` changes only what sits
 in the page: ONE PLAN's deck, and the site's theme recorded on the story's root.
@@ -258,12 +338,19 @@ each frame twice and reports whether the PNGs match.
 ## Films
 
 The story plays as two films, the 3:00 master and the 90-second cut, captured frame by frame on the player's own
-clock at 1920 x 1080 and 60 frames a second, and encoded as H.264 (crf 14, yuv420p, faststart).
+clock at 1920 x 1080 and 60 frames a second, and encoded as H.264 (crf 14, yuv420p, faststart). A third, the Living
+Brain cut (`--cut brain`, 69 s), is the brain station's whole sequence: three brains, combined, linked across, the Grand
+Prix brain, one page and its links across brains, remember and retrieve, and Living Brain's own interface. The master's
+Living Brain beat is 0:41 to 0:49 (retrieve, connect, then Living Brain's own interface) and the 90-second cut's 0:25 to
+0:31 (connect, then its own interface; `src/stations/brain/film.ts`). Living Brain's own interface plays from a recording
+kept out of git (`storyboard/interface/frames/`, made by `src/stations/brain/capture-interface.mjs`): a checkout that
+captures these films needs that folder copied in, and `capture-story.mjs` refuses them without it.
 
 ```sh
 sh scripts/serve.sh <port>
 node scripts/capture-story.mjs --port <port> --cut master --out storyboard/cut --frames <dir>
 node scripts/capture-story.mjs --port <port> --cut 90s --out storyboard/cut --frames <dir>
+node scripts/capture-story.mjs --port <port> --cut brain --out storyboard/cut --frames <dir>
 sh scripts/stop.sh <port>
 ```
 
@@ -285,7 +372,7 @@ From the repository root:
 
 ```sh
 pnpm --filter @gatelock/world typecheck
-pnpm --filter @gatelock/world build       # dist/: the lab, the story, ONE PLAN and the stack's demo page
+pnpm --filter @gatelock/world build       # dist/: the lab, the story, ONE PLAN, the stack's and the Memory tab's demo pages
 node_modules/.bin/vitest run --config packages/world/src/game/vitest.config.mjs
 ```
 
@@ -294,6 +381,8 @@ From this folder, with the pages served (`sh scripts/serve.sh <port>`):
 ```sh
 node src/game/play.check.mjs --port <port>                         # ONE PLAN played in headless Chrome
 node src/stations/stack/demo/check.mjs --port <port> --out <dir>   # every piece's card and route
+node src/stations/brain/demo/check.mjs --port <port> --out <dir>   # every brain, the 28 tags, a card, routes, keys, phones
+node src/stations/brain/check-figures.mjs --port <port>             # every number the brain frames and lines show, traced
 ```
 
 The game's tests hold the page's scoring to the engine (`packages/engine`) and its hashing and chain calls to
@@ -301,8 +390,8 @@ The game's tests hold the page's scoring to the engine (`packages/engine`) and i
 glass, fits it, and seals against a scripted wallet in the page; no request leaves the page.
 
 The pages for each mount: `src/story/story.html` (`?mode=site&beat=<id>`, or
-`?mode=capture&cut=master|90s&w=1920&h=1080`), `src/game/play.html` (`?mode=`, `theme=`, `arm=`, `dial=`, `glass=`) and
-`src/stations/stack/demo/index.html` (`?theme=`).
+`?mode=capture&cut=master|90s|brain&w=1920&h=1080`), `src/game/play.html` (`?mode=`, `theme=`, `arm=`, `dial=`, `glass=`),
+`src/stations/stack/demo/index.html` (`?theme=`) and `src/stations/brain/demo/index.html` (`?theme=`, `brain=`, `page=`).
 
 The render, capture and check scripts drive headless Chrome on the GPU through a launcher module named by
 `WORLD_BROWSER_LIB`. It exports `launch()` and `guardRequests()`: Playwright's Chromium with a temporary profile and

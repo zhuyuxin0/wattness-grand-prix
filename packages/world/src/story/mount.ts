@@ -24,7 +24,7 @@ export interface MountOptions {
   /** The beat to open on: its index or id ('desert-willow', 'the-map', ...); in capture, the film's second to open on. */
   startBeat?: number | string;
   onRoute?(tabId: TabId): void;
-  /** capture: the film to play (master, 3:00, or the 90-second cut). */
+  /** capture: the film to play (master, 3:00, the 90-second cut, or brain, the Living Brain cut, 69 s). */
   cut?: CutId;
   /** The words: the site shows each frame's own caption; a capture the film's line by default. */
   captions?: Captions;
@@ -72,7 +72,8 @@ export function mountStory(el: HTMLElement, opts: MountOptions = {}): StoryHandl
     await Promise.all(['400 26px', '500 16px', '600 40px'].map((f) => document.fonts.load(`${f} "Libre Franklin Brand"`)));
     const data = await loadData();
     if (dead) return;
-    // the films run each hold's clock (Parc fermé's time-lapse under its line); the site rests on each beat's state
+    // the films run each hold's clock (Parc fermé's time-lapse under its line); the site rests on each beat's state, on
+    // its own stops (beats.ts SITE_KEYS)
     player = new StoryPlayer({ root, width: W, height: H, dpr, cut: mode === 'capture' ? opts.cut ?? 'master' : 'site', data, holds: mode === 'capture' ? 'run' : 'rest',
       captions: opts.captions ?? (mode === 'capture' ? 'film' : 'frame'), preserve: mode === 'capture', onError: (e, frame) => emit('error', { frame, error: String(e) }) });
     if (mode === 'site') {

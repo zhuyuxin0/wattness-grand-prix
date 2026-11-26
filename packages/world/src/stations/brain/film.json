@@ -1,0 +1,30 @@
+{
+ "schema": "grand-prix.story.films.v1",
+ "note": "The Living Brain cut's rows (SPEC 4.1, LB1 to LB8): start and end in seconds, the brain station's frames shown, and the one line the viewer reads. Every number in a line is read from brain-scene.json (or frame-data.json's sponsors.living_brain); figures names the field each comes from, and src/stations/brain/check-figures.mjs holds them to it.",
+ "brain": [
+  { "start_s": 0, "end_s": 8, "beats": [], "lb": "LB1", "frames": ["brain.sequence"],
+    "line": "Living Brain holds three of our brains: the Grand Prix build, 123 pages; the Wattness Terminal, 18; Desert Willow's review, 1.",
+    "figures": { "123": "brains[grand-prix].pages", "18": "brains[terminal].pages", "1": "brains[battery-review].pages" } },
+  { "start_s": 8, "end_s": 14, "beats": [], "lb": "LB2", "frames": ["brain.sequence"],
+    "line": "Combined into one team brain of 142 pages. Each brain keeps its own.",
+    "figures": { "142": "combined.pages" } },
+  { "start_s": 14, "end_s": 24, "beats": [], "lb": "LB3", "frames": ["brain.sequence"],
+    "line": "Living Brain linked them: 55 connections across brains, 43 build to Terminal, 12 build to review. One conflict flagged: two counts, and both hold.",
+    "figures": { "55": "combined.across", "43": "combined.acrossByPair[grand-prix|terminal]", "12": "combined.acrossByPair[battery-review|grand-prix]" } },
+  { "start_s": 24, "end_s": 32, "beats": [], "lb": "LB4", "frames": ["brain.sequence"],
+    "line": "Inside the Grand Prix brain: 34 build notes, compiled into 123 pages and 276 connections, 107 of them strong.",
+    "figures": { "34": "brains[grand-prix].notes", "123": "brains[grand-prix].pages", "276": "brains[grand-prix].connections", "107": "brains[grand-prix].strong" } },
+  { "start_s": 32, "end_s": 40, "beats": [], "lb": "LB5", "frames": ["brain.sequence"],
+    "line": "Page 02, Battery Tab: what the Battery tab shows, linked to 20 pages in its brain.",
+    "figures": { "02": "pages[grand-prix/battery-tab].n", "20": "pages[grand-prix/battery-tab].connections" } },
+  { "start_s": 40, "end_s": 49, "beats": [], "lb": "LB6", "frames": ["brain.sequence"],
+    "line": "Across brains it links to the Terminal's Battery Page and to Desert Willow's review: 5 more, 2 of them strong.",
+    "figures": { "5": "pages[grand-prix/battery-tab].across", "2": "across[] touching battery-tab, strength strong" } },
+  { "start_s": 49, "end_s": 61, "beats": [], "lb": "LB7", "frames": ["brain.sequence"],
+    "line": "Remember: at 10:58 CT, Desert Willow's hedge review went into its brain. Retrieve: a fresh session's answer now cites that page. A read as of the plan's 09:12 CT cutoff admits nothing, and the plan read no memory.",
+    "figures": { "10:58": "frame-data sponsors.living_brain.citation.available.ct", "09:12": "frame-data sponsors.living_brain.plan_time_cutoff_check.cutoff.ct" } },
+  { "start_s": 61, "end_s": 69, "beats": [], "lb": "LB8", "frames": ["brain.interface"],
+    "line": "The same brain in Living Brain's own interface, where pages are called memories: 123, with 276 connections.",
+    "figures": { "123": "brains[grand-prix].pages", "276": "brains[grand-prix].connections" } }
+ ]
+}

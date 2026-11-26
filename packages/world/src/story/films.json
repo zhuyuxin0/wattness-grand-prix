@@ -91,7 +91,37 @@
   },
   {
    "start_s": 41,
+   "end_s": 44,
+   "beats": [],
+   "frames": [
+    "brain.review"
+   ],
+   "line": "After the seal, retrieve: a new session's answer cites Desert Willow's review. No plan reads it.",
+   "lb": "LB7"
+  },
+  {
+   "start_s": 44,
    "end_s": 47,
+   "beats": [],
+   "frames": [
+    "brain.shared"
+   ],
+   "line": "Connect: 55 links across our three brains, made after the seal, one conflict flagged.",
+   "lb": "LB-M"
+  },
+  {
+   "start_s": 47,
+   "end_s": 49,
+   "beats": [],
+   "frames": [
+    "brain.interface"
+   ],
+   "line": "The Grand Prix brain in Living Brain's own interface.",
+   "lb": "LB8"
+  },
+  {
+   "start_s": 49,
+   "end_s": 54,
    "beats": [
     8
    ],
@@ -101,8 +131,8 @@
    "line": "Desert Willow's sealed day under 301 price scenarios. With no hedge, 56 lose money."
   },
   {
-   "start_s": 47,
-   "end_s": 54,
+   "start_s": 54,
+   "end_s": 60,
    "beats": [
     9
    ],
@@ -112,8 +142,8 @@
    "line": "A hedge on the same schedule (B) draws each hedged hour together: 11 days lose money."
   },
   {
-   "start_s": 54,
-   "end_s": 61,
+   "start_s": 60,
+   "end_s": 66,
    "beats": [
     10
    ],
@@ -123,8 +153,8 @@
    "line": "Chosen together (C), the schedule moves under the hedge until the battery backs every contract."
   },
   {
-   "start_s": 61,
-   "end_s": 70,
+   "start_s": 66,
+   "end_s": 75,
    "beats": [
     11
    ],
@@ -132,17 +162,6 @@
     "X04"
    ],
    "line": "The sealed plan (C) gives up $124.17 of mean against A and lifts the worst tenth from a $1,749.13 loss to a $406.91 gain."
-  },
-  {
-   "start_s": 70,
-   "end_s": 75,
-   "beats": [
-    12
-   ],
-   "frames": [
-    "X05"
-   ],
-   "line": "Your turn: the same day, the same 301 scenarios, the planner's own score."
   },
   {
    "start_s": 75,
@@ -353,17 +372,33 @@
   },
   {
    "start_s": 25,
+   "end_s": 28,
+   "beats": [],
+   "frames": [
+    "brain.shared"
+   ],
+   "line": "After the seal, Living Brain links our three brains: 55 connections across them.",
+   "lb": "LB-M"
+  },
+  {
+   "start_s": 28,
+   "end_s": 31,
+   "beats": [],
+   "frames": [
+    "brain.interface"
+   ],
+   "line": "The Grand Prix brain in Living Brain's own interface.",
+   "lb": "LB8"
+  },
+  {
+   "start_s": 31,
    "end_s": 40,
    "beats": [
     8,
-    9,
-    10,
     11
    ],
    "frames": [
     "X01",
-    "X02",
-    "X03",
     "X04"
    ],
    "line": "Dispatch and hedge chosen together lift the worst tenth from a $1,749.13 loss to a $406.91 gain."
@@ -436,5 +471,6 @@
    ],
    "line": "Wattness Grand Prix. Every ERCOT battery with complete public data (316 on Nov 26), planned for tomorrow and sealed on BNB Chain before the gate. Anyone can check any plan. gp.wattness.tech · wattness.tech"
   }
- ]
+ ],
+ "edited": "Living Brain beats (stations/brain/film.ts; the combined brain on its short clock, frame brain.shared), Nov 26: the master's rows 41-49 (retrieve, 41-44; connect, 44-47; its own interface, 47-49) take X05's row and a second each from X01, X02 and X03 (49-54, 54-60, 60-66), X04 at 66-75, Parc Ferme still at 75; the 90-second cut's rows 25-31 take X02 and X03 from the arcade's row (31-40, X01 and X04). The figures in the new lines are brain-scene.json's: 55 combined.across. The lines say when the brains were written and linked, after the seal, and that no plan reads them (the site's stop stands after the weather odds). Every other row is the source's."
 }

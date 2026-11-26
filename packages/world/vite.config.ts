@@ -78,7 +78,8 @@ export default defineConfig({
   preview: { host: "127.0.0.1", strictPort: true },
   // Every station is crawled at startup, so no dependency is discovered mid-render (a discovery reloads the page).
   optimizeDeps: { entries: ["lab.html", "src/**/*.ts"], include: ["three", ...ADDONS] },
-  // Every page the package serves: the frame lab, the story (site and capture), ONE PLAN and the stack's live demo.
+  // Every page the package serves: the frame lab, the story (site and capture), ONE PLAN, the stack's live demo and the
+  // Memory tab's (the brain station's).
   // three is one chunk of about 820 kB and the synced frame data another of about 730 kB, so the limit sits above both.
   build: {
     outDir: "dist",
@@ -89,6 +90,7 @@ export default defineConfig({
         story: resolve(here, "src/story/story.html"),
         play: resolve(here, "src/game/play.html"),
         stack: resolve(here, "src/stations/stack/demo/index.html"),
+        brain: resolve(here, "src/stations/brain/demo/index.html"),
       },
     },
   },

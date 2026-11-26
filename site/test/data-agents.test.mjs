@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { memoryRelation } from "../src/shell/memory-pages.ts";
 import { TABS } from "../src/shell/tabs.ts";
 import { decodeAtlasPayload, fundingDecision, RECORDED_ATLAS } from "../scripts/data/prices.mjs";
 
@@ -74,6 +75,12 @@ test("every tab of the side panel has a page in the build's memory", () => {
   for (const c of b.connections) {
     assert.ok(pages.has(`${c.aBrain}:${c.a}`) && pages.has(`${c.bBrain}:${c.b}`), `a connection names a missing page: ${c.a}, ${c.b}`);
   }
+});
+
+test("the line at each tab's foot says how the build's memory holds the tab, as its tab map does", () => {
+  const b = data("memory/build-brain.json");
+  // own page, the nearest page (the brain has none for the tab), or a section of another page
+  for (const t of TABS) assert.equal(memoryRelation(t.id), b.tabs[t.id]?.relation, `the ${t.label} tab's cue`);
 });
 
 test("the agents' record names seven identities and three jobs, steps in order", () => {

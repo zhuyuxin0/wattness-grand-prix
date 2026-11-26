@@ -1,6 +1,6 @@
 // Captures the story player's film (src/story/story.html?mode=capture) in headless Chrome on the GPU.
 //
-//   node scripts/capture-story.mjs --port <p> [--cut master|90s] [--from s] [--to s] [--fps 60] [--out <dir>]
+//   node scripts/capture-story.mjs --port <p> [--cut master|90s|brain] [--from s] [--to s] [--fps 60] [--out <dir>]
 //        [--frames <dir>] [--scale 1|2] [--captions film|frame|none] [--no-encode | --encode-only] [--crf 14]
 //   node scripts/capture-story.mjs --port <p> --shots [--cut master] [--out <dir>] [--scale 2]
 //   node scripts/capture-story.mjs --port <p> --times 1,12.5,30 [--out <dir>]
@@ -18,7 +18,7 @@
 // beside the output.
 import { execFileSync, spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -27,13 +27,13 @@ const RESERVED = new Set([5184, 5185, 15190, 15193, 15199]);
 const argv = process.argv.slice(2);
 const has = (name) => argv.includes(`--${name}`);
 const opt = (name, fallback = null) => { const i = argv.indexOf(`--${name}`); return i >= 0 && argv[i + 1] != null && !argv[i + 1].startsWith('--') ? argv[i + 1] : fallback; };
-const usage = 'usage: node scripts/capture-story.mjs --port <p> [--cut master|90s] [--from s] [--to s] [--fps 60] [--out dir] [--frames dir] [--scale 1|2] [--captions film|frame|none] [--shots | --times a,b | --measure t0,t1 [--gpu]] [--no-encode] [--crf 14]';
+const usage = 'usage: node scripts/capture-story.mjs --port <p> [--cut master|90s|brain] [--from s] [--to s] [--fps 60] [--out dir] [--frames dir] [--scale 1|2] [--captions film|frame|none] [--shots | --times a,b | --measure t0,t1 [--gpu]] [--no-encode] [--crf 14]';
 const port = Number(opt('port'));
 if (!Number.isInteger(port) || port <= 0) { console.error(usage); process.exit(2); }
 if (RESERVED.has(port)) { console.error(`port ${port} is reserved; pick a spare port`); process.exit(2); }
 const here = dirname(fileURLToPath(import.meta.url));
 const pkg = resolve(here, '..');
-const cut = opt('cut', 'master') === '90s' ? '90s' : 'master';
+const cut = ['90s', 'brain'].includes(opt('cut', 'master')) ? opt('cut') : 'master';
 const fps = Number(opt('fps', '60'));
 const scale = Number(opt('scale', '1'));
 const captions = opt('captions', 'film');
@@ -87,6 +87,12 @@ try {
   const err0 = await errorOf();
   if (err0) throw new Error(err0);
   const story = await page.evaluate(() => window.__gpStory);
+  // Living Brain's own interface plays from a recording kept out of git (storyboard/interface/frames, made by
+  // src/stations/brain/capture-interface.mjs). A film that shows it is refused in a checkout without the recording,
+  // rather than captured with the frame's stand-in: copy the folder in, outside git, first.
+  if (story.keys.some((k) => k.frame === 'brain.interface') && !existsSync(join(pkg, 'storyboard/interface/frames/manifest.json'))) {
+    throw new Error(`the ${cut} film shows Living Brain's own interface, whose recording is not in this checkout: copy storyboard/interface/frames (manifest.json and its JPEGs) into packages/world/storyboard/interface/frames, outside git, then capture again`);
+  }
   const from = Number(opt('from', '0')), to = Math.min(story.seconds, Number(opt('to', String(story.seconds))));
 
   if (has('measure')) {

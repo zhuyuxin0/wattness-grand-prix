@@ -5,16 +5,19 @@ import { dualTime } from "../../lib/time";
 import { panelSections } from "../../shell/tabs";
 import { Section, Stat, StatRow } from "../../ui";
 import { pageKey, type BuildBrain, type BuildConnection, type BuildPage } from "./data";
+import { readSelection, selectedKey, selectionOf, writeSelection } from "./select";
 
 // The build's own brain: every tab of this site and the page Living Brain keeps
-// on it, and one page at a time with its connections, in this brain and across
+// on it (or the nearest page it has, or the page the tab is a section of), and
+// one page at a time with its connections, in this brain and across
 // the brains Living Brain combines. Living Brain's text stays as it wrote it;
 // a correction stands beside any summary or reasoning that misstates the
 // repository or the chain record.
 //
 // ?tab=<id> names the tab the visitor came from (the quiet line at each tab's
-// foot links here) and opens its page; ?page=<brain>:<slug> opens any page,
-// and picking another tab's row only changes that.
+// foot links here) and opens its page; ?brain=<brain>&page=<slug> opens any
+// page (select.ts: the 3D stage over it reads and writes the same two), and
+// picking another tab's row only changes those.
 
 const STRENGTHS = ["strong", "medium", "weak"] as const;
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -53,7 +56,7 @@ export function Build({ b }: { b: BuildBrain }) {
   const sections = useMemo(() => panelSections(), []);
   const asked = params.get("tab");
   const here = asked && b.tabs[asked] ? asked : "memory";
-  const pick = params.get("page");
+  const pick = selectedKey(readSelection(params));
   const selected = (pick && pages.get(pick)) || pages.get(pageKey("grand-prix", b.tabs[here]?.page ?? "memory-tab")) || b.pages[0]!;
   const pageRef = useRef<HTMLDivElement>(null);
 
@@ -65,9 +68,7 @@ export function Build({ b }: { b: BuildBrain }) {
   }, [asked]);
 
   const openPage = (key: string) => {
-    const next = new URLSearchParams(params);
-    next.set("page", key);
-    setParams(next, { replace: true });
+    setParams(writeSelection(params, selectionOf(key)), { replace: true });
     pageRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
   };
 
@@ -82,14 +83,14 @@ export function Build({ b }: { b: BuildBrain }) {
           <Stat label="The build's brain" value={formatInt(b.brain.pages)} unit=" pages" note={`${formatInt(b.brain.connections)} connections: ${STRENGTHS.map((s) => `${b.brain.byStrength[s] ?? 0} ${s}`).join(" · ")}`} />
           {terminal && <Stat label="The Terminal's brain" value={formatInt(terminal.pages)} unit=" pages" note={`${formatInt(terminal.connections)} connections, "${terminal.name}"`} />}
           <Stat label="Across brains" value={formatInt(b.combined.crossBrainConnections)} unit=" links" note={`in "${b.combined.name}", ${formatInt(b.combined.pages)} pages in all`} />
-          <Stat label="Read back" value={read.ct} size="sm" note={read.yours ?? "market time"} />
+          <Stat label="Pages read back" value={read.ct} size="sm" note={read.yours ?? "market time"} />
         </StatRow>
         <p className="mem-source">
           {b.brain.description} Compiled by Living Brain from {formatInt(b.brain.notes.compiled)} short notes on the build. {SHORT}
         </p>
       </section>
 
-      <Section id="mem-tabs" title="Every Tab's Page" lede="Each tab of this site and the page Living Brain keeps on it. Pick one to open the page and its connections." source={SHORT}>
+      <Section id="mem-tabs" title="Every Tab's Page" lede="Each tab of this site and the page Living Brain keeps on it, or the nearest page it has. Pick one to open the page and its connections." source={SHORT}>
         <div className="mem-tabs">
           {sections.map((sec) => (
             <div key={sec.group?.id ?? "start"} className="mem-tabs__group">
@@ -167,7 +168,13 @@ function PageView({
   const tabs = Object.entries(b.tabs).filter(([, t]) => page.brain === "grand-prix" && t.page === page.slug);
   const also = [...new Set(tabs.flatMap(([, t]) => t.also))].map((s) => pages.get(pageKey("grand-prix", s))).filter((p): p is BuildPage => !!p);
   const labels = panelSections().flatMap((s) => s.tabs);
-  const tabNames = tabs.map(([id]) => labels.find((t) => t.id === id)?.label).filter(Boolean) as string[];
+  const nameOf = (id: string) => labels.find((t) => t.id === id)?.label;
+  // the tabs this page is the brain's own page for, the nearest page for (the brain has none of their own), and the
+  // tabs that are a section of it (build-brain.json tabs[id].relation)
+  const named = (rel: string) => tabs.filter(([, t]) => t.relation === rel).map(([id]) => nameOf(id)).filter(Boolean) as string[];
+  const own = named("own"), nearest = named("nearest");
+  const sections = tabs.filter(([, t]) => t.relation === "related").flatMap(([id, t]) => (nameOf(id) ? [{ label: nameOf(id)!, section: t.section }] : []));
+  const theTabs = (names: string[]) => (names.length === 1 ? `the ${names[0]} tab` : `the ${names.join(" and ")} tabs`);
 
   return (
     <Section
@@ -176,7 +183,16 @@ function PageView({
       title={page.title}
       lede={
         <>
-          {tabNames.length > 0 && <>The page for {tabNames.length === 1 ? `the ${tabNames[0]} tab` : `the ${tabNames.join(" and ")} tabs`}. </>}
+          {own.length > 0 && <>The page for {theTabs(own)}. </>}
+          {nearest.length > 0 && (
+            <>
+              The nearest page to {theTabs(nearest)}, which {nearest.length === 1 ? "has" : "have"} no page of {nearest.length === 1 ? "its" : "their"} own in
+              this brain.{" "}
+            </>
+          )}
+          {sections.map((x) => (
+            <span key={x.label}>The {x.label} tab is {x.section ? `this page's section "${x.section}"` : "a section of this page"}. </span>
+          ))}
           {formatInt(links.length)} connection{links.length === 1 ? "" : "s"}
           {across ? `, ${formatInt(across)} of them to another brain` : ""}.
         </>
