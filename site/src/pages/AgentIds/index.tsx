@@ -2,10 +2,11 @@ import type { ReactNode } from "react";
 import { useShowcaseManifest } from "../../data";
 import { now } from "../../lib/capture";
 import { dualTime } from "../../lib/time";
-import { Glyph, Hash, Loading, PageHeader, Ready, Section } from "../../ui";
+import { Glyph, Hash, Loading, PageHeader, Ready, Section, type CheckItem } from "../../ui";
 import { LiveRead } from "../../ui/LiveRead";
 import { Flow, shortDay, TabLink } from "../Battery/kit";
 import { useAgents, useCards, useChain, useHostedCard, type Agent, type AgentsFile, type CardRead, type ChainState, type IdentityRead, type Job, type JobRead, type LiveState, type Party } from "./data";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { addressUrl, txUrl } from "./rpc";
 import "./styles.css";
 
@@ -107,8 +108,46 @@ export default function AgentIdsPage() {
   );
 }
 
+/** The jobs' Check it: each job's deliverable and every step's transaction, the parties without an ID, the contracts. */
+function jobItems(f: AgentsFile): CheckItem[] {
+  const items: CheckItem[] = [];
+  for (const j of f.jobs) {
+    items.push({
+      kind: "hash",
+      label: `Job ${j.jobId}: the deliverable's fingerprint`,
+      value: j.deliverable,
+      href: j.deliverableUrl,
+      copy: `job ${j.jobId} deliverable fingerprint`,
+      note: j.fingerprint === "sha256" ? "SHA-256 of the scenarios file's RFC 8785 canonical JSON" : "Keccak-256 of the deliverable's canonical JSON",
+    });
+    for (const t of j.transactions) items.push({ kind: "transaction", label: `Job ${j.jobId}: ${STEP[t.step] ?? t.step}`, value: t.hash, href: txUrl(t.hash), copy: `job ${j.jobId} ${t.step} transaction`, note: `Block ${t.blockNumber.toLocaleString("en-US")}` });
+  }
+  const buyers = new Set(f.jobs.flatMap((j) => [j.client, j.provider]).filter((p) => p.agentId == null).map((p) => p.address));
+  for (const b of buyers) items.push({ kind: "address", label: "Wattness's test buyer wallet, with no agent ID", value: b, href: addressUrl(b), copy: "test buyer wallet" });
+  items.push(
+    { kind: "address", label: "The ERC-8183 commerce contract", value: f.erc8183.commerce, href: addressUrl(f.erc8183.commerce), copy: "commerce contract" },
+    { kind: "address", label: "Its router", value: f.erc8183.router, href: addressUrl(f.erc8183.router), copy: "router" },
+    { kind: "address", label: `The payment token, ${f.paymentToken.symbol}`, value: f.paymentToken.address, href: addressUrl(f.paymentToken.address), copy: "payment token" },
+  );
+  return items;
+}
+
+/** The identities' Check it: the registry, and each agent's wallet, registration and card update. */
+function agentItems(f: AgentsFile): CheckItem[] {
+  const items: CheckItem[] = [{ kind: "address", label: "The ERC-8004 registry", value: f.registry, href: addressUrl(f.registry), copy: "registry" }];
+  for (const a of f.agents) {
+    items.push(
+      { kind: "address", label: `${a.title}'s wallet`, value: a.wallet, href: addressUrl(a.wallet), copy: `${a.title}'s wallet` },
+      { kind: "transaction", label: `${a.title}: registered as agent ${a.agentId}`, value: a.registered.hash, href: txUrl(a.registered.hash), copy: "registration transaction" },
+      { kind: "transaction", label: `${a.title}: its card's address set`, value: a.uriSet.hash, href: txUrl(a.uriSet.hash), copy: "URI update transaction" },
+    );
+  }
+  return items;
+}
+
 function Agents({ f }: { f: AgentsFile }) {
   const { state, busy, failed, again } = useChain(f);
+  const registry = useLogoRegistry();
   const cards = useCards(f.agents);
   const read = state.status === "ready" ? state.read : null;
   const agents = [...f.agents].sort((a, b) => ORDER.indexOf(a.role) - ORDER.indexOf(b.role));
@@ -117,10 +156,17 @@ function Agents({ f }: { f: AgentsFile }) {
       <Section
         id="ids-agents"
         title="Seven Identities"
+        builtWith={sponsors(registry, "bnbchain", { id: "agentstudio", caption: "Agent Studio" }, { id: "aws", caption: "AgentCore" })}
+        check={{
+          items: agentItems(f),
+          status: state.status === "ready" ? "verified" : state.status === "loading" ? "checking" : null,
+          how: "Each identity is read back from the registry on BSC testnet in your browser; each address and transaction opens on testnet.bscscan.com.",
+        }}
         lede="An ID is a token on the registry, owned by the agent's own wallet and pointing to its card: what the agent reads, what it writes and the code that does it. Each is read back from the chain in your browser and held to the record. The six roles are deterministic code, with no language model, and all run in one process before each day-ahead gate; a handoff between two of them is an ERC-8183 job."
         source={
           <>
-            {SOURCE} Registry {f.registry}. Record: contracts/deployments/agents.bsc-testnet.json for the six roles, the stack's integrations record for the evaluator.
+            {SOURCE} Record: contracts/deployments/agents.bsc-testnet.json for the six roles, the stack's integrations record for the evaluator; the registry's address is in Check
+            it.{registry ? ` ${registry.note}` : ""}
           </>
         }
       >
@@ -135,10 +181,16 @@ function Agents({ f }: { f: AgentsFile }) {
       <Section
         id="ids-jobs"
         title={`${word(f.jobs.length)} Paid Jobs`}
+        builtWith={sponsors(registry, "bnbchain")}
+        check={{
+          items: jobItems(f),
+          status: state.status === "ready" ? "verified" : state.status === "loading" ? "checking" : null,
+          how: "Each job's client, provider, amount, deliverable and status are read back from the commerce contract on BSC testnet in your browser.",
+        }}
         lede={`An ERC-8183 job escrows the client's payment, takes the provider's deliverable as a fingerprint on chain, and pays the provider when it settles. Each job here paid ${units(f.jobs[0]?.amountWei ?? "0", f.paymentToken.decimals)} ${f.paymentToken.symbol}, a testnet stablecoin with no cash value.`}
         source={
           <>
-            {SOURCE} Commerce contract {f.erc8183.commerce}, router {f.erc8183.router}. Steps:{" "}
+            {SOURCE} The commerce contract, its router and every step's transaction are in Check it. Steps:{" "}
             {(() => {
               const dep = f.jobs.filter((j) => j.task === "price-scenarios").map((j) => j.jobId);
               const read = f.jobs.filter((j) => j.task !== "price-scenarios").map((j) => j.jobId);
@@ -343,7 +395,7 @@ function PartyName({ p }: { p: Party }) {
     );
   return (
     <span className="ids-party">
-      Wattness's test buyer wallet, with no agent ID, <Hash value={p.address} href={addressUrl(p.address)} label="Wattness's test buyer wallet" />
+      Wattness's test buyer wallet, with no agent ID
     </span>
   );
 }
@@ -402,7 +454,6 @@ function JobCard({ f, j, read, loading }: { f: AgentsFile; j: Job; read: ChainSt
         <div>
           <dt>Deliverable</dt>
           <dd>
-            <Hash value={j.deliverable} head={8} tail={6} label="deliverable fingerprint" />
             <span className="muted">
               {j.fingerprint === "sha256"
                 ? "The SHA-256 of the scenarios file's RFC 8785 canonical JSON."
@@ -458,7 +509,9 @@ function StepList({ j }: { j: Job }) {
                 {at.ct}
                 {at.yours && <span className="muted"> · {at.yours}</span>}
               </span>
-              <Hash value={t.hash} head={6} tail={4} href={txUrl(t.hash)} label={`${t.step} transaction`} />
+              <a className="ids-step__tx" href={txUrl(t.hash)} target="_blank" rel="noreferrer" aria-label={`The ${STEP[t.step] ?? t.step} transaction on testnet.bscscan.com (opens in a new tab)`}>
+                <Glyph name="popout" />
+              </a>
             </li>
           );
         })}

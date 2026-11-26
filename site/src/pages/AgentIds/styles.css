@@ -242,13 +242,19 @@
   color: var(--w-fg);
   white-space: nowrap;
 }
-@media (max-width: 479px) {
-  .ids-steps li {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  .ids-steps li .hash {
-    grid-column: 1 / -1;
-  }
+/* each step's transaction opens on the explorer; its hash is in the section's Check it */
+.ids-step__tx {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  align-self: center;
+  color: var(--w-muted);
+  border-radius: var(--t-radius-xs);
+}
+.ids-step__tx:hover {
+  color: var(--w-fg);
+  background: var(--t-hover);
 }
 
 .ids-what {
