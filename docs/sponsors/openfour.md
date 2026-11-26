@@ -54,6 +54,22 @@ People who buy into AI agents' launches and want graduation to mean the agent ha
 | The Nov 26 record bound | [`0xd100cfa2…`](https://testnet.bscscan.com/tx/0xd100cfa2402baaeec7de4545deedec2f72d238bbb53ec3fc34753d93718a1128) | Nov 25, 13:17:40 |
 | Graduated into the PancakeSwap V2 pair | [`0xc549f6e5…`](https://testnet.bscscan.com/tx/0xc549f6e5a6598ba308e6ecb837cf0da2a6fa23c1d72a6e40065df4c585af5330) | Nov 25, 13:17:51 |
 
+### The second launch, Nov 27: create, buy, sell, migrate
+
+Grand Prix Planner 27 Nov (PLNR27, testnet placeholder) `0x027C1A8D15ceb3048F5EC787D5e1E64B1043cE47`, on the same module and preset, graduated into the PancakeSwap V2 pair `0x28Fb374c51B89c7D58c5849a478339BFda640879` once the Nov 27 sealed record was bound. Times are CT on Nov 26.
+
+| What | Transaction | When (CT) |
+|---|---|---|
+| Launch created | [`0x26ab9fbc…`](https://testnet.bscscan.com/tx/0x26ab9fbc2def498e98436ee1754700eaddcd5c6d3a3ea54a83a7e9562d546323) | 11:39:46 |
+| Bought 1 billion | [`0x65bd6eba…`](https://testnet.bscscan.com/tx/0x65bd6eba352db36dd2054f307330352fca71ce4468e8fc8778f9d21b3f2268b5) | 11:40:11 |
+| Sold 900 million back to the curve | [`0x1e420c74…`](https://testnet.bscscan.com/tx/0x1e420c74807f518ea5a7ce5831add11c13b51a0d4cd06b20c6cc3eeb62f6fd56) | 11:40:27 |
+| Bought to sell-out | [`0xdd809ed5…`](https://testnet.bscscan.com/tx/0xdd809ed51df954bd0e3f4aa931650ac6a187f20072cfeb22ee05ecd8224d9467) | 11:40:44 |
+| Graduation refused with `EvidenceMissing` | [`0xce84183e…`](https://testnet.bscscan.com/tx/0xce84183e3eba32a691dd66dad351c1eba0541df7d64c46a7471cfe222891eeaf) | 11:40:58 |
+| The Nov 27 record bound | [`0xd7be1172…`](https://testnet.bscscan.com/tx/0xd7be1172ffe756dc26175c9b6520fcdfe41d85a7b190cd571bffa851ed10d515) | 11:41:17 |
+| Graduated into the PancakeSwap V2 pair | [`0x9d2b5112…`](https://testnet.bscscan.com/tx/0x9d2b5112d35700f4fe274fcc70dc537ddfb9755d4f891d4e4e26d7ee133b6720) | 11:41:28 |
+
+Every create, buy, sell and migrate of both launches is in [`modules/openfour/submission/tokens.json`](../../modules/openfour/submission/tokens.json). The gameplay proposal (description, composition, risk notes) is [openfour-gameplay.md](openfour-gameplay.md), and the AI-assisted audit of the module and its preset wiring is [openfour-ai-audit.md](openfour-ai-audit.md).
+
 ## Build and test
 
 From the repository root:
