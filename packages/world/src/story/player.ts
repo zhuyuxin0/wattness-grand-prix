@@ -151,10 +151,14 @@ export class StoryPlayer {
   /** A key's run through its hold, when the holds run (the films) and it has one. */
   private runOf(k: FilmKey): Run | null { return this.holds === 'run' && k.run?.length ? k.run : null; }
 
-  /** A key's local time `since` seconds into its hold: its run in the films, else its beat's rest. */
+  /** A key's local time `since` seconds into its hold: its run in the films, else its beat's rest. In the films a frame
+   *  that moves at its rest (FrameHandle.live) and has no run there runs its own clock on from the rest instead; the
+   *  site runs that clock itself (site.ts), on the wall clock. */
   holdLocal(k: FilmKey, inst: FrameInstance, since: number): number {
     const run = this.runOf(k);
-    return run ? runAt(run, since) : keyDef(k.key).local ?? inst.restLocal;
+    if (run) return runAt(run, since);
+    const rest = keyDef(k.key).local ?? inst.restLocal;
+    return this.holds === 'run' && inst.handle?.live ? rest + Math.max(0, since) : rest;
   }
 
   /** The picture at film time t: which frames, at which local times and cameras, at which opacities. */
@@ -179,9 +183,9 @@ export class StoryPlayer {
     if (!ia?.ready || !ib?.ready) return null;
     const leg = F.leg(where.i), e = where.e;
     const mode = leg.cam ?? 'glide';
-    // the outgoing frame held where its hold ended; the incoming one plays its own motion into its rest, or, when its
-    // hold runs a clock, waits at the run's start
-    const la = leg.clockA ? leg.clockA[0] + (leg.clockA[1] - leg.clockA[0]) * e : this.holdLocal(A, ia, A.until - A.at);
+    // the outgoing frame held where its hold ended (one that moves at its rest runs on through the leg); the incoming
+    // one plays its own motion into its rest, or, when its hold runs a clock, waits at the run's start
+    const la = leg.clockA ? leg.clockA[0] + (leg.clockA[1] - leg.clockA[0]) * e : this.holdLocal(A, ia, A.until - A.at + (ia.handle?.live ? e * where.dur : 0));
     const runB = this.runOf(B);
     const restB = runB ? runAt(runB, 0) : keyDef(B.key).local ?? ib.restLocal;
     const motion = runB ? 0 : Math.min(restB, where.dur);

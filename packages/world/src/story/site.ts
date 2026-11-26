@@ -2,11 +2,14 @@
 // arrow keys, Page Up and Down, Space, a swipe, or the chapter rail. A step plays the leg at the film's own pace (its
 // camera eased inside the leg), a jump across chapters lands one stop short and plays the last leg, and the wheel
 // scrubs through the legs and snaps to the nearest rest when it stops. At a rest the picture stands still: nothing is
-// drawn until the position moves (there is no hover and no parallax, so a still pointer draws nothing). With reduced
-// motion the rests are stills and a step cross-fades from one to the next.
+// drawn until the position moves (there is no hover and no parallax, so a still pointer draws nothing), except where the
+// frame moves at its rest (FrameHandle.live: the stack's comets at its rest and in the closing plan view, Living Brain's
+// stop), which draws again at 30 fps while the story is on screen. With reduced motion the rests are stills and a step
+// cross-fades from one to the next.
 import { keyDef } from './clock';
 import { PARTS, TAB_LABEL, type KeyDef, type TabId } from './beats';
 import type { StoryPlayer, Picture } from './player';
+import type { FrameInstance } from './instances';
 import { smooth } from './moves';
 
 export interface Beat { index: number; id: string; name: string; term: string | null; part: string; tab: TabId | null; frame: string }
@@ -20,6 +23,9 @@ const STEP_PACE = 1.15;
 const SCREENS_PER_MOVE = 1.6;
 const SPRING = 6;
 const REDUCED_FADE_S = 0.45;
+/** A rest whose frame moves (FrameHandle.live) draws again at this rate: the motion reads, at half the GPU time of
+ *  drawing every display frame. */
+const LIVE_FPS = 30;
 
 const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement);
 const arrowSvg = () => {
@@ -60,6 +66,12 @@ export class SiteController {
   private prefetchIdx = 0;
   private dead = false;
   private told = new Set<string>();
+  /** The frame that moves at its rest (FrameHandle.live) the story rested on last, and its clock: seconds run past its
+   *  rest's local time. When the live rest last drew, and whether the story is on screen (it draws only then). */
+  private live: { inst: FrameInstance; t: number } | null = null;
+  private liveDrawnAt = -1;
+  private onScreen = true;
+  private io: IntersectionObserver | null = null;
   readonly beats: Beat[];
 
   constructor(private root: HTMLElement, private P: StoryPlayer, private reduced: boolean,
@@ -112,6 +124,10 @@ export class SiteController {
   start(at = 0) {
     this.pos = this.target = Math.max(0, Math.min(this.beats.length - 1, at));
     this.last = performance.now();
+    if (!this.io && typeof IntersectionObserver === 'function') {
+      this.io = new IntersectionObserver((es) => { this.onScreen = es.some((x) => x.isIntersecting); });
+      this.io.observe(this.root);
+    }
     this.raf = requestAnimationFrame(this.loop);
   }
 
@@ -267,6 +283,7 @@ export class SiteController {
     }
     this.waitingSince = -1; this.wait.classList.remove('is-on');
     const atRest = Math.abs(p - Math.round(p)) < 1e-6 && !this.play && this.wheelAt < 0;
+    pic = this.withLive(pic, atRest, dt, now);
     if (p !== this.drawnAt) {
       this.P.render(pic, 0);
       this.drawnAt = p;
@@ -289,6 +306,34 @@ export class SiteController {
     if (stop !== this.stop) this.setStop(stop);
     if (atRest && now - this.settledAt > 400) this.prefetch(stop);
   };
+
+  /** The picture with the clock of the frame that moves at its rest (FrameHandle.live: the stack's comets, run as the
+   *  Tech Stack tab runs them, and Living Brain's stop). Resting on it, its clock runs on the wall clock and the rest
+   *  draws again at LIVE_FPS while the story is on screen; on a leg out of it, its clock runs on in the frame left
+   *  behind, so it keeps moving as the camera goes; wherever it is drawn it carries its clock, so it never jumps back.
+   *  With reduced motion the rests are stills and nothing runs. */
+  private withLive(pic: Picture, atRest: boolean, dt: number, now: number): Picture {
+    if (this.reduced) return pic;
+    if (this.live?.inst.disposed) this.live = null;
+    const F = this.P.film, w = pic.where;
+    // the frame at the rest, or the one a leg leaves (held at its rest while the camera goes)
+    let held: FrameInstance | undefined;
+    if (atRest) held = pic.draws[0]?.inst;
+    else if (w.kind === 'leg' && w.i > 0) {
+      const a = keyDef(F.keys[w.i - 1]!.key).frame;
+      if (a !== keyDef(F.keys[w.i]!.key).frame) held = pic.draws.find((d) => d.inst.id === a)?.inst;
+    }
+    if (atRest && held?.handle?.live && this.live?.inst !== held) this.live = { inst: held, t: 0 };
+    const L = this.live;
+    if (!L) return pic;
+    if (held === L.inst && this.onScreen && !document.hidden) {
+      L.t += dt;
+      // once a frame is due, the position counts as not drawn yet (at a rest nothing else draws it)
+      if (now - this.liveDrawnAt >= 1000 / LIVE_FPS - 4) { this.liveDrawnAt = now; this.drawnAt = NaN; }
+    }
+    if (!pic.draws.some((d) => d.inst === L.inst)) return pic;
+    return { ...pic, draws: pic.draws.map((d) => (d.inst === L.inst ? { ...d, local: d.local + L.t } : d)) };
+  }
 
   private showWait(now: number) {
     if (this.waitingSince < 0) this.waitingSince = now;
@@ -338,6 +383,7 @@ export class SiteController {
   dispose() {
     this.dead = true;
     cancelAnimationFrame(this.raf);
+    this.io?.disconnect();
     window.removeEventListener('keydown', this.onKey);
     this.root.removeEventListener('wheel', this.onWheel);
     this.root.removeEventListener('click', this.onClick);
