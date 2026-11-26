@@ -1,0 +1,21 @@
+// The Grand Prix's edge Worker. Every value here is public: the bucket, the contract, the agent wallet
+// and the RPC endpoints. Nothing secret is bound; the deploy token is read by scripts/deploy.ts.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "grand-prix-edge",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-01",
+  // node:crypto's createHash: the runtime's own SHA-256, synchronous.
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  // The version is part of every edge cache key, so a deploy never serves an earlier version's output.
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
+  "vars": {
+    "GREENFIELD_BASE": "https://gnfd-testnet-sp3.nodereal.io/view/wattness-grand-prix-records/",
+    "COMMITTER": "0xfa22C29C4c3d975FCC617D899B1B695eFF2d94b8",
+    "GATE_RECORD": "0x2922c68cE15EB3e83B7f43b136e981dDc4262876",
+    "RPC_BSC_MAINNET": "https://bsc-dataseed.bnbchain.org,https://bsc-dataseed1.bnbchain.org,https://bsc-dataseed2.bnbchain.org",
+    "RPC_BSC_TESTNET": "https://bsc-testnet-dataseed.bnbchain.org,https://bsc-testnet.bnbchain.org"
+  }
+}
