@@ -69,6 +69,8 @@ export class SiteController {
   /** The time the position came to rest at its stop (-1 while it moves). */
   private restedAt = -1;
   private prefetchIdx = 0;
+  /** Whether Living Brain's particles have been asked for off the main thread (warmBrains). */
+  private warmed = false;
   private dead = false;
   private told = new Set<string>();
   /** The frame that moves at its rest (FrameHandle.live) the story rested on last, and its clock: seconds run past its
@@ -119,6 +121,8 @@ export class SiteController {
     root.addEventListener('touchmove', this.onTouchMove, { passive: false });
     root.addEventListener('touchend', this.onTouchEnd);
     window.addEventListener('keydown', this.onKey);
+    // the camera's travel is drawn lighter here (player.ts aoThroughLeg): a visitor's legs play live, the films' do not
+    P.motionLight = true;
     // the chrome's rects stay clear of the frames' plates
     P.keepOut = () => [bar].map((el) => {
       const a = el.getBoundingClientRect(), b = this.root.getBoundingClientRect();
@@ -319,8 +323,21 @@ export class SiteController {
     const stop = Math.round(p);
     if (stop !== this.stop) this.setStop(stop);
     // the frames round the rest start building as soon as the camera has landed and the plates are laid out
-    if (atRest && !this.decorating) this.prefetch(stop);
+    if (atRest && !this.decorating) { this.warmBrains(); this.prefetch(stop); }
   };
+
+  /** Living Brain's particles, made off the main thread once the story first rests (stations/brain/prepare.ts primes
+   *  shape.ts with what its worker sends back). Without them the brain station's setup waits for that worker, and a
+   *  setup holds the position (a step 300 ms after landing at 13 held 0.7 s, its words showing); the first frame to
+   *  draw a brain, the hub's Team data pit (built ahead at 03), made their shared surface sample itself, a task of
+   *  about 0.95 s that a key pressed then waited out. The arrays are the same either way, so every picture is too. */
+  private warmBrains() {
+    if (this.warmed) return;
+    this.warmed = true;
+    void Promise.all([import('../stations/brain/prepare'), import('../stations/brain/world')])
+      .then(([prep, world]) => (this.dead ? undefined : prep.preparePoints(world.worldPoints())))
+      .catch(() => undefined);
+  }
 
   /** The picture with the clock of the frame that moves at its rest (FrameHandle.live: the stack's comets, run as the
    *  Tech Stack tab runs them, and Living Brain's stop). Resting on it, its clock runs on the wall clock and the rest

@@ -46,6 +46,14 @@ export function runAt(run: Run, s: number): number {
   return last[1];
 }
 
+/** The share of a frame's ambient occlusion drawn at a leg's progress e (0 to 1, its time) when the player draws the
+ *  camera's travel lighter (the site): whole for the first tenth, out by 28%, none through the middle, back from 72%
+ *  and whole again from 90%. The camera eases (moves.ts calm), so it is at a seventh of its top speed where the AO
+ *  starts to go and past half of it while none is drawn; it lands, and the rest is drawn, with the frame's own AO. */
+export function aoThroughLeg(e: number): number {
+  return e < 0.5 ? 1 - smooth((e - 0.1) / 0.18) : smooth((e - 0.72) / 0.18);
+}
+
 interface Draw { inst: FrameInstance; local: number; alpha: number; pose: CameraPose | 'own'; rise?: number }
 export interface Picture { draws: Draw[]; plates: { inst: FrameInstance; key: string; k: number } | null; where: Where; t: number }
 
@@ -96,6 +104,13 @@ export class StoryPlayer {
   /** Milliseconds each render took (CPU side, and to the GPU's finish when measured). */
   readonly timings: { cpu: number[]; gpu: number[] } = { cpu: [], gpu: [] };
   measureGpu = false;
+  /** Draw the camera's travel lighter (the site sets it; the films keep every picture whole): the frames' ambient
+   *  occlusion fades out through the middle of a leg (aoThroughLeg) and is whole again before the camera lands. */
+  motionLight = false;
+  /** What the shadow map holds: the frame it was last drawn for, at which local time and rise, and the epoch then. */
+  private shadowOf: { inst: FrameInstance; local: number; rise: number | null; epoch: number } | null = null;
+  /** Counts what may move a frame's casters besides its clock: a layout (decorate), a build, a resize. */
+  private epoch = 0;
   dead = false;
   /** Rects (stage px) of the page's own chrome, kept clear of the frames' plates. */
   keepOut: (() => { x: number; y: number; w: number; h: number }[]) | null = null;
@@ -148,7 +163,7 @@ export class StoryPlayer {
     const run = this.queue.then(async () => {
       if (inst.ready || inst.disposed) return inst;
       if (this.dead) throw new Error('story: the player was disposed');
-      this.building.add(frame); this.writing.add(frame);
+      this.building.add(frame); this.writing.add(frame); this.epoch++;
       const b0 = performance.now();
       try {
         await inst.build();
@@ -283,6 +298,7 @@ export class StoryPlayer {
   }
 
   private drop(id: string, inst: FrameInstance) {
+    if (this.shadowOf?.inst === inst) this.shadowOf = null;
     this.rises.delete(inst); inst.dispose(); this.insts.delete(id);
     perfLog()?.events.push({ e: 'drop', frame: id, t: performance.now() });
   }
@@ -299,16 +315,27 @@ export class StoryPlayer {
     const shown = new Set(pic.draws.map((d) => d.inst));
     for (const inst of this.insts.values()) inst.root.visible = false;
     let under = false;
+    // the camera's travel drawn lighter (the site): less AO through the middle of a leg, the frame's own at a rest
+    this.stage.setAOMotion(this.motionLight && pic.where.kind === 'leg' ? aoThroughLeg(pic.where.e) : 1);
     pic.draws.forEach((d, n) => {
       d.inst.lastUsed = t0;
+      const owned = this.S.owner === d.inst;
       d.inst.pose(d.local, dt);
       const r = this.rises.get(d.inst) ?? (d.rise != null ? this.riseFor(d.inst) : null);
       if (r) { if (d.rise != null) r.set(d.rise); else r.restore(); }
       const pose = d.pose === 'own' ? d.inst.ownPose ?? d.inst.restPose! : d.pose;
       this.stage.setCamera(pose);
       d.inst.root.visible = true;
-      this.stage.requestShadow();
+      // the shadow map is kept when it was last drawn for this frame at this local time and rise, the stage has been
+      // this frame's since (no other frame drawn, laid out or built) and no time passes in this draw: only the camera
+      // has moved, and the camera never changes a shadow (the key light's box is the frame's own)
+      const rise = d.rise ?? null, s = this.shadowOf;
+      const keep = owned && dt === 0 && !!s && s.inst === d.inst && s.local === d.local && s.rise === rise && s.epoch === this.epoch;
+      this.stage.holdShadow(keep);
+      if (!keep) this.stage.requestShadow();
       this.stage.render();
+      this.stage.holdShadow(false);
+      if (!keep) this.shadowOf = { inst: d.inst, local: d.local, rise, epoch: this.epoch };
       d.inst.root.visible = false;
       if (pic.draws.length > 1 && n === 0) {
         // the outgoing frame, whole, beneath the incoming one
@@ -318,6 +345,7 @@ export class StoryPlayer {
         under = true;
       }
     });
+    this.stage.setAOMotion(1);
     const top = pic.draws[pic.draws.length - 1];
     const a = top ? (pic.draws.length > 1 ? top.alpha : 1) : 1;
     this.canvas.style.opacity = a >= 1 ? '' : a.toFixed(4);
@@ -346,7 +374,9 @@ export class StoryPlayer {
       this.stage.setCamera(inst.restPose!);
       this.stage.camera.updateMatrixWorld();
       this.syncLine(pic.t);
+      this.epoch++;
       try { await inst.decorate(key); } catch (e) { this.errors.set(`${inst.id}:decorate`, String(e)); }
+      this.epoch++;
       // the scope line's height reaches the film's line too, so it clears a long scope as the frame's caption would
       const h = inst.platesHost.style.getPropertyValue('--hw-scope-h');
       if (h) this.line.style.setProperty('--hw-scope-h', h); else this.line.style.removeProperty('--hw-scope-h');
@@ -386,7 +416,9 @@ export class StoryPlayer {
       this.stage.setCamera(pose);
       this.stage.camera.updateMatrixWorld();
       moved = true;
+      this.epoch++;
       try { await inst.decorate(key); } catch (e) { this.errors.set(`${inst.id}:decorate`, String(e)); }
+      this.epoch++;
     };
     // a leg between two frames of one world that show different screens (leg.screens 'both'): each frame's screens
     // through the leg, on the one camera both draw with, whichever picture shows
@@ -475,6 +507,7 @@ export class StoryPlayer {
     this.stage.setSize(width, height, dpr);
     this.under.width = Math.round(width * dpr); this.under.height = Math.round(height * dpr);
     // the frames fitted their cameras, lines and plates to the old size: they are built again as the story needs them
+    this.epoch++;
     this.prune([]);
   }
 

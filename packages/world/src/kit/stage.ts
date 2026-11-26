@@ -96,14 +96,53 @@ class LayerPass extends RenderPass {
   }
 }
 
+/** Point and spot lights that cast no shadow and project no map are lit in a plain loop that passes over a light
+ *  which does not reach the fragment (outside its cone or past its distance, where three's own code adds zero), in
+ *  place of three's unrolled block, which runs every light's BRDF for every fragment. The picture is the same (at most
+ *  one level apart, from rounding, at every rest and leg of the story); the shader is a fraction of the size. Three
+ *  unrolls the loop only to index shadow maps and light maps by a constant, so a light with either keeps three's
+ *  code. The garage's 35 high bays and 4 pit lamps drew the pit wall's leg in about 200 ms a frame at DPR 2 on an
+ *  M1 Max with the unrolled block and 25 ms with the loop (lane E's probe, 27 Nov, under load). Done once, before
+ *  any program is built; if three's chunk is not the one this was written for, it is left as it is. */
+export function installLightLoop() {
+  const chunks = THREE.ShaderChunk, src = chunks.lights_fragment_begin;
+  if (typeof src !== 'string' || src.includes('LIGHT_LOOP_PLAIN')) return;
+  const pointAt = src.indexOf('#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )');
+  const spotAt = src.indexOf('#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )');
+  const nextAt = spotAt < 0 ? -1 : src.indexOf('#if ( NUM_', spotAt + 1);
+  const point = src.slice(pointAt, spotAt), spot = src.slice(spotAt, nextAt);
+  const RE = 'RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );';
+  if (pointAt < 0 || spotAt < pointAt || nextAt < 0 || ![point, spot].every((b) => b.includes('#pragma unroll_loop_start') && b.includes(RE))) {
+    console.warn('stage: three\'s lights_fragment_begin is not the one installLightLoop knows; left unrolled');
+    return;
+  }
+  const plain = (kind, type, when) => `#if ( NUM_${kind}_LIGHTS > 0 ) && defined( RE_Direct ) && ${when} // LIGHT_LOOP_PLAIN
+	${type} ${type[0].toLowerCase()}${type.slice(1)};
+	for ( int i = 0; i < NUM_${kind}_LIGHTS; i ++ ) {
+		${type[0].toLowerCase()}${type.slice(1)} = ${type[0].toLowerCase()}${type.slice(1)}s[ i ];
+		get${type}Info( ${type[0].toLowerCase()}${type.slice(1)}, geometryPosition, directLight );
+		if ( ! directLight.visible ) continue;
+		${RE}
+	}
+#else
+`;
+  chunks.lights_fragment_begin = src.slice(0, pointAt)
+    + plain('POINT', 'PointLight', '( ! defined( USE_SHADOWMAP ) || NUM_POINT_LIGHT_SHADOWS == 0 )') + point + '#endif\n'
+    + plain('SPOT', 'SpotLight', '( NUM_SPOT_LIGHT_MAPS == 0 ) && ( ! defined( USE_SHADOWMAP ) || NUM_SPOT_LIGHT_SHADOWS == 0 )') + spot + '#endif\n'
+    + src.slice(nextAt);
+}
+
 /** Redraws the shadow map at the start of a frame: every frame while `auto`, otherwise only when asked (a scene
- *  that knows when its lights or casters changed asks; the camera alone never needs it). */
+ *  that knows when its lights or casters changed asks; the camera alone never needs it). While `hold` is set the map
+ *  is kept as it was last drawn, whatever auto and a request say (the caller knows nothing that lights or casts has
+ *  changed since: the same scene at the same time, seen from another place). */
 class ShadowOncePass extends Pass {
-  constructor() { super(); this.needsSwap = false; this.auto = true; this.pending = true; }
-  render(renderer) { if (this.auto || this.pending) { renderer.shadowMap.needsUpdate = true; this.pending = false; } }
+  constructor() { super(); this.needsSwap = false; this.auto = true; this.pending = true; this.hold = false; }
+  render(renderer) { if (this.hold) return; if (this.auto || this.pending) { renderer.shadowMap.needsUpdate = true; this.pending = false; } }
 }
 
 export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', stage = null, ao = true }) {
+  installLightLoop();
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: false });
   renderer.setPixelRatio(dpr);
   // no link check per program (three reads the program's and both shaders' logs on first use: three round trips to the
@@ -187,10 +226,21 @@ export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', st
     ov();
     scene.traverse((o) => { if (o.visible && (o.userData.noAO || (o.material && (o.material.userData?.noAO)))) { o.visible = false; this._visibilityCache.push(o); } });
   };
+  // the share of a scene's ambient occlusion drawn while the camera travels (setAOMotion): 1 draws the scene's own;
+  // at its scene's strength times this share of 0.002 or less, the AO pass and its copy-back are both skipped
+  let aoMotion = 1;
+  const aoSkipped = () => gtao.blendIntensity * aoMotion <= 0.002;
   const gtaoRender = gtao.render.bind(gtao);
-  gtao.render = (...a) => { const bg = scene.background; scene.background = null; gtaoRender(...a); scene.background = bg; };
+  gtao.render = (...a) => {
+    if (aoSkipped()) return;
+    const bg = scene.background, k = gtao.blendIntensity;
+    scene.background = null; gtao.blendIntensity = k * aoMotion;
+    try { gtaoRender(...a); } finally { gtao.blendIntensity = k; scene.background = bg; }
+  };
   composer.addPass(gtao);
   const copyBack = new CopyBackPass(); copyBack.enabled = ao;
+  const copyBackRender = copyBack.render.bind(copyBack);
+  copyBack.render = (...a) => { if (!aoSkipped()) copyBackRender(...a); };
   composer.addPass(copyBack);
   const overlay = new LayerPass(scene, camera, OVERLAY);
   composer.addPass(overlay);
@@ -224,9 +274,17 @@ export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', st
     gtao.enabled = on; copyBack.enabled = on;
     gtao.blendIntensity = Math.min(1, Math.max(0, k));
   }
+  /** The share (0..1) of the scene's ambient occlusion drawn while the camera travels: 1 at rest (the scene's own
+   *  strength); a story lowers it through the middle of a camera move, where the AO and copy-back passes are about
+   *  half of a frame's GPU time, and has it back at 1 before the camera lands. It is not the scene's: setAOStrength
+   *  and the scene's state are left as they are. */
+  function setAOMotion(k) { aoMotion = Math.min(1, Math.max(0, Number.isFinite(k) ? k : 1)); }
   /** Shadow-map refresh: auto (every frame) or on request (requestShadow() before the frame that needs it). */
   function setShadowAuto(on) { shadowPass.auto = !!on; if (!on) shadowPass.pending = true; }
   function requestShadow() { shadowPass.pending = true; }
+  /** Keep the shadow map as last drawn, whatever auto and requests say (on), or redraw it as they say (off). For a
+   *  caller that knows the lights and the casters are as they were when it was drawn: only the camera has moved. */
+  function holdShadow(on) { shadowPass.hold = !!on; }
 
   /** Key light from compass azimuth (deg, from the subject toward the light) and elevation; shadow box fitted. */
   function setKey({ az = 225, el = 50, center = [0, 0, 0], radius = 20, intensity, rimAz, rimEl = 22, rimIntensity }) {
@@ -379,7 +437,7 @@ export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', st
     scene.traverse((o) => { if (o.isMesh || o.isLine || o.isPoints) { o.geometry?.dispose?.(); const ms = Array.isArray(o.material) ? o.material : [o.material]; for (const m of ms) { if (!m) continue; for (const k of Object.keys(m)) { const v = m[k]; if (v && v.isTexture) v.dispose(); } m.dispose?.(); } } });
     renderer.dispose(); renderer.forceContextLoss?.();
   }
-  return { THREE, sky, renderer, scene, camera, composer, gtao, key, rim, fill, ground, catcher, setTheme, setAO, setAOStrength, setShadowAuto, requestShadow, setKey, setCamera, applyProjection, setFade, setGround, setBackdrop, setLight, setSize, render, preparePrograms, dispose, frameInfo, theme: () => themeNow };
+  return { THREE, sky, renderer, scene, camera, composer, gtao, key, rim, fill, ground, catcher, setTheme, setAO, setAOStrength, setAOMotion, setShadowAuto, requestShadow, holdShadow, setKey, setCamera, applyProjection, setFade, setGround, setBackdrop, setLight, setSize, render, preparePrograms, dispose, frameInfo, theme: () => themeNow };
 }
 
 /** Put every object flagged userData.overlay (and its subtree) on the overlay layer only. */
