@@ -153,6 +153,17 @@ describe("a changed byte is refused", () => {
     expect(extra.status).toBe(502);
     expect(await extra.text()).toContain("receipt fields (fields:");
   });
+
+  it("refuses a receipt whose contract address differs from the published one in case alone", async () => {
+    // The published receipts give the address in its checksum form; a lower-cased copy is other bytes.
+    const u = upstreams();
+    const lower = text.receiptMainnet.replace("0x2922c68cE15EB3e83B7f43b136e981dDc4262876", "0x2922c68ce15eb3e83b7f43b136e981ddc4262876");
+    expect(lower).not.toBe(text.receiptMainnet);
+    u.objects.set(`${DAY}/record.bsc-mainnet.json`, lower);
+    const res = await call(freshOrigin(), "/day/2026-11-26/record.bsc-mainnet.json");
+    expect.soft(res.status).toBe(502);
+    expect.soft((await res.text()).slice(0, 600)).toMatch(/contract: receipt "?0x2922c68ce15eb3e83b7f43b136e981ddc4262876"?, served "?0x2922c68cE15EB3e83B7f43b136e981dDc4262876/);
+  });
 });
 
 describe("a wrong root is refused", () => {

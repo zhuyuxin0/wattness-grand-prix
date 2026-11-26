@@ -588,7 +588,8 @@ export async function sealedReceipt(day: Day, network: NetworkName): Promise<Ser
     same("mode", ["receipt", r.mode], ["expected", "contract"]),
     same("chain id", ["receipt", r.chainId], [network, NETWORKS[network]]),
     same("chain id of the RPC", ["RPC", chain.chainId], [network, NETWORKS[network]]),
-    same("contract", ["receipt", String(r.contract).toLowerCase()], ["served", chain.contract.toLowerCase()]),
+    // Exactly: both are in checksum form, and a copy in another case is other bytes.
+    same("contract", ["receipt", r.contract], ["served", chain.contract]),
     same("scope label", ["receipt", r.scopeLabel], ["expected", PLAN_SCOPE_LABEL]),
     same("scope", ["receipt", r.scope], ["keccak256(scope label)", typeof r.scopeLabel === "string" && r.scopeLabel ? scopeId(r.scopeLabel) : null]),
     same("key", ["receipt", r.key], ["computed", recordKey(chain.committer, chain.scope, day.od)]),
