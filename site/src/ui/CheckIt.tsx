@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Glyph } from "./Glyph";
 import { Hash } from "./Hash";
 import { CHECK_WORDS as WORDS, countLine, type CheckKind } from "./check-count";
@@ -45,10 +45,19 @@ const STATUS: Record<CheckStatus, { word: string; glyph: "check" | "refresh" | "
 };
 
 export function CheckIt({ items, status, how, open, id, className }: CheckItProps) {
+  // the list is drawn once opened, so a section with a thousand files keeps a light page
+  const [drawn, setDrawn] = useState(!!open);
   if (!items.length) return null;
   const s = status ? STATUS[status] : null;
   return (
-    <details className={`checkit${s ? ` checkit--${status}` : ""}${className ? ` ${className}` : ""}`} id={id} open={open || undefined}>
+    <details
+      className={`checkit${s ? ` checkit--${status}` : ""}${className ? ` ${className}` : ""}`}
+      id={id}
+      open={open || undefined}
+      onToggle={(e) => {
+        if ((e.currentTarget as HTMLDetailsElement).open) setDrawn(true);
+      }}
+    >
       <summary className="checkit__line">
         {s && (
           <span className="checkit__status">
@@ -63,23 +72,25 @@ export function CheckIt({ items, status, how, open, id, className }: CheckItProp
           <Glyph name="fold-open" className="checkit__opened" />
         </span>
       </summary>
-      <div className="checkit__body">
-        {how && <p className="checkit__how">{how}</p>}
-        <dl className="checkit__list">
-          {items.map((it, i) => (
-            <div key={`${it.kind}:${it.value}:${i}`} className="checkit__row">
-              <dt>
-                <span className="checkit__kind">{WORDS[it.kind][0]}</span>
-                <span className="checkit__label">{it.label}</span>
-              </dt>
-              <dd>
-                <Hash value={it.value} full href={it.href ?? undefined} label={it.copy ?? (typeof it.label === "string" ? it.label : WORDS[it.kind][0])} />
-                {it.note && <p className="checkit__note">{it.note}</p>}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+      {drawn && (
+        <div className="checkit__body">
+          {how && <p className="checkit__how">{how}</p>}
+          <dl className="checkit__list">
+            {items.map((it, i) => (
+              <div key={`${it.kind}:${it.value}:${i}`} className="checkit__row">
+                <dt>
+                  <span className="checkit__kind">{WORDS[it.kind][0]}</span>
+                  <span className="checkit__label">{it.label}</span>
+                </dt>
+                <dd>
+                  <Hash value={it.value} full href={it.href ?? undefined} label={it.copy ?? (typeof it.label === "string" ? it.label : WORDS[it.kind][0])} />
+                  {it.note && <p className="checkit__note">{it.note}</p>}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      )}
     </details>
   );
 }
