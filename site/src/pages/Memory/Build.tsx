@@ -184,7 +184,12 @@ function PageView({
       lede={
         <>
           {own.length > 0 && <>The page for {theTabs(own)}. </>}
-          {nearest.length > 0 && <>The nearest page to {theTabs(nearest)}: the brain has none of {nearest.length === 1 ? "its" : "their"} own. </>}
+          {nearest.length > 0 && (
+            <>
+              The nearest page to {theTabs(nearest)}, which {nearest.length === 1 ? "has" : "have"} no page of {nearest.length === 1 ? "its" : "their"} own in
+              this brain.{" "}
+            </>
+          )}
           {sections.map((x) => (
             <span key={x.label}>The {x.label} tab is {x.section ? `its section "${x.section}"` : "a section of it"}. </span>
           ))}
