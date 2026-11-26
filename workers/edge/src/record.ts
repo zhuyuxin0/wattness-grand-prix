@@ -615,6 +615,10 @@ export async function sealedReceipt(day: Day, network: NetworkName): Promise<Ser
     same("block", ["receipt", r.blockNumber], ["on chain", rec.blockNumber]),
     same("committed at", ["receipt", r.committedAt], ["on chain", rec.committedAt]),
   ]);
+  // Refused on its own bytes and fields first: a receipt that fails them is refused with those reasons,
+  // whatever an RPC would say about the transaction it names.
+  const form = byteForm(parsed);
+  refuse(path, [form, fields]);
   const txHash = typeof r.txHash === "string" && /^0x[0-9a-f]{64}$/.test(r.txHash) ? (r.txHash as Hex) : null;
   const tx = txHash ? await readCommitTx(day.cfg, network, txHash) : null;
   const event = tx?.committed.length === 1 ? tx.committed[0] : undefined;
@@ -629,7 +633,7 @@ export async function sealedReceipt(day: Day, network: NetworkName): Promise<Ser
       "on chain": `${chain.key} ${rec.root} od ${rec.od} ${rec.leafCount} leaves`,
     }),
   ]);
-  const checks = [byteForm(parsed), fields, txCheck];
+  const checks = [form, fields, txCheck];
   refuse(path, checks);
   return {
     path,

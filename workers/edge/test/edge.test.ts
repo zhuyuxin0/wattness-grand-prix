@@ -172,6 +172,17 @@ describe("a changed byte is refused", () => {
     }
   });
 
+  it("refuses a receipt on its fields before looking up its transaction", async () => {
+    // Mainnet's receipt under the testnet name: its fields are wrong for testnet, and testnet has no
+    // receipt for its transaction. The fields decide, with a 502, whatever the transaction lookup would say.
+    const u = upstreams();
+    u.objects.set(`${DAY}/record.bsc-testnet.json`, text.receiptMainnet);
+    const res = await call(freshOrigin(), "/day/2026-11-26/record.bsc-testnet.json");
+    expect.soft(res.status).toBe(502);
+    expect.soft((await res.text()).slice(0, 400)).toContain("receipt fields (chain id: receipt 56, bsc-testnet 97");
+    expect.soft(u.log).not.toContain("bsc-testnet eth_getTransactionReceipt");
+  });
+
   it("refuses a receipt whose contract address differs from the published one in case alone", async () => {
     // The published receipts give the address in its checksum form; a lower-cased copy is other bytes.
     const u = upstreams();
