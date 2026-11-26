@@ -16,8 +16,10 @@ import { readSelection, writeSelection } from "./select";
 // page view under it: the mount never writes the URL, it asks through onState
 // and this page writes it; back, forward and a pick in the lists below reach
 // the stage through goTo. The package and three.js load here, by dynamic
-// import, so they stay in this tab's chunks. The stage holds its own dark in
-// either theme; without WebGL the mount lists the pages, in the page's theme.
+// import, so they stay in this tab's chunks; the brains' particles are made
+// in a worker before the mount (prepareBrain), so opening the tab never stalls
+// the page. The stage holds its own dark in either theme; without WebGL the
+// mount lists the pages, in the page's theme.
 
 /** The site's tabs by the package's ids, as the brain's cards name them ("Open Battery", "Part of: Seal"). This tab
  *  is left out: its own card's "Open Memory" (and "Part of: Memory") would navigate to the tab the visitor is on,
@@ -68,7 +70,9 @@ export function BrainStage({ build, settled }: Props) {
       handle.current = null;
       setFailed(true);
     };
-    import("@world/stations/brain/mount").then(({ mountBrain }) => {
+    import("@world/stations/brain/mount").then(async ({ mountBrain, prepareBrain }) => {
+      if (gone || !el.current) return;
+      await prepareBrain(el.current);
       if (gone || !el.current) return;
       h = mountBrain(el.current, {
         theme: live.current.theme,

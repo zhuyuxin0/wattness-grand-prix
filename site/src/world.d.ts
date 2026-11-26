@@ -392,4 +392,6 @@ declare module "@world/stations/brain/mount" {
   }
 
   export function mountBrain(el: HTMLElement, opts?: BrainOptions): BrainHandle;
+  /** Makes the brains' particles off the main thread (a module worker) for a mount on this element, so mountBrain after it opens without a long task. Never rejects. */
+  export function prepareBrain(el: HTMLElement, opts?: Pick<BrainOptions, "quality">): Promise<void>;
 }
