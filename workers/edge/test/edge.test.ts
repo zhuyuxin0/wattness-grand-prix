@@ -4,7 +4,8 @@ import { gateTs } from "../../../packages/core/src/gate.ts";
 import { fileSha256, type Hex } from "../src/bytes.ts";
 import { merkleRoot } from "../src/merkle.ts";
 import { forgetVerified } from "../src/record.ts";
-import { VERIFIED_CACHE } from "../src/respond.ts";
+import { EdgeError } from "../src/errors.ts";
+import { VERIFIED_CACHE, errorResponse } from "../src/respond.ts";
 import { BASE, DAY, bytesOf, call, freshOrigin, text, upstreams, utf8 } from "./fake.ts";
 import { changeOneDigit } from "./tamper.ts";
 
@@ -576,6 +577,32 @@ describe("requests", () => {
     const preflight = await call(freshOrigin(), LEAF, { method: "OPTIONS" });
     expect(preflight.status).toBe(204);
     expect(preflight.headers.get("access-control-allow-methods")).toBe("GET, HEAD, OPTIONS");
+  });
+
+  it("quotes at most 200 characters of a request value, so a 20,000-character one gives a short answer", async () => {
+    upstreams();
+    const long = "9".repeat(20_000);
+    for (const path of [
+      `/day/${long}/index.json`,
+      `/verify/DSWL_ESS_ESR1?od=${long}`,
+      `/day/2026-11-26/index.json?network=${"x".repeat(20_000)}`,
+      `/day/2026-11-26/index.json?envelope=${"x".repeat(20_000)}`,
+      `/day/2026-11-26/${"a%20".repeat(5_000)}.json`,
+      `/verify/${"A".repeat(20_000)}?od=2026-11-26`,
+      `/${"n".repeat(20_000)}`,
+    ]) {
+      const res = await call(freshOrigin(), path);
+      const what = `${path.slice(0, 32)}... (${path.length} characters)`;
+      expect.soft([400, 404], what).toContain(res.status);
+      expect.soft((await bytesOf(res)).length, what).toBeLessThan(2100);
+    }
+  });
+
+  it("cuts any reason at 2,000 characters where a response is made", async () => {
+    const res = errorResponse(new EdgeError(502, `a reason ${"r".repeat(10_000)}`), false);
+    const body = await res.text();
+    expect.soft(body.length).toBeLessThan(2100);
+    expect.soft(body).toMatch(/\.\.\. \(10009 characters\)\n$/);
   });
 
   it("refuses writes, bad days, unknown networks and paths that are not plain", async () => {

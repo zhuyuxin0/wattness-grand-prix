@@ -1,6 +1,6 @@
 import { assertOd, isoFromOd } from "../../../packages/core/src/gate.ts";
 import { configFrom, NETWORKS, isNetwork, type Config, type Env, type NetworkName } from "./config.ts";
-import { EdgeError } from "./errors.ts";
+import { EdgeError, cut } from "./errors.ts";
 import { isPlainPath } from "./greenfield.ts";
 import { homePage } from "./page.ts";
 import {
@@ -22,10 +22,13 @@ import { cacheableVerdict, verdictFor } from "./verdict.ts";
 
 export type { Env } from "./config.ts";
 
+/** A request value as a reason quotes it: as JSON, and at most 200 characters of it. */
+const quoted = (v: string): string => JSON.stringify(cut(v, 200));
+
 /** YYYY-MM-DD or YYYYMMDD to the uint32 the contract takes. */
 export function parseDay(raw: string): number {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw) ?? /^(\d{4})(\d{2})(\d{2})$/.exec(raw);
-  if (!m) throw new EdgeError(400, `${JSON.stringify(raw)} is not a day; use YYYY-MM-DD`);
+  if (!m) throw new EdgeError(400, `${quoted(raw)} is not a day; use YYYY-MM-DD`);
   const od = Number(m[1]) * 10_000 + Number(m[2]) * 100 + Number(m[3]);
   try {
     assertOd(od);
@@ -41,7 +44,7 @@ function networksOf(url: URL, single: boolean): NetworkName[] {
   const raw = url.searchParams.get("network") ?? "bsc-mainnet";
   const asked = raw.split(",").map((s) => s.trim());
   const bad = asked.filter((n) => !isNetwork(n));
-  if (bad.length > 0 || asked.length === 0) throw new EdgeError(400, `network ${JSON.stringify(raw)}: use bsc-mainnet, bsc-testnet${single ? "" : " or both, comma-separated"}`);
+  if (bad.length > 0 || asked.length === 0) throw new EdgeError(400, `network ${quoted(raw)}: use bsc-mainnet, bsc-testnet${single ? "" : " or both, comma-separated"}`);
   const networks = ORDER.filter((n) => asked.includes(n));
   if (single && networks.length !== 1) throw new EdgeError(400, "a verdict is for one network: network=bsc-mainnet or network=bsc-testnet");
   return networks;
@@ -51,7 +54,7 @@ function flag(url: URL, name: string): boolean {
   const v = url.searchParams.get(name);
   if (v === null || v === "0" || v === "false") return false;
   if (v === "" || v === "1" || v === "true") return true;
-  throw new EdgeError(400, `${name}=${v}: use ${name}=1`);
+  throw new EdgeError(400, `${name}=${quoted(v)}: use ${name}=1`);
 }
 
 const headOnly = (request: Request, res: Response): Response => (request.method === "HEAD" ? new Response(null, res) : res);
@@ -110,7 +113,7 @@ async function route(request: Request, url: URL, env: Env, ctx: ExecutionContext
   if (parts[1] === "day" && parts.length >= 4) {
     const od = parseDay(parts[2] ?? "");
     const asked = parts.slice(3).join("/");
-    if (!isPlainPath(asked)) throw new EdgeError(400, `${JSON.stringify(asked)} is not a plain relative path`);
+    if (!isPlainPath(asked)) throw new EdgeError(400, `${quoted(asked)} is not a plain relative path`);
     const path = asked === "manifest.json" ? "index.json" : asked;
     const networks = networksOf(url, false);
     const envelope = flag(url, "envelope");
@@ -119,7 +122,7 @@ async function route(request: Request, url: URL, env: Env, ctx: ExecutionContext
   }
   if (parts[1] === "verify" && parts.length === 3) {
     const battery = parts[2] ?? "";
-    if (!/^[A-Z0-9_]{1,64}$/.test(battery)) throw new EdgeError(400, `${JSON.stringify(battery)} is not an ERCOT resource name`);
+    if (!/^[A-Z0-9_]{1,64}$/.test(battery)) throw new EdgeError(400, `${quoted(battery)} is not an ERCOT resource name`);
     const raw = url.searchParams.get("od");
     if (!raw) throw new EdgeError(400, `od is required: /verify/${battery}?od=YYYY-MM-DD`);
     const od = parseDay(raw);
@@ -130,7 +133,7 @@ async function route(request: Request, url: URL, env: Env, ctx: ExecutionContext
       return verdictResponse(v, cacheableVerdict(v));
     });
   }
-  throw new EdgeError(404, `no endpoint at ${url.pathname}; GET / lists them`);
+  throw new EdgeError(404, `no endpoint at ${quoted(url.pathname)}; GET / lists them`);
 }
 
 export default {
