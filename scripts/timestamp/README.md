@@ -6,7 +6,7 @@ when no chain transaction can be sent, or a second witness beside one.
 ```sh
 scripts/timestamp/stamp.sh out/od-20261126/manifest.json            # FreeTSA
 scripts/timestamp/stamp.sh out/od-20261126/manifest.json digicert   # DigiCert
-scripts/timestamp/verify.sh out/od-20261126/manifest.json out/od-20261126/freetsa.tsr [freetsa.tsq]
+scripts/timestamp/verify.sh out/od-20261126/manifest.json out/od-20261126/freetsa.tsr [out/od-20261126/freetsa.tsq]
 ```
 
 The manifest is a planned day's index with every leaf beside it, as
