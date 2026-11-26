@@ -43,7 +43,7 @@ A second plan for the same day, simulated 22 seconds after the gate, is refused 
 
 ## Run it
 
-Node 22 and pnpm 11:
+Node 22 (22.18 or later) and pnpm 11:
 
 ```sh
 pnpm install
@@ -51,10 +51,17 @@ pnpm test
 pnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet --scope gate-record/ercot-da-energy --battery DSWL_ESS_ESR1
 ```
 
-A second implementation of the leaf hash, in Python's standard library:
+To plan a day yourself, with no key and no chain, for any operating day whose gate (10:00 CT the day before) is still ahead:
 
 ```sh
-python3 -I tools/verify_hash.py fixtures/od-20261126/leaves/DSWL_ESS_ESR1.json
+pnpm plan --od YYYY-MM-DD --network local
+pnpm verify out/local/od-YYYYMMDD/manifest.json --no-chain
+```
+
+A second implementation of the leaf hash, in Python's standard library. It prints the leaf the index lists for Desert Willow, then MATCH:
+
+```sh
+python3 -I tools/verify_hash.py fixtures/od-20261126/leaves/DSWL_ESS_ESR1.json --expect 0x067e4a612ccfd5976b66d561a40bd26256590c57eab24763fd5f9f48b76db2b1
 ```
 
 ## Layout
