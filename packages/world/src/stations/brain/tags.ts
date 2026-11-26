@@ -326,6 +326,18 @@ export class Chrome {
     if (this.scopeEl.textContent !== text) this.scopeEl.textContent = text;
   }
 
+  /** A narrow layer (data-narrow, brain.css): the scope line right under the HUD, clear of the caption along the bottom. */
+  stackScope() {
+    if (!this.scopeEl) return;
+    const top = this.hudEl ? this.hudEl.offsetTop + this.hudEl.offsetHeight + 8 : null;
+    this.scopeEl.style.top = top == null ? '' : `${top}px`;
+  }
+
+  /** The layer's own words (the HUD and the scope line) as boxes no tag stands on (keptAt's keepOut), 4 px round. */
+  chromeRects(): [number, number, number, number][] {
+    return [this.hudEl, this.scopeEl].flatMap((e) => (e && e.offsetWidth ? [[e.offsetLeft - 4, e.offsetTop - 4, e.offsetLeft + e.offsetWidth + 4, e.offsetTop + e.offsetHeight + 4] as [number, number, number, number]] : []));
+  }
+
   /** A page's card beside its tag (below it, or above when there is no room), sliding in as k goes to 1. */
   card(c: { page: Page; color: string; meta: string; summary: string | null; label?: string } | null, at: { x: number; y: number } | null, k: number, size: { width: number; height: number }) {
     if (!c || !at || k <= 0.002) { if (this.cardEl) { this.cardEl.style.opacity = '0'; this.cardEl.style.visibility = 'hidden'; } return; }

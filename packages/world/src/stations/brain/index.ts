@@ -5,7 +5,7 @@
 // brain.interface is Living Brain's own interface, a recording played on the overlay; brain.calibrate is the
 // calibration pose (SPEC 3.4) with no words.
 import type { FrameContext, FrameHandle, StationModule } from '../types';
-import { BrainWorld, restPose, REST, type WorldPose } from './world';
+import { BrainWorld, restPose, REST, ORBIT, VFOV, type WorldPose } from './world';
 import { FilmClock, T, T_SHARED, acrossLanded, COUNTS, type Moments } from './clock';
 import { BrainBloomPass } from './bloom';
 import { Chrome, memberScreen, memberScreenAt, projectorFor, projectorNow, restCamera, type TagSpec } from './tags';
@@ -62,10 +62,15 @@ async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string
   const bloom = new BrainBloomPass(Math.round(W * ctx.dpr), Math.round(H * ctx.dpr));
   st.composer.insertPass(bloom, st.composer.passes.length - 1);
   const clock = new FilmClock(world, o.moments);
-  const chrome = new Chrome(ctx.overlay, look.film);
+  // a phone's stage (the site's story under 720 px): the words at 1x, the film's 1.5x cut them at both edges; the scope
+  // line under the HUD, clear of the caption along the bottom (brain.css, Chrome.stackScope)
+  const narrow = W < 720;
+  const chrome = new Chrome(ctx.overlay, look.film && !narrow);
+  chrome.el.dataset.narrow = narrow ? '1' : '0';
   const size = { width: W, height: H };
   const restCam = restCamera(W / H);
-  const pose = (t: number): WorldPose => (o.calibrate ? calibratePose(clock, t, o.view) : clock.pose(t));
+  const fit = fitter(W / H);
+  const pose = (t: number): WorldPose => fit(o.calibrate ? calibratePose(clock, t, o.view) : clock.pose(t));
   let now = o.at ? o.at(time) : time;
 
   const lay = (useStage: boolean) => {
@@ -78,11 +83,12 @@ async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string
     const q = Math.floor(now / 0.15) * 0.15, f = Math.min(1, (now - q) / 0.15);
     const kept = (tq: number) => {
       const P = pose(tq), wq = words(tq, clock, world);
-      return chrome.keptAt(look.tags ? wq.tags : [], projectorFor(world, P, size), BRAIN_IDS.map((b) => ({ b, ms: memberScreenAt(P, b, size), k: wq.members[b] })));
+      return chrome.keptAt(look.tags ? wq.tags : [], projectorFor(world, P, size), BRAIN_IDS.map((b) => ({ b, ms: memberScreenAt(P, b, size), k: wq.members[b] })), narrow ? chrome.chromeRects() : null);
     };
     const k1 = kept(q), k0 = kept(q - 0.15);
     const shown = (id: string) => (k0.has(id) ? 1 - f : 0) + (k1.has(id) ? f : 0);
-    chrome.tags(look.tags ? w.tags : [], project, shown, p.cam.dist);
+    // the tags fade with Living Brain's own distance (a narrow stage's framing only moves the camera back)
+    chrome.tags(look.tags ? w.tags : [], project, shown, (p as FitPose)._dist ?? p.cam.dist);
     for (const b of BRAIN_IDS) {
       const cam = useStage ? st.camera : restCam;
       const ms = memberScreen(world, b, cam, size);
@@ -90,6 +96,7 @@ async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string
     }
     chrome.hud(w.hud);
     chrome.scope(scopeLine(inFilm(ctx.overlay)));
+    if (narrow) chrome.stackScope();
     const card = w.card;
     if (card) {
       const s = project(card.cloud, card.index);
@@ -119,6 +126,28 @@ async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string
       if (o.caption && look.words) ctx.plates.caption({ head: o.caption, line: o.line ?? (o.row ? lineFor(o.row) : undefined) });
     },
     dispose() { chrome.dispose(); world.dispose(); },
+  };
+}
+
+type FitPose = WorldPose & { _dist?: number };
+
+/** A stage narrower than it is tall (the site's story on a phone): the pose framed as the Memory tab's stage frames one
+ *  (mount.ts frame, orbitScale). The camera backs off by Living Brain's rule, max(0.68, 1.15 x aspect) for one brain,
+ *  max(0.5, 0.85 x aspect) for the combined view (eased between them as the distance is), and the members' orbits (and
+ *  LB1's row, and the camera's target that follows a member in) are drawn in, so the members and their names stay on
+ *  the stage. A pose on a wide stage is returned as it is. _dist keeps Living Brain's own distance, for the tags. */
+function fitter(aspect: number): (p: WorldPose) => WorldPose {
+  if (aspect >= 1) return (p) => p;
+  const kAll = Math.max(0.5, 0.85 * aspect), kOne = Math.max(0.68, 1.15 * aspect);
+  const half = (4.6 / kAll) * Math.tan(((VFOV / 2) * Math.PI) / 180) * aspect;
+  const orbK = Math.min(1, Math.max(0.7, (half * 0.92 - 0.3) / ORBIT.radius));
+  return (p) => {
+    const d = p.cam.dist, z = Math.min(1, Math.max(0, (d - 2.15) / (3.1 - 2.15))), e = z * z * (3 - 2 * z);
+    (p as FitPose)._dist = d;
+    p.cam.dist = d / (kOne + (kAll - kOne) * e);
+    p.cam.target.multiplyScalar(orbK);
+    for (const b of BRAIN_IDS) p.members[b].pos.multiplyScalar(orbK);
+    return p;
   };
 }
 

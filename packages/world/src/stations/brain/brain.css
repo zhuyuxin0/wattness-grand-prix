@@ -82,3 +82,9 @@
 .lb-hint { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; white-space: nowrap;
   font: 500 10px / 1.2 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); letter-spacing: 2px; text-transform: uppercase; color: rgba(255, 255, 255, 0.55);
   background: rgba(2, 6, 23, 0.4); border: 1px solid rgba(34, 211, 238, 0.15); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); }
+
+/* a phone's stage in the story (data-narrow, index.ts): the words at 1x, the HUD below the story's top bar, the scope
+   line right under the HUD (Chrome.stackScope sets its top), left-aligned across the stage, clear of the caption plate
+   along the bottom */
+.lb-layer[data-narrow="1"] .lb-hud { left: 12px; top: 56px; right: 12px; }
+.lb-layer[data-narrow="1"] .lb-scope { left: 12px; right: 12px; top: 108px; bottom: auto; max-width: none; text-align: left; font-size: 11.5px; padding: 4px 8px; }
