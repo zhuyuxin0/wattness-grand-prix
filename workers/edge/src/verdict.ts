@@ -7,10 +7,10 @@ import { codeHashFromTree, scopeId } from "./abi.ts";
 import { checksumAddress, isBytes32, type Hex } from "./bytes.ts";
 import { readDayRecord } from "./chain.ts";
 import { MIN_CONFIRMATIONS, NETWORKS, PLAN_SCOPE_LABEL, type NetworkName } from "./config.ts";
-import { EdgeError } from "./errors.ts";
+import { EdgeError, cut } from "./errors.ts";
 import { isPlainPath } from "./greenfield.ts";
 import { leafHash, rootAndProof, rootFromProof } from "./merkle.ts";
-import { INDEX_OBJECT, check, comparison, parseJson, renderingOf, same, type Check, type Day, type FleetLeaf } from "./record.ts";
+import { INDEX_OBJECT, check, comparison, parseJson, renderingOf, type Check, type Day, type FleetLeaf } from "./record.ts";
 
 export interface Verdict {
   schema: "gate-record.edge-verdict.v1";
@@ -33,6 +33,22 @@ const get = (v: unknown, ...path: string[]): unknown =>
   path.reduce<unknown>((o, k) => (typeof o === "object" && o !== null && !Array.isArray(o) ? (o as Record<string, unknown>)[k] : undefined), v);
 const num = (v: unknown): number | null => (typeof v === "number" && Number.isSafeInteger(v) ? v : null);
 
+/** A value as the verdict prints it: whole, or, past 200 characters, the first 200 of its text or JSON. */
+function bounded(v: unknown): unknown {
+  if (typeof v === "string") return cut(v, 200);
+  let json: string | undefined;
+  try {
+    json = JSON.stringify(v);
+  } catch {
+    json = undefined;
+  }
+  return json !== undefined && json.length > 200 ? cut(json, 200) : v;
+}
+
+// record.ts's same, printing each value bounded: a verdict compares values read from the leaf, which is
+// unchecked until it passes, and a value that holds the plan must not carry it into the verdict.
+const same = (name: string, a: [string, unknown], b: [string, unknown]) => comparison(name, a[1] === b[1], { [a[0]]: bounded(a[1]), [b[0]]: bounded(b[1]) });
+
 export async function verdictFor(day: Day, network: NetworkName, battery: string): Promise<Verdict> {
   const indexObject = await day.object(INDEX_OBJECT);
   if (!indexObject) throw new EdgeError(404, `no record is published for ${day.day}: Greenfield has no od-${day.od}/${INDEX_OBJECT}`);
@@ -46,7 +62,7 @@ export async function verdictFor(day: Day, network: NetworkName, battery: string
     const excluded = Array.isArray(index.exclusions) ? (index.exclusions as { resource?: unknown; reason?: unknown }[]).find((e) => e?.resource === battery) : undefined;
     throw new EdgeError(
       404,
-      excluded ? `${battery} has no plan in the record of ${day.day}; the index lists it as excluded: ${String(excluded.reason)}` : `${battery} has no plan in the record of ${day.day}`,
+      excluded ? `${battery} has no plan in the record of ${day.day}; the index lists it as excluded: ${cut(String(excluded.reason), 200)}` : `${battery} has no plan in the record of ${day.day}`,
     );
   }
   const entry = leaves[position] as FleetLeaf;
@@ -65,7 +81,7 @@ export async function verdictFor(day: Day, network: NetworkName, battery: string
   try {
     computed = leafHash(m);
   } catch (err) {
-    hashProblem = (err as Error).message;
+    hashProblem = cut((err as Error).message, 200);
   }
   const walked = computed ? rootFromProof(computed, position, size, proof) : null;
   const rec = chain.record;

@@ -76,6 +76,22 @@ describe("the verdict for Desert Willow on 26 Nov matches the repository verifie
   });
 });
 
+describe("a verdict prints the leaf's values bounded", () => {
+  it("fails a leaf carrying the plan in operating_day without printing the plan", async () => {
+    upstreams();
+    const plain = await (await call(freshOrigin(), "/verify/DSWL_ESS_ESR1?od=2026-11-26")).text();
+    forgetVerified();
+    const u = upstreams();
+    const plan = JSON.parse(text.dswl) as Record<string, unknown>;
+    u.objects.set(`${DAY}/leaves/DSWL_ESS_ESR1.json`, `${JSON.stringify({ ...plan, operating_day: { ...plan } }, null, 2)}\n`);
+    const { res, v } = await verdict("/verify/DSWL_ESS_ESR1?od=2026-11-26");
+    const body = await res.text();
+    expect.soft(v.verdict).toBe("fail");
+    expect.soft(body.length, "the changed leaf's verdict, against the published leaf's").toBeLessThan(plain.length + 1024);
+    expect.soft(body).not.toContain("energy_kwh");
+  });
+});
+
 describe("what a verdict cannot be given for", () => {
   it("answers 404 for a battery the day's index left out, with the index's reason", async () => {
     upstreams();
