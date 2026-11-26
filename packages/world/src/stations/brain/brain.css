@@ -35,6 +35,11 @@
   font: 500 calc(10px * var(--lb-k)) / 1.35 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55); }
 .lb-layer[data-film="1"] .lb-hud { left: 96px; top: 64px; }
 .lb-hud .lb-pair { white-space: nowrap; }
+/* a pair the host acts on (the Memory tab's conflict): a button that reads as the HUD's text, underlined on hover */
+.lb-hud .lb-act { pointer-events: auto; cursor: pointer; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit;
+  text-decoration: underline dotted rgba(253, 164, 175, 0.55); text-underline-offset: 3px; }
+.lb-hud .lb-act:hover { text-decoration-style: solid; color: rgba(255, 255, 255, 0.8); }
+.lb-hud .lb-act:focus-visible { outline: 2px solid rgba(103, 232, 249, 0.8); outline-offset: 2px; border-radius: 2px; }
 .lb-hud b { font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.06em; margin-right: 0.1em; color: rgba(103, 232, 249, 0.9); }
 .lb-hud b.em { color: rgba(110, 231, 183, 0.9); }
 .lb-hud b.rose { color: rgba(253, 164, 175, 0.9); }

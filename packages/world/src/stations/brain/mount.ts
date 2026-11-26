@@ -20,7 +20,7 @@ import { BrainWorld, restPose, REST, ORBIT, VFOV } from './world';
 import { BrainBloomPass } from './bloom';
 import { makeRibbons } from './ribbons';
 import { Chrome, memberScreen, projectorNow } from './tags';
-import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, keyOf, fmt, PLAIN, scopeLine } from './data';
+import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, conflictOf, keyOf, fmt, PLAIN, THE, scopeLine } from './data';
 import { pageCard, hoverCard, pageRows, brainChips, setChips, fixOf, glyph } from './card';
 import { T_SHARED } from './moments';
 
@@ -219,7 +219,10 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     const b = S.focus === 'all' ? null : brainOf(S.focus);
     chrome.hud(b
       ? [[{ n: fmt(b.pages), label: b.pages === 1 ? 'page' : 'pages' }, { n: fmt(b.connections), label: 'connections' }, ...(b.connections ? [{ n: fmt(b.strong), label: 'strong', tone: 'em' as const }] : [])]]
-      : [[{ n: fmt(SCENE.combined.pages), label: 'pages' }, { n: fmt(SCENE.combined.across), label: 'across brains' }, { n: String(SCENE.conflicts.length), label: SCENE.conflicts.length === 1 ? 'conflict' : 'conflicts', tone: 'rose' as const }]]);
+      : [[{ n: fmt(SCENE.combined.pages), label: 'pages' }, { n: fmt(SCENE.combined.across), label: 'across brains' },
+        // the conflict opens its page in the build's brain, whose card carries it (Conflict across brains)
+        { n: String(SCENE.conflicts.length), label: SCENE.conflicts.length === 1 ? 'conflict' : 'conflicts', tone: 'rose' as const,
+          ...(SCENE.conflicts.length ? { act: { id: 'conflict', label: `${SCENE.conflicts.length === 1 ? 'The conflict' : 'A conflict'} across brains: open ${page(SCENE.conflicts[0].a.brain, SCENE.conflicts[0].a.slug)?.title ?? 'its page'}, page ${String(page(SCENE.conflicts[0].a.brain, SCENE.conflicts[0].a.slug)?.n ?? '').padStart(2, '0')} of ${THE[SCENE.conflicts[0].a.brain]}` } } : {}) }]]);
     // the keyboard's path into the focused brain's pages, in number order; Enter pins a page and focus goes into its card
     if (navRowsFor !== S.focus) {
       navRows?.remove();
@@ -504,11 +507,14 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     const wAll = wOf('all');
     if (wAll > 0.02) {
       const ids = new Set(centerTagIdx);
-      world.centerPages.forEach((p, i) => { if (isT(p) || isS(p) || (target && lit.has(keyOf(p.brain, p.slug)))) ids.add(i); });
+      // while the conflict's rose arc is drawn, its two pages are tagged in rose, as the story's stop flags them
+      const conflictOn = P.conflict > 0.02;
+      const inConflict = (p) => conflictOn && !!conflictOf(p.brain, p.slug);
+      world.centerPages.forEach((p, i) => { if (isT(p) || isS(p) || (target && lit.has(keyOf(p.brain, p.slug))) || inConflict(p)) ids.add(i); });
       for (const i of ids) {
-        const p = world.centerPages[i];
-        specs.push({ id: `c:${p.brain}/${p.slug}`, cloud: 'center', index: i, page: p, color: brainOf(p.brain).color, k: wAll * reveal(p.n), order: isS(p) ? -9 : isT(p) ? -8 : centerTagIdx.indexOf(i) >= 0 ? centerTagIdx.indexOf(i) : 50 + p.n,
-          view: 'combined', hot: isT(p) || lit.has(keyOf(p.brain, p.slug)), sel: !!isS(p) });
+        const p = world.centerPages[i], cf = inConflict(p);
+        specs.push({ id: `c:${p.brain}/${p.slug}`, cloud: 'center', index: i, page: p, color: brainOf(p.brain).color, k: wAll * reveal(p.n), order: isS(p) ? -9 : isT(p) ? -8 : cf ? -6 : centerTagIdx.indexOf(i) >= 0 ? centerTagIdx.indexOf(i) : 50 + p.n,
+          view: 'combined', hot: isT(p) || lit.has(keyOf(p.brain, p.slug)) || cf, sel: !!isS(p), conflict: cf });
       }
     }
     for (const b of BRAIN_IDS) {
@@ -652,7 +658,14 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     if (mb && !memberOf(e.relatedTarget)) S.hoverBrain = null;
   };
   const onClick = (e) => {
-    const tg = tagOf(e.target), mb = memberOf(e.target);
+    const tg = tagOf(e.target), mb = memberOf(e.target), act = e.target?.closest?.('[data-act]');
+    if (act?.dataset.act === 'conflict' && SCENE.conflicts.length) {
+      // the conflict's page in the build's brain (its card carries the conflict); focus into the card from the keyboard
+      const c = SCENE.conflicts[0].a, fromKeys = act.matches(':focus-visible');
+      keepFocus(() => select(c.brain, c.slug, 'user'));
+      if (fromKeys) { returnTo = null; focusCard(); }
+      e.stopPropagation(); return;
+    }
     if (tg) { select(tg.dataset.brain, tg.dataset.page, 'user'); e.stopPropagation(); }
     else if (mb) { focusBrain(mb.dataset.brain, 'user'); e.stopPropagation(); }
   };

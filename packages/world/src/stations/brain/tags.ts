@@ -294,8 +294,9 @@ export class Chrome {
     name.el.classList.toggle('is-hot', hot);
   }
 
-  /** The HUD: rows of a number and its words. */
-  hud(rows: { n: string; label: string; tone?: 'em' | 'rose' }[][] | null, k = 1) {
+  /** The HUD: rows of a number and its words. A pair with `act` is a button (data-act, its aria-label), for a host
+   *  that acts on it (the Memory tab's conflict opens its page); the films' HUD has none. */
+  hud(rows: { n: string; label: string; tone?: 'em' | 'rose'; act?: { id: string; label: string } }[][] | null, k = 1) {
     if (!rows) { this.hudEl?.remove(); this.hudEl = null; this.hudKey = ''; return; }
     if (!this.hudEl) { this.hudEl = document.createElement('div'); this.hudEl.className = 'lb-hud'; this.el.appendChild(this.hudEl); }
     const key = JSON.stringify(rows);
@@ -306,7 +307,8 @@ export class Chrome {
         line.forEach((r, i) => {
           // a number and its words never part at a wrap, and the dot before them wraps with them, so no line ends on one
           if (i) d.append(document.createTextNode(' '));
-          const pair = document.createElement('span'); pair.className = 'lb-pair';
+          const pair = document.createElement(r.act ? 'button' : 'span'); pair.className = r.act ? 'lb-pair lb-act' : 'lb-pair';
+          if (r.act) { (pair as HTMLButtonElement).type = 'button'; pair.dataset.act = r.act.id; pair.setAttribute('aria-label', r.act.label); }
           const b = document.createElement('b'); b.textContent = r.n; if (r.tone) b.className = r.tone;
           if (i) pair.append(document.createTextNode('· '));
           pair.append(b, document.createTextNode(` ${r.label}`));
