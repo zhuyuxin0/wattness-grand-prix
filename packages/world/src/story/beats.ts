@@ -58,6 +58,10 @@ export const KEYS = {
   // the sealed copy, every check passing ("All five checks pass"); the tamper that follows shows the changed copy failing
   check: { frame: 'grid.R03-pass', part: 'III', name: 'Anyone can check any plan', term: 'the stewards', tab: 'verify' },
   tamper: { frame: 'venue.stewards', part: 'III', name: 'A changed number fails the check', term: 'the stewards', tab: 'verify' },
+  // the site's tamper: the check's own bay in its changed copy, on the check's camera, so the step from the check is a
+  // state flip and the failure plays in on the frame's clock (stations/grid/r03.ts REVEAL); the films keep the venue's
+  // split-screen stewards
+  'tamper-site': { frame: 'grid.R03', part: 'III', name: 'A changed number fails the check', term: 'the stewards', tab: 'verify' },
   drive: { frame: 'venue.drive', stop: false, part: 'III', name: 'Past the timing screens', term: null, tab: null },
   ranked: { frame: 'grid.R04', part: 'III', name: 'Every sealed plan, ranked', term: 'the standings', tab: 'fleet' },
   season: { frame: 'towers.T02-season', part: 'III', name: 'Paid for days sealed before the gate', term: 'the season purse', tab: 'season' },
@@ -228,6 +232,10 @@ export const SITE_KEYS: FilmKey[] = (() => {
   const d = brain[brain.length - 1]!.until - from;
   const later = (k: FilmKey): FilmKey => ({ ...k, at: k.at + d, until: k.until + d });
   const all = [...before, ...arcade, ...sealed, ...brain, ...MASTER.slice(at('odds') + 1).map(later)];
+  // the tamper is the check's bay in its changed copy ('tamper-site'): one camera, the cross-fade over before the
+  // frame's failure starts (r03.ts REVEAL.card, 0.6 s of its 2.0), and a leg 0.8 s longer, so the failure plays at a
+  // pace that reads
+  const siteKey = (k: FilmKey): FilmKey => (k.key === 'tamper' ? { ...k, key: 'tamper-site', at: k.at + 0.8, leg: { fade: [0.05, 0.25] } } : k);
   const out: FilmKey[] = [];
   let shift = 0;
   all.forEach((k, i) => {
@@ -235,7 +243,7 @@ export const SITE_KEYS: FilmKey[] = (() => {
     const prior = all[i - 1], prev = out[out.length - 1];
     // after a run left out: this key's own leg (from the last key left out), from the last key kept
     if (prior && prev && SITE_LEFT_OUT.has(prior.key)) shift = k.at - (prev.until + (k.at - prior.until));
-    out.push(shift ? { ...k, at: k.at - shift, until: k.until - shift } : k);
+    out.push(siteKey(shift ? { ...k, at: k.at - shift, until: k.until - shift } : k));
   });
   return out;
 })();
