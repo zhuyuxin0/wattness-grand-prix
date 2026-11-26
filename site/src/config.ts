@@ -8,6 +8,10 @@ export const SHADOW_NOTE = "Shadow plans, computed from public data.";
 export const REPO_URL = "https://github.com/zhuyuxin0/wattness-grand-prix";
 export const TERMINAL_URL = "https://wattness.tech";
 
+/** Ness's live service, Wattness's own on Microsoft Azure: Ask Ness sends a question here (POST /ask) and shows the
+ *  answer under the prepared ones. It answers this site and local previews on ports 15191 to 15198. */
+export const NESS_LIVE_URL = "https://grand-prix-ness.agreeablerock-3bbe0a7a.southcentralus.azurecontainerapps.io";
+
 export const CENTRAL_TZ = "America/Chicago";
 
 /** ERCOT's day-ahead gate, in market time. */

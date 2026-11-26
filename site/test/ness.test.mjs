@@ -235,7 +235,7 @@ test("the answers hold to the facts check: Wattness by name, no ticker for the p
 
 test("the panel says what it is, and every page carries the launcher", () => {
   const panel = readFileSync(join(site, "src", "ness", "NessPanel.tsx"), "utf8");
-  assert.ok(panel.includes("Prepared answers from the record. Each links to what it rests on."));
+  assert.ok(panel.includes("Pick a question for an answer checked against the record, or ask Ness anything about the Grand Prix."));
   const layout = readFileSync(join(site, "src", "shell", "Layout.tsx"), "utf8");
   assert.match(layout, /<AskNess \/>/);
   const launcher = readFileSync(join(site, "src", "ness", "Launcher.tsx"), "utf8");
