@@ -191,7 +191,7 @@ function PageView({
             </>
           )}
           {sections.map((x) => (
-            <span key={x.label}>The {x.label} tab is {x.section ? `its section "${x.section}"` : "a section of it"}. </span>
+            <span key={x.label}>The {x.label} tab is {x.section ? `this page's section "${x.section}"` : "a section of this page"}. </span>
           ))}
           {formatInt(links.length)} connection{links.length === 1 ? "" : "s"}
           {across ? `, ${formatInt(across)} of them to another brain` : ""}.
