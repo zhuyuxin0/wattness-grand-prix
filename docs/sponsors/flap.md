@@ -4,7 +4,7 @@
 
 Built on Flap's Pool Launch Portal through our own Launcher Factory, on BSC testnet. A season round launches its token only once GateRecord holds a named agent's plan for a named day, sealed before that day's gate; a round that has not launched by its deadline only refunds. Round 3 [launched](https://testnet.bscscan.com/tx/0x4881264736e39903dd28eadd23602d8d710c558055be4f2f74db9d5eeb872429) on BSC testnet at 08:12:32 CT on Nov 26 (21:12:32 Bangkok), 2 min 16 s after the Nov 27 record it waited for. The season token, PRIX, is a testnet placeholder.
 
-Code: [`modules/flap`](../../modules/flap) (the contracts and the season runner) and [`packages/adapters/flap`](../../packages/adapters/flap) (the read clients). Launch UI: the Wattness Season Mini App, built from Flap's vault component template and [open on Flap's host](https://utter.cash/apps/wattness-season?artifactPath=vaultui_wattness-season_01M8B7TYBFEQE0QK4PP4DFY5E6%2Fv20261126132700625_wattness-season_b2e5ede52980&lang=en), and the [Season tab](https://gp.wattness.tech/#/markets/season), which reads the rounds live from BSC testnet.
+Code: [`modules/flap`](../../modules/flap) (the contracts and the season runner) and [`packages/adapters/flap`](../../packages/adapters/flap) (the read clients). Launch UI: the Wattness Season Mini App, built from Flap's vault component template and [open on Flap's host](https://utter.cash/apps/wattness-season?artifactPath=vaultui_wattness-season_01M8B7TYBFEQE0QK4PP4DFY5E6%2Fv20261126132700625_wattness-season_b2e5ede52980&lang=en), and the [Season tab](https://gp.wattness.tech/markets/season), which reads the rounds live from BSC testnet.
 
 ## How the launch mechanism works
 

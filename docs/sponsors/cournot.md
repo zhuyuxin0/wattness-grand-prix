@@ -35,7 +35,7 @@ The rule is `gate-record.weather-stress.v1`, and its parameters are written into
 
 ## 4. Where users see the claim and the evidence
 
-- **The Forecast tab.** The [Forecast tab](https://gp.wattness.tech/#/agents/forecast)'s "Weather Odds from Cournot" card shows the rule beside a recorded reading, the Nov 25 call (Cournot market 24962617): the exact claim (market, station, threshold and date), Cournot's probability, its basis (Kalshi's YES quote and its time), when it was received, the stress weight, the hedge limit and the contract cap, and the battery's own stress days. The rule's assumptions are labeled there as ours.
+- **The Forecast tab.** The [Forecast tab](https://gp.wattness.tech/agents/forecast)'s "Weather Odds from Cournot" card shows the rule beside a recorded reading, the Nov 25 call (Cournot market 24962617): the exact claim (market, station, threshold and date), Cournot's probability, its basis (Kalshi's YES quote and its time), when it was received, the stress weight, the hedge limit and the contract cap, and the battery's own stress days. The rule's assumptions are labeled there as ours.
 - **Every Nov 27 plan.** Each of the 316 plans carries, under `outside_inputs.cournot`: the rule and its parameters, the claim, p in parts per million, Cournot's basis as returned, the receipt time, the response's route and SHA-256, the stress days, and the stress weight and hedge cap before and after.
 - **The response itself.** Published beside the record on BNB Greenfield, at `od-20261127/cournot/probability.json` in the bucket `wattness-grand-prix-records`.
 

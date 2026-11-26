@@ -6,7 +6,7 @@ Route: **OpenFour Hub**, a new launch mechanism. Preset: **Evidence-gated Bondin
 
 OpenFour, Four.meme's open launch framework, builds each launch from swappable modules. Evidence-gated Bonding V1 keeps Bonding V1's Token, Vault, Curve and Trade and replaces Migrate, so an agent's token graduates only once the agent's own sealed record is bound to it. It runs on our own deployment of OpenFour on BSC testnet, made with OpenFour's fork-deploy toolkit, and the agent token, PLNR, is a testnet placeholder.
 
-Code: [`modules/openfour`](../../modules/openfour). Interface: the [Launchpad tab](https://gp.wattness.tech/#/markets/launchpad), which reads the launch with view calls.
+Code: [`modules/openfour`](../../modules/openfour). Interface: the [Launchpad tab](https://gp.wattness.tech/markets/launchpad), which reads the launch with view calls.
 
 ## How the mechanism works
 

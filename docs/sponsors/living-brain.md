@@ -2,7 +2,7 @@
 
 <!-- MEDIA: video-living-brain -->
 
-Living Brain is the agents' persistent memory, used through its REST API. Desert Willow (DSWL_ESS_ESR1), the showcase battery, has a brain of its own for the reviews of its plans; the build and the Wattness Terminal each have one too. Code: [`packages/adapters/living-brain`](../../packages/adapters/living-brain). Interface: the [Memory tab](https://gp.wattness.tech/#/agents/memory).
+Living Brain is the agents' persistent memory, used through its REST API. Desert Willow (DSWL_ESS_ESR1), the showcase battery, has a brain of its own for the reviews of its plans; the build and the Wattness Terminal each have one too. Code: [`packages/adapters/living-brain`](../../packages/adapters/living-brain). Interface: the [Memory tab](https://gp.wattness.tech/agents/memory).
 
 ## The problem
 
