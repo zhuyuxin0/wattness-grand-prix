@@ -224,7 +224,8 @@ Node 22 (22.18 or later) and pnpm 11:
 ```sh
 pnpm install
 pnpm test
-pnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet --scope gate-record/ercot-da-energy --battery DSWL_ESS_ESR1
+pnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet --scope gate-record/ercot-da-energy --battery DSWL_ESS_ESR1 \
+  --outcomes fixtures/od-20261126/outcomes-bsc-mainnet
 ```
 
 To plan an operating day in the coming week yourself, with no key and no chain, while its gate (10:00 CT the day before) is still ahead:

@@ -1,0 +1,77 @@
+{
+  "schema": "gate-record.outcome.v1",
+  "stage": 1,
+  "operating_day": "2026-11-26",
+  "manifest_root": "0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7",
+  "inputs": {
+    "release_id": "terminal-daily-20261126-1120",
+    "manifest_sha256": "2f5105c5f2c007bbb82c33aa504fc6c2e32a317cf140c4635d81974e9632563b",
+    "files": [
+      {
+        "route": "/data/terminal-display/v1/releases/terminal-daily-20261126-1120/catalogs/ba.json",
+        "sha256": "26c9518154b691197eb5a292ad9698c5d5e45a8ce5e1a24d1e25c146700b8f0e"
+      },
+      {
+        "route": "/data/terminal-display/v1/releases/terminal-daily-20261126-1120/manifest.json",
+        "sha256": "2f5105c5f2c007bbb82c33aa504fc6c2e32a317cf140c4635d81974e9632563b"
+      },
+      {
+        "route": "/api/prices/CLO_RN/2026-11-26",
+        "sha256": "126d34f7f71a01a674fcdba927cdedd73a951defb75cc254ca07a63d643fb9e5"
+      }
+    ],
+    "live": []
+  },
+  "prices": {
+    "da_node_cents": [
+      3957,
+      3849,
+      3986,
+      3969,
+      3993,
+      4433,
+      3675,
+      3550,
+      1828,
+      1347,
+      1311,
+      1378,
+      1329,
+      1346,
+      1304,
+      1292,
+      2964,
+      4284,
+      4277,
+      4400,
+      4591,
+      4598,
+      4367,
+      3496
+    ],
+    "rt_hub_cents": null
+  },
+  "arms": {
+    "A": {
+      "energy_uusd": 4597088130,
+      "wear_uusd": 370988000,
+      "hedge_uusd": 0,
+      "fees_uusd": 0,
+      "net_uusd": 4226100130
+    },
+    "B": {
+      "energy_uusd": 4597088130,
+      "wear_uusd": 370988000,
+      "hedge_uusd": null,
+      "fees_uusd": 68950000,
+      "net_uusd": null
+    },
+    "C": {
+      "energy_uusd": 3490189430,
+      "wear_uusd": 277860000,
+      "hedge_uusd": null,
+      "fees_uusd": 42350000,
+      "net_uusd": null
+    }
+  }
+}
