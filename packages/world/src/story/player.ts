@@ -1,5 +1,6 @@
 // THE STORY PLAYER. One renderer and one stage (lib/stage.ts over the kit's) for the whole story; each station frame is
-// built into it once, lazily, when the story comes near it, and disposed when the story has gone on (instances.ts).
+// built into it once, lazily, when the story comes near it, and disposed once the story has gone on and it is not among
+// the frames drawn last (instances.ts; trim).
 // One seekable time drives everything: draw(t) poses each frame shown at its own local time, sets the camera for the
 // leg or the rest, and renders. Where two frames meet, both are drawn in the same tick: the outgoing one is copied to
 // a 2D canvas beneath and the incoming one fades in over it on the WebGL canvas, as the intro's scenes cross-fade
@@ -48,6 +49,15 @@ export function runAt(run: Run, s: number): number {
 interface Draw { inst: FrameInstance; local: number; alpha: number; pose: CameraPose | 'own'; rise?: number }
 export interface Picture { draws: Draw[]; plates: { inst: FrameInstance; key: string; k: number } | null; where: Where; t: number }
 
+/** A measuring harness's log (site/scripts/perf-story.mjs puts window.__gpPerf on the page before it loads): the
+ *  player and the site push what they do onto it, timed by performance.now(). Without it (any visit) nothing is
+ *  recorded and nothing changes. `draws` holds each render's start and its CPU milliseconds, in pairs. */
+export interface PerfLog { events: Record<string, unknown>[]; draws: number[]; player?: StoryPlayer; site?: unknown }
+export function perfLog(): PerfLog | null {
+  const log = (globalThis as { __gpPerf?: PerfLog }).__gpPerf;
+  return log && Array.isArray(log.events) && Array.isArray(log.draws) ? log : null;
+}
+
 const dataFiles = import.meta.glob<unknown>('../data/*.json', { import: 'default' });
 export async function loadData() {
   const get = async (n: string) => { const f = dataFiles[`../data/${n}`]; return f ? f() : null; };
@@ -69,6 +79,12 @@ export class StoryPlayer {
   private insts = new Map<string, FrameInstance>();
   private queue: Promise<unknown> = Promise.resolve();
   private building = new Set<string>();
+  /** Frames whose setup is writing the shared stage, until their programs are queued: nothing else may draw meanwhile. */
+  private writing = new Set<string>();
+  /** Frames built whose programs are still compiling: not drawn until they have (a first draw would compile them). */
+  private compiling = new Set<string>();
+  /** Each build queued or under way, by frame, so a second ask joins it. */
+  private pending = new Map<string, Promise<FrameInstance>>();
   private rises = new Map<FrameInstance, Rise>();
   private underOn = false;
   private lineKey = '';
@@ -105,6 +121,8 @@ export class StoryPlayer {
       keepOut: () => this.keepOut?.() ?? [],
       captionOverride: () => (this.captions === 'film' ? { el: this.line.childElementCount ? this.line : null } : this.captions === 'none' ? { el: null } : null),
     };
+    const log = perfLog();
+    if (log) log.player = this;
   }
 
   setCut(cut: CutId) { this.film = film(cut); this.lineKey = ''; }
@@ -116,37 +134,66 @@ export class StoryPlayer {
     return i;
   }
 
-  /** Builds a frame (one build at a time: a setup writes the shared stage) and compiles its programs. */
-  ensure(frame: string): Promise<FrameInstance> {
+  /** Builds a frame (one build at a time: a setup writes the shared stage) and compiles its programs; resolves once they
+   *  have compiled. The stage is free again once they are queued, so the story draws its other frames while they
+   *  compile (isBuilding), and this one from then on (drawable). `why` names the caller for a measuring harness's log:
+   *  a picture that needs it now, or a build ahead of the visitor. */
+  ensure(frame: string, why: 'need' | 'prefetch' = 'need'): Promise<FrameInstance> {
     const inst = this.inst(frame);
+    const queued = this.pending.get(frame);
+    if (queued) return queued;
     if (inst.ready) return Promise.resolve(inst);
     if (inst.error) return Promise.reject(new Error(inst.error));
+    const asked = performance.now();
     const run = this.queue.then(async () => {
       if (inst.ready || inst.disposed) return inst;
       if (this.dead) throw new Error('story: the player was disposed');
-      this.building.add(frame);
+      this.building.add(frame); this.writing.add(frame);
       const b0 = performance.now();
       try {
         await inst.build();
-        inst.buildMs = Math.round(performance.now() - b0);
-        // only this frame's group visible while its programs compile
+        const b1 = performance.now();
+        inst.buildMs = Math.round(b1 - b0);
+        // only this frame's group visible while its programs compile, and the other frames' groups out of the scene
+        // until the compile has been queued: three's compile prepares every material in the scene, shown or not, so each
+        // build would prepare the kept frames' materials again under this frame's stage state (and queue variants of
+        // them no frame draws), and wait for all their programs. preparePrograms queues them before its first await.
         for (const x of this.insts.values()) x.root.visible = x === inst;
         inst.pose(inst.restLocal, 0);
         if (inst.restPose) this.stage.setCamera(inst.restPose);
-        await this.stage.preparePrograms([() => inst.pose(inst.restLocal, 0)], () => !this.dead && !inst.disposed);
+        const scene = this.stage.scene, parked = [...this.insts.values()].filter((x) => x !== inst && x.root.parent === scene);
+        for (const x of parked) scene.remove(x.root);
+        let compiled: ReturnType<WorldStage['preparePrograms']>;
+        try { compiled = this.stage.preparePrograms([() => inst.pose(inst.restLocal, 0)], () => !this.dead && !inst.disposed); }
+        finally { for (const x of parked) scene.add(x.root); }
+        // the programs are queued and the stage is free: the other frames may draw while they compile (a draw takes the
+        // stage and keeps this frame's state, which its next turn puts back)
         inst.root.visible = false;
-        inst.readyMs = Math.round(performance.now() - b0);
+        this.writing.delete(frame); this.compiling.add(frame);
+        const prep = await compiled;
+        const b2 = performance.now();
+        inst.readyMs = Math.round(b2 - b0);
+        perfLog()?.events.push({ e: 'build', frame, why, asked, start: b0, built: b1, ready: b2, buildMs: inst.buildMs, readyMs: inst.readyMs, programs: prep.programs, prep: prep.state });
       } catch (e) {
+        perfLog()?.events.push({ e: 'build', frame, why, asked, start: b0, failed: performance.now() });
         this.errors.set(frame, e instanceof Error ? (e.stack ?? e.message) : String(e));
         this.o.onError?.(e, frame);
         throw e;
-      } finally { this.building.delete(frame); }
+      } finally { this.building.delete(frame); this.writing.delete(frame); this.compiling.delete(frame); }
       return inst;
     });
     this.queue = run.catch(() => undefined);
+    const done = () => { if (this.pending.get(frame) === run) this.pending.delete(frame); };
+    this.pending.set(frame, run);
+    run.then(done, done);
     return run;
   }
-  isBuilding() { return this.building.size > 0; }
+  /** Whether a build is writing the shared stage now (its setup, up to its programs queued): nothing else may draw. */
+  isBuilding() { return this.writing.size > 0; }
+  /** Whether any build is queued or under way. */
+  isBusy() { return this.pending.size > 0; }
+  /** Whether a frame can be drawn: built, and its programs compiled. */
+  private drawable(inst: FrameInstance | undefined): inst is FrameInstance { return !!inst && inst.ready && !this.compiling.has(inst.id); }
 
   /** A key's run through its hold, when the holds run (the films) and it has one. */
   private runOf(k: FilmKey): Run | null { return this.holds === 'run' && k.run?.length ? k.run : null; }
@@ -168,7 +215,7 @@ export class StoryPlayer {
     const instOf = (k: FilmKey) => this.insts.get(keyDef(k.key).frame);
     if (where.kind === 'hold') {
       const k = keyAt(where.i), inst = instOf(k);
-      if (!inst?.ready) return null;
+      if (!this.drawable(inst)) return null;
       const local = this.holdLocal(k, inst, where.since);
       const stop = keyDef(k.key).stop !== false;
       const span = k.until - k.at;
@@ -180,7 +227,7 @@ export class StoryPlayer {
     }
     const A = keyAt(where.i - 1), B = keyAt(where.i);
     const ia = instOf(A), ib = instOf(B);
-    if (!ia?.ready || !ib?.ready) return null;
+    if (!this.drawable(ia) || !this.drawable(ib)) return null;
     const leg = F.leg(where.i), e = where.e;
     const mode = leg.cam ?? 'glide';
     // the outgoing frame held where its hold ended (one that moves at its rest runs on through the leg); the incoming
@@ -223,7 +270,21 @@ export class StoryPlayer {
   /** Disposes every frame not in keep. */
   prune(keep: Iterable<string>) {
     const k = new Set(keep);
-    for (const [id, inst] of this.insts) if (!k.has(id) && inst.ready && !this.building.has(id)) { this.rises.delete(inst); inst.dispose(); this.insts.delete(id); }
+    for (const [id, inst] of this.insts) if (!k.has(id) && inst.ready && !this.building.has(id)) this.drop(id, inst);
+  }
+
+  /** Lets frames go, least recently drawn first: those in keep stay, and so do the `drawn` frames drawn last (so a step
+   *  back to any of them draws at once); a frame built ahead and never drawn stays only while it is in keep. */
+  trim(keep: Iterable<string>, drawn: number) {
+    const k = new Set(keep);
+    const built = [...this.insts].filter(([id, inst]) => inst.ready && !this.building.has(id));
+    const recent = new Set(built.filter(([, i]) => i.lastUsed > 0).sort((a, b) => b[1].lastUsed - a[1].lastUsed).slice(0, Math.max(0, drawn)).map(([id]) => id));
+    for (const [id, inst] of built) if (!k.has(id) && !recent.has(id)) this.drop(id, inst);
+  }
+
+  private drop(id: string, inst: FrameInstance) {
+    this.rises.delete(inst); inst.dispose(); this.insts.delete(id);
+    perfLog()?.events.push({ e: 'drop', frame: id, t: performance.now() });
   }
 
   private riseFor(inst: FrameInstance): Rise {
@@ -239,6 +300,7 @@ export class StoryPlayer {
     for (const inst of this.insts.values()) inst.root.visible = false;
     let under = false;
     pic.draws.forEach((d, n) => {
+      d.inst.lastUsed = t0;
       d.inst.pose(d.local, dt);
       const r = this.rises.get(d.inst) ?? (d.rise != null ? this.riseFor(d.inst) : null);
       if (r) { if (d.rise != null) r.set(d.rise); else r.restore(); }
@@ -266,6 +328,7 @@ export class StoryPlayer {
     this.last = pic;
     this.tick++;
     const cpu = performance.now() - t0;
+    perfLog()?.draws.push(t0, cpu);
     this.timings.cpu.push(cpu);
     if (this.measureGpu) { this.stage.renderer.getContext().finish(); this.timings.gpu.push(performance.now() - t0); }
     if (this.timings.cpu.length > 20000) { this.timings.cpu.splice(0, 10000); this.timings.gpu.splice(0, 10000); }
@@ -335,7 +398,7 @@ export class StoryPlayer {
       const shares = [1 - smooth((w.e - 0.5) / 0.25), smooth((w.e - 0.4) / 0.3)];
       for (const [j, k] of [this.film.keys[w.i - 1]!, this.film.keys[w.i]!].entries()) {
         const inst = this.insts.get(keyDef(k.key).frame);
-        if (!inst?.ready || inst.screens === false) continue;
+        if (!this.drawable(inst) || inst.screens === false) continue;
         if (shares[j]! <= 0.002) { sets.push([inst, 0, 0]); continue; }
         await layout(inst, pose, `leg:${pic.t}`);
         sets.push([inst, inst.screens ? shares[j]! : 0, 0]);
@@ -394,7 +457,7 @@ export class StoryPlayer {
       const k = F.keys[j];
       if (!k) continue;
       const inst = this.insts.get(keyDef(k.key).frame);
-      if (inst?.ready) return { draws: [{ inst, local: this.holdLocal(k, inst, Math.max(0, Math.min(k.until - k.at, t - k.at))), alpha: 1, pose: inst.restPose! }], plates: null, where, t };
+      if (this.drawable(inst)) return { draws: [{ inst, local: this.holdLocal(k, inst, Math.max(0, Math.min(k.until - k.at, t - k.at))), alpha: 1, pose: inst.restPose! }], plates: null, where, t };
     }
     return null;
   }
