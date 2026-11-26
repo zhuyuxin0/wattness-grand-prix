@@ -568,10 +568,15 @@ void main() {
   float facing = max(dot(n, normalize(vV)), 0.0);
   float rim = pow(1.0 - facing, 2.7), broad = pow(1.0 - facing, 1.3);
   float t = uTime * 0.3;
-  float cloud = sin(vL.x * 5.0 + t + sin(vL.y * 4.0 - t * 0.6));
-  float streak = pow(max(0.0, cloud), 10.0);
+  // Living Brain's orbs: lilac-white, filled with moving filament noise over the whole disc (two crossing waves, and a
+  // finer second octave for the filaments' grain), a bright rim and a glint; the face is the tint itself, never a dark
+  // glass
+  vec3 q = vL * 10.0, r = vL * 23.0;
+  float n1 = sin(q.x + t + sin(q.y * 0.8 - t * 0.6)) * sin(q.z * 0.9 - t * 0.4 + sin(q.x * 0.7 + t * 0.3));
+  float n2 = sin(r.y + t * 1.3 + sin(r.z * 0.8 + t * 0.5)) * sin(r.x * 0.9 - t * 0.7);
+  float streak = pow(max(0.0, 0.6 * n1 + 0.4 * n2), 2.0);
   float glint = pow(max(dot(n, normalize(vec3(-0.45, 0.7, 0.5))), 0.0), 18.0);
-  vec3 c = vec3(0.01, 0.018, 0.04) + uTint * (broad * 0.25 + rim * 0.95) + vec3(0.6, 0.8, 1.0) * (glint * 0.7 + streak * (0.08 + rim * 0.3));
+  vec3 c = uTint * (0.55 + 0.45 * broad) + vec3(0.85, 0.9, 1.0) * (streak * 0.9 + rim * 0.5 + glint * 0.6);
   gl_FragColor = vec4(c * 0.9, uA);
 }`;
 const HALO_VERT = /* glsl */`
@@ -588,6 +593,6 @@ uniform vec3 uTint;
 varying vec2 vUv;
 void main() {
   float r = length(vUv - 0.5) * 2.0;
-  float ring = exp(-pow((r - 0.52) / 0.12, 2.0)) * 0.35 + exp(-pow(r / 0.6, 2.0)) * 0.12;
+  float ring = exp(-pow((r - 0.52) / 0.12, 2.0)) * 0.6 + exp(-pow(r / 0.6, 2.0)) * 0.12;
   gl_FragColor = vec4(uTint * ring, uA * ring);
 }`;
