@@ -19,9 +19,11 @@ import { readSelection, writeSelection } from "./select";
 // import, so they stay in this tab's chunks. The stage holds its own dark in
 // either theme; without WebGL the mount lists the pages, in the page's theme.
 
-/** The site's tabs by the package's ids, as the brain's cards name them ("Open Battery", "Part of: Seal"). */
+/** The site's tabs by the package's ids, as the brain's cards name them ("Open Battery", "Part of: Seal"). This tab
+ *  is left out: its own card's "Open Memory" (and "Part of: Memory") would navigate to the tab the visitor is on,
+ *  which drops the selection, flies the stage back out and closes the card. */
 const TAB_LIST: { id: string; label: string }[] = Object.keys(WORLD_TABS).flatMap((id) => {
-  const t = worldTab(id);
+  const t = id === "memory" ? null : worldTab(id);
   return t ? [{ id, label: t.label }] : [];
 });
 
