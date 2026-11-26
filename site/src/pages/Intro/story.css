@@ -65,6 +65,13 @@
   font-size: var(--t-fs-sm);
   color: var(--w-muted);
 }
+/* Sound, then the way out, at the bar's right end. */
+.story-dialog__actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .story-dialog__close {
   flex: none;
 }
@@ -190,11 +197,13 @@
   .story-dialog__bar {
     padding-left: var(--gp-gutter);
   }
-  .story-dialog__close {
+  .story-dialog__close,
+  .story-dialog__sound {
     width: 32px;
     padding: 0;
   }
-  .story-dialog__close-label {
+  .story-dialog__close-label,
+  .story-dialog__sound .sound-toggle__label {
     position: absolute;
     width: 1px;
     height: 1px;

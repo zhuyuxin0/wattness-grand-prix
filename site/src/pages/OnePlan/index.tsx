@@ -2,6 +2,7 @@ import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import type { SealReceipt } from "@world/game";
 import { TABS } from "../../shell/tabs";
 import { PageHeader } from "../../ui";
+import { SoundToggle } from "../Intro/SoundToggle";
 import { Cabinet } from "./Cabinet";
 import { HowItPlays } from "./HowItPlays";
 import { SealedPlan } from "./SealedPlan";
@@ -10,7 +11,8 @@ import "./styles.css";
 // ONE PLAN: the playable plan. Its stage is mountOnePlan from packages/world in
 // play mode, loaded with a dynamic import in this tab only, so the other tabs
 // stay light. Beside it, what the dial, the glass, the score and the seal mean;
-// under it, once the visitor seals, the receipt.
+// under it, once the visitor seals, the receipt. The cabinet sounds only once
+// the visitor turns Sound on in the page's head (off by default, remembered).
 
 const tab = TABS.find((t) => t.id === "one-plan");
 
@@ -48,7 +50,7 @@ export default function OnePlanPage() {
 
   return (
     <div className="page page--one-plan">
-      <PageHeader title="ONE PLAN" lede={tab?.summary} />
+      <PageHeader title="ONE PLAN" lede={tab?.summary} aside={<SoundToggle />} />
       <div ref={box} className={`arcade${wide ? " arcade--rail" : ""}`}>
         {!wide && <HowItPlays folded />}
         <div className="arcade__main">

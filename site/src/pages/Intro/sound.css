@@ -1,0 +1,11 @@
+/* The Sound switch (SoundToggle.tsx): a button in the Terminal's face with the
+   speaker glyph and its name; turned on, it takes the selected ground and the
+   accent's underline, as a pressed segment does. */
+
+.btn.sound-toggle[aria-pressed="true"] {
+  background: var(--t-selected);
+  box-shadow: var(--t-mark-under);
+}
+.btn.sound-toggle[aria-pressed="true"]:hover {
+  background: color-mix(in srgb, var(--w-fg) 4%, var(--t-selected));
+}

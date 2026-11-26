@@ -29,6 +29,8 @@ const DRAWN = [
   "more",
   "docs",
   "menu",
+  "sound",
+  "sound-off",
 ] as const;
 
 /** Earlier names, drawn with the Terminal's glyph for the same job. */
