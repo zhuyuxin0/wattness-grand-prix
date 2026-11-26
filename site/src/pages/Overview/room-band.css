@@ -1,0 +1,59 @@
+/*
+ * The control room's panes as dock panes (RoomBand.tsx, room-band.ts), from 1000px of room. The band fills the room
+ * over the landscape, at least one view tall as the room's own grid and taller where the panes ask for it; the page's
+ * head stands in its top left corner and the Panes menu in its top right. Each dock pane is the room's glass
+ * (control-room.css .ov-pane) and names its part in its header, so the part inside drops its own glass and keeps the
+ * title its header repeats for assistive tech only.
+ */
+
+/* At least one view tall, as the room's own grid; taller where the panes ask for it (PaneBand grow). */
+.ov-room > .gp-band-host--docked {
+  height: max(640px, calc(100svh - var(--gp-masthead-h)));
+}
+
+.ov-room .gp-band {
+  --gp-band-glass: color-mix(in srgb, var(--t-raised) 92%, transparent);
+  --gp-band-line: color-mix(in srgb, var(--w-fg) 12%, transparent);
+  --gp-band-radius: var(--t-radius-paper);
+  --gp-band-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent),
+    0 1px 2px rgb(0 0 0 / 0.2),
+    0 18px 40px -20px rgb(0 0 0 / 0.75);
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .ov-room .gp-band {
+    --gp-band-glass: color-mix(in srgb, var(--t-raised) 70%, transparent);
+    --gp-band-blur: blur(14px) saturate(150%);
+  }
+}
+
+/* A part inside its dock pane: the pane is the glass and its header names it. */
+.ov-room .gp-band__content > .ov-pane {
+  padding: 10px 16px 14px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.ov-room .gp-band__content > .ov-pane > .ov-pane__head:not(:has(.ov-pane__meta)) {
+  display: contents;
+}
+.ov-room .gp-band__body .ov-pane__title,
+.ov-room .gp-band__body .start-here__grid:first-child .start-here__title {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Verify's matches open inside its pane, which scrolls, rather than over its neighbors. */
+.ov-room .gp-band__body .ov-find__pop {
+  position: static;
+  margin-top: 4px;
+}
+.ov-room .gp-band__content > .start-here {
+  padding: 10px 16px 14px;
+}

@@ -129,6 +129,9 @@ carries to the rest; a link may name one with `/battery/<resource>` or `?battery
   under the band's key once the reader changes one (try/catch). Narrower than its `minWidth` the band draws the page's
   own markup for its parts instead (a phone's column). rc-dock and the dock load by one dynamic import
   (`band-dock.tsx`); until then the panes stand in their places as named frames. `test/band.test.mjs` holds the model.
+  The Overview's control room is the first band (`pages/Overview/RoomBand.tsx`, `room-band.ts`): from 1000px of room
+  its parts are dock panes in the room's own arrangement (`gp.room`), and below that the room's own column.
+  `test/room-band.test.mjs` holds it.
 - Related (`src/shell/related.ts`, one set per tab; drawn by `PageHeader` and under the Intro's hero by
   `src/shell/RelatedStrip.tsx`): the two to four tabs each page leads to. A click previews the tab as a floating pane
   over the page; a link held with ⌘, Ctrl or Shift, or a middle click, opens it in a new browser tab; the pane's Open

@@ -10,6 +10,7 @@ import { StartHere } from "../Intro/StartHere";
 import { Strip } from "../Fleet/Strip";
 import { hubLabel, plainName } from "../Fleet/names";
 import { LOOP, NESS_QUESTIONS, askSearch, boardTop, findBatteries, sealOf, verifyPath } from "./room";
+import { RoomBand } from "./RoomBand";
 import "./control-room.css";
 
 // The control room: the Overview's first view, the Terminal's home. Behind it the Tech Stack's 3D in motion, a
@@ -381,26 +382,39 @@ export function ControlRoom() {
   const ready = all.status === "ready" ? all.data : null;
   const day = ready?.[0] ?? null;
   const seal = ready ? sealOf(ready[1].receipts) : null;
+  const head = <PageHeader className="ov-room__head" title="Overview" lede="Tomorrow's plan for every Texas battery with complete public data, sealed on BNB Chain before the market closes." />;
+  const parts = {
+    seal: day && seal ? <SealPane day={day} seal={seal} /> : null,
+    verify: day ? <VerifyPane day={day} /> : null,
+    morph: <MorphPane />,
+    fleet: day ? <FleetPane day={day} /> : null,
+    ness: NESS_IN_BUILD ? <NessPane /> : undefined,
+    start: <StartHere id="ov-start" />,
+  };
   // Two sides round the landscape's middle, Ask Ness under it, and the visitors' ways in along its foot; a phone reads
-  // them in order.
+  // them in order. From 1000px of room the same parts are dock panes in that arrangement (RoomBand.tsx).
   return (
     <section className="ov-room" data-atmosphere="dark" aria-label="Control room">
       <Landscape />
-      <div className="ov-room__panes">
-        <div className="ov-room__side ov-room__side--left">
-          <PageHeader className="ov-room__head" title="Overview" lede="Tomorrow's plan for every Texas battery with complete public data, sealed on BNB Chain before the market closes." />
-          {day && seal && <SealPane day={day} seal={seal} />}
-          {day && <VerifyPane day={day} />}
-        </div>
-        <div className="ov-room__side ov-room__side--right">
-          <MorphPane />
-          {day && <FleetPane day={day} />}
-        </div>
-        {NESS_IN_BUILD && <NessPane />}
-        <div className="ov-room__start">
-          <StartHere id="ov-start" />
-        </div>
-      </div>
+      <RoomBand
+        head={head}
+        parts={parts}
+        stacked={
+          <div className="ov-room__panes">
+            <div className="ov-room__side ov-room__side--left">
+              {head}
+              {parts.seal}
+              {parts.verify}
+            </div>
+            <div className="ov-room__side ov-room__side--right">
+              {parts.morph}
+              {parts.fleet}
+            </div>
+            {parts.ness}
+            <div className="ov-room__start">{parts.start}</div>
+          </div>
+        }
+      />
     </section>
   );
 }
