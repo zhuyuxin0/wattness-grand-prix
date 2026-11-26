@@ -1,0 +1,143 @@
+/* Start where you are. Blocks: start-here*. A heading, then one entry per kind of visitor: the sponsor's logo chip
+   (or the reader's name), one line, and the page it opens. Every color is a token, so the list takes its ground's:
+   the night under the landing's hero, or a page in the visitor's theme. The columns follow the room the list has
+   (a container query), not the window: five with the heading as the first cell, three under it, one on a phone.
+   Hovers change color only. */
+
+.start-here {
+  container-type: inline-size;
+}
+.start-here__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--t-space-3);
+}
+.start-here__head {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: 2px 0 var(--t-space-1);
+}
+.start-here__title {
+  font-family: var(--t-font-display);
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--w-fg);
+}
+.start-here__lede {
+  font-size: var(--t-fs-sm);
+  line-height: 1.4;
+  color: var(--w-muted);
+}
+
+.start-here__link {
+  display: grid;
+  align-content: start;
+  gap: var(--t-space-2);
+  min-width: 0;
+  padding: 10px 12px 11px;
+  /* the Terminal's glass: a raised ground, a hair of a border, a lit top edge and a soft lift */
+  border: 1px solid color-mix(in srgb, var(--w-fg) 11%, transparent);
+  border-radius: var(--t-radius-paper);
+  background: color-mix(in srgb, var(--t-raised) 72%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 9%, transparent),
+    0 10px 24px -14px rgb(0 0 0 / 0.45);
+  color: var(--w-fg);
+  text-decoration: none;
+  transition:
+    background-color var(--m-dur-s) var(--m-ease-out),
+    border-color var(--m-dur-s) var(--m-ease-out);
+}
+.start-here__link:hover {
+  background: color-mix(in srgb, var(--t-raised) 86%, var(--w-fg));
+  border-color: color-mix(in srgb, var(--t-accent-mark) 60%, transparent);
+}
+.start-here__link:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+}
+/* one height for a chip and a name, so the lines start level */
+.start-here__who {
+  display: flex;
+  align-items: center;
+  min-height: 24.5px;
+  min-width: 0;
+}
+/* the whole entry is the link: the chip takes its pointer (outweighing the chip's own rule, which loads later) */
+.start-here__link .lg-chip {
+  cursor: inherit;
+}
+.start-here__name {
+  font-size: var(--t-fs);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--w-fg);
+}
+/* a sponsor's name in words while its logo is not in */
+.start-here__name--chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24.5px;
+  padding: 0 8px;
+  border: 1px solid var(--w-border);
+  border-radius: 6px;
+  font-size: var(--t-fs-sm);
+}
+.start-here__line {
+  font-size: var(--t-fs-sm);
+  line-height: 1.42;
+  color: var(--w-muted);
+}
+/* the page it opens, after the line */
+.start-here__to {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--w-fg);
+  transition: color var(--m-dur-s) var(--m-ease-out);
+}
+.start-here__link:hover .start-here__to {
+  color: var(--t-accent-text);
+}
+
+/* one column on a phone: a little tighter, so the list stays short */
+@container (max-width: 599px) {
+  .start-here__grid {
+    gap: 6px;
+  }
+  .start-here__link {
+    gap: var(--t-space-1);
+    padding: 9px 12px 10px;
+  }
+}
+
+/* three columns, the heading over them */
+@container (min-width: 600px) {
+  .start-here__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .start-here__head {
+    grid-column: 1 / -1;
+  }
+}
+
+/* five columns, the heading as the first cell: two rows */
+@container (min-width: 1000px) {
+  .start-here__grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--t-space-3) var(--t-space-4);
+  }
+  .start-here__head {
+    grid-column: auto;
+    padding: 8px 8px 0 0;
+    gap: var(--t-space-1);
+  }
+  .start-here__title {
+    font-size: 17px;
+  }
+}
