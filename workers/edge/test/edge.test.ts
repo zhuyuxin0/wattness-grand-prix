@@ -30,7 +30,7 @@ describe("a good file passes", () => {
       "x-gate-block": "135677078",
       "x-gate-sha256": "690ae05bf4d238858cbb88f2479ee6426bd9a907d9f747a00671434387332581",
       "x-gate-source": `https://gnfd-testnet-sp3.nodereal.io/view/wattness-grand-prix-records/${DAY}/manifest.json`,
-      "x-gate-not-covered": "exclusions, showcase, plan_unix",
+      "x-gate-not-covered": "exclusions, showcase, plan_unix, leaves[].resource",
       "x-gate-cache": "miss",
     });
     expect(res.headers.get("x-gate-checks")).toBe("byte form, index shape, root recomputes, RPC chain, record key, on-chain record, gate");
@@ -299,7 +299,10 @@ describe("a wrong root is refused", () => {
     u.objects.set(`${DAY}/manifest.json`, `${JSON.stringify(relabeled, null, 2)}\n`);
     u.objects.set(`${DAY}/leaves/${name}.json`, text.dswl);
     const origin = freshOrigin();
-    expect((await call(origin, "/day/2026-11-26/index.json")).status).toBe(200);
+    const index = await call(origin, "/day/2026-11-26/index.json");
+    expect(index.status).toBe(200);
+    // Served as verified with Desert Willow's leaf hash beside DSWL_ESS_ESR0, so the names are named as not covered.
+    expect(index.headers.get("x-gate-not-covered")?.split(", ")).toContain("leaves[].resource");
     const leaf = await call(origin, `/day/2026-11-26/leaves/${name}.json`);
     expect(leaf.status).toBe(502);
     expect(await leaf.text()).toContain('resource: document "DSWL_ESS_ESR1", index "DSWL_ESS_ESR0"');

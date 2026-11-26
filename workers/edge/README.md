@@ -50,12 +50,15 @@ one way and another the other.
 GateRecord accepts records from any wallet. The Worker serves those of the agent wallet named in
 `wrangler.jsonc` (`COMMITTER`), under the scope `gate-record/ercot-da-energy`.
 
-No hash covers the index's `exclusions`, `showcase` and `plan_unix`; the response names them in
-`x-gate-not-covered`. No hash covers its file paths either, so they are fixed: battery R's files must be
-`leaves/<R>.json` and `leaves/<R>.scenarios.json`, and an index that names any other path is refused. A request
-for `leaves/<R>.json` can then reach only R's entry, and the leaf's own `battery.resource`, checked whenever the
-leaf is served, must be R, so the index cannot serve one battery's plan under another's name. Files no hash
-names, such as `sync/<R>.json`, answer 404 with their Greenfield URL.
+No hash covers the index's `exclusions`, `showcase` and `plan_unix`, nor the battery name beside each leaf hash
+(`leaves[].resource`): the root fixes each hash and its position, not the name it is listed under. The index's
+response names all four in `x-gate-not-covered`, and an index served as verified can list a battery's leaf hash
+under another name. The file paths are fixed by the name: battery R's files must be `leaves/<R>.json` and
+`leaves/<R>.scenarios.json`, and an index that names any other path is refused. Each file is tied to its battery
+when it is served: `leaves/<R>.json` only when the leaf's own `battery.resource` is R, and
+`leaves/<R>.scenarios.json`, `salt.txt` and the files a leaf names only on the word of a leaf that passed that
+check under the name it is listed under. Files no hash names, such as `sync/<R>.json`, answer 404 with their
+Greenfield URL.
 
 The verdict's checks follow the repository verifier's V1 (the root from the leaf and its audit path), V2 (the
 record key and the record at it) and V3 (the gate). `test/verify.test.ts` compares them with `packages/verifier`'s
@@ -78,7 +81,8 @@ A verified response on a record at least 15 blocks deep is put in the edge cache
 verified. Nothing is cached before it is verified: refusals, 404s and responses on a fresher record carry
 `no-store`. The cache key includes the Worker's version (the version metadata binding), so a new deploy never
 serves an earlier version's verdicts or headers. Each isolate also keeps the indexes and leaves it has verified,
-so a burst of requests for one day reads the chain once.
+so a burst of requests for one day reads the chain once. A remembered leaf is keyed by its hash and vouches only
+for an entry listed under the name it was verified under; under any other name the leaf is read and checked again.
 
 ## Run it
 

@@ -18,7 +18,9 @@ GET /day/<day>/index.json
     is its root; GateRecord.keyOf gives the record key computed here; GateRecord.get(key) holds that
     root, leaf count, code hash, day, scope and committer; the gate, computed as GateRecord.gateTs
     computes it, agrees with the contract and the index, and the record was committed before it.
-    Not covered by any hash, and named in x-gate-not-covered: exclusions, showcase and plan_unix.
+    Not covered by any hash, and named in x-gate-not-covered: exclusions, showcase, plan_unix and
+    leaves[].resource, the battery name beside each leaf hash (the root fixes each hash and its
+    position, not the name it is listed under).
 
 GET /day/<day>/<path>
     leaves/<R>.json            SHA-256(0x00 || RFC 8785 form) is the index's leaf for R; the

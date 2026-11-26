@@ -104,10 +104,12 @@ export interface FleetIndex {
 }
 
 /**
- * The index fields no hash covers: the publisher's statements, served as published. An entry's file
- * paths are not among them: they must be leaves/<R>.json and leaves/<R>.scenarios.json for its battery R.
+ * The index fields no hash covers: the publisher's statements, served as published. Among them is the
+ * battery name beside each leaf hash: the root fixes each hash and its position, not the name it is listed
+ * under. An entry's file paths are fixed by that name (leaves/<R>.json and leaves/<R>.scenarios.json for
+ * battery R), and a leaf is served under R only when its own battery.resource is R.
  */
-export const INDEX_NOT_COVERED = ["exclusions", "showcase", "plan_unix"] as const;
+export const INDEX_NOT_COVERED = ["exclusions", "showcase", "plan_unix", "leaves[].resource"] as const;
 
 export interface Parsed {
   object: StoredObject;
