@@ -45,7 +45,7 @@ export function labelItems(space, d, project, skip = new Set()) {
     const p = project(at); if (!p) continue;
     const pod = POD_IDS.includes(id);
     const lg = LOGO_OF[id];
-    out.push({ id, x: p.x, y: p.y, plain: lab.plain, name: lab.name, logo: lg?.logo, caption: lg?.caption, align: ALIGN[id] ?? 'below',
+    out.push({ id, x: p.x, y: p.y, plain: lab.plain, name: lab.name, logo: lg?.logo, caption: lg?.caption, lead: lg?.lead, align: ALIGN[id] ?? 'below',
       cls: [pod ? 'stk-pod' : '', ghost(id) ? 'stk-ghost' : ''].filter(Boolean).join(' ') });
   }
   return out;

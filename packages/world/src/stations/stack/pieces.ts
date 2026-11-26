@@ -39,12 +39,13 @@ export const POD_IDS = ['forecaster', 'state', 'market', 'hedger', 'risk', 'plan
  *  over the piece. caption: words beside the logo, for a piece of ours or a product that wears its owner's logo. The
  *  Terminal, the verifier, the arena and the pods keep their words; ERCOT keeps its name (the market, which the
  *  registry has no file for). */
-export const LOGO_OF: Partial<Record<PieceId, { logo: string | string[]; caption?: string }>> = {
+export const LOGO_OF: Partial<Record<PieceId, { logo: string | string[]; caption?: string; lead?: string }>> = {
   cournot: { logo: ['cournot', 'kalshi'] },
   // ElectronX's logo is its name over a large X, in white: at a label's size the X reads and the word does not
   electronx: { logo: 'electronx', caption: 'ElectronX' },
   studio: { logo: 'agentstudio' },
-  aws: { logo: 'aws' },
+  // lead: words before the chip, so the label reads on as one sentence
+  aws: { logo: 'aws', caption: 'AgentCore', lead: 'which runs them on' },
   brain: { logo: 'livingbrain' },
   gate: { logo: 'bnbchain' },
   greenfield: { logo: 'greenfield' },
@@ -63,7 +64,8 @@ export function labels(d) {
     cournot: { plain: 'Weather odds', name: 'Cournot · Kalshi markets' },
     electronx: { plain: 'Hedge terms', name: 'ElectronX' },
     studio: { plain: 'Identities and paid jobs', name: 'BNB Agent Studio' },
-    aws: { plain: 'Hosted agents', name: 'Amazon Bedrock AgentCore' },
+    // they run on AWS through BNB Agent Studio's managed hosting, not on an AWS account of ours
+    aws: { plain: 'Hosted through BNB Agent Studio', name: 'which runs them on AWS AgentCore' },
     forecaster: { plain: 'Forecaster' }, state: { plain: 'State keeper' }, market: { plain: 'Market reader' },
     hedger: { plain: 'Hedger' }, risk: { plain: 'Risk officer' }, planner: { plain: 'Planner' },
     brain: { plain: 'Memory', name: 'Living Brain' },
@@ -227,7 +229,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     aws: make('aws', {
-      caps: 'Agent hosting · AWS', name: 'Amazon Bedrock AgentCore',
+      caps: 'Agent hosting · AWS, through BNB Agent Studio', name: 'Amazon Bedrock AgentCore',
       role: `${H.hosted || HF.hosted ? 'Runs' : 'Ran'} two agents that BNB Agent Studio's managed hosting deployed here, each selling its work as an ERC-8183 job: the evaluator, agent ${S.agent_id}, which checks a sealed record against GateRecord on BSC testnet, and the Forecaster, agent ${hf.agent_id}, which delivers a battery's sealed price scenarios.`,
       rows: [
         // after the trial the runtimes and their cards are gone: the cards' links would 404, so the rows keep the span

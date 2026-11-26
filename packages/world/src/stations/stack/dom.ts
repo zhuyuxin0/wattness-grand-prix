@@ -21,8 +21,8 @@ const CSS = `
 .stk-labels { position: absolute; inset: 0; pointer-events: none; z-index: 21; }
 .stk-lab { position: absolute; left: 0; top: 0; white-space: nowrap; display: flex; flex-direction: column; gap: 1px; font: 500 14px/17px var(--w-font-sans, system-ui, sans-serif);
   color: #dfe3e7; text-shadow: 0 0 2px #101315, 0 0 4px #101315, 0 0 7px #101315; transition: opacity 0.2s ease; }
-/* the name line's words: never the chip's own spans, which keep its ink */
-.stk-lab > span { font-weight: 400; font-size: 12px; line-height: 14px; color: #98a1aa; }
+/* the name line's words (and the words before a chip): never the chip's own spans, which keep its ink */
+.stk-lab > span, .stk-lab .stk-lead > span { font-weight: 400; font-size: 12px; line-height: 14px; color: #98a1aa; }
 .stk-lab[data-align="right"], .stk-lab[data-align="inside"] { align-items: flex-start; }
 .stk-lab[data-align="left"] { align-items: flex-end; text-align: right; }
 .stk-lab[data-align="below"], .stk-lab[data-align="above"] { align-items: center; text-align: center; }
@@ -33,6 +33,8 @@ const CSS = `
    takes the pointer the labels' layer lets through; the label's glow is for words on the stage, not on the white glass */
 .stk-lab .lg-chip { --lg-h: 13px; margin-top: 4px; text-shadow: none; transition: opacity 0.2s ease, translate 0.12s ease-out, box-shadow 0.12s ease-out; }
 .stk-lab.stk-dim .lg-chip { opacity: 0.6; }
+.stk-lab .stk-lead { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.stk-lab .stk-lead .lg-chip { margin-top: 0; }
 /* on a phone's stage the labels would sit on each other: the owners' chips go in one row of their own, wrapped */
 .stk-strip { position: absolute; left: 16px; right: 16px; top: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; z-index: 21; pointer-events: none; }
 .stk-strip .lg-chip { --lg-h: 11px; }
@@ -42,7 +44,7 @@ const CSS = `
 /* while another piece is open its neighbours step back in color, not opacity, so they still read at 4.5:1 or more on
    the stage (#8f979f on #101315 is about 6:1; #7d858d about 4.9:1) */
 .stk-lab.stk-dim { color: #8f979f; }
-.stk-lab.stk-dim > span { color: #7d858d; }
+.stk-lab.stk-dim > span, .stk-lab.stk-dim .stk-lead > span { color: #7d858d; }
 /* a narrow stage (a phone): at that scale the labels would sit on each other, so a tap's card names each piece */
 .stk-root.is-narrow .stk-lab, .stk-root.is-narrow .intro-tick.stk-after { display: none; }
 .stk-root.is-narrow .stk-card .stk-mono { white-space: normal; overflow-wrap: anywhere; }
@@ -87,7 +89,7 @@ const CSS = `
 .stk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 /* the light cut */
 [data-stk-theme="light"] .stk-lab { color: #1f2429; text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 7px #fff; }
-[data-stk-theme="light"] .stk-lab > span { color: #59606a; }
+[data-stk-theme="light"] .stk-lab > span, [data-stk-theme="light"] .stk-lab .stk-lead > span { color: #59606a; }
 [data-stk-theme="light"] .stk-lab.stk-dim { color: #59606a; }
 [data-stk-theme="light"] .stk-lab.stk-dim > span { color: #5f666f; }
 [data-stk-theme="light"] .stk-lab.stk-pod { color: #1a1a1a; }
@@ -150,7 +152,12 @@ export function labelLayer(host) {
         if (!el) {
           el = document.createElement('div'); el.className = `stk-lab${it.cls ? ` ${it.cls}` : ''}`; el.dataset.piece = it.id; el.dataset.align = it.align ?? 'below';
           const b = document.createElement('b'); b.style.fontWeight = 'inherit'; b.textContent = it.plain; el.appendChild(b);
-          if (it.logo) { el.classList.add('has-logo'); el.appendChild(logoChip(it.logo, { caption: it.caption })); }
+          if (it.logo && it.lead) {
+            // words, then the chip, on one line (the AgentCore piece: "which runs them on" its owner's chip)
+            const row = document.createElement('div'); row.className = 'stk-lead';
+            const w = document.createElement('span'); w.textContent = it.lead;
+            row.append(w, logoChip(it.logo, { caption: it.caption })); el.classList.add('has-logo'); el.appendChild(row);
+          } else if (it.logo) { el.classList.add('has-logo'); el.appendChild(logoChip(it.logo, { caption: it.caption })); }
           else if (it.name) { const s = document.createElement('span'); s.textContent = it.name; el.appendChild(s); }
           box.appendChild(el); els.set(it.id, el);
         }
