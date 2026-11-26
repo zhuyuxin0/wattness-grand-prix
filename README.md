@@ -58,7 +58,7 @@ pnpm plan --od YYYY-MM-DD --network local
 pnpm verify out/local/od-YYYYMMDD/manifest.json --no-chain
 ```
 
-A second implementation of the leaf hash, in Python's standard library. It prints the leaf the index lists for Desert Willow, then MATCH:
+A second implementation of the leaf hash, in Python's standard library. It prints Desert Willow's leaf as the index lists it, the same value again as a one-leaf root, then MATCH:
 
 ```sh
 python3 -I tools/verify_hash.py fixtures/od-20261126/leaves/DSWL_ESS_ESR1.json --expect 0x067e4a612ccfd5976b66d561a40bd26256590c57eab24763fd5f9f48b76db2b1
