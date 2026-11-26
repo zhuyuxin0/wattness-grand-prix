@@ -2,7 +2,7 @@ import type { RefObject } from "react";
 import { Glyph } from "../ui/Glyph";
 import { ThemeToggle } from "../ui/ThemeToggle";
 import { Brand } from "./Brand";
-import { GateTag, MarketClock, useSecondClock } from "./MarketClock";
+import { MarketClock, useSecondClock } from "./MarketClock";
 import { groupOf, type PanelTab } from "./tabs";
 
 interface MastheadProps {
@@ -13,22 +13,21 @@ interface MastheadProps {
 }
 
 /**
- * wattness.tech's masthead: the lockup and the product name at the left; the
- * market clock, the gate and the theme toggle at the right. On a phone a second
- * band names the page and opens the tab list as a drawer.
+ * wattness.tech's masthead: the lockup and the product name at the left, the market clock after them, the theme toggle
+ * at the right. The clock stays on every tab, as wattness.tech's permanent row keeps it. On a phone a second band
+ * names the page, opens the tab list as a drawer, and keeps the phase and the DAM deadline.
  */
 export function Masthead({ tab, menuOpen, onMenu, menuRef }: MastheadProps) {
   const now = useSecondClock();
   const group = tab ? groupOf(tab) : null;
-  // The Overview leads with this same countdown; a second one in the masthead would only repeat it.
-  const gate = tab?.id !== "overview";
   return (
     <header className="masthead">
       <div className="masthead__row">
         <Brand />
-        <div className="masthead__end">
+        <div className="masthead__clock">
           <MarketClock now={now} />
-          {gate && <GateTag now={now} />}
+        </div>
+        <div className="masthead__end">
           <ThemeToggle />
         </div>
       </div>
@@ -47,7 +46,9 @@ export function Masthead({ tab, menuOpen, onMenu, menuRef }: MastheadProps) {
           <span className="page-menu__label">{tab?.label ?? "Pages"}</span>
           <Glyph name="caret" />
         </button>
-        {gate && <GateTag now={now} compact />}
+        <div className="masthead__clock masthead__clock--band">
+          <MarketClock now={now} band />
+        </div>
       </div>
     </header>
   );

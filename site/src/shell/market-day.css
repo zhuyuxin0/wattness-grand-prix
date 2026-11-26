@@ -1,81 +1,498 @@
-/* The market day: the masthead's clock and gate open it. A popover under the control from 768px up, a sheet from the
-   foot of a phone. After wattness.tech's market clock (wattness-site apps/mms/src/skins/wattness.css, .mc-pop): the
-   raised plane, a hairline and the lift; one bar of the day's phases with now marked, the list of its moments, the two
-   deadlines.
-   Color follows what a battery desk can do in a phase, as on the Terminal: bids open (ok), clearing (ink), results
-   and DRUC (info), the Adjustment Period (violet). Teal stays for focus and selection; no caution amber. */
+/* The market clock and its day, as wattness.tech draws them: the masthead's items from wattness-site
+   apps/mms/src/skins/wattness.css (.mc-*) and console-layout.css (.masthead-clock), the popover's liquid glass from
+   ui/glass.css and ui/popover.css (.tlp-host.tlp-framed, .glass-bezel), value for value. Only the names change, to the
+   Grand Prix's tokens (src/styles/tokens.css); the two state colors its palette leaves out, caution and violet, are
+   wattness.tech's own values and are used by the clock alone.
+   Color follows what a battery desk can do in a phase: bids open (ok), closing (caution, the deadline's last hour), last
+   minutes (bad, its last 15), clearing (ink), results and DRUC (info), the Adjustment Period (violet). */
 
-/* ---------------------------------------------------------------- triggers */
+:root {
+  --mc-caution: #a05f00;
+  --mc-caution-bg: #fbf2df;
+  --mc-violet: #6b2fa0;
+  --mc-violet-bg: #f2e9f8;
 
-/* The clock keeps its place: the ground a press lands on reaches 6px past its text either side. */
-button.market-clock {
-  margin: 0 -6px;
-  padding: 3px 6px;
-  border: 0;
-  border-radius: var(--t-radius);
-  background: transparent;
-  cursor: pointer;
-  transition: background var(--m-dur-s) ease-out;
+  /* glass.css, "crystal" (wattness.tech's default look) */
+  --mc-glass-fill: color-mix(in srgb, var(--t-raised) 68%, transparent);
+  --mc-glass-surface: linear-gradient(
+      145deg,
+      color-mix(in srgb, white 12%, transparent),
+      transparent 48%,
+      color-mix(in srgb, var(--w-accent) 3%, transparent)
+    ),
+    var(--mc-glass-fill);
+  --mc-glass-blur: blur(6px) saturate(1.4);
+  --mc-glass-hairline: color-mix(in srgb, white 40%, transparent);
+  --mc-glass-graze: color-mix(in srgb, black 30%, transparent);
+  --mc-glass-rim: inset 0 1.5px 1px -0.5px rgb(255 255 255 / 0.96), inset 0 -1.5px 1px -0.5px rgb(0 0 0 / 0.34),
+    inset 0 0 4px -2px rgb(255 255 255 / 0.35), inset 0 0 0 1px rgb(255 255 255 / 0.16);
+  --mc-glass-lift: 0 3px 10px -7px rgb(0 0 0 / 0.4);
+  --mc-glass-depth: 0 12px 30px -14px rgb(0 0 0 / 0.38);
 }
-button.market-clock:hover,
-button.market-clock[aria-expanded="true"] {
-  background: var(--t-hover);
+:root[data-theme="dark"] {
+  --mc-caution: #e0a030;
+  --mc-caution-bg: #2c2410;
+  --mc-violet: #9f8cf5;
+  --mc-violet-bg: #211e36;
+
+  --mc-glass-fill: color-mix(in srgb, var(--t-raised) 78%, transparent);
+  --mc-glass-hairline: color-mix(in srgb, white 22%, transparent);
+  --mc-glass-graze: rgb(0 0 0 / 0.55);
+  --mc-glass-rim: inset 0 1.5px 1px -0.5px rgb(255 255 255 / 0.34), inset 0 -1.5px 1px -0.5px rgb(0 0 0 / 0.5),
+    inset 0 0 4px -2px rgb(255 255 255 / 0.14), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  --mc-glass-lift: 0 3px 10px -7px rgb(0 0 0 / 0.6);
+  --mc-glass-depth: 0 14px 32px -12px rgb(0 0 0 / 0.6);
 }
 
-/* Hover and open draw a ring in the tag's own color: a darker ground would take the ok pill's 11px words under 4.5:1
-   (4.80:1 at rest). */
-button.gate-tag {
-  border: 0;
-  cursor: pointer;
-  transition: box-shadow var(--m-dur-s) ease-out;
-}
-button.gate-tag .glyph-caret {
-  margin-left: -1px;
-}
-button.gate-tag:hover,
-button.gate-tag[aria-expanded="true"] {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 55%, transparent);
+/* ---------------------------------------------------------------- the masthead's clock */
+
+/* The clock's column: after the lockup, as wide as the row leaves it, and the container its items answer to. */
+.masthead__clock {
+  flex: 1 1 auto;
+  min-width: 0;
+  container: mc-row / inline-size;
 }
 
-/* ---------------------------------------------------------------- the panel */
-
-.gate-day {
-  /* The Terminal's violet state (wattness.tech's --s-violet), the Adjustment Period's alone here: its words
-     7.00:1 on their ground in light, 5.79:1 in dark. */
-  --gate-adjust: #6b2fa0;
-  --gate-adjust-bg: #f2e9f8;
-
-  display: flex;
-  flex-direction: column;
-  gap: var(--t-space-4);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  background: var(--t-raised);
+.mc {
+  position: relative;
+  display: grid;
+  grid-template-columns: 160px 240px 150px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  font: 11px/1.45 var(--w-font-sans);
+  font-variant-numeric: tabular-nums;
   color: var(--w-fg);
-  font-size: var(--t-fs-sm);
-  line-height: var(--t-lh);
-  text-align: left;
-  white-space: normal;
+  white-space: nowrap;
 }
-:root[data-theme="dark"] .gate-day {
-  --gate-adjust: #9f8cf5;
-  --gate-adjust-bg: #211e36;
+.mc-wall {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  white-space: nowrap;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.mc-wall b {
+  font-size: 13px;
+  font-weight: 600;
+}
+.mc-wall:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 3px;
+}
+.mc-mine {
+  color: var(--w-muted);
 }
 
-.gate-day--pop {
+/* A tag never runs into the column beside it: it shrinks to its column, and a part that still does not fit ends in an
+   ellipsis. Its title and the day's popover keep the whole of it. */
+.mc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-self: start;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  height: 24px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: normal;
+  text-align: left;
+  white-space: nowrap;
+}
+.mc-tag > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+button.mc-tag {
+  cursor: pointer;
+}
+.mc-for,
+.mc-in {
+  font-weight: 400;
+  opacity: 0.85;
+}
+.mc-open {
+  color: var(--s-ok);
+  background: var(--s-ok-bg);
+}
+.mc-near {
+  color: var(--mc-caution);
+  background: var(--mc-caution-bg);
+}
+.mc-urgent {
+  color: var(--s-bad);
+  background: var(--s-bad-bg);
+}
+.mc-clear {
+  color: var(--t-pane);
+  background: var(--w-fg);
+}
+.mc-post {
+  color: var(--s-info);
+  background: var(--s-info-bg);
+}
+.mc-adj {
+  color: var(--mc-violet);
+  background: var(--mc-violet-bg);
+}
+.mc-rt {
+  color: var(--w-fg);
+  background: var(--t-raised);
+  border-color: var(--w-border);
+}
+.mc-dead {
+  white-space: nowrap;
+}
+.mc-dead b {
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.mc-near-t b {
+  color: var(--mc-caution);
+}
+.mc-urgent-t b {
+  color: var(--s-bad);
+}
+.mc-dead-short {
+  display: none;
+}
+
+/* At smaller widths the clock keeps the wall time and the next DAM deadline, as wattness.tech's does at the same widths
+   of its column. A press on the wall time always opens every phase and deadline. */
+@container mc-row (max-width: 860px) {
+  .mc-rt .mc-for {
+    display: none;
+  }
+}
+@container mc-row (max-width: 650px) {
+  .mc {
+    grid-template-columns: 160px minmax(0, 1fr) 145px;
+  }
+  .mc-rt {
+    display: none;
+  }
+  .mc-tag .mc-for {
+    display: none;
+  }
+  /* One line, the phase and the time left, in a block box so that it ends in an ellipsis. */
+  .mc > button.mc-tag {
+    display: block;
+    text-overflow: ellipsis;
+  }
+}
+@container mc-row (max-width: 496px) {
+  .mc-tag .mc-in {
+    display: none;
+  }
+}
+@container mc-row (max-width: 514px) {
+  .mc-tag.mc-adj .mc-in {
+    display: none;
+  }
+}
+@container mc-row (max-width: 440px) {
+  .mc {
+    grid-template-columns: 160px minmax(0, 1fr);
+  }
+  .mc > button.mc-tag {
+    display: none;
+  }
+  .mc-dead {
+    justify-self: end;
+  }
+}
+@container mc-row (max-width: 340px) {
+  .mc-dead-label {
+    display: none;
+  }
+  .mc-dead-short {
+    display: inline;
+  }
+}
+@container mc-row (max-width: 270px) {
+  .mc {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mc-dead {
+    display: none;
+  }
+}
+
+/* The phone: the row's clock gives way, as wattness.tech's does on a narrow window, and the second band keeps the phase
+   and the deadline (wattness.tech's short "DAM") beside the page's name. The phase opens the sheet. */
+.masthead__clock--band {
+  display: none;
+}
+@media (max-width: 767px) {
+  .masthead__row > .masthead__clock {
+    display: none;
+  }
+  .masthead__clock--band {
+    display: flex;
+    justify-content: flex-end;
+    flex: 1 1 0;
+    container: mc-band / inline-size;
+  }
+}
+.mc--band {
+  display: flex;
+  justify-content: flex-end;
+  width: auto;
+}
+.mc--band > button.mc-tag {
+  display: block;
+  text-overflow: ellipsis;
+}
+.mc--band .mc-tag .mc-for,
+.mc--band .mc-dead-label {
+  display: none;
+}
+.mc--band .mc-dead-short {
+  display: inline;
+}
+.mc--band .mc-dead {
+  flex: none;
+}
+@container mc-band (max-width: 250px) {
+  .mc--band .mc-tag .mc-in {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- the popover: liquid glass */
+
+/* The frame: 8px of glass around the day, 14px corners. */
+.mc-host {
   position: fixed;
   z-index: 50;
   top: 0;
   left: 0;
-  width: min(640px, calc(100vw - 24px));
-  padding: 14px 16px 12px;
-  border: 1px solid var(--w-border);
-  border-radius: var(--t-radius-md);
-  box-shadow: var(--t-shadow-2);
-  animation: gate-day-in var(--m-dur-s) var(--m-ease-out);
+  padding: 8px;
+  border-radius: 14px;
+  color: var(--w-fg);
+  background: transparent;
+  /* Inside the glass, hover and selection are tints of what lies under them. */
+  --t-selected: color-mix(in srgb, var(--w-accent) 16%, transparent);
+  --t-hover: color-mix(in srgb, var(--w-fg) 7%, transparent);
+}
+.mc-bezel {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: var(--mc-glass-surface);
+  border: 1px solid var(--mc-glass-hairline);
+  -webkit-backdrop-filter: var(--mc-glass-blur);
+  backdrop-filter: var(--mc-glass-blur);
+  box-shadow: 0 0 0 1px var(--mc-glass-graze), var(--mc-glass-rim), var(--mc-glass-lift), var(--mc-glass-depth);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .mc-bezel {
+    background: var(--t-pane);
+  }
+}
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .mc-bezel {
+    background: var(--t-pane);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 1px solid var(--w-fg);
+    box-shadow: none;
+  }
+}
+@media (forced-colors: active) {
+  .mc-bezel {
+    background: Canvas;
+    border: 1px solid CanvasText;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
 }
 
-/* The phone's sheet, over a scrim like the tab drawer's. */
+/* The day itself, clear on the glass. */
+.mc-pop {
+  position: relative;
+  z-index: 1;
+  width: 640px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 12px 14px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mc-pop,
+.mc-sheet {
+  font: 11px/1.45 var(--w-font-sans);
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  white-space: normal;
+}
+.mc-pop-h {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* The day's stretches, and the red now line drawn over them, unbroken, through whichever name it meets. */
+.mc-strip {
+  position: relative;
+  flex: none;
+  height: 26px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--t-chrome);
+}
+.mc-seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  overflow: hidden;
+  border-right: 2px solid var(--t-raised);
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.mc-seg span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10.5px;
+}
+.mc-now {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--s-bad);
+}
+
+/* Every boundary's time, on two alternating rows, each with its own short rule up toward the strip. */
+.mc-ticks {
+  position: relative;
+  flex: none;
+  height: 28px;
+  font-size: 10px;
+  color: var(--w-muted);
+}
+.mc-ticks span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.mc-ticks span.mc-tick-low {
+  top: 14px;
+}
+.mc-ticks span:first-child {
+  transform: none;
+}
+.mc-ticks span:last-child {
+  transform: translateX(-100%);
+}
+.mc-ticks span::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 1px;
+  height: 3px;
+  background: var(--w-border);
+}
+.mc-ticks span.mc-tick-low::before {
+  top: -17px;
+  height: 17px;
+}
+.mc-ticks span:first-child::before {
+  left: 0;
+}
+.mc-ticks span:last-child::before {
+  left: auto;
+  right: 0;
+}
+
+/* The list is the legend: each row's swatch is its phase's strong color, an event a hollow ring. */
+.mc-list {
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.mc-list td {
+  padding: 3px 8px 3px 0;
+  vertical-align: top;
+  border-bottom: 1px solid var(--t-rule);
+}
+.mc-list .mc-at {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.mc-list .mc-src {
+  color: var(--w-muted);
+}
+.mc-list tr.mc-passed {
+  color: var(--w-muted);
+}
+.mc-list tr[title] {
+  cursor: help;
+}
+.mc-swatch {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 6px;
+  border-radius: 2px;
+  vertical-align: 0;
+  border: 1px solid transparent;
+}
+.mc-swatch.mc-event {
+  background: none;
+  border-color: var(--w-muted);
+  border-radius: 50%;
+}
+.mc-swatch:not(.mc-event) {
+  background: currentColor;
+}
+.mc-swatch.mc-clear {
+  background: var(--w-fg);
+}
+
+.mc-pop-deadlines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  white-space: normal;
+}
+.mc-foot {
+  color: var(--w-muted);
+  font-size: 10px;
+}
+
+/* ---------------------------------------------------------------- the phone's sheet */
+
+/* Over a scrim like the tab drawer's, from the foot of the screen. */
 .gate-sheet {
   position: fixed;
   inset: 0;
@@ -86,32 +503,27 @@ button.gate-tag[aria-expanded="true"] {
   inset: 0;
   background: rgba(10, 12, 14, 0.42);
 }
-.gate-day--sheet {
+.mc-sheet {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
   max-height: 88vh;
   max-height: 88dvh;
-  gap: var(--t-space-3);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 0 var(--gp-gutter) calc(var(--t-space-5) + env(safe-area-inset-bottom, 0px));
+  background: var(--t-raised);
+  color: var(--w-fg);
   border-top: 1px solid var(--w-border);
   border-radius: var(--t-radius-paper) var(--t-radius-paper) 0 0;
   box-shadow: var(--t-shadow-2);
-  animation: gate-sheet-in var(--m-dur-m) var(--m-ease-out);
+  animation: mc-sheet-in var(--m-dur-m) var(--m-ease-out);
 }
-
-@keyframes gate-day-in {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes gate-sheet-in {
+@keyframes mc-sheet-in {
   from {
     opacity: 0;
     transform: translateY(16px);
@@ -121,313 +533,44 @@ button.gate-tag[aria-expanded="true"] {
     transform: none;
   }
 }
-/* A recording draws the open panel, not its arrival. */
-:root[data-capture="1"] .gate-day {
+/* A recording draws the open sheet, not its arrival. */
+:root[data-capture="1"] .mc-sheet {
   animation: none;
 }
-
-/* ---------------------------------------------------------------- head and now */
-
-.gate-day__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--t-space-4);
-}
-/* On the sheet the head stays in view while the list scrolls under it. */
-.gate-day--sheet .gate-day__head {
+/* The head stays in view while the list scrolls under it. */
+.mc-sheet__head {
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: 10px 0 var(--t-space-1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--t-space-4);
+  padding: 10px 0 4px;
   background: var(--t-raised);
 }
-.gate-day__title {
-  padding-top: 3px;
-  font-family: var(--w-font-sans);
-  font-size: var(--t-fs);
-  font-weight: 600;
-  line-height: 1.35;
-}
-.gate-day__zone {
-  font-weight: 400;
-  color: var(--w-muted);
-}
-.btn.gate-day__close {
+.btn.mc-sheet__close {
   flex: none;
   width: 28px;
   height: 24px;
   margin-right: -4px;
   padding: 0;
 }
-
-.gate-day__now {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--t-space-1) var(--t-space-3);
+/* On the sheet each row keeps its time, state and moment on one line, its reference under them. */
+.mc-sheet .mc-list,
+.mc-sheet .mc-list tbody {
+  display: block;
 }
-.gate-day__now-at {
-  font-weight: 600;
-  white-space: nowrap;
-}
-.gate-day__muted {
-  font-weight: 400;
-  color: var(--w-muted);
-}
-.gate-day__phase {
-  display: inline-flex;
-  align-items: center;
-  height: 22px;
-  padding: 0 8px;
-  border-radius: var(--t-radius);
-  font-size: var(--t-fs-xs);
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* ---------------------------------------------------------------- tones */
-
-.gate-day__tone--open {
-  color: var(--s-ok);
-  background: var(--s-ok-bg);
-}
-.gate-day__tone--clear {
-  color: var(--t-pane);
-  background: var(--w-fg);
-}
-.gate-day__tone--post {
-  color: var(--s-info);
-  background: var(--s-info-bg);
-}
-.gate-day__tone--adjust {
-  color: var(--gate-adjust);
-  background: var(--gate-adjust-bg);
-}
-
-/* ---------------------------------------------------------------- the bar */
-
-.gate-day__bar {
+.mc-sheet .mc-list tr {
   display: grid;
-  gap: 3px;
-}
-/* The now line sits in the strip's shape, clipped at its rounded ends, as wattness.tech's sits in its strip. */
-.gate-day__track {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--t-radius);
-}
-.gate-day__strip {
-  position: relative;
-  height: 26px;
-  overflow: hidden;
-  border-radius: var(--t-radius);
-  background: var(--t-chrome);
-}
-.gate-day__seg {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  /* With the label's own 3px, its words stand 6px in from the stretch's edge. */
-  padding: 0 3px;
-  border-right: 2px solid var(--t-raised);
-  font-size: var(--t-fs-2xs);
-  font-weight: 600;
-}
-.gate-day__seg:last-child {
-  border-right: 0;
-}
-/* A label lies over the now line on its stretch's own ground, 3px wider than its words either side: the line stops at
-   the word, shows above and below it, and never cuts it. */
-.gate-day__seg-label {
-  position: relative;
-  z-index: 1;
-  min-width: 0;
-  padding: 0 3px;
-  overflow: hidden;
-  white-space: nowrap;
-  background: inherit;
-}
-/* Now: wattness.tech's red line (its .mc-now), the strip's full height and inside it. */
-.gate-day__marker {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  margin-left: -1px;
-  background: var(--s-bad);
-}
-
-/* Every boundary's time, on two alternating rows so 13:30 and 14:30 never print over each other. */
-.gate-day__ticks {
-  position: relative;
-  height: 27px;
-  font-size: var(--t-fs-2xs);
-  line-height: 12px;
-  color: var(--w-muted);
-}
-.gate-day__ticks span {
-  position: absolute;
-  top: 2px;
-  transform: translateX(-50%);
-  white-space: nowrap;
-}
-.gate-day__ticks span.gate-day__tick--low {
-  top: 15px;
-}
-.gate-day__ticks span:first-child {
-  transform: none;
-}
-.gate-day__ticks span:last-child {
-  transform: translateX(-100%);
-}
-.gate-day__ticks span::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: -5px;
-  width: 1px;
-  height: 5px;
-  background: var(--w-border);
-}
-.gate-day__ticks span.gate-day__tick--low::before {
-  top: -18px;
-  height: 18px;
-}
-.gate-day__ticks span:first-child::before {
-  left: 0;
-}
-.gate-day__ticks span:last-child::before {
-  left: auto;
-  right: 0;
-}
-
-/* ---------------------------------------------------------------- the list */
-
-.gate-day__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--t-rule);
-  font-size: var(--t-fs-xs);
-}
-.gate-day__moment {
-  display: grid;
-  grid-template-columns: 52px 72px 44px minmax(0, 1fr) minmax(0, 150px);
-  column-gap: var(--t-space-3);
-  align-items: baseline;
-  padding: 4px 0;
+  grid-template-columns: 52px 44px minmax(0, 1fr);
+  padding: 3px 0;
   border-bottom: 1px solid var(--t-rule);
 }
-/* A reader on Central time has no second clock to show. */
-.gate-day__list--ct .gate-day__moment {
-  grid-template-columns: 52px 44px minmax(0, 1fr) minmax(0, 150px);
+.mc-sheet .mc-list td {
+  padding: 0 8px 0 0;
+  border-bottom: 0;
 }
-.gate-day__list--ct .gate-day__yours {
-  display: none;
-}
-.gate-day__what {
-  display: contents;
-}
-.gate-day__at {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.gate-day__swatch {
-  flex: none;
-  align-self: center;
-  width: 9px;
-  height: 9px;
-  border-radius: 2px;
-}
-.gate-day__swatch.gate-day__tone--open {
-  background: var(--s-ok);
-}
-.gate-day__swatch.gate-day__tone--clear {
-  background: var(--w-fg);
-}
-.gate-day__swatch.gate-day__tone--post {
-  background: var(--s-info);
-}
-.gate-day__swatch.gate-day__tone--adjust {
-  background: var(--gate-adjust);
-}
-.gate-day__swatch--event {
-  border: 1px solid var(--w-muted);
-  border-radius: 50%;
-}
-.gate-day__yours,
-.gate-day__state,
-.gate-day__cite {
-  color: var(--w-muted);
-}
-.gate-day__yours {
-  white-space: nowrap;
-}
-.gate-day__label em {
-  color: var(--w-muted);
-}
-/* Moments to come read in ink, moments passed step back, the phase that runs now stands out. */
-.gate-day__moment--passed {
-  color: var(--w-muted);
-}
-.gate-day__moment--now .gate-day__state,
-.gate-day__moment--now .gate-day__label {
-  color: var(--w-fg);
-  font-weight: 600;
-}
-@media (hover: hover) {
-  .gate-day__moment[title],
-  .gate-day__deadlines p[title] {
-    cursor: help;
-  }
-}
-
-/* On the sheet: the times and the state on one line, the moment and its reference under them. */
-.gate-day--sheet .gate-day__moment {
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  row-gap: 1px;
-  padding: 4px 0;
-}
-.gate-day--sheet .gate-day__state {
-  justify-self: end;
-}
-.gate-day--sheet .gate-day__what {
-  display: block;
-  grid-column: 1 / -1;
-  padding-left: 15px;
-}
-.gate-day--sheet .gate-day__cite::before {
-  content: "· ";
-}
-
-/* ---------------------------------------------------------------- deadlines and the citation */
-
-.gate-day__deadlines {
-  display: grid;
-  gap: var(--t-space-1);
-  font-size: var(--t-fs-xs);
-}
-.gate-day__deadlines b {
-  font-weight: 600;
-}
-/* A time left keeps together on one line: "< 1 min left" never breaks after its sign. */
-.gate-day__left {
-  white-space: nowrap;
-}
-.gate-day__late {
-  color: var(--s-bad);
-}
-.gate-day__foot {
-  padding-top: var(--t-space-3);
-  border-top: 1px solid var(--t-rule);
-  font-size: var(--t-fs-2xs);
-  line-height: 1.5;
-  color: var(--w-muted);
+.mc-sheet .mc-list .mc-src {
+  grid-column: 3;
 }
