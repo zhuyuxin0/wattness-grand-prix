@@ -7,15 +7,20 @@ import { addressUrl, useTestnet, type Live } from "../../lib/testnet";
 import { Glyph, Hash, Loading, PageHeader, Section } from "../../ui";
 import { LiveRead } from "../../ui/LiveRead";
 import { readSeason, type RoundView, type SeasonRead } from "./chain";
-import { WorkedExample } from "./Example";
+import { AppPane } from "./AppPane";
+import { CheckIt } from "./CheckIt";
 import { LaunchedRound, RoundThree } from "./Rounds";
+import { SCOPE, SEASON } from "./addresses";
 import { FLAP_FEE_BPS, ROUND3_TERMS, TAX_DAYS, termsOf } from "./terms";
 import { bpsText, odDay, usd } from "./view";
 import "./styles.css";
 
-// Season: the Flap season from modules/flap. How a season works, round 1 (the
-// first launched round) and round 3 read live from BSC testnet, how round 3 works (its terms,
-// each once), and a worked example computed from round 3's own configuration.
+// Season: the Flap season from modules/flap. First the launch App itself, the
+// Wattness Season Mini App that Flap's host runs (release 7, its build in
+// public/apps/wattness-season/), framed in guest mode on BSC testnet: round 3
+// live, its replay, and Alice, Bob and Carol played out. Then the new way to
+// launch in four steps, the season's terms, and round 1 and round 3 read live.
+// Each section's hashes and addresses sit in one Check it, one click away.
 
 const SOURCE = (
   <>
@@ -91,8 +96,7 @@ function RoundRules({ round }: { round?: RoundView }) {
   return (
     <ul className="season-disclose">
       <li>
-        <strong>Whether it launches rests on Wattness.</strong> The round can launch only once Wattness's committer wallet{" "}
-        <Hash value={t.committer} head={4} tail={4} href={addressUrl(t.committer)} copy={false} label="committer address" /> has sealed its record for {day} in GateRecord
+        <strong>Whether it launches rests on Wattness.</strong> The round can launch only once Wattness's committer wallet has sealed its record for {day} in GateRecord
         before that day's gate, and the raise has reached its minimum. If the round has not launched by its deadline, every deposit can be claimed back in full; there is no
         withdrawal before then.
       </li>
@@ -103,7 +107,7 @@ function RoundRules({ round }: { round?: RoundView }) {
       <li>
         <strong>Caps.</strong> Up to {testUsd(t.walletCap)} a wallet and {testUsd(t.raiseCap)} for the round, from at most{" "}
         <span className="num">{formatInt(t.maxContributors)}</span> wallets. The vault takes at most {testUsd(t.rewardCap)} of the trading tax; tax above that goes to the
-        round's creator, Wattness's testnet wallet <Hash value={t.creator} head={4} tail={4} href={addressUrl(t.creator)} copy={false} label="creator address" />.
+        round's creator, Wattness's testnet wallet.
       </li>
       <li>
         <strong>
@@ -127,9 +131,37 @@ function RoundRules({ round }: { round?: RoundView }) {
         processor, is an upgradeable proxy.
       </li>
       <li>
-        <strong>Testnet tokens only.</strong> Test USD and PRIX live on BSC testnet.
+        <strong>Testnet tokens only.</strong> Test USD and PRIX (testnet) live on BSC testnet.
       </li>
     </ul>
+  );
+}
+
+/** The terms' wallets and contracts, folded. */
+function TermsCheck({ round }: { round?: RoundView }) {
+  const t = round ? termsOf(round) : ROUND3_TERMS;
+  const rows: { what: string; value: string; href?: string }[] = [
+    { what: "Committer, Wattness's record wallet", value: t.committer, href: addressUrl(t.committer) },
+    { what: "Creator, Wattness's testnet wallet", value: t.creator, href: addressUrl(t.creator) },
+    { what: "Round 3's Launcher", value: SEASON.round3.launcher, href: addressUrl(SEASON.round3.launcher) },
+    { what: "GateRecord", value: SEASON.gateRecord, href: addressUrl(SEASON.gateRecord) },
+    { what: `Scope, ${SCOPE.label}`, value: SCOPE.id },
+    { what: "Test USD", value: SEASON.quoteToken, href: addressUrl(SEASON.quoteToken) },
+    { what: "Season launcher factory", value: SEASON.launcherFactory, href: addressUrl(SEASON.launcherFactory) },
+    { what: "Season vault factory", value: SEASON.vaultFactory, href: addressUrl(SEASON.vaultFactory) },
+    { what: "Flap's Portal", value: SEASON.portal, href: addressUrl(SEASON.portal) },
+  ];
+  return (
+    <CheckIt what="the wallets and contracts these terms name">
+      <ul className="season-check__list">
+        {rows.map((r) => (
+          <li key={r.what}>
+            <span className="season-check__what">{r.what}</span>
+            <Hash value={r.value} href={r.href ?? null} label={r.what} />
+          </li>
+        ))}
+      </ul>
+    </CheckIt>
   );
 }
 
@@ -175,11 +207,60 @@ export default function SeasonPage() {
     <div className="page page--season">
       <PageHeader
         title="Season"
-        lede="A season token on Flap's Pool Launch, on BSC testnet. A round launches PRIX only once the Wattness agent's plan for a named day is sealed in GateRecord before that day's gate, and its vault pays contributors for the season days their agent sealed in time."
+        lede="A new way to launch on Flap: the token launches only once a real-world proof is on chain, the Wattness agent's plan for a day of ERCOT batteries sealed in GateRecord before the market's 10:00 CT gate. Below, the launch App itself, live on BSC testnet: round 3 as a race, its replay, and Alice, Bob and Carol played out."
       />
 
-      <Section id="season-how" title="How a Season Works" source={<>What the contracts do, in four steps. {CONTRACTS}</>}>
+      <Section
+        id="season-app"
+        source={
+          <>
+            The App reads round 3's Launcher, GateRecord, the pool and the vault in your browser from BSC testnet; the replays' transactions are on testnet.bscscan.com, and
+            Alice, Bob and Carol's amounts follow the contracts' rules. {CONTRACTS}
+          </>
+        }
+      >
+        <AppPane />
+      </Section>
+
+      <Section
+        id="season-how"
+        title="A New Way to Launch"
+        lede="A launch on Flap usually waits only for money. A season round also waits for proof of work done in the physical world, read on chain, and pays its backers by the days that proof arrives on time."
+        source={<>What the contracts do, in four steps. {CONTRACTS}</>}
+      >
         <Steps />
+      </Section>
+
+      <Section
+        id="season-rules"
+        title="The Season's Terms"
+        variant="panel"
+        source={
+          <>
+            Round 3's terms as its Launcher holds them on BSC testnet; round 1 runs the same code with the same caps. Flap's fee as round 1's tax processor
+            holds it. {CONTRACTS}
+          </>
+        }
+      >
+        <div className="season-stack">
+          <RoundRules round={s?.round3} />
+          <TermsCheck round={s?.round3} />
+        </div>
+      </Section>
+
+      <Section id="season-round-3" title="Round 3" lede={roundThreeLede(s)} source={SOURCE}>
+        {s ? (
+          <div className="season-stack">
+            <Stamp live={live} first />
+            {s.round3.status === "launched" ? (
+              <LaunchedRound round={s.round3} symbol={s.quoteSymbol} now={now} />
+            ) : (
+              <RoundThree round={s.round3} symbol={s.quoteSymbol} now={now} />
+            )}
+          </div>
+        ) : (
+          <Pending live={live} first />
+        )}
       </Section>
 
       <Section
@@ -190,50 +271,12 @@ export default function SeasonPage() {
       >
         {s ? (
           <div className="season-stack">
-            <Stamp live={live} first />
-            <LaunchedRound round={s.launched} txs={s.launchedTxs} symbol={s.quoteSymbol} now={now} />
-          </div>
-        ) : (
-          <Pending live={live} first />
-        )}
-      </Section>
-
-      <Section id="season-round-3" title="Round 3" lede={roundThreeLede(s)} source={SOURCE}>
-        {s ? (
-          <div className="season-stack">
             <Stamp live={live} />
-            {s.round3.status === "launched" ? (
-              <LaunchedRound round={s.round3} symbol={s.quoteSymbol} now={now} />
-            ) : (
-              <RoundThree round={s.round3} symbol={s.quoteSymbol} now={now} />
-            )}
+            <LaunchedRound round={s.launched} txs={s.launchedTxs} symbol={s.quoteSymbol} now={now} />
           </div>
         ) : (
           <Pending live={live} />
         )}
-      </Section>
-
-      <Section
-        id="season-rules"
-        title="How This Round Works"
-        variant="panel"
-        source={
-          <>
-            Round 3's terms as its Launcher holds them on BSC testnet; round 1 runs the same code with the same caps. Flap's fee as round 1's tax processor
-            holds it. {CONTRACTS}
-          </>
-        }
-      >
-        <RoundRules round={s?.round3} />
-      </Section>
-
-      <Section
-        id="season-example"
-        title="A Worked Example"
-        lede="Three contributors in round 3. The figures follow from the round's configuration as read above, with the contracts' own arithmetic."
-        source={<>Computed in your browser from round 3's configuration: its cap, the pool and reserve halves, the earned share, the tax cap and the season days. {SOURCE}</>}
-      >
-        {s ? <WorkedExample round={s.round3} symbol={s.quoteSymbol} /> : <Pending live={live} />}
       </Section>
     </div>
   );

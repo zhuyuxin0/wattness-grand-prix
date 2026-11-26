@@ -467,3 +467,176 @@
   font-size: var(--t-fs-sm);
   line-height: var(--t-lh-prose);
 }
+
+/* ---------------------------------------------------------------- the App */
+
+/* The Wattness Season Mini App, release 7, framed as it runs on Flap: its own
+   dark plate in both themes (the App is dark-only, as Flap's host is), a bar
+   with Flap's chip and the way to the host, and the App's static build in
+   /apps/wattness-season/ below it. The frame takes the App's height from the
+   App itself (a message from the same origin), so the page scrolls once. */
+.season-app {
+  border-radius: var(--t-radius-lg, 14px);
+  overflow: hidden;
+  background: #070808;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 18px 48px -24px rgba(0, 0, 0, 0.55);
+}
+:root[data-theme="light"] .season-app {
+  box-shadow:
+    0 0 0 1px rgba(16, 19, 21, 0.18),
+    0 18px 48px -26px rgba(16, 19, 21, 0.45);
+}
+.season-app__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 14px;
+  background: #101315;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e6e8ea;
+}
+.season-app__title {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  min-width: 0;
+  font-weight: 650;
+  font-size: var(--t-fs-sm);
+}
+.season-app__title .season-app__release {
+  color: #969ca3;
+  font-weight: 500;
+}
+.season-app__mode {
+  color: #969ca3;
+  font-size: 12px;
+}
+.season-app__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: #d0ff00;
+  color: #101315;
+  font-size: var(--t-fs-sm);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.season-app__open:hover {
+  background: #e2ff5c;
+}
+.season-app__open:focus-visible {
+  outline: 2px solid #d0ff00;
+  outline-offset: 2px;
+}
+.season-app__frame {
+  display: block;
+  width: 100%;
+  height: 1500px;
+  border: 0;
+  background: #070808;
+  color-scheme: dark;
+}
+@media (max-width: 639px) {
+  .season-app {
+    margin-inline: calc(-1 * var(--t-space-2, 8px));
+    border-radius: var(--t-radius-md, 10px);
+  }
+  .season-app__bar {
+    padding: 8px 10px;
+  }
+  .season-app__open {
+    margin-left: 0;
+  }
+  .season-app__frame {
+    height: 2600px;
+  }
+}
+.season-app__note {
+  margin: var(--t-space-3, 12px) 0 0;
+  color: var(--w-muted);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+
+/* ------------------------------------------------------------- the new way */
+
+.season-new {
+  display: grid;
+  gap: var(--t-space-4, 16px);
+}
+.season-new__lead {
+  margin: 0;
+  max-width: 68ch;
+  font-size: var(--t-fs-md, 15px);
+  line-height: var(--t-lh-prose);
+}
+
+/* ---------------------------------------------------------------- Check it */
+
+/* Each section's hashes and addresses, one click away: ONE PLAN's folded panel. */
+.season-check {
+  display: block;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+}
+.season-check__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--t-space-4);
+  min-height: 40px;
+  padding: var(--t-space-2) var(--t-space-4);
+  list-style: none;
+  cursor: pointer;
+  font-size: var(--t-fs-sm);
+}
+.season-check__summary::-webkit-details-marker {
+  display: none;
+}
+.season-check__summary:hover {
+  background: var(--t-hover);
+}
+.season-check__caret {
+  flex: none;
+  color: var(--w-muted);
+  transition: transform var(--m-dur-s) ease-out;
+}
+.season-check[open] .season-check__caret {
+  transform: rotate(180deg);
+}
+.season-check[open] .season-check__summary {
+  border-bottom: 1px solid var(--t-rule);
+}
+.season-check__body {
+  display: grid;
+  gap: var(--t-space-4);
+  padding: var(--t-space-4);
+  min-width: 0;
+}
+.season-check__list {
+  display: grid;
+  gap: var(--t-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.season-check__list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px var(--t-space-3);
+  min-width: 0;
+}
+.season-check__list .season-check__what {
+  color: var(--w-muted);
+  min-width: 11rem;
+}
