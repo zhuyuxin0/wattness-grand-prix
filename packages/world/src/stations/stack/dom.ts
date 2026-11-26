@@ -21,13 +21,14 @@ const CSS = `
 .stk-labels { position: absolute; inset: 0; pointer-events: none; z-index: 21; }
 .stk-lab { position: absolute; left: 0; top: 0; white-space: nowrap; display: flex; flex-direction: column; gap: 1px; font: 500 14px/17px var(--w-font-sans, system-ui, sans-serif);
   color: #dfe3e7; text-shadow: 0 0 2px #101315, 0 0 4px #101315, 0 0 7px #101315; transition: opacity 0.2s ease; }
-.stk-lab span { font-weight: 400; font-size: 12px; line-height: 14px; color: #98a1aa; }
+/* the name line's words: never the chip's own spans, which keep its ink */
+.stk-lab > span { font-weight: 400; font-size: 12px; line-height: 14px; color: #98a1aa; }
 .stk-lab[data-align="right"], .stk-lab[data-align="inside"] { align-items: flex-start; }
 .stk-lab[data-align="left"] { align-items: flex-end; text-align: right; }
 .stk-lab[data-align="below"], .stk-lab[data-align="above"] { align-items: center; text-align: center; }
 .stk-lab.stk-pod { font-size: 14.5px; color: #e6e9ec; }
 .stk-lab.stk-ghost { color: #8a929a; }
-.stk-lab.stk-ghost span { color: #6f777f; }
+.stk-lab.stk-ghost > span { color: #6f777f; }
 /* a sponsor piece's name line is its owner's logo chip (kit/logos/chip.css): a link to the owner in a new tab, so it
    takes the pointer the labels' layer lets through; the label's glow is for words on the stage, not on the white glass */
 .stk-lab .lg-chip { --lg-h: 13px; margin-top: 4px; text-shadow: none; transition: opacity 0.2s ease, translate 0.12s ease-out, box-shadow 0.12s ease-out; }
@@ -41,7 +42,7 @@ const CSS = `
 /* while another piece is open its neighbours step back in color, not opacity, so they still read at 4.5:1 or more on
    the stage (#8f979f on #101315 is about 6:1; #7d858d about 4.9:1) */
 .stk-lab.stk-dim { color: #8f979f; }
-.stk-lab.stk-dim span { color: #7d858d; }
+.stk-lab.stk-dim > span { color: #7d858d; }
 /* a narrow stage (a phone): at that scale the labels would sit on each other, so a tap's card names each piece */
 .stk-root.is-narrow .stk-lab, .stk-root.is-narrow .intro-tick.stk-after { display: none; }
 .stk-root.is-narrow .stk-card .stk-mono { white-space: normal; overflow-wrap: anywhere; }
@@ -86,9 +87,9 @@ const CSS = `
 .stk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 /* the light cut */
 [data-stk-theme="light"] .stk-lab { color: #1f2429; text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 7px #fff; }
-[data-stk-theme="light"] .stk-lab span { color: #59606a; }
+[data-stk-theme="light"] .stk-lab > span { color: #59606a; }
 [data-stk-theme="light"] .stk-lab.stk-dim { color: #59606a; }
-[data-stk-theme="light"] .stk-lab.stk-dim span { color: #5f666f; }
+[data-stk-theme="light"] .stk-lab.stk-dim > span { color: #5f666f; }
 [data-stk-theme="light"] .stk-lab.stk-pod { color: #1a1a1a; }
 [data-stk-theme="light"] .stk-lab.stk-ghost { color: #8b939c; }
 [data-stk-theme="light"] .intro-tick.stk-after { color: #4a515a; background: rgba(255, 255, 255, 0.92); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.16); }

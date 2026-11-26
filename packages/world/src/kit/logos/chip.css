@@ -53,6 +53,8 @@ a.lg-chip, .lg-chip a { cursor: pointer; }
 
 /* a product's words beside its owner's logo, after a hairline */
 .lg-cap {
+  /* the words keep a reading size on a small chip (a label's, a phone's row) */
+  font-size: max(10px, 1em);
   display: inline-flex;
   align-items: center;
   align-self: stretch;
