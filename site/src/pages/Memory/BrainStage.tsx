@@ -60,6 +60,10 @@ export function BrainStage({ build, settled }: Props) {
     const fail = (error: unknown) => {
       if (gone) return;
       console.warn("The brains could not start:", error);
+      // the stage steps aside below, so the mount and its WebGL context go now, not when the tab closes
+      h?.dispose();
+      h = null;
+      handle.current = null;
       setFailed(true);
     };
     import("@world/stations/brain/mount").then(({ mountBrain }) => {
