@@ -18,9 +18,9 @@ export function BuiltWith({ logos, label = "Built with", className }: { logos: r
       <span className="built-with__chips">
         {logos.map((e) =>
           "logo" in e ? (
-            <LogoChip key={key(e)} logo={e.logo} caption={e.caption} size={13} />
+            <LogoChip key={key(e)} logo={e.logo} caption={e.caption} size={16} />
           ) : (
-            <LogoChip key={key(e)} logo={Array.isArray(e) ? [...e] : (e as ChipLogo)} size={13} />
+            <LogoChip key={key(e)} logo={Array.isArray(e) ? [...e] : (e as ChipLogo)} size={16} />
           ),
         )}
       </span>
