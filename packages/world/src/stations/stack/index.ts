@@ -144,6 +144,9 @@ async function setup(ctx: FrameContext, kind: Kind, hoverId: string | null = nul
   const handle: FrameHandle = {
     time,
     steps: 30,
+    // the whole space at rest and the plan view: their comets run on at the rest, as on the Tech Stack tab; the seal's
+    // two views keep their designed moment
+    live: kind === 'rest' || kind === 'close',
     note: '',
     update(t) {
       stage.setCamera(pose);
