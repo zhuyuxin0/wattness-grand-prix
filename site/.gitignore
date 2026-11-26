@@ -5,3 +5,8 @@ dist/
 .vite/
 *.tsbuildinfo
 .build/
+# Scene captures: scripts/capture-scene.mjs writes <scene>-<t>.png stills and --mp4 videos where it runs
+grid-*.png
+brain-*.png
+*.mp4
+*.webm
