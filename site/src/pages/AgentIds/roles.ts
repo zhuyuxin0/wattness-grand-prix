@@ -64,7 +64,7 @@ export const FACES: Record<string, RoleFace> = {
     still: "agent-planner",
     alt: "The Planner's three boards in 3D: Desert Willow's Nov 26 plans A, B and C, the sealed plan C edged in BNB yellow",
     scope: "Desert Willow's Nov 26 plans",
-    does: "Solves each battery's charge and discharge by hour, scores three plans and seals the best under one root.",
+    does: "Solves each battery's charge and discharge by hour and seals the day's plans as one root; for Desert Willow it scores three plans and keeps the best.",
     glyph: "M2 3.75h9M2 8h9M2 12.25h5.25M9.25 12.25l1.75 1.75 3.25-3.5",
     color: { dark: "#F0B90B", light: "#b08405" },
   },
