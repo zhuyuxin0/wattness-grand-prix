@@ -1,7 +1,9 @@
 // The frame lab. lab.html?frame=<id>&w=1920&h=1080 [&theme=dark|light] [&dpr=2] [&station=<dir>] [&debug=0]
-// mounts the stage at that size, imports only the station that owns the frame, sets the frame up, poses it at the
-// frame's own time on a fixed-step clock, draws until the picture has settled, lays out its plates, then sets
-// window.__ready = true, or window.__error to the message. Without ?frame= it lists every station's frames.
+// [&plates=0] mounts the stage at that size, imports only the station that owns the frame, sets the frame up, poses
+// it at the frame's own time on a fixed-step clock, draws until the picture has settled, lays out its plates (unless
+// plates=0: the picture alone, without its caption, scope line, leaders or key, as the site's landing uses
+// chapter 01), then sets window.__ready = true, or window.__error to the message. Without ?frame= it lists every
+// station's frames.
 // Nothing here reads the wall clock for the picture; performance.now() only times the render for its receipt.
 import './lib/tokens.css';
 import './kit/css/glass.css';
@@ -24,6 +26,8 @@ export interface LabReport {
   steps: number;
   settle: number;
   skin: 'walk' | 'intro';
+  /** False for plates=0: the frame's decorate (caption, scope line, leaders, key) was not run. */
+  plates: boolean;
   note: string;
   gpu: string;
   /** Module start to ready, ms. */
@@ -45,6 +49,7 @@ const W = Math.round(num('w', 1920)), H = Math.round(num('h', 1080));
 const theme: Theme = q.get('theme') === 'light' ? 'light' : 'dark';
 const dpr = num('dpr', window.devicePixelRatio || 1);
 const debug = q.get('debug') !== '0';
+const withPlates = q.get('plates') !== '0';
 
 // Lazy on purpose: a station is imported only when one of its frames is asked for, so one station's error cannot
 // break another's frames.
@@ -166,13 +171,13 @@ async function main() {
   for (let i = 0; i < settle; i++) { stage.requestShadow(); stage.render(); await raf(); }
   stage.renderer.getContext().finish();
 
-  await handle.decorate?.();
+  if (withPlates) await handle.decorate?.();
   await Promise.all(waits);
   await document.fonts.ready;
   await raf(); await raf();
 
   window.__frame = {
-    id: frameId, station, width: W, height: H, dpr, theme, time, steps, settle, skin, note: handle.note,
+    id: frameId, station, width: W, height: H, dpr, theme, time, steps, settle, skin, plates: withPlates, note: handle.note,
     gpu: stage.gpu(), renderMs: Math.round(performance.now() - started), programs,
     frameInfo: JSON.parse(JSON.stringify(stage.frameInfo)), data: { frameData: frameData != null, layout: layout != null },
   };
