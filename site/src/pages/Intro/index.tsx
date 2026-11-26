@@ -10,6 +10,7 @@ import { CENTRAL_TZ } from "../../config";
 import { Glyph, Section } from "../../ui";
 import { TabIcon } from "../../ui/TabIcon";
 import { CHAPTERS, chapterHref, type Chapter } from "../../chapters/map";
+import { BuildMemory } from "./BuildMemory";
 import { Closing } from "./Closing";
 import { Hero } from "./Hero";
 import { STORY_MARK, STORY_PLAYABLE, markStory, warmStory, warmWhenIdle } from "./story";
@@ -287,6 +288,7 @@ export default function IntroPage() {
         </Section>
       </div>
 
+      <BuildMemory armed={stillIn} paused={story} />
       <Closing armed={stillIn} paused={story} caption={facts?.caption} onPlay={STORY_PLAYABLE ? openStory : undefined} onPlayIntent={warmStory} />
     </div>
   );
