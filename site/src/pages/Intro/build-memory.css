@@ -1,0 +1,75 @@
+/* The Intro's band on how the Grand Prix is built (BuildMemory.tsx): dark in either theme on the brains' own ground
+   (packages/world's brain mount.css draws its stage on #000102), so the stage has no edge inside it; the head in the
+   page's column, and the stage under it, full width on a phone. The still of the same stage holds the place until
+   the live one has drawn, then gives way to it. */
+
+.intro-brain {
+  border-top: 1px solid var(--w-border);
+  background: #000102;
+}
+.intro-brain__section {
+  width: 100%;
+  max-width: calc(var(--gp-max) + 2 * var(--gp-gutter));
+  padding: var(--gp-space-8) var(--gp-gutter);
+}
+/* One line beside the title's action wherever the column has the room. */
+.intro-brain__section .section__lede {
+  max-width: 124ch;
+}
+.intro-brain__open.btn {
+  height: 36px;
+  padding: 0 14px 0 16px;
+  font-size: var(--t-fs);
+  border-radius: var(--t-radius-paper);
+}
+
+.intro-brain__stage {
+  position: relative;
+  height: clamp(420px, 64vh, 680px);
+  overflow: hidden;
+  background: #000102;
+}
+.intro-brain__still,
+.intro-brain__space {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Whole and never past its own size, about where and how large the live stage draws the three brains. */
+.intro-brain__still {
+  display: block;
+  object-fit: scale-down;
+  transition: opacity var(--m-dur-l) var(--m-ease-out);
+}
+/* Until its first picture the live stage is neither seen nor reached (no pointer, no focus); then it fades in over
+   the still. */
+.intro-brain__space {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--m-dur-l) var(--m-ease-out), visibility 0s linear var(--m-dur-l);
+}
+.intro-brain__stage.is-live .intro-brain__space {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--m-dur-l) var(--m-ease-out), visibility 0s;
+}
+.intro-brain__stage.is-live .intro-brain__still {
+  opacity: 0;
+}
+/* While the introduction is open the stage hides inside its box, which keeps its height so nothing moves: out of
+   view the mount stops its loop, and it resumes where it was. */
+.intro-brain__stage[data-paused] > .intro-brain__space {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .intro-brain__section {
+    padding: var(--gp-space-7) var(--gp-gutter);
+  }
+  /* On a phone the stage takes the screen's width, about as tall as it is wide, as the Memory tab's does. */
+  .intro-brain__stage {
+    margin-inline: calc(-1 * var(--gp-gutter));
+    height: clamp(360px, 115vw, 70vh);
+  }
+}
