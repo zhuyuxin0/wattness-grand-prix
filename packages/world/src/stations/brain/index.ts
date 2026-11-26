@@ -36,7 +36,8 @@ export function lineFor(row: string): string {
     case 'LB7': {
       if (!SCENE_LB) return '';
       const hm = (s: string) => s.slice(0, 5);
-      return `Remember: at ${hm(SCENE_LB.compiled)} CT, Desert Willow's hedge review went into its brain. Retrieve: a fresh session's answer now cites that page. As of the plan's ${hm(SCENE_LB.cutoff)} CT cutoff, memory admitted ${SCENE_LB.admitted ? `${SCENE_LB.admitted} later ${SCENE_LB.admitted === 1 ? 'page' : 'pages'}` : 'nothing later'}.`;
+      // the cutoff check is a read run afterwards, as of the plan's cutoff: the plan itself read no memory
+      return `Remember: at ${hm(SCENE_LB.compiled)} CT, Desert Willow's hedge review went into its brain. Retrieve: a fresh session's answer now cites that page. A read as of the plan's ${hm(SCENE_LB.cutoff)} CT cutoff admits ${SCENE_LB.admitted ? `${SCENE_LB.admitted} ${SCENE_LB.admitted === 1 ? 'page' : 'pages'}` : 'nothing'}, and the plan read no memory.`;
     }
     default: return '';
   }
@@ -233,7 +234,7 @@ function words(t: number, clock: FilmClock, world: BrainWorld) {
       rows: [{ k: 'Retrieve' }, { s: `Before: needs a supported review · ${lb.beforeCitations} citations` }, { v: `After: assumed-entry scenario · ${lb.afterCitations} citation` }] });
     if (t >= T.cutoff) {
       plates.push({ id: 'cutoff', cls: 'is-cutoff', fx: 0.7, fy: 0.52, k: smooth(seg(T.cutoff + 0.9, T.cutoff + 1.3)),
-        rows: [{ k: `As of the plan’s cutoff, ${lb.cutoff}` }, { v: `${lb.admitted} pages admitted` }, { s: 'The review became available after the cutoff' }] });
+        rows: [{ k: `A read as of the plan’s cutoff, ${lb.cutoff}` }, { v: `${lb.admitted} ${lb.admitted === 1 ? 'page' : 'pages'} admitted` }, { s: `The review came in at ${lb.compiled}; the plan read no memory` }] });
       const e = smooth(seg(T.cutoff, T.cutoff + 1.4));
       ring = { r: 260 - 214 * e, k: smooth(seg(T.cutoff, T.cutoff + 0.3)), label: lb.cutoff };
     }

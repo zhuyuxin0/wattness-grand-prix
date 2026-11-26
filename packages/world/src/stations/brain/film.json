@@ -21,7 +21,7 @@
     "line": "Across brains it links to the Terminal's Battery Page and to Desert Willow's review: 5 more, 2 of them strong.",
     "figures": { "5": "pages[grand-prix/battery-tab].across", "2": "across[] touching battery-tab, strength strong" } },
   { "start_s": 49, "end_s": 61, "beats": [], "lb": "LB7", "frames": ["brain.sequence"],
-    "line": "Remember: at 10:58 CT, Desert Willow's hedge review went into its brain. Retrieve: a fresh session's answer now cites that page. As of the plan's 09:12 CT cutoff, memory admitted nothing later.",
+    "line": "Remember: at 10:58 CT, Desert Willow's hedge review went into its brain. Retrieve: a fresh session's answer now cites that page. A read as of the plan's 09:12 CT cutoff admits nothing, and the plan read no memory.",
     "figures": { "10:58": "frame-data sponsors.living_brain.citation.available.ct", "09:12": "frame-data sponsors.living_brain.plan_time_cutoff_check.cutoff.ct" } },
   { "start_s": 61, "end_s": 69, "beats": [], "lb": "LB8", "frames": ["brain.interface"],
     "line": "The same brain in Living Brain's own interface, where pages are called memories: 123, with 276 connections.",
