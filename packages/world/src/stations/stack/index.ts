@@ -12,7 +12,7 @@ import { cards, n0, short, ct, dayLabel, pathLen, WORDS, PIECE_IDS, LOGO_OF } fr
 import { ISO, stageLook, fitRest, labelItems, zoneItems, afterItems, keyRows, screenBox } from './common';
 import { hoverController } from './hover';
 import { GLYPH_COLOR } from './glyphs';
-import { chipsReady } from '../../kit/logos';
+import { chipsReady, logoChip } from '../../kit/logos';
 import { inFilm } from '../../lib/yours';
 import GF from './greenfield-record.json';
 import TN from './integrations.json';
@@ -26,6 +26,16 @@ type Kind = 'rest' | 'seal' | 'seal-late' | 'inspect' | 'close' | 'cube-check' |
 
 /** The owners' chips in the stack's reading order (the real world, the agents, the seal, the markets): a phone's row. */
 const STRIP = ['cournot', 'electronx', 'studio', 'brain', 'gate', 'greenfield', 'cloudflare', 'aws', 'atlas', 'cmc', 'flap', 'openfour'] as const;
+
+/** Where each owner's chip stands in the plan view (S04), on the ground plane (x, z): over its piece, or for Agent
+ *  Studio on the deck's open front right of Living Brain's sphere, and for GateRecord just south of the cube's pad
+ *  (the cube itself is BNB Chain's symbol, read from above). */
+const PLAN_AT: Record<(typeof STRIP)[number], [number, number]> = {
+  cournot: [POS.cournot.x + 4, POS.cournot.z + 2], electronx: [POS.electronx.x, POS.electronx.z],
+  studio: [60, POS.deck.z1 - 18], brain: [POS.brain.x, POS.brain.z],
+  gate: [POS.cube.x, POS.cube.z + POS.cube.pad + 12], greenfield: [POS.trays.x, POS.trays.z], cloudflare: [POS.edge.x, POS.edge.z], aws: [POS.evaluator.x, POS.evaluator.z],
+  atlas: [POS.atlas.x, POS.atlas.z], cmc: [POS.cmc.x, POS.cmc.z], flap: [(POS.coin.x + POS.vault.x) / 2, POS.coin.z], openfour: [POS.tower.x, POS.tower.z],
+};
 
 /** The kinds of piece a hover still is made for (the six agents are one kind: the Forecaster stands for them). */
 export const HOVER_STILLS = ['ercot', 'terminal', 'cournot', 'electronx', 'studio', 'aws', 'forecaster', 'brain', 'greenfield', 'verifier', 'cloudflare', 'atlas', 'cmc', 'arena', 'flap', 'openfour'];
@@ -259,8 +269,29 @@ async function setup(ctx: FrameContext, kind: Kind, hoverId: string | null = nul
         await bnb.decode().catch(() => {});
         const capR = (cap as HTMLElement | null)?.getBoundingClientRect(), hostR = host.getBoundingClientRect();
         const right = W - 96, left = capR ? capR.right - hostR.left + 40 : W * 0.66;
-        lk.style.transform = `translate3d(${Math.max(left, right - lk.offsetWidth).toFixed(1)}px, ${(capR ? capR.top - hostR.top + 34 : H - 230).toFixed(1)}px, 0)`;
+        // on a stage narrower than the cut the room right of the caption can be less than the lockup: it scales to fit
+        // (the story leaves the lockup out on a phone: story.css)
+        const lx = Math.max(left, right - lk.offsetWidth), room = W - 24 - lx, ks = Math.max(0.5, Math.min(1, room / lk.offsetWidth));
+        lk.style.transformOrigin = '0 0';
+        lk.style.transform = `translate3d(${lx.toFixed(1)}px, ${(capR ? capR.top - hostR.top + 34 : H - 230).toFixed(1)}px, 0)${ks < 1 ? ` scale(${ks.toFixed(3)})` : ''}`;
         zoneTitles(host, ZONES.map((zn) => { const p = proj(zn.at); return p ? { text: zn.text, x: p.x, y: p.y - 10 } : null; }).filter(Boolean), theme);
+        // the owners' logo chips, read from above: from straight overhead the 3D marks stand edge-on (CMC's plaque,
+        // Flap's coin, OpenFour's tokens), so each piece's chip stands over it. They are DOM, so each faces the camera
+        // and reads in full; a phone's plan is too small for them, so there they stand in one row under it
+        if (narrow) {
+          const ys = boundsPoints().map((p) => proj(p.toArray())?.y).filter((y) => y != null && y >= 0 && y <= H) as number[];
+          logoStrip(host, STRIP.map((id) => LOGO_OF[id]!), (ys.length ? Math.max(...ys) : H * 0.6) + 12);
+        } else {
+          const plan = document.createElement('div'); plan.className = 'stk-plan'; host.appendChild(plan);
+          // 16 px logos in the 1920 cut, smaller with the stage, never under 12
+          const lg = Math.round(Math.max(12, Math.min(16, 18.5 * (W / 1920))));
+          for (const id of STRIP) {
+            const [x, z] = PLAN_AT[id], p = proj([x, 0, z]); if (!p) continue;
+            const l = LOGO_OF[id]!, chip = logoChip(l.logo as any, { caption: l.caption, size: lg });
+            plan.appendChild(chip);
+            chip.style.transform = `translate3d(${(p.x - chip.offsetWidth / 2).toFixed(1)}px, ${(p.y - chip.offsetHeight / 2).toFixed(1)}px, 0)`;
+          }
+        }
       }
       // a still or a film's frame is taken with the owners' logos drawn (a file that never comes holds it 1.5 s at most)
       await chipsReady(host);
