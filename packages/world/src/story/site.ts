@@ -91,7 +91,7 @@ export class SiteController {
     this.now = document.createElement('div'); this.now.className = 'gp-now'; this.now.setAttribute('aria-live', 'polite');
     this.route = document.createElement('button'); this.route.type = 'button'; this.route.className = 'gp-route'; this.route.hidden = true;
     this.route.addEventListener('click', (e) => { e.stopPropagation(); const tab = this.beats[this.stop]?.tab; if (tab) { this.emit('route', tab); this.onRoute?.(tab); } });
-    this.hint = document.createElement('p'); this.hint.className = 'gp-hint'; this.hint.textContent = 'Scroll, swipe or press the arrow keys to move through the story';
+    this.hint = document.createElement('p'); this.hint.className = 'gp-hint'; this.hint.textContent = 'Scroll, swipe or press the arrow keys to move through it';
     this.wait = document.createElement('p'); this.wait.className = 'gp-wait'; this.wait.textContent = 'Building the next station';
     // one thin bar along the top edge, above where the frames keep their key cards and banners
     const bar = document.createElement('div'); bar.className = 'gp-bar';
