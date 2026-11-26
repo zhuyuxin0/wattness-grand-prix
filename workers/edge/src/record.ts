@@ -137,7 +137,9 @@ export function parseJson(object: StoredObject, what: string): Parsed {
  * along unchecked: no padding, no duplicate key a different parser would read the other way, no escapes.
  * The order of an object's keys is the exception: RFC 8785 sorts them, so no hash fixes it.
  */
-export function renderingOf(text: string, doc: unknown): "pretty-printed" | "RFC 8785" | null {
+export type Rendering = "pretty-printed" | "RFC 8785";
+
+export function renderingOf(text: string, doc: unknown): Rendering | null {
   if (text === `${JSON.stringify(doc, null, 2)}\n`) return "pretty-printed";
   try {
     const c = canonicalJson(doc);
@@ -148,12 +150,21 @@ export function renderingOf(text: string, doc: unknown): "pretty-printed" | "RFC
   return null;
 }
 
-const byteForm = (p: Parsed): Check => {
-  const found = renderingOf(p.text, p.doc);
-  return check("byte form", "the bytes are the document's own rendering, pretty-printed with a final newline or in RFC 8785 form", [
+const byteFormCheck = (found: Rendering | null): Check =>
+  check("byte form", "the bytes are the document's own rendering, pretty-printed with a final newline or in RFC 8785 form", [
     comparison("rendering", found !== null, { found: found ?? "neither form (extra whitespace, a duplicate key, an escape or a missing newline)" }),
   ]);
-};
+const byteForm = (p: Parsed): Check => byteFormCheck(renderingOf(p.text, p.doc));
+
+/**
+ * The rendering of a file's bytes, refused with the 502 /day gives when they are in neither form: /verify
+ * applies it to the leaf, so no verdict is given for a copy /day would not serve.
+ */
+export function checkedRendering(p: Parsed, what: string): Rendering {
+  const found = renderingOf(p.text, p.doc);
+  refuse(what, [byteFormCheck(found)]);
+  return found as Rendering;
+}
 
 const RESOURCE = /^[A-Z0-9_]+$/;
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);

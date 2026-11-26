@@ -68,7 +68,9 @@ lines and V3 are the verifier's; V1's first line reads `GateRecord holds <root>`
 `record.json says <root>`, and V2 has no `on-chain root <root>, recomputed <root>` line.
 
 A verdict is given only under an index that passes the checks `/day` applies to the index's own bytes (its
-rendering and its shape, paths included); otherwise the answer is the same 502. It finds the battery by its name
+rendering and its shape, paths included), and only for a leaf whose bytes `/day` would serve in that form (the
+document's own rendering); otherwise the answer is the same 502 `/day` gives. A leaf in that form that fails a
+check, such as the one with a changed digit, gets a failing verdict. It finds the battery by its name
 in the index, which no hash fixes: the leaf check fails unless the leaf's own `battery.resource` is that name, and
 when the index lists no leaf under the name the answer is a 404 that says so, given only when Greenfield's copy
 of the index is the one whose root GateRecord holds.

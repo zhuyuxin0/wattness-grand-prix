@@ -132,6 +132,42 @@ describe("what a verdict cannot be given for", () => {
   });
 });
 
+describe("a verdict is given only for a leaf whose bytes /day would serve", () => {
+  // Each copy parses to the published document, so its leaf hash holds and a verdict on the document alone
+  // would pass, citing a copy that a first-wins parser, for one, reads otherwise. /day refuses each on its bytes.
+  const forms: [string, string][] = [
+    ["a duplicate key", text.dswl.replace('{\n  "schema"', '{\n  "salt": "0x00",\n  "schema"')],
+    ["one extra space", text.dswl.replace('"schema": ', '"schema":  ')],
+    ["CRLF line ends", text.dswl.replaceAll("\n", "\r\n")],
+    ["no final newline", text.dswl.slice(0, -1)],
+    ["an escaped letter", text.dswl.replace('"market": "ERCOT"', '"market": "\\u0045RCOT"')],
+  ];
+  for (const [what, body] of forms) {
+    it(`refuses a leaf with ${what}, with the 502 /day gives for it`, async () => {
+      expect(body).not.toBe(text.dswl);
+      expect(JSON.parse(body)).toEqual(JSON.parse(text.dswl));
+      const u = upstreams();
+      u.objects.set(`${DAY}/leaves/DSWL_ESS_ESR1.json`, body);
+      const res = await call(freshOrigin(), "/verify/DSWL_ESS_ESR1?od=2026-11-26");
+      expect.soft(res.status).toBe(502);
+      expect.soft(res.headers.get("x-gate-verified")).toBe("fail");
+      expect.soft(res.headers.get("cache-control")).toBe("no-store");
+      const error = String(((await res.json()) as { error?: string }).error);
+      expect.soft(error).toContain('leaves/DSWL_ESS_ESR1.json is not served: byte form (rendering: found "neither form');
+      forgetVerified();
+      const day = await call(freshOrigin(), "/day/2026-11-26/leaves/DSWL_ESS_ESR1.json");
+      expect.soft(day.status).toBe(502);
+      expect.soft(await day.text()).toBe(`502: ${error}\n`);
+    });
+  }
+
+  it("says so on /", async () => {
+    upstreams();
+    const page = (await (await call(freshOrigin(), "/")).text()).replace(/\s+/g, " ");
+    expect(page).toContain("and only for a leaf whose bytes /day would serve in that form (its document's own rendering)");
+  });
+});
+
 describe("a verdict is given only under an index the /day endpoints would serve", () => {
   const under = async (change: (d: Loose) => void, battery = "DSWL_ESS_ESR1") => {
     const u = upstreams();

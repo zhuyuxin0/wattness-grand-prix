@@ -10,7 +10,7 @@ import { MIN_CONFIRMATIONS, NETWORKS, PLAN_SCOPE_LABEL, type NetworkName } from 
 import { EdgeError, cut } from "./errors.ts";
 import { isPlainPath } from "./greenfield.ts";
 import { leafHash, rootAndProof, rootFromProof } from "./merkle.ts";
-import { INDEX_OBJECT, check, checkIndexFile, comparison, parseJson, renderingOf, sealedIndex, type Check, type Day, type FleetLeaf } from "./record.ts";
+import { INDEX_OBJECT, check, checkIndexFile, checkedRendering, comparison, parseJson, sealedIndex, type Check, type Day, type FleetLeaf, type Rendering } from "./record.ts";
 
 export interface Verdict {
   schema: "gate-record.edge-verdict.v1";
@@ -24,8 +24,8 @@ export interface Verdict {
   /** index counts from 0, as RFC 6962 audit paths do; number from 1, as the site shows it. */
   leaf: { index: number; number: number; of: number; computed: Hex | null; listed: Hex; proof: Hex[] };
   record: { key: Hex; root: Hex; leaf_count: number; code_hash: Hex; committed_at: number; block: number; confirmations: number } | null;
-  /** How the published leaf's bytes render its document; informational, not part of the verdict. */
-  rendering: string | null;
+  /** How the published leaf's bytes render its document. A leaf in neither form gets the 502 /day gives, not a verdict. */
+  rendering: Rendering;
   sources: { index: string; leaf: string; rpc: string };
 }
 
@@ -79,6 +79,9 @@ export async function verdictFor(day: Day, network: NetworkName, battery: string
   const [leafObject, chain] = await Promise.all([day.object(entry.manifest), readDayRecord(day.cfg, network, day.od)]);
   if (!leafObject) throw new EdgeError(502, `the index of ${day.day} names ${entry.manifest}, and Greenfield has no such object`);
   const parsed = parseJson(leafObject, entry.manifest);
+  // The rule /day applies to the leaf's own bytes: a copy that parses to the plan but is not its rendering
+  // (a duplicate key, extra whitespace, an escape) is refused, as /day refuses it, rather than given a verdict.
+  const rendering = checkedRendering(parsed, entry.manifest);
   const m = parsed.doc;
 
   const size = leaves.length;
@@ -207,7 +210,7 @@ export async function verdictFor(day: Day, network: NetworkName, battery: string
     record: rec
       ? { key: chain.key, root: rec.root, leaf_count: rec.leafCount, code_hash: rec.codeHash, committed_at: rec.committedAt, block: rec.blockNumber, confirmations: chain.head - rec.blockNumber }
       : null,
-    rendering: renderingOf(parsed.text, m),
+    rendering,
     sources: { index: indexObject.url, leaf: leafObject.url, rpc: chain.rpc },
   };
 }

@@ -40,9 +40,11 @@ GET /verify/<battery>?od=<day>&network=bsc-mainnet
     the leaf hash; its Merkle proof to the committed root; the record key and the record at it;
     the commit's time against the day's gate, computed as the contract does. The checks follow the
     repository verifier's V1, V2 and V3, and for a plan that passes they print its lines. A verdict
-    is given only under an index that passes the rendering and shape checks above. The battery is
-    found by its name in the index, which no hash fixes: 404 when the index lists no leaf under it,
-    and the leaf check fails unless the leaf's own battery.resource is that name.
+    is given only under an index that passes the rendering and shape checks above, and only for a
+    leaf whose bytes /day would serve in that form (its document's own rendering); otherwise the
+    answer is the 502 /day gives. A leaf in that form that fails a check gets a failing verdict.
+    The battery is found by its name in the index, which no hash fixes: 404 when the index lists
+    no leaf under it, and the leaf check fails unless the leaf's own battery.resource is that name.
 
 <day> is YYYY-MM-DD or YYYYMMDD.
 ?network=bsc-mainnet (the default), bsc-testnet, or both: bsc-mainnet,bsc-testnet.
