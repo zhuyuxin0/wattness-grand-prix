@@ -61,12 +61,25 @@ python3 -I tools/verify_hash.py fixtures/od-20261126/leaves/DSWL_ESS_ESR1.json
 
 | Path | What it holds |
 |---|---|
-| `contracts/` | GateRecord, its tests, and the deploy, commit and Sourcify scripts |
-| `packages/core` | Canonical JSON, leaves and roots, record keys, the gate clock |
+| `contracts/` | GateRecord, its tests and deployments, and the deploy, commit and Sourcify scripts |
+| `packages/core` | Canonical JSON, leaves and roots, record keys, the gate clock, the weather rule and the outcome index |
 | `packages/data` | Hash-checked readers for the Terminal's public release and live prices |
 | `packages/engine` | Forecast, price scenarios and the dispatch and hedge optimization (HiGHS) |
 | `packages/verifier` | The end-to-end check |
 | `packages/agent` | Plans an operating day for the fleet and links each stage's outcome |
+| `packages/agents` | The plan's six roles as ERC-8004 agents on BSC testnet, their cards, and a read client for their identities and ERC-8183 jobs |
+| `packages/adapters/cournot` | Reads one Cournot event probability before the gate, the input to the weather rule |
+| `packages/adapters/living-brain` | Living Brain memory for a battery's plan reviews, read back as of a cutoff with its sources |
+| `packages/adapters/atlas-cmc` | BNB and USDT prices from Atlas's signed reports and CoinMarketCap, turned into a reference budget for evaluations |
+| `packages/adapters/flap` | Read-only clients for Flap Pool Launch and the season round on BSC testnet |
+| `packages/adapters/agent-studio` | Evaluates a sealed plan; `WattnessEvaluator/` sells the evaluation as an ERC-8183 job through BNB Agent Studio |
+| `modules/flap` | The season Launcher and Vault for Flap Pool Launch: the season token launches only once a named plan is sealed before its gate |
+| `modules/openfour` | An OpenFour migrate module that graduates a launch only when the agent's sealed record is in GateRecord |
+| `scripts/agents` | Runners that create the role wallets, register the six agents, publish their cards and run a job, on BSC testnet and Greenfield testnet |
+| `scripts/greenfield` | Publishes a sealed day's files to BNB Greenfield testnet and checks every download's SHA-256 |
+| `scripts/timestamp` | RFC 3161 timestamps of a root, the fallback when no transaction can be sent |
+| `site/` | The public site at gp.wattness.tech, a static Vite app built apart from the workspace |
+| `docs/outcomes.md` | How the three outcome stages settle and how the verifier checks them (V10) |
 | `fixtures/od-20261126` | The sealed record of 26 Nov: the index, two leaves, both chain receipts |
 | `tools/verify_hash.py` | The standard-library hash check |
 
