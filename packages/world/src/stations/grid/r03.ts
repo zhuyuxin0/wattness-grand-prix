@@ -198,8 +198,9 @@ export async function r03(ctx: FrameContext, state: CopyState = 'changed'): Prom
     });
     face.position.set(WALL.x - 0.18, PLATE.y, z); face.rotation.y = -Math.PI / 2; root.add(face);
   });
-  // the screen: dark glass in a bezel over the five lamps, from the first lamp's center to the last's, 28 x 9.6 m;
-  // decorate sets the page's board on its face at the screen's aspect (venue/board.ts: the rows share its height)
+  // the screen: a face behind glass in a bezel over the five lamps, from the first lamp's center to the last's,
+  // 28 x 9.6 m; decorate sets the page's board on the face at the screen's aspect (venue/board.ts: the rows share its
+  // height)
   const SCR = { x: WALL.x - 0.28, y: 10.8, z: 10, w: 28, h: 9.6 };
   const boardH = Math.round((BOARD.width * SCR.h) / SCR.w);
   const bezel = new THREE.Mesh(chamferBox(THREE, 0.3, SCR.h + 0.7, SCR.w + 0.7, 0.1), paint);
