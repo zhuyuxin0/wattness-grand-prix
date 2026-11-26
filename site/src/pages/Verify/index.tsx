@@ -6,7 +6,8 @@ import { isCapture } from "../../lib/capture";
 import { EDGE_HOST, edgeVerifyUrl } from "../../lib/edge";
 import { formatDec1 } from "../../lib/format";
 import { useSelectedBattery } from "../../shell/battery";
-import { BATTERY_NAMES, BatteryPicker, Glyph, Hash, PageHeader, Ready, Section } from "../../ui";
+import { BATTERY_NAMES, BatteryPicker, Glyph, PageHeader, Ready, Section } from "../../ui";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { Check, Verdict, type CheckState } from "./CheckCard";
 import { useStewards } from "./useStewards";
 import { NETWORKS } from "./verify/chain";
@@ -43,6 +44,7 @@ export default function VerifyPage() {
 }
 
 function Verify({ day }: { day: DayIndex }) {
+  const registry = useLogoRegistry();
   const { "*": splat = "" } = useParams();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -222,8 +224,22 @@ function Verify({ day }: { day: DayIndex }) {
       <Section
         id="vf-cli"
         title="Run It Yourself"
-        lede="The same checks from a terminal, with no browser in the loop."
-        source={`GateRecord on BNB Smart Chain, read from each chain's receipt. ${SOURCE_LINE}`}
+        lede="The same checks from a terminal, with no browser in the loop, or from the edge."
+        builtWith={sponsors(registry, "cloudflare")}
+        check={{
+          items: [
+            {
+              kind: "address",
+              label: `GateRecord on ${network.short}`,
+              value: CONTRACT_ADDRESS,
+              href: `${network.explorer}/address/${CONTRACT_ADDRESS}`,
+              copy: "GateRecord contract address",
+              note: "The contract every check reads; its verified source is under Add Your Agent.",
+            },
+          ],
+          how: "The address opens on the chain's explorer.",
+        }}
+        source={`GateRecord on BNB Smart Chain, read from each chain's receipt. ${SOURCE_LINE}${registry ? ` ${registry.note}` : ""}`}
       >
         <div className="vf-cli">
           <div className="vf-cli__step">
@@ -263,8 +279,7 @@ pnpm verify fixtures/od-20261126/manifest.json \\
           </a>
         </p>
         <p className="vf-contract">
-          GateRecord <Hash value={CONTRACT_ADDRESS} href={`${network.explorer}/address/${CONTRACT_ADDRESS}`} label="contract address" /> on {network.short}. Its verified source
-          is under <Link to="/about/agents">Add Your Agent</Link>.
+          Every check reads GateRecord on {network.short}, its address in Check it below. Its verified source is under <Link to="/about/agents">Add Your Agent</Link>.
         </p>
       </Section>
     </>
