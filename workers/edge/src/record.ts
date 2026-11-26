@@ -285,6 +285,17 @@ export function forgetVerified(): void {
 
 export const INDEX_OBJECT = "manifest.json";
 
+/**
+ * The index's checks on its own bytes, before any chain is read: its rendering and its shape. Refused with
+ * a 502 when either fails. /day and /verify both apply them, so neither answers under an index the other refuses.
+ */
+export function checkIndexFile(parsed: Parsed, day: string): { form: Check; shape: { problems: string[]; root: Hex | null } } {
+  const shape = indexShapeErrors(parsed.doc, day);
+  const form = byteForm(parsed);
+  refuse(`the index of ${day}`, [form, check("index shape", "core's fleetIndexErrors", shape.problems.map((p) => comparison(p, false, {})))]);
+  return { form, shape };
+}
+
 export async function sealedIndex(day: Day, network: NetworkName): Promise<SealedIndex> {
   const memoKey = `${day.od}|${network}`;
   const known = sealedMemo.get(memoKey);
@@ -294,9 +305,7 @@ export async function sealedIndex(day: Day, network: NetworkName): Promise<Seale
   if (!object) throw new EdgeError(404, `no record is published for ${day.day}: Greenfield has no od-${day.od}/${INDEX_OBJECT}`);
   const what = `the index of ${day.day}`;
   const parsed = parseJson(object, what);
-  const shape = indexShapeErrors(parsed.doc, day.day);
-  const form = byteForm(parsed);
-  refuse(what, [form, check("index shape", "core's fleetIndexErrors", shape.problems.map((p) => comparison(p, false, {})))]);
+  const { form, shape } = checkIndexFile(parsed, day.day);
   const index = parsed.doc as FleetIndex;
 
   const chain = await readDayRecord(day.cfg, network, day.od);

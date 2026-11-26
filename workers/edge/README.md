@@ -67,6 +67,12 @@ changed digit the results agree (V1 and V2 fail, V3 passes), and V1's root line,
 lines and V3 are the verifier's; V1's first line reads `GateRecord holds <root>` where the verifier's reads
 `record.json says <root>`, and V2 has no `on-chain root <root>, recomputed <root>` line.
 
+A verdict is given only under an index that passes the checks `/day` applies to the index's own bytes (its
+rendering and its shape, paths included); otherwise the answer is the same 502. It finds the battery by its name
+in the index, which no hash fixes: the leaf check fails unless the leaf's own `battery.resource` is that name, and
+when the index lists no leaf under the name the answer is a 404 that says so, given only when Greenfield's copy
+of the index is the one whose root GateRecord holds.
+
 ## Headers
 
 On a served file: `x-gate-verified`, `x-gate-network`, `x-gate-root`, `x-gate-record-key`, `x-gate-block`,

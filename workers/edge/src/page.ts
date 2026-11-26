@@ -38,7 +38,10 @@ GET /verify/<battery>?od=<day>&network=bsc-mainnet
     A JSON verdict for one battery, each check named with pass or fail and the values compared:
     the leaf hash; its Merkle proof to the committed root; the record key and the record at it;
     the commit's time against the day's gate, computed as the contract does. The checks follow the
-    repository verifier's V1, V2 and V3, and for a plan that passes they print its lines.
+    repository verifier's V1, V2 and V3, and for a plan that passes they print its lines. A verdict
+    is given only under an index that passes the rendering and shape checks above. The battery is
+    found by its name in the index, which no hash fixes: 404 when the index lists no leaf under it,
+    and the leaf check fails unless the leaf's own battery.resource is that name.
 
 <day> is YYYY-MM-DD or YYYYMMDD.
 ?network=bsc-mainnet (the default), bsc-testnet, or both: bsc-mainnet,bsc-testnet.

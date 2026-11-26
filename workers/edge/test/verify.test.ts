@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { fileSha256, type Hex } from "../src/bytes.ts";
+import { merkleRoot } from "../src/merkle.ts";
 import { forgetVerified, type Check } from "../src/record.ts";
 import type { Verdict } from "../src/verdict.ts";
-import { DAY, call, freshOrigin, text, upstreams } from "./fake.ts";
+import { DAY, call, freshOrigin, text, upstreams, utf8 } from "./fake.ts";
 import golden from "./fixtures/verifier.json";
 import { changeOneDigit } from "./tamper.ts";
 
 type Golden = Record<"V1" | "V2" | "V3", { status: "PASS" | "FAIL"; details: string[] }>;
+type Loose = Record<string, any>;
+const pretty = (doc: unknown) => `${JSON.stringify(doc, null, 2)}\n`;
 const cases = golden.cases as Record<string, { results: Golden }>;
 
 beforeEach(() => forgetVerified());
@@ -97,7 +101,25 @@ describe("what a verdict cannot be given for", () => {
     upstreams();
     const res = await call(freshOrigin(), "/verify/AMAD_ESS_ESR1?od=2026-11-26");
     expect(res.status).toBe(404);
-    expect(((await res.json()) as { error: string }).error).toBe("AMAD_ESS_ESR1 has no plan in the record of 2026-11-26; the index lists it as excluded: AMAD_ESS_ESR1 census row: p_max_mw");
+    expect(((await res.json()) as { error: string }).error).toBe(
+      "the index of 2026-11-26 lists no leaf under the name AMAD_ESS_ESR1 (a verdict finds a battery by the names in the index, which no hash fixes); it lists the battery as excluded: AMAD_ESS_ESR1 census row: p_max_mw",
+    );
+  });
+
+  it("says a 404 rests on the index's names: relabeled, Desert Willow's own name finds no leaf", async () => {
+    // The root fixes the leaf hashes, not the names: relabel Desert Willow's entry, order kept, and the
+    // index still verifies, with its plan as leaf 94 under another name.
+    const u = upstreams();
+    const relabeled = JSON.parse(text.index) as Loose;
+    const name = "DSWL_ESS_ESR0";
+    Object.assign(relabeled.leaves[93], { resource: name, manifest: `leaves/${name}.json`, scenarios: `leaves/${name}.scenarios.json` });
+    relabeled.showcase = name;
+    u.objects.set(`${DAY}/manifest.json`, pretty(relabeled));
+    const res = await call(freshOrigin(), "/verify/DSWL_ESS_ESR1?od=2026-11-26");
+    expect.soft(res.status).toBe(404);
+    expect.soft(((await res.json()) as { error: string }).error).toBe(
+      "the index of 2026-11-26 lists no leaf under the name DSWL_ESS_ESR1 (a verdict finds a battery by the names in the index, which no hash fixes)",
+    );
   });
 
   it("answers 404 for an unknown battery or day, and 400 without a day or with two networks", async () => {
@@ -107,5 +129,84 @@ describe("what a verdict cannot be given for", () => {
     expect((await call(freshOrigin(), "/verify/DSWL_ESS_ESR1")).status).toBe(400);
     expect((await call(freshOrigin(), "/verify/DSWL_ESS_ESR1?od=2026-11-26&network=bsc-mainnet,bsc-testnet")).status).toBe(400);
     expect((await call(freshOrigin(), "/verify/dswl?od=2026-11-26")).status).toBe(400);
+  });
+});
+
+describe("a verdict is given only under an index the /day endpoints would serve", () => {
+  const under = async (change: (d: Loose) => void, battery = "DSWL_ESS_ESR1") => {
+    const u = upstreams();
+    const doc = JSON.parse(text.index) as Loose;
+    change(doc);
+    u.objects.set(`${DAY}/manifest.json`, pretty(doc));
+    return call(freshOrigin(), `/verify/${battery}?od=2026-11-26`);
+  };
+  const refused = async (res: Response, reason: string, what: string) => {
+    expect.soft(res.status, what).toBe(502);
+    expect.soft(res.headers.get("x-gate-verified"), what).toBe("fail");
+    expect.soft(res.headers.get("cache-control"), what).toBe("no-store");
+    expect.soft(String(((await res.json()) as { error?: string }).error).slice(0, 600), what).toContain(reason);
+  };
+
+  it("refuses a verdict under an index that swaps two batteries' files, with the objects swapped to match", async () => {
+    // Each battery's leaf would still hash to its entry, and each verdict pass, citing the other's URL.
+    for (const battery of ["CLO_ESR1", "DSWL_ESS_ESR1"]) {
+      forgetVerified();
+      const u = upstreams();
+      const swapped = JSON.parse(text.index) as Loose;
+      const dswl = swapped.leaves.find((l: Loose) => l.resource === "DSWL_ESS_ESR1");
+      const clo = swapped.leaves.find((l: Loose) => l.resource === "CLO_ESR1");
+      [dswl.manifest, clo.manifest] = [clo.manifest, dswl.manifest];
+      [dswl.scenarios, clo.scenarios] = [clo.scenarios, dswl.scenarios];
+      u.objects.set(`${DAY}/manifest.json`, pretty(swapped));
+      u.objects.set(`${DAY}/leaves/CLO_ESR1.json`, text.dswl);
+      u.objects.set(`${DAY}/leaves/DSWL_ESS_ESR1.json`, text.clo);
+      await refused(await call(freshOrigin(), `/verify/${battery}?od=2026-11-26`), 'index shape (leaves: CLO_ESR1 names "leaves/DSWL_ESS_ESR1.json" as its manifest', battery);
+    }
+  });
+
+  it("refuses a verdict under an index with a field beside the planner's", async () => {
+    await refused(await under((d) => (d.attested_by = "anything")), 'index shape (index: unknown field "attested_by")', "extra field");
+  });
+
+  it("refuses a verdict under an index whose bytes are not its own rendering", async () => {
+    const u = upstreams();
+    u.objects.set(`${DAY}/manifest.json`, text.index.replace('"schema": ', '"schema":  '));
+    await refused(await call(freshOrigin(), "/verify/DSWL_ESS_ESR1?od=2026-11-26"), "byte form (rendering:", "extra space");
+  });
+
+  it("refuses, rather than answer 404, under an index that drops the battery", async () => {
+    const drop = (d: Loose) => {
+      d.leaves = d.leaves.filter((l: Loose) => l.resource !== "DSWL_ESS_ESR1");
+    };
+    // As left: the root and the leaf count no longer match the leaves, and the showcase is gone.
+    await refused(await under(drop), "index shape (leaf_count 316, 315 leaves listed", "dropped");
+    // Made self-consistent: only GateRecord's root shows that this is not the record.
+    const consistent = (d: Loose) => {
+      drop(d);
+      d.leaf_count = d.leaves.length;
+      d.root = merkleRoot(d.leaves.map((l: Loose) => l.leaf as Hex));
+      d.showcase = d.leaves[0].resource;
+    };
+    forgetVerified();
+    await refused(await under(consistent), 'on-chain record (root: on chain "0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7", index "0x', "dropped, self-consistent");
+    // The same, with the published index verified and remembered by this isolate: the 404 would rest on
+    // the copy the verdict read, which is not the one remembered.
+    forgetVerified();
+    const u = upstreams();
+    expect((await call(freshOrigin(), "/day/2026-11-26/index.json")).status).toBe(200);
+    const doc = JSON.parse(text.index) as Loose;
+    consistent(doc);
+    u.objects.set(`${DAY}/manifest.json`, pretty(doc));
+    await refused(await call(freshOrigin(), "/verify/DSWL_ESS_ESR1?od=2026-11-26"), "is not served: Greenfield's copy (SHA-256 ", "dropped, self-consistent, published index remembered");
+  });
+
+  it("still gives a failing verdict, not a refusal, under a self-consistent index whose root GateRecord does not hold", async () => {
+    const res = await under((d) => {
+      d.leaves[93].leaf = `0x${fileSha256(utf8("a different plan"))}`;
+      d.root = merkleRoot(d.leaves.map((l: Loose) => l.leaf as Hex));
+    });
+    expect.soft(res.status).toBe(200);
+    expect.soft(((await res.json()) as Verdict).verdict).toBe("fail");
+    expect.soft(res.headers.get("cache-control")).toBe("no-store");
   });
 });

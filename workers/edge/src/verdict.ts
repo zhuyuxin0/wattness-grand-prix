@@ -4,13 +4,13 @@
 // and for a changed leaf the results agree and two lines differ (test/verify.test.ts pins which).
 import { formatInZone, gateTs, gateTsFromTimeZone } from "../../../packages/core/src/gate.ts";
 import { codeHashFromTree, scopeId } from "./abi.ts";
-import { checksumAddress, isBytes32, type Hex } from "./bytes.ts";
+import { checksumAddress, fileSha256, isBytes32, type Hex } from "./bytes.ts";
 import { readDayRecord } from "./chain.ts";
 import { MIN_CONFIRMATIONS, NETWORKS, PLAN_SCOPE_LABEL, type NetworkName } from "./config.ts";
 import { EdgeError, cut } from "./errors.ts";
 import { isPlainPath } from "./greenfield.ts";
 import { leafHash, rootAndProof, rootFromProof } from "./merkle.ts";
-import { INDEX_OBJECT, check, comparison, parseJson, renderingOf, type Check, type Day, type FleetLeaf } from "./record.ts";
+import { INDEX_OBJECT, check, checkIndexFile, comparison, parseJson, renderingOf, sealedIndex, type Check, type Day, type FleetLeaf } from "./record.ts";
 
 export interface Verdict {
   schema: "gate-record.edge-verdict.v1";
@@ -52,17 +52,25 @@ const same = (name: string, a: [string, unknown], b: [string, unknown]) => compa
 export async function verdictFor(day: Day, network: NetworkName, battery: string): Promise<Verdict> {
   const indexObject = await day.object(INDEX_OBJECT);
   if (!indexObject) throw new EdgeError(404, `no record is published for ${day.day}: Greenfield has no od-${day.od}/${INDEX_OBJECT}`);
-  const index = parseJson(indexObject, `the index of ${day.day}`).doc as { leaves?: unknown; exclusions?: unknown };
+  const parsedIndex = parseJson(indexObject, `the index of ${day.day}`);
+  // The rules the /day endpoints apply to the index's own bytes: no verdict under an index they refuse.
+  checkIndexFile(parsedIndex, day.day);
+  const index = parsedIndex.doc as { leaves?: unknown; exclusions?: unknown };
   const leaves = Array.isArray(index.leaves) ? (index.leaves as Partial<FleetLeaf>[]) : [];
   if (leaves.length === 0 || !leaves.every((l) => typeof l === "object" && l !== null && isBytes32(l.leaf))) {
     throw new EdgeError(502, `the index of ${day.day} does not list its leaves as 32-byte hashes`);
   }
   const position = leaves.findIndex((l) => l.resource === battery);
   if (position < 0) {
-    const excluded = Array.isArray(index.exclusions) ? (index.exclusions as { resource?: unknown; reason?: unknown }[]).find((e) => e?.resource === battery) : undefined;
+    // A battery is found by the names beside the leaf hashes, which no hash fixes, so a 404 says what the
+    // index lists, not what the record holds; and it is said only under the copy whose root GateRecord holds.
+    const sealed = await sealedIndex(day, network);
+    const copy = fileSha256(indexObject.bytes);
+    if (sealed.sha256 !== copy) throw new EdgeError(502, `the index of ${day.day} is not served: Greenfield's copy (SHA-256 ${copy}) is not the one verified on ${network} (SHA-256 ${sealed.sha256})`);
+    const excluded = sealed.index.exclusions.find((e) => e.resource === battery);
     throw new EdgeError(
       404,
-      excluded ? `${battery} has no plan in the record of ${day.day}; the index lists it as excluded: ${cut(String(excluded.reason), 200)}` : `${battery} has no plan in the record of ${day.day}`,
+      `the index of ${day.day} lists no leaf under the name ${battery} (a verdict finds a battery by the names in the index, which no hash fixes)${excluded ? `; it lists the battery as excluded: ${cut(excluded.reason, 200)}` : ""}`,
     );
   }
   const entry = leaves[position] as FleetLeaf;
