@@ -596,13 +596,20 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
       down = null;
     }
   };
+  // the browser took the gesture (a vertical swipe scrolls the page): the drag ends where it is, its turn and tilt
+  // with it, and nothing is picked
+  const onCancel = (e) => {
+    pts.delete(e.pointerId);
+    if (pts.size < 2) pinch0 = 0;
+    if (!pts.size) { S.drag = false; root.classList.remove('is-grab'); down = null; S.vel.az = 0; S.vel.el = 0; }
+  };
   const onWheel = (e) => {
     e.preventDefault();
     // Living Brain's zoom speed 0.8: a 120 px notch takes the distance times 0.952, eased in draw()
     S.zoomTo = Math.max(1.4, Math.min(dMax(), (S.zoomTo ?? S.cam.dist) * Math.pow(0.952, -e.deltaY / 120)));
     S.camB = null; S.pauseUntil = now() + 4;
   };
-  canvas.addEventListener('pointerdown', onDown); canvas.addEventListener('pointermove', onMove); canvas.addEventListener('pointerup', onUp); canvas.addEventListener('pointercancel', onUp);
+  canvas.addEventListener('pointerdown', onDown); canvas.addEventListener('pointermove', onMove); canvas.addEventListener('pointerup', onUp); canvas.addEventListener('pointercancel', onCancel);
   canvas.addEventListener('pointerleave', (e) => { if (!pts.size && !tagOf(e.relatedTarget)) { setHover(null); S.hoverBrain = null; } });
   canvas.addEventListener('wheel', onWheel, { passive: false });
   // the pointer's last real position: a move that changes it lets hover act again
