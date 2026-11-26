@@ -82,11 +82,12 @@ The handle:
 
 In site mode the story plays the site's own stops (`beats.ts` SITE_KEYS: the master's keys from before Living Brain's
 beat, X05 "Your turn" kept, with Living Brain's one stop after the pit wall; never Living Brain's own interface, whose
-recording a site's checkout does not hold). The wheel or trackpad scrubs through a move and snaps to the nearest rest. A click, the arrow keys, Page
-Up and Page Down, Space, Home and End, a swipe and the chapter rail along the top step through the beats. The wheel
-is the story's while the pointer is over it; the keys act while the story has focus or the pointer, or while nothing
-on the page has focus. The story fills the element and follows its size. At a rest with a still pointer nothing is
-drawn.
+recording a site's checkout does not hold; less SITE_LEFT_OUT, the late seal's second stop on Parc fermé and the
+season and launch towers, which the Season and Launchpad tabs read live). The wheel or trackpad scrubs through a move
+and snaps to the nearest rest. A click, the arrow keys, Page Up and Page Down, Space, Home and End, a swipe and the
+chapter rail along the top step through the beats. The wheel is the story's while the pointer is over it; the keys act
+while the story has focus or the pointer, or while nothing on the page has focus. The story fills the element and
+follows its size. At a rest with a still pointer nothing is drawn.
 
 Frames are built one at a time as the story reaches them, their shaders compiled before they first draw, and released
 once the story is two keys past them (a key is a beat, or a point a move passes through).
