@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { SHADOW_NOTE, SOURCE_LINE } from "../../config";
 import { combine, useDay, useReceipts } from "../../data";
@@ -7,17 +7,21 @@ import { formatInt } from "../../lib/format";
 import { dualTime, formatInZone } from "../../lib/time";
 import { CENTRAL_TZ } from "../../config";
 import { Glyph, Section } from "../../ui";
-import { SceneSlot } from "./SceneSlot";
-import { STORY_MARK, STORY_PLAYABLE, markStory, prefetchStoryStill } from "./story";
+import { Closing } from "./Closing";
+import { Hero } from "./Hero";
+import { STORY_MARK, STORY_PLAYABLE, markStory, warmStory, warmWhenIdle } from "./story";
 import StoryOverlay from "./StoryOverlay";
 import "./styles.css";
 
-// Intro: the Grand Prix's opening. The stage keeps its own dark and tells the
-// story in 3D; under it, in the visitor's theme, one plain line of what this
-// is, the way into the app, and the story's steps beside what each one means
-// for a battery and the technology that carries it. The racing words live
-// here and in the glossary, never in the app's names. The stage's bar opens
-// the story (packages/world's mountStory) over the whole viewport.
+// Intro: the Grand Prix's opening. It opens on chapter 01 of the introduction,
+// Desert Willow at night, dark in either theme, with the one hero line, the
+// day's facts, Play and Verify, and the lockup that closes the introduction.
+// Under it, in the visitor's theme, the steps of a plan's day beside what each
+// means for a battery and the technology that carries it; the racing words
+// live here and in the glossary, never in the app's names. The page ends on
+// the starting grid's close, played as it comes on screen, with the ways on
+// beneath. Play opens the introduction (packages/world's mountStory) over the
+// whole viewport.
 
 /** A time in a sentence: CT, then the reader's own in brackets (with its date when the reader's day differs). */
 function Clock({ unix }: { unix: number }) {
@@ -103,15 +107,22 @@ export default function IntroPage() {
   const navigate = useNavigate();
   const [story, setStory] = useState(false);
   const play = useRef<HTMLButtonElement>(null);
-  const openStory = useCallback(() => {
+  // The button that opened the introduction (the hero's, or the closing band's), for focus on the way back.
+  const opener = useRef<HTMLElement | null>(null);
+  const openStory = useCallback((from?: HTMLElement) => {
+    opener.current = from ?? play.current;
     markStory(STORY_MARK.open);
     setStory(true);
   }, []);
   // Esc or the close button: back to the button that opened it.
   const closeStory = useCallback(() => {
     setStory(false);
-    requestAnimationFrame(() => play.current?.focus({ preventScroll: true }));
+    requestAnimationFrame(() => (opener.current ?? play.current)?.focus({ preventScroll: true }));
   }, []);
+  // The introduction's code, on an idle moment once the still is in: never on first paint.
+  const [stillIn, setStillIn] = useState(false);
+  useEffect(() => (stillIn ? warmWhenIdle() : undefined), [stillIn]);
+  const onStillLoad = useCallback(() => setStillIn(true), []);
   // A beat's "Open <tab>": the story closes and the tab opens, focus on its page.
   const routeFromStory = useCallback(
     (to: string) => {
@@ -133,7 +144,7 @@ export default function IntroPage() {
             lead: main ? minSec(main.secondsBeforeGate) : null,
             caption: (
               <>
-                Replay of the sealed morning, {date}: plans made at <Clock unix={day.planUnix} />
+                The sealed morning, {date}: plans made at <Clock unix={day.planUnix} />
                 {main && (
                   <>
                     , sealed at <Clock unix={main.blockTime} />
@@ -146,47 +157,30 @@ export default function IntroPage() {
         })()
       : null;
 
+  const factsLine = facts ? (
+    <>
+      <span className="num">{formatInt(facts.plans)}</span> on {facts.day}: their plans went on chain
+      {facts.lead && (
+        <>
+          {" "}
+          <span className="num">{facts.lead}</span> before ERCOT's 10:00&nbsp;CT day-ahead gate
+        </>
+      )}
+      . Anyone can check any of them.
+    </>
+  ) : (
+    <>Every plan goes on chain before ERCOT's 10:00&nbsp;CT day-ahead gate. Anyone can check any of them.</>
+  );
+
   return (
     <div className="page page--intro">
-      {/* The stage keeps its own dark in either theme, as wattness.tech's intro does. */}
-      <section className="intro-stage" data-atmosphere="dark" aria-label="The Grand Prix, in 3D">
-        <SceneSlot caption={facts?.caption} paused={story} onPlay={STORY_PLAYABLE ? openStory : undefined} onPlayIntent={prefetchStoryStill} playRef={play} />
-      </section>
+      <Hero facts={factsLine} onPlay={STORY_PLAYABLE ? () => openStory() : undefined} onPlayIntent={warmStory} playRef={play} onStillLoad={onStillLoad} />
       {story && <StoryOverlay onClose={closeStory} onRoute={routeFromStory} />}
 
       <div className="intro-body">
-        <header className="intro-head">
-          <h1 className="intro__line">AI agents plan tomorrow for every Texas battery with complete public data and seal each plan on BNB&nbsp;Chain before the market closes.</h1>
-          <p className="intro__sub">
-            {facts ? (
-              <>
-                <span className="num">{formatInt(facts.plans)}</span> on {facts.day}: their plans went on chain
-                {facts.lead && (
-                  <>
-                    {" "}
-                    <span className="num">{facts.lead}</span> before ERCOT's 10:00 CT day-ahead gate
-                  </>
-                )}
-                . Anyone can check any of them.
-              </>
-            ) : (
-              <>Every plan goes on chain before ERCOT's 10:00 CT day-ahead gate. Anyone can check any of them.</>
-            )}
-          </p>
-          <div className="intro__actions">
-            {/* One primary action per view: the story where the build can play it, else the way into the app. */}
-            <Link to="/overview" className={STORY_PLAYABLE ? "btn" : "btn btn--primary"}>
-              Open the Overview
-              <Glyph name="next" />
-            </Link>
-            <Link to="/verify" className="btn">
-              Verify a plan
-            </Link>
-          </div>
-          <p className="intro__source">
-            {SOURCE_LINE} Commits: GateRecord on BNB Smart Chain, read from each chain's receipt. {SHADOW_NOTE}
-          </p>
-        </header>
+        <p className="intro__source">
+          {SOURCE_LINE} Commits: GateRecord on BNB Smart Chain, read from each chain's receipt. {SHADOW_NOTE}
+        </p>
 
         <Section
           title="The Grand Prix, Step by Step"
@@ -225,6 +219,8 @@ export default function IntroPage() {
           </ol>
         </Section>
       </div>
+
+      <Closing armed={stillIn} paused={story} caption={facts?.caption} onPlay={STORY_PLAYABLE ? openStory : undefined} onPlayIntent={warmStory} />
     </div>
   );
 }

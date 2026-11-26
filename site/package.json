@@ -6,8 +6,8 @@
   "scripts": {
     "data": "node scripts/build-data.mjs",
     "dev": "vite",
-    "build": "node scripts/build-data.mjs && tsc -p tsconfig.json --noEmit && vite build",
-    "build:app": "tsc -p tsconfig.json --noEmit && vite build",
+    "build": "node scripts/build-data.mjs && tsc -p tsconfig.json --noEmit && vite build && node scripts/spa-routes.mjs",
+    "build:app": "tsc -p tsconfig.json --noEmit && vite build && node scripts/spa-routes.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node --test test/*.test.mjs"

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { OnePlanHandle, SealReceipt } from "@world/game";
 import { SHOWCASE } from "../../config";
 import { now } from "../../lib/capture";
@@ -10,6 +10,15 @@ import { useTheme } from "../../ui";
 // and the read-out) follows the site's theme through setTheme. The package and
 // three.js load here, by dynamic import, so they stay in this tab's chunks.
 
+/** A plain click on one of the cabinet's own links to a page here (the seal card's record link): the path it opens. */
+function pagePath(e: MouseEvent): string | null {
+  if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return null;
+  const a = e.target instanceof Element ? e.target.closest("a[href]") : null;
+  const href = a?.getAttribute("href");
+  if (!a || !href || !href.startsWith("/") || href.startsWith("//") || a.hasAttribute("download")) return null;
+  return (a.getAttribute("target") ?? "_self") === "_self" ? href : null;
+}
+
 export function Cabinet({ onSeal }: { onSeal: (receipt: SealReceipt) => void }) {
   const el = useRef<HTMLDivElement>(null);
   const game = useRef<OnePlanHandle | null>(null);
@@ -18,6 +27,9 @@ export function Cabinet({ onSeal }: { onSeal: (receipt: SealReceipt) => void }) 
   themeNow.current = theme;
   const sealed = useRef(onSeal);
   sealed.current = onSeal;
+  const navigate = useNavigate();
+  const go = useRef(navigate);
+  go.current = navigate;
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -28,6 +40,16 @@ export function Cabinet({ onSeal }: { onSeal: (receipt: SealReceipt) => void }) 
       console.warn("ONE PLAN could not start:", error);
       setFailed(true);
     };
+    // The cabinet's links are plain anchors (the package knows no router): a plain click on one that opens a page here
+    // goes through the router, as a Link does, so the site does not reload; any other click is the browser's.
+    const host = el.current;
+    const follow = (e: MouseEvent) => {
+      const to = pagePath(e);
+      if (!to) return;
+      e.preventDefault();
+      go.current(to);
+    };
+    host?.addEventListener("click", follow);
     import("@world/game").then(({ mountOnePlan }) => {
       if (gone || !el.current) return;
       handle = mountOnePlan(el.current, {
@@ -37,13 +59,14 @@ export function Cabinet({ onSeal }: { onSeal: (receipt: SealReceipt) => void }) 
         // The gate check reads the site's clock, so a recording's fixed clock holds here too.
         now: () => now() / 1000,
         // Once the field's gate has passed, the seal card points to the sealed record.
-        recordHref: "#/seal",
+        recordHref: "/seal",
       });
       game.current = handle;
       handle.ready.catch(fail);
     }, fail);
     return () => {
       gone = true;
+      host?.removeEventListener("click", follow);
       game.current = null;
       handle?.dispose();
     };

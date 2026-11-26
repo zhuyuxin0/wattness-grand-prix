@@ -49,7 +49,7 @@ function Verify({ day }: { day: DayIndex }) {
   const [carried, carry] = useSelectedBattery();
   const [again, setAgain] = useState(0);
 
-  // A link names its battery (#/verify/<resource>); without one, the battery the
+  // A link names its battery (/verify/<resource>); without one, the battery the
   // other tabs carry; else the day's showcase.
   const known = new Set(day.batteries.map((b) => b.resource));
   const resource = known.has(splat) ? splat : known.has(carried) ? carried : day.showcase;

@@ -21,7 +21,7 @@ function Moved({ to }: { to: string }) {
   return <Navigate replace to={{ pathname: rest ? `${to}/${rest}` : to, search }} />;
 }
 
-/** #/pit-wall?battery=X&arm=B&hour=17 opens #/battery/X?arm=B&hour=17. */
+/** /pit-wall?battery=X&arm=B&hour=17 opens /battery/X?arm=B&hour=17. */
 function PitWallMoved() {
   const params = new URLSearchParams(useLocation().search);
   const battery = params.get("battery");

@@ -14,7 +14,7 @@ import "./styles.css";
 // Battery: one battery's plan in full. The sealed plan leads; below it the
 // plan by hour (any of the three can be shown), the three plans compared, and
 // the asset with its limits. The URL carries the state, so any frame loads
-// directly: #/battery/DSWL_ESS_ESR1?arm=B&hour=17. The battery carries to the
+// directly: /battery/DSWL_ESS_ESR1?arm=B&hour=17. The battery carries to the
 // agent tabs.
 
 const TABLE_ID = "bt-hours";

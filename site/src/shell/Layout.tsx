@@ -40,7 +40,7 @@ export function Layout() {
 
   return (
     <div className="app">
-      {/* A hash route owns the fragment, so the skip link moves focus itself. */}
+      {/* The skip link moves focus itself, so the address never gains a #main and the history no extra step. */}
       <a
         className="skip"
         href="#main"

@@ -1,8 +1,8 @@
 // Recording mode. Scripted captures load the page with
 //   ?clock=2026-11-25T15:30:00Z   a fixed clock (ISO instant or unix ms)
 //   ?capture=1                    no ticking, no hover-only reveals
-// before the hash, e.g. /?clock=1795620000000&capture=1#/stewards, so every
-// frame of a recording is reproducible.
+// on any path, e.g. /verify?clock=1795620000000&capture=1, so every frame of a
+// recording is reproducible.
 
 function param(name: string): string | null {
   try {

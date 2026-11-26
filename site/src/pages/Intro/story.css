@@ -124,8 +124,9 @@
   }
 }
 
-/* On a phone the 16:9 still would letterbox in the tall screen with its words at
-   5 px: the loading line stands alone on the stage's ground until the beat draws. */
+/* On a phone the 16:9 still would letterbox in the tall screen, framed unlike the
+   story's own upright view: the loading line stands alone on the stage's ground
+   until the beat draws. */
 @media (max-width: 599px) {
   .story-dialog__still img {
     display: none;

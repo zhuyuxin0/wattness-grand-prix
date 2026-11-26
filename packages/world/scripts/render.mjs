@@ -1,7 +1,7 @@
 // Renders frame-lab frames to PNG in headless Chrome on the GPU.
 //
 //   node scripts/render.mjs --port <p> --frames <id,id> --out <dir> [--scale 2] [--theme dark|light]
-//        [--w 1920] [--h 1080] [--repeat n] [--timeout 180]
+//        [--w 1920] [--h 1080] [--repeat n] [--timeout 180] [--plates 0] [--raw]
 //
 // The lab must already be served on 127.0.0.1:<port> (scripts/serve.sh). Chrome is launched through the launcher module
 // that WORLD_BROWSER_LIB names (README: Checks): the user's
@@ -10,6 +10,8 @@
 // brought back to w x h by ffmpeg's Lanczos when scale > 1. Writes <out>/<id>.png and <id>.json (render time, the
 // GPU's renderer string, console warnings and errors, refused requests, the GPU's load before and after). With
 // --repeat n each frame is drawn n times in fresh pages and the receipt says whether the PNGs' SHA-256 agree.
+// --plates 0 shoots the picture alone (the lab's plates=0: no caption, scope line, leaders or key). --raw keeps the
+// shot at device pixels too, as <id>.raw.png, when scale > 1 (a master for other sizes).
 // A receipt names a PNG inside this package by its path from the package's folder ("storyboard/frames/<id>.png"), so a
 // committed receipt carries no local path; a PNG outside the package keeps its absolute path.
 import { execFileSync, spawn } from 'node:child_process';
@@ -25,7 +27,7 @@ const named = (p) => { const r = relative(pkg, resolve(p)); return r && !r.start
 const RESERVED = new Set([5184, 5185, 15190, 15193, 15199]);
 const argv = process.argv.slice(2);
 const opt = (name, fallback = null) => { const i = argv.indexOf(`--${name}`); return i >= 0 && argv[i + 1] != null ? argv[i + 1] : fallback; };
-const usage = 'usage: node scripts/render.mjs --port <p> --frames <id,id> --out <dir> [--scale 2] [--theme dark|light] [--w 1920] [--h 1080] [--repeat n] [--timeout 180]';
+const usage = 'usage: node scripts/render.mjs --port <p> --frames <id,id> --out <dir> [--scale 2] [--theme dark|light] [--w 1920] [--h 1080] [--repeat n] [--timeout 180] [--plates 0] [--raw]';
 const port = Number(opt('port'));
 const ids = (opt('frames') ?? '').split(',').map((s) => s.trim()).filter(Boolean);
 const out = opt('out');
@@ -36,7 +38,10 @@ const theme = opt('theme', 'dark') === 'light' ? 'light' : 'dark';
 const W = Number(opt('w', '1920')), H = Number(opt('h', '1080'));
 const repeat = Math.max(1, Number(opt('repeat', '1')));
 const timeout = Number(opt('timeout', '180')) * 1000;
+const plates = opt('plates', '1') !== '0';
+const raw = argv.includes('--raw');
 const base = `http://127.0.0.1:${port}`;
+const labUrl = (id) => `${base}/lab.html?frame=${encodeURIComponent(id)}&w=${W}&h=${H}&theme=${theme}${plates ? '' : '&plates=0'}`;
 
 const gpuLoad = () => {
   try { return Number(execFileSync('ioreg', ['-r', '-d', '1', '-c', 'IOAccelerator'], { encoding: 'utf8' }).match(/"Device Utilization %"=(\d+)/)?.[1] ?? NaN); }
@@ -74,7 +79,7 @@ try {
       page.on('console', (m) => { if (m.type() === 'warning' || m.type() === 'error') logs.push(`${m.type()}: ${m.text()}`.slice(0, 600)); });
       page.on('pageerror', (e) => logs.push(`pageerror: ${String(e?.stack ?? e).slice(0, 600)}`));
       const gpuBefore = gpuLoad(), t0 = Date.now();
-      const url = `${base}/lab.html?frame=${encodeURIComponent(id)}&w=${W}&h=${H}&theme=${theme}`;
+      const url = labUrl(id);
       let state = null, error = null;
       try {
         await page.goto(url, { waitUntil: 'load', timeout });
@@ -94,13 +99,14 @@ try {
       const shot = await page.screenshot({ type: 'png', clip: { x: 0, y: 0, width: W, height: H }, animations: 'disabled', caret: 'hide' });
       const png = join(out, `${fileOf(id)}${r ? `.repeat-${r}` : ''}.png`);
       if (scale > 1) await lanczos(shot, png); else writeFileSync(png, shot);
+      if (raw && scale > 1 && !r) writeFileSync(join(out, `${fileOf(id)}.raw.png`), shot);
       const hash = sha256(readFileSync(png));
       runs.push({ ok: true, png: named(png), sha256: hash, wallMs, renderMs: state.frame?.renderMs ?? null, gpuLoad: { before: gpuBefore, after: gpuLoad() }, frame: state.frame, logs });
       await page.close();
     }
     const first = runs[0];
     const receipt = {
-      id, url: `${base}/lab.html?frame=${encodeURIComponent(id)}&w=${W}&h=${H}&theme=${theme}`, width: W, height: H, scale, theme,
+      id, url: labUrl(id), width: W, height: H, scale, theme, plates,
       shot: scale > 1 ? `${W * scale} x ${H * scale} device px, Lanczos to ${W} x ${H}` : `${W} x ${H}`,
       ok: runs.every((x) => x.ok), error: runs.find((x) => !x.ok)?.error ?? null,
       png: first?.png ?? null, sha256: first?.sha256 ?? null,

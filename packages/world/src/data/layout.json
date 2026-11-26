@@ -106,8 +106,8 @@
    "hero": "the 316-column starting grid on the start straight over the Texas map (layout.texas, layout.grid)",
    "screen": "the Race weekend figure row",
    "pages": [
-    "#/",
-    "#/standings"
+    "/",
+    "/fleet"
    ],
    "frames": [
     "W01",
@@ -153,7 +153,7 @@
    "hero": "radar mast 22 m at [-430, 0, -66] with a 9 m dish; the scope, a 14 m round display under a glass dome at [-372, 0.9, -66]",
    "screen": "the scope; the pit wall's Weather radar panel",
    "pages": [
-    "#/pit-wall"
+    "/battery"
    ],
    "frames": [
     "W02"
@@ -198,7 +198,7 @@
    "hero": "a hangar under a liquid-glass roof at y 18 over the whole enclosure; the workshop (build bench 60 m at [-120, 0, 6], racks x -160..-80, z -26..-14)",
    "screen": "the Garage page's agent card",
    "pages": [
-    "#/garage"
+    "/about/agents"
    ],
    "frames": [
     "G01"
@@ -243,7 +243,7 @@
    "hero": "chart wall 56 x 14 m centered [-130, 0, -224] (kit/chartwall.ts; battery strip recolored to the site's discharge teal and charge #7f9cc0)",
    "screen": "Price outlook",
    "pages": [
-    "#/pit-wall"
+    "/battery"
    ],
    "frames": [
     "G02"
@@ -288,7 +288,7 @@
    "hero": "the walkthrough's battery column at 5.2x (radius 6 m, 24 m for 100%) at [10, 0, -222], rings at 5% and 95%, a mark at 50%",
    "screen": "State of charge",
    "pages": [
-    "#/pit-wall"
+    "/battery"
    ],
    "frames": [
     "G02"
@@ -333,7 +333,7 @@
    "hero": "a wall of 527 file tiles, 54 x 12 m, centered [147, 0, -226]",
    "screen": "the input list",
    "pages": [
-    "#/pit-wall"
+    "/battery"
    ],
    "frames": [
     "G02"
@@ -378,7 +378,7 @@
    "hero": "arm C's 24-hour strip, 48 x 2.4 m at [-130, 0, -122], glass tiles over its 7 hedged hours, the orange dashed outline",
    "screen": "Hedge chart and Published terms",
    "pages": [
-    "#/pit-wall"
+    "/battery"
    ],
    "frames": [
     "G02"
@@ -423,7 +423,7 @@
    "hero": "a quarter-scale coin tray (arm C's 301 coins, 15 m) at [10, 0, -122]; the A2 feeder arriving from the south",
    "screen": "Arms compared",
    "pages": [
-    "#/pit-wall"
+    "/battery"
    ],
    "frames": [
     "G02"
@@ -469,7 +469,7 @@
    "hero": "three strategy boards 12 x 8 m at [125, 0, -124], [147, 0, -124], [169, 0, -124]; C's edged in BNB yellow",
    "screen": "the pit wall page",
    "pages": [
-    "#/pit-wall"
+    "/battery"
    ],
    "frames": [
     "G02"
@@ -514,7 +514,7 @@
    "hero": "a glass floor over the box; under it the Terminal's six layers (y -7 to -2) and Living Brain's 18 pages (y -1.2)",
    "screen": "the pit wall's Team data panel",
    "pages": [
-    "#/pit-wall"
+    "/battery"
    ],
    "frames": [
     "G03",
@@ -561,8 +561,8 @@
    "hero": "the ring track (center [358, -200], radius 40) round the root plate (gold glass, radius 14, y 0.6) and its 316-tick ring (radius 22); barrier across the lane at [283.2, -146.3] (the plinth's edge, heading 64); gate clock [284, 14, -147]; the late capsule stops 12 m short at [270.1, 0.45, -141.6]; pylons [440, 0, -232] (BSC) and [452, 0, -186] (testnet), 26 m",
    "screen": "the sealed record card",
    "pages": [
-    "#/",
-    "#/garage"
+    "/",
+    "/about/agents"
    ],
    "frames": [
     "R02"
@@ -607,7 +607,7 @@
    "hero": "timing pylon 32 x 8 m at [330, 0, -86] facing the lane; three gates over the lane (x 360..380) at z -112, -96, -80, 12 m high",
    "screen": "the weekend strip",
    "pages": [
-    "#/"
+    "/"
    ],
    "frames": [
     "W03"
@@ -652,7 +652,7 @@
    "hero": "leaf card 6 x 4 m at [408, 0.4, 18]; a nine-rung ladder to a root plate at [430, 22, -6]; a lamp wall at x 456 (z -16..24) facing west with five lamps; screen 10 x 6 m at [456, 12, 4]",
    "screen": "the Stewards report board",
    "pages": [
-    "#/stewards"
+    "/verify"
    ],
    "frames": [
     "R03",
@@ -742,8 +742,8 @@
    "hero": "the Downforce cabinet (layout.arena.machine), the standings tower, the kiosk",
    "screen": "Arms compared; Standings",
    "pages": [
-    "#/standings",
-    "#/pit-wall"
+    "/fleet",
+    "/battery"
    ],
    "frames": [
     "X01",

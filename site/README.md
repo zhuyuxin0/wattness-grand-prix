@@ -1,14 +1,14 @@
 # Wattness Grand Prix: site
 
-The public site for the sealed record. A static Vite + React 18 + TypeScript app with hash routing and a relative
-base, so one build serves from any path. It is its own project, outside the repository's pnpm workspace.
+The public site for the sealed record. A static Vite + React 18 + TypeScript app with clean paths (`/verify`,
+`/battery/DSWL_ESS_ESR1`). It is its own project, outside the repository's pnpm workspace.
 
 ```sh
 pnpm install --ignore-workspace
 pnpm data       # out/od-20261126 -> public/data (fixtures/od-20261126 when out/ is absent)
 pnpm dev        # http://127.0.0.1:15191/
-pnpm build      # data, type-check, build to dist/
-pnpm build:app  # type-check and build without regenerating data
+pnpm build      # data, type-check, build to dist/, then the page at every path (scripts/spa-routes.mjs)
+pnpm build:app  # the same without regenerating data
 pnpm preview    # http://127.0.0.1:15192/
 ```
 
@@ -18,11 +18,29 @@ readback come from `cache/site-sources/` (or `GP_SOURCES`, `--structure`, `--bra
 published copies are kept. The script refuses to publish a credential from the private env file or any of the
 verifier's excluded days, and keeps `public/data` under 3 MB.
 
+## Paths and hosting
+
+The build's base is `/`, so a page at any depth loads `/assets/` and `/data/` from the domain's root. It serves only
+from a root: gp.wattness.tech, where GitHub Pages publishes it (the repository's github.io address redirects there).
+From a subpath or the file system it would not find its scripts.
+
+GitHub Pages serves files, not routes, so after `vite build` `scripts/spa-routes.mjs` writes the page at every path
+the app answers: each tab, the first site's routes that moved (`/stewards`, `/pit-wall`, ...), and each battery's
+Fleet, Battery and Verify pages (the frame data's battery list, with `public/data/day.json`'s), each as `<path>.html`
+and `<path>/index.html`, which Pages serves either way. A tab's copy carries its title and summary for link previews.
+Every other path gets `404.html`, the same page, which shows the app's Not Found. `pnpm preview` answers every path
+with the page; to see what Pages answers, serve `dist/` with a static server that has no fallback to `index.html`.
+`test/spa-routes.test.mjs` holds the build to the list.
+
+Links from the hash-routed site keep working: a script at the top of `index.html` turns `/#/verify` into `/verify`
+before the app reads the address, keeping both queries (`/?capture=1#/battery/X?arm=B` becomes
+`/battery/X?capture=1&arm=B`).
+
 ## Recording
 
-Load any page with `?clock=<ISO instant or unix ms>&capture=1` before the hash, e.g.
-`/?clock=2026-11-25T15:30:00Z&capture=1#/stewards`. The clock is fixed (countdowns render one frame), looping
-motion stops and hover-only reveals show. Pages read the clock with `now()` from `src/lib/capture.ts`.
+Load any page with `?clock=<ISO instant or unix ms>&capture=1`, e.g. `/verify?clock=2026-11-25T15:30:00Z&capture=1`.
+The clock is fixed (countdowns render one frame), looping motion stops and hover-only reveals show. Pages read the
+clock with `now()` from `src/lib/capture.ts`.
 
 ## Data (`public/data/`)
 
@@ -52,34 +70,34 @@ there, in the pipeline's order. Each tab is one folder under `src/pages/`, owned
 
 | Group | Tab | Route | Folder |
 |---|---|---|---|
-| | Intro | `#/` | `pages/Intro` (the starting grid; the 3D story opens over it from the stage bar) |
-| Today | Overview | `#/overview` | `pages/Overview` |
-| Plans | Fleet | `#/fleet`, `#/fleet/<resource>` | `pages/Fleet` |
-| Plans | Battery | `#/battery`, `#/battery/<resource>` | `pages/Battery` |
-| Agents | Agent IDs | `#/agents/ids` | `pages/AgentIds` |
-| Agents | Forecast | `#/agents/forecast` | `pages/Forecast` |
-| Agents | State of Charge | `#/agents/state` | `pages/StateOfCharge` |
-| Agents | Hedge | `#/agents/hedge` | `pages/Hedge` |
-| Agents | Risk | `#/agents/risk` | `pages/Risk` |
-| Agents | Memory | `#/agents/memory` | `pages/Memory` |
-| On Chain | Seal | `#/seal` | `pages/Seal` |
-| On Chain | Verify | `#/verify`, `#/verify/<resource>` | `pages/Verify` |
-| On Chain | Files | `#/files` | `pages/Files` |
-| Markets | Season | `#/markets/season` | `pages/Season` |
-| Markets | Launchpad | `#/markets/launchpad` | `pages/Launchpad` |
-| Markets | Prices | `#/markets/prices` | `pages/Prices` |
-| Markets | ONE PLAN | `#/markets/one-plan` | `pages/OnePlan` (ONE PLAN's stage) |
-| About | How It Works | `#/about` | `pages/HowItWorks` |
-| About | Tech Stack | `#/about/stack` | `pages/TechStack` (the stack's map) |
-| About | Add Your Agent | `#/about/agents` | `pages/AddAgent` |
+| | Intro | `/` | `pages/Intro` (chapter 01's still, `public/hero/` with its receipt; the introduction opens over it from Play; the starting grid's close ends the page) |
+| Today | Overview | `/overview` | `pages/Overview` |
+| Plans | Fleet | `/fleet`, `/fleet/<resource>` | `pages/Fleet` |
+| Plans | Battery | `/battery`, `/battery/<resource>` | `pages/Battery` |
+| Agents | Agent IDs | `/agents/ids` | `pages/AgentIds` |
+| Agents | Forecast | `/agents/forecast` | `pages/Forecast` |
+| Agents | State of Charge | `/agents/state` | `pages/StateOfCharge` |
+| Agents | Hedge | `/agents/hedge` | `pages/Hedge` |
+| Agents | Risk | `/agents/risk` | `pages/Risk` |
+| Agents | Memory | `/agents/memory` | `pages/Memory` |
+| On Chain | Seal | `/seal` | `pages/Seal` |
+| On Chain | Verify | `/verify`, `/verify/<resource>` | `pages/Verify` |
+| On Chain | Files | `/files` | `pages/Files` |
+| Markets | Season | `/markets/season` | `pages/Season` |
+| Markets | Launchpad | `/markets/launchpad` | `pages/Launchpad` |
+| Markets | Prices | `/markets/prices` | `pages/Prices` |
+| Markets | ONE PLAN | `/markets/one-plan` | `pages/OnePlan` (ONE PLAN's stage) |
+| About | How It Works | `/about` | `pages/HowItWorks` |
+| About | Tech Stack | `/about/stack` | `pages/TechStack` (the stack's map) |
+| About | Add Your Agent | `/about/agents` | `pages/AddAgent` |
 
 Tab names are plain; the Grand Prix's words live in the Intro, the glossary and one short note under a page's title
 (the tab's `term`). The battery tabs share one selection (`src/shell/battery.ts`): picking a battery on any of them
-carries to the rest; a link may name one with `#/battery/<resource>` or `?battery=<resource>`.
+carries to the rest; a link may name one with `/battery/<resource>` or `?battery=<resource>`.
 
 - A page's `index.tsx` default-exports the page; it is lazy-loaded as its own chunk, so a page can import
   `three` or d3 without weighing on the others. Routes end in `/*`, so a page owns its sub-paths
-  (`#/standings/DSWL_ESS_ESR1`) with its own nested `<Routes>`.
+  (`/fleet/DSWL_ESS_ESR1`) with its own nested `<Routes>`.
 - Put page-only components, charts, scenes and styles in the page folder (`styles.css` is already imported).
 - The shared folders (`ui`, `data`, `lib`, `design`, `styles`, `shell`, `routes.tsx`, `config.ts`) are stable. When a
   page needs something new there, add a new file instead of changing an existing one.
