@@ -5,16 +5,20 @@ import { dualTime } from "../../lib/time";
 import { Glyph, Hash, Loading, PageHeader, Ready, Section } from "../../ui";
 import { LiveRead as LiveStamp } from "../../ui/LiveRead";
 import { age, addressUrl } from "../AgentIds/rpc";
-import { Fact, Facts, Flow, TabLink } from "../Battery/kit";
+import { Fact, Facts, TabLink } from "../Battery/kit";
 import { LogoChip } from "../../ui/LogoChip";
 import { useLiveFeeds, usePrices, useSigner, type FeedRead, type LiveRead, type LiveState, type PricesFile } from "./data";
+import { SOURCE_COLUMN } from "./places";
 import { baseBudget, chainReadProblems } from "./rule";
+import { Strip } from "./Strip";
 import "./styles.css";
 
-// Prices: BNB and USDT in US dollars. Atlas's feeds on BSC testnet, read live
-// in the browser; Atlas's signed report and CoinMarketCap's quotes as the
-// Atlas and CoinMarketCap adapter recorded them, side by side; and the
-// evaluation budget those prices set, before and after, by the adapter's rule.
+// Prices: BNB and USDT in US dollars. Under the head, a strip of the four
+// companies' logos and the two sources', each a jump to its row or column.
+// Atlas's feeds on BSC testnet, read live in the browser; Atlas's signed
+// report and CoinMarketCap's quotes as the Atlas and CoinMarketCap adapter
+// recorded them, side by side; and the evaluation budget those prices set,
+// before and after, by the adapter's rule, with what the budget is and is not.
 // Then, as context only, four Texas power companies' tokenized stocks from
 // Atlas's feeds on BNB Smart Chain.
 
@@ -68,17 +72,9 @@ export default function PricesPage() {
     <div className="page page--prices">
       <PageHeader
         title="Prices"
-        lede={
-          <>
-            BNB and USDT in US dollars from Atlas's oracle and from CoinMarketCap, side by side, and the reference budget they set for evaluations of a sealed record; below
-            them, four Texas power companies' tokenized stocks on BNB Smart Chain.
-            <Flow>
-              {NOT_PLANS} The budget pays nothing itself; the evaluator's jobs on <TabLink to="/agents/ids">Agent IDs</TabLink> were paid 0.1 U each. Testnet BNB has no cash
-              value, so every dollar figure in the budget is a reference.
-            </Flow>
-          </>
-        }
+        lede="BNB and USDT in US dollars from Atlas's oracle and from CoinMarketCap, the evaluation budget they set, and four Texas power companies' tokenized stocks on BNB Smart Chain."
       />
+      <Strip logos={logos} />
       <Ready state={state} label="Loading the prices">
         {(p) => <Prices p={p} logos={logos} />}
       </Ready>
@@ -277,14 +273,14 @@ function SideBySide({ p, logos }: { p: PricesFile; logos: Logos | null }) {
             <article key={asset} className="px-pair" aria-label={`${asset}/USD`}>
               <h3 className="px-pair__name">{asset}/USD</h3>
               <div className="px-pair__cols">
-                <div className="px-src">
+                <div className="px-src" id={asset === "BNB" ? SOURCE_COLUMN.atlas : undefined}>
                   <div className="px-src__who">
                     {logos ? <LogoChip logo={logos.atlas} size={13} /> : "Atlas ·"} signed report, feed {ax.feedId}
                   </div>
                   <div className="px-src__price num">{usd(ax.priceUsd, dp)}</div>
                   <When unix={ax.observedAtSeconds} />
                 </div>
-                <div className="px-src">
+                <div className="px-src" id={asset === "BNB" ? SOURCE_COLUMN.cmc : undefined}>
                   <div className="px-src__who">
                     {logos ? <LogoChip logo={logos.cmc} size={13} /> : "CoinMarketCap"} Pro · id {cx.cmcId}
                   </div>
@@ -351,6 +347,10 @@ function Budget({ p, state }: { p: PricesFile; state: LiveState }) {
       lede={`The evaluation budget is a declared ${d.treasuryBnb} BNB, not a wallet balance. The adapter's rule values it at the lower of the two BNB prices, holds back a reserve that grows with the day's move, and counts the evaluations the rest pays for at ${cents(d.evaluationPriceUsdCents)} each.`}
       source={`${SOURCE} Rule: fundingDecision in packages/adapters/atlas-cmc, run on the recorded inputs at the run's own clock, ${at.ct}${at.yours ? ` (${at.yours})` : ""}; it gives the decision the run recorded.`}
     >
+      <p className="px-budget-note">
+        {NOT_PLANS} The budget counts evaluations of a sealed record and pays nothing itself; the evaluator's jobs on{" "}
+        <TabLink to="/agents/ids">Agent IDs</TabLink> were paid 0.1 U each. Testnet BNB has no cash value, so every dollar figure in the budget is a reference.
+      </p>
       <div className="px-ba" role="table" aria-label="The budget before and after the prices">
         <div className="px-ba__row px-ba__head" role="row">
           <span role="columnheader" />

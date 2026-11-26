@@ -1,5 +1,100 @@
-/* Prices. Blocks: px-*. The live feeds as cards, the two sources side by
-   side, the budget as a before and after; every block stacks on a phone. */
+/* Prices. Blocks: px-*. The strip of logos under the head, the live feeds as
+   cards, the two sources side by side, the budget as a before and after; every
+   block stacks on a phone. */
+
+/* ---------------------------------------------------------------- the strip */
+
+/* Right under the head, as the Battery tab's toolbar sits: the four companies'
+   chips, then the sources', each a jump to its row or column below. The groups
+   wrap as a whole on a narrow page, the chips within them after. */
+.px-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-3) var(--t-space-6);
+  margin-top: calc(var(--t-space-4) - var(--gp-space-8));
+  padding: 0 0 var(--t-space-4);
+  border-bottom: 1px solid var(--t-rule);
+}
+@media (max-width: 767px) {
+  .px-strip {
+    margin-top: calc(var(--t-space-4) - var(--gp-space-7));
+  }
+}
+.px-strip__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  min-width: 0;
+}
+.px-strip__label {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.px-strip__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2);
+}
+/* the link holds the chip: its pointer, and a teal edge on hover (the chip's stylesheet comes later, so these
+   rules outweigh its own) */
+.px-strip__jump {
+  display: inline-flex;
+  border-radius: 7px;
+  text-decoration: none;
+}
+.px-strip__jump .lg-chip {
+  cursor: pointer;
+}
+.px-strip .px-strip__jump:hover .lg-chip {
+  box-shadow: inset 0 -1px 0 rgba(16, 19, 21, 0.05), 0 0 0 1px color-mix(in srgb, var(--t-accent-mark) 70%, transparent), 0 4px 12px -6px rgba(16, 19, 21, 0.28);
+}
+.px-strip__jump:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+}
+/* a name in words while the chips' stylesheet is not in: the chip's height, so nothing moves when it comes */
+.px-strip__word {
+  display: inline-flex;
+  align-items: center;
+  height: 22.75px;
+  padding: 0 9px;
+  border: 1px solid var(--w-border);
+  border-radius: 7px;
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+  color: var(--w-fg);
+}
+
+/* A jump's places land under the masthead (two rows on a phone) with a little of what is above them in view: the
+   pair's name over a source's column, the row above a company's. The browser's own scroll to an address's #id
+   lands there too. */
+.px-src[id] {
+  scroll-margin-top: calc(var(--gp-masthead-h) + 52px);
+}
+.page--prices .atlas-board__row[id] {
+  scroll-margin-top: calc(var(--gp-masthead-h) + 40px);
+}
+@media (max-width: 767px) {
+  .px-src[id] {
+    scroll-margin-top: calc(2 * var(--gp-masthead-h) + 52px);
+  }
+  .page--prices .atlas-board__row[id] {
+    scroll-margin-top: calc(2 * var(--gp-masthead-h) + 40px);
+  }
+}
+
+/* what the budget is and is not, at the head of its section */
+.px-budget-note {
+  max-width: 96ch;
+  margin-bottom: var(--t-space-5);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
 
 
 .px-when {

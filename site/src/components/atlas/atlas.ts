@@ -34,6 +34,12 @@ export const TEXAS_FEEDS: readonly StockFeed[] = [
   { id: 995, pair: "IRENB/USD", symbol: "IRENB", company: "IREN", role: "Runs large data centers on the Texas grid", logo: "iren.svg" },
 ];
 
+/** The Texas board's own id on a page, unless the page gives it another. */
+export const TEXAS_BOARD = "texas-power";
+
+/** A company's row on the board, by the board's id and the token's symbol: "texas-power-vstb", a place a link can name. */
+export const boardRowId = (board: string, feed: StockFeed): string => `${board}-${feed.symbol.toLowerCase()}`;
+
 /**
  * The MultiFeed the four stock feeds are pushed to on BNB Smart Chain (Atlas's
  * platform 14). Atlas sets each feed to push on a 2% move and at least every

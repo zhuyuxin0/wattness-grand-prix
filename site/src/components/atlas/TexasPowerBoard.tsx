@@ -2,7 +2,7 @@ import { formatUsd, shortHash } from "../../lib/format";
 import { dualTime } from "../../lib/time";
 import { Glyph, Loading, Section } from "../../ui";
 import { LogoChip, type ChipLogo } from "../../ui/LogoChip";
-import { LATE_MARGIN_S, STOCK_MULTIFEED, TEXAS_FEEDS, feedPage, fixedToNumber, formatAge, freshness, marketNote, type StockFeed } from "./atlas";
+import { LATE_MARGIN_S, STOCK_MULTIFEED, TEXAS_BOARD, TEXAS_FEEDS, boardRowId, feedPage, fixedToNumber, formatAge, freshness, marketNote, type StockFeed } from "./atlas";
 import type { FeedSnapshot, MultiFeedRead, NodeRead } from "./chain";
 import { Stamp, Unread } from "./ReadState";
 import { useStockFeeds, type Polled } from "./useAtlas";
@@ -25,14 +25,15 @@ const COMPANY: Record<string, { href: string; w: number; h: number; optical: num
   "ge-vernova.svg": { href: "https://www.gevernova.com/", w: 1274, h: 281.3, optical: 1.4 },
   "iren.svg": { href: "https://iren.com/", w: 153, h: 80, optical: 1.35 },
 };
-const chipOf = (feed: StockFeed): ChipLogo | null => {
+/** A company's logo for the site's chip (its own file in public/logos, its page as the link); null for a file not listed. */
+export const companyChip = (feed: StockFeed): ChipLogo | null => {
   const c = COMPANY[feed.logo];
   return c ? { id: feed.symbol.toLowerCase(), name: feed.company, href: c.href, src: logoUrl(feed.logo), w: c.w, h: c.h, ground: "light", optical: c.optical } : null;
 };
 
 /** chips: the page has loaded the logo chip's stylesheet (with @world/kit/logos), so each company's logo stands in the
  *  site's white glass chip, a link to the company in a new tab; until then, in a plain light box. */
-export function TexasPowerBoard({ id = "texas-power", chips = false }: { id?: string; chips?: boolean }) {
+export function TexasPowerBoard({ id = TEXAS_BOARD, chips = false }: { id?: string; chips?: boolean }) {
   const feeds = useStockFeeds();
   return (
     <Section
@@ -52,12 +53,12 @@ export function TexasPowerBoard({ id = "texas-power", chips = false }: { id?: st
         </>
       }
     >
-      <Board feeds={feeds} chips={chips} />
+      <Board board={id} feeds={feeds} chips={chips} />
     </Section>
   );
 }
 
-function Board({ feeds, chips }: { feeds: Polled<NodeRead<MultiFeedRead>>; chips: boolean }) {
+function Board({ board, feeds, chips }: { board: string; feeds: Polled<NodeRead<MultiFeedRead>>; chips: boolean }) {
   if (!feeds.data) {
     if (!feeds.error) return <Loading label="Reading BNB Smart Chain" />;
     return <Unread polled={feeds}>Atlas's feeds could not be read from BNB Smart Chain just now, so the board is not shown.</Unread>;
@@ -84,7 +85,7 @@ function Board({ feeds, chips }: { feeds: Polled<NodeRead<MultiFeedRead>>; chips
           <span role="columnheader">Feed</span>
         </div>
         {TEXAS_FEEDS.map((feed, i) => (
-          <Row key={feed.id} feed={feed} snap={read.snapshots[i]} read={read} chips={chips} />
+          <Row key={feed.id} id={boardRowId(board, feed)} feed={feed} snap={read.snapshots[i]} read={read} chips={chips} />
         ))}
       </div>
       <p className="atlas-read">
@@ -95,12 +96,12 @@ function Board({ feeds, chips }: { feeds: Polled<NodeRead<MultiFeedRead>>; chips
   );
 }
 
-function Row({ feed, snap, read, chips }: { feed: StockFeed; snap: FeedSnapshot | undefined; read: MultiFeedRead; chips: boolean }) {
+function Row({ id, feed, snap, read, chips }: { id: string; feed: StockFeed; snap: FeedSnapshot | undefined; read: MultiFeedRead; chips: boolean }) {
   const fresh = snap ? freshness(snap.onchainTs, read.block.timestamp, HEARTBEAT) : null;
   const written = snap && fresh && fresh.state !== "empty";
-  const chip = chips ? chipOf(feed) : null;
+  const chip = chips ? companyChip(feed) : null;
   return (
-    <div className="atlas-board__row" role="row">
+    <div id={id} className="atlas-board__row" role="row">
       <span role="rowheader" className="atlas-board__company">
         {chip ? (
           <LogoChip logo={chip} size={13} className="atlas-chip" />
