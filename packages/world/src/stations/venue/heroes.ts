@@ -434,8 +434,16 @@ export function buildTiming(d: FrameData, H: Hardware) {
   const atlas = d.sponsors.atlas.signed_pull, cmc = d.sponsors.cmc.quotes;
   const bnbA = atlas.prices.find((p: any) => p.feed_id === 633).usd as number, usdtA = atlas.prices.find((p: any) => p.feed_id === 649).usd as number;
   const bnbC = cmc.assets.find((a: any) => a.symbol === 'BNB').price_usd as number, usdtC = cmc.assets.find((a: any) => a.symbol === 'USDT').price_usd as number;
-  const digits = (c: CanvasRenderingContext2D, text: string, x: number, y: number, px: number, color: string, weight = 600, face = '"Barlow Condensed", "Libre Franklin Brand", sans-serif', track = 0) => {
-    c.font = `${weight} ${px}px ${face}`; c.fillStyle = color; c.textBaseline = 'alphabetic'; (c as any).letterSpacing = `${track}px`; c.fillText(text, x, y);
+  // the screens' type is the site's display face, as on the stewards' board (the condensed timing face is gone); a
+  // figure or a label wider than the room to its screen's right margin is set smaller to fit, not cut. Returns where
+  // the text ends, so a figure can follow its label
+  const digits = (c: CanvasRenderingContext2D, text: string, x: number, y: number, px: number, color: string, weight = 600, face = '"Libre Franklin Brand", "Helvetica Neue", Arial, sans-serif', track = 0) => {
+    (c as any).letterSpacing = `${track}px`; c.font = `${weight} ${px}px ${face}`;
+    const room = c.canvas.width - x - 28;
+    let wide = c.measureText(text).width;
+    if (wide > room) { c.font = `${weight} ${Math.floor((px * room) / wide)}px ${face}`; wide = c.measureText(text).width; }
+    c.fillStyle = color; c.textBaseline = 'alphabetic'; c.fillText(text, x, y);
+    return x + wide;
   };
   const ctTime = (o: any) => o.ct.slice(11, 19) + ' CT';
   const cmcBnb = cmc.assets.find((a: any) => a.symbol === 'BNB'), cmcUsdt = cmc.assets.find((a: any) => a.symbol === 'USDT');
@@ -494,8 +502,9 @@ export function buildTiming(d: FrameData, H: Hardware) {
   for (const z of [84.4, 119.6]) { const led = new THREE.Mesh(new THREE.BoxGeometry(110, 0.08, 0.08), glowMat(HEX.teal, 1.6)); led.position.set(-95, 14.2, z); g.add(led); }
   const strip = screen(1024, 128, (c, w, h) => {
     c.fillStyle = '#0b1014'; c.fillRect(0, 0, w, h);
-    digits(c, 'BNB', 36, 88, 52, '#969ca3', 600, undefined, 3); digits(c, bnbA.toFixed(2), 150, 92, 72, '#f6f7f8', 500);
-    digits(c, 'USDT', 520, 88, 52, '#969ca3', 600, undefined, 3); digits(c, usdtA.toFixed(5), 650, 92, 72, '#f6f7f8', 500);
+    // each figure after its label, at the label's measured end
+    const pair = (label: string, fig: string, x: number) => digits(c, fig, digits(c, label, x, 88, 46, '#969ca3', 600, undefined, 2) + 18, 92, 72, '#f6f7f8', 500);
+    pair('BNB', bnbA.toFixed(2), 36); pair('USDT', usdtA.toFixed(5), 520);
     c.fillStyle = '#2ec7a6'; c.fillRect(0, h - 6, w, 6);
   }, 1.5);
   for (const x of xs) for (const s2 of [1, -1]) {
