@@ -11,7 +11,8 @@ import { HERO_STILL } from "./story";
 // night, full bleed and dark in either theme, as the introduction itself is.
 // It is a still, so the first paint loads no three.js; Play opens the
 // introduction on the same picture. Over it, on the introduction's glass: the
-// one hero line, the day's facts, Play and Verify; top right, the lockup that
+// one hero line, the day's facts, Play, the way into the Terminal (the
+// Overview's control room) and Verify; top right, the lockup that
 // closes the introduction (chapter 23). Under the picture, on the same night
 // ground, "Start where you are": the page that answers each kind of visitor.
 // From 1024px the picture gives up the height that list takes, so the list is
@@ -38,7 +39,7 @@ export function Lockup({ className }: { className?: string }) {
 interface HeroProps {
   /** The day's line under the hero line: how many plans, and how long before the gate they went on chain. */
   facts: ReactNode;
-  /** Opens the introduction; without it (a build that cannot play it) the Overview takes the primary place. */
+  /** Opens the introduction; without it (a build that cannot play it) "Enter the Terminal" takes the primary place. */
   onPlay?: () => void;
   /** Warms the introduction's code as the pointer or focus reaches Play. */
   onPlayIntent?: () => void;
@@ -105,19 +106,20 @@ export function Hero({ facts, onPlay, onPlayIntent, playRef, onStillLoad }: Hero
               </button>
             ) : (
               <Link to="/overview" className="btn btn--primary intro-hero__play">
-                Open the Overview
+                Enter the Terminal
                 <Glyph name="next" />
               </Link>
             )}
-            <Link to="/verify" className="btn intro-hero__verify">
-              Verify a plan
-            </Link>
             {onPlay && (
-              <Link to="/overview" className="intro-hero__link">
-                Open the Overview
+              <Link to="/overview" className="btn intro-hero__enter">
+                Enter the Terminal
                 <Glyph name="next" />
               </Link>
             )}
+            <Link to="/verify" className="intro-hero__link">
+              Verify a plan
+              <Glyph name="next" />
+            </Link>
           </div>
         </div>
         <p className="intro-hero__scope">
