@@ -212,6 +212,27 @@ test("the answers keep the site's words: American spelling, minus for a differen
   }
 });
 
+test("the answers hold to the facts check: Wattness by name, no ticker for the payment token, no independent checks, figures with their chain", () => {
+  const token = JSON.parse(readFileSync(join(site, "public", "data", "agents.json"), "utf8")).paymentToken.symbol;
+  assert.ok(token, "agents.json names the payment token");
+  const ticker = new RegExp(`\\b${token}\\b`);
+  for (const a of ANSWERS) {
+    const text = [allText(a), ...a.sources.map((s) => s.label)].join("\n");
+    assert.ok(!/\b(our|ours|Our|Ours|we|We|us)\b/.test(text), `${a.id} speaks in the first person`);
+    assert.ok(!ticker.test(text), `${a.id} names the testnet payment token by its ticker`);
+    assert.ok(!/\bindependent (check|checks|verifier|verification)\b/i.test(text), `${a.id} calls Wattness's own checks independent`);
+    assert.ok(!/\broots? covers?\b/i.test(text), `${a.id} says a root covers files it does not name`);
+    for (const m of text.matchAll(/AgentCore/g)) assert.equal(text.slice(Math.max(0, m.index - 15), m.index), "Amazon Bedrock ", `${a.id}: AgentCore by its full name`);
+    for (const m of text.matchAll(/0\.0000086 BNB(.{0,15})/g)) assert.equal(m[1], " on BSC mainnet", `${a.id}: the seal's fee without its chain`);
+  }
+  const criteria = ANSWERS.find((a) => a.id === "bnb-criteria");
+  assert.ok(!/\bsix\b/.test(criteria.question), "the Developer Track's article names five judging criteria");
+  const items = criteria.body.flatMap((b) => (typeof b === "object" && "list" in b ? b.list : []));
+  for (const name of ["Design and usability", "Scalability", "Innovation", "Open source", "Integration", "Roadmap, community and business model"]) {
+    assert.ok(items.some((i) => i.startsWith(`${name}:`)), `bnb-criteria lacks ${name}`);
+  }
+});
+
 test("the panel says what it is, and every page carries the launcher", () => {
   const panel = readFileSync(join(site, "src", "ness", "NessPanel.tsx"), "utf8");
   assert.ok(panel.includes("Prepared answers from the record. Each links to what it rests on."));
