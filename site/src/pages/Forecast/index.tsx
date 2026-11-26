@@ -177,7 +177,7 @@ export default function ForecastPage() {
                   lede={`The day-ahead forecast this battery's plans used for ${day0}, and the ${count(common.scenarios.count)} ${weighted} scenarios around it, in $/MWh.`}
                   source={`${SOURCE_LINE} Operating day ${day0}, hours in CT. Forecast: the hub forecast plus the node's average day-ahead basis to the hub over the basis days.${
                     nodePaths ? ` Thin lines: ${nodePaths.length} of the ${count(common.scenarios.count)} scenarios, one per history day, each with the first basis day.` : ""
-                  }`}
+                  }${weighted === "equally weighted" ? "" : " Percentiles count each scenario once; the plans weigh them as the weather rule below sets."}`}
                 >
                   <div className="fc-readout">
                     <NodeReadout desk={desk} common={common} />
@@ -236,10 +236,17 @@ export default function ForecastPage() {
 
                   <Section title="How the Scenarios Are Built" source={`${SOURCE_LINE} The same days and rule for all ${common.batteries} batteries.`}>
                     <Facts className="fc-method">
-                      <Fact label="Day type" note={`${day0} is off-peak: weekends and NERC holidays count together.`}>
+                      <Fact
+                        label="Day type"
+                        note={
+                          ref.dayType === "offpeak"
+                            ? `${day0} is off-peak: weekends and NERC holidays count together.`
+                            : `${day0} is a weekday: only weekdays that are not NERC holidays count.`
+                        }
+                      >
                         {ref.dayType === "offpeak" ? "Off-peak" : ref.dayType === "weekday" ? "Weekday" : ref.dayType}
                       </Fact>
-                      <Fact label="Forecast reference days" note={`The newest ${ref.dayType === "offpeak" ? "off-peak" : ref.dayType} days at least ${ref.lagDays} days before the operating day, weighted ${ref.days.map((d) => d.weight).join(", ")}.`}>
+                      <Fact label="Forecast reference days" note={`The newest ${ref.dayType === "offpeak" ? "off-peak days" : ref.dayType === "weekday" ? "weekdays" : `${ref.dayType} days`} at least ${ref.lagDays} days before the operating day, weighted ${ref.days.map((d) => d.weight).join(", ")}.`}>
                         {listDays(ref.days)}, {ref.days[0]?.day.slice(0, 4)}
                       </Fact>
                       <Fact label="Basis days" note="The node's day-ahead price minus the hub's, averaged by hour, moves the hub forecast to the node.">
@@ -259,11 +266,12 @@ export default function ForecastPage() {
 
                 <CournotCard
                   common={common}
+                  desk={desk}
                   hubName={desk.hub}
                   hub={hub}
                   historyDays={hubs.historyDays}
                   basisCount={hubs.basisDays.length}
-                  sealedUnix={common.operatingDay === "2026-11-26" ? sealedUnix : null}
+                  sealedUnix={receipts.status === "ready" && receipts.data.operatingDay === common.operatingDay ? sealedUnix : null}
                 />
 
                 <Section

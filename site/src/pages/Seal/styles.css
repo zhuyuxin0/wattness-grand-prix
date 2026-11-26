@@ -397,3 +397,40 @@
     gap: var(--t-space-3);
   }
 }
+
+/* ---------------------------------------------------------------- earlier sealed days */
+
+.seal-earlier {
+  display: grid;
+  gap: var(--t-space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.seal-earlier__day {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: var(--t-space-1) var(--t-space-4);
+  align-items: baseline;
+  font-size: var(--t-fs-sm);
+}
+.seal-earlier__name {
+  grid-row: span 3;
+  font-weight: 600;
+}
+.seal-earlier__root,
+.seal-earlier__commit {
+  grid-column: 2;
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .seal-earlier__day {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .seal-earlier__name,
+  .seal-earlier__root,
+  .seal-earlier__commit {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}

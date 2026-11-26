@@ -144,7 +144,7 @@ export default function IntroPage() {
             lead: main ? minSec(main.secondsBeforeGate) : null,
             caption: (
               <>
-                The sealed morning, {date}: plans made at <Clock unix={day.planUnix} />
+                The record for {shortDay(day.operatingDay)}, on the morning of {date}: plans made at <Clock unix={day.planUnix} />
                 {main && (
                   <>
                     , sealed at <Clock unix={main.blockTime} />

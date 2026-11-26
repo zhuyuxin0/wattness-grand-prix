@@ -1,6 +1,6 @@
 import { SealCost } from "../../components/atlas/SealCost";
 import { SOURCE_LINE } from "../../config";
-import { combine, useDay, useLateSeal, useReceipts, type DayIndex, type LateSeal, type Receipts } from "../../data";
+import { combine, useDay, useLateSeal, useReceipts, type DayIndex, type EarlierDay, type LateSeal, type Receipts } from "../../data";
 import { minSec } from "../../lib/clock";
 import { formatInt } from "../../lib/format";
 import { dualTime, formatOperatingDay } from "../../lib/time";
@@ -11,8 +11,9 @@ import "./styles.css";
 
 // Seal: the operating day as BNB Chain holds it. The lead is how long before
 // the gate the root went on chain; then both receipts field by field, and the
-// gate the contract computes for itself, with the late commit it refuses; last,
-// what the mainnet commit paid in gas, in dollars at Atlas's BNB/USD.
+// gate the contract computes for itself, with the late commit it refuses; the
+// earlier sealed days, each with its own root and commits; last, what the
+// mainnet commit paid in gas, in dollars at Atlas's BNB/USD.
 
 const CHAIN_SOURCE = "Commits: GateRecord on BNB Smart Chain, read from each chain's receipt.";
 
@@ -120,6 +121,40 @@ function Record({ day, receipts, late }: { day: DayIndex; receipts: Receipts; la
         </div>
       </Section>
 
+      {receipts.earlier && receipts.earlier.length > 0 && <Earlier days={receipts.earlier} />}
     </>
+  );
+}
+
+/** Earlier sealed days, newest first: each day's root and its commits, linked to the explorers. */
+function Earlier({ days }: { days: EarlierDay[] }) {
+  return (
+    <Section
+      id="seal-earlier"
+      title="Earlier Sealed Days"
+      lede="Every day's record stays on chain under its own key. Each earlier day's root and its two commits, from that day's own receipts."
+      source={CHAIN_SOURCE}
+    >
+      <ul className="seal-earlier">
+        {days.map((d) => (
+          <li key={d.operatingDay} className="seal-earlier__day">
+            <span className="seal-earlier__name">{formatOperatingDay(d.operatingDay)}</span>
+            <span className="seal-earlier__root">
+              Root <Hash value={d.root} head={6} tail={4} label={`root for ${d.operatingDay}`} /> over <span className="num">{formatInt(d.leafCount)}</span> plans
+            </span>
+            {d.receipts.map((r) => {
+              const at = dualTime(r.blockTime);
+              return (
+                <span key={r.chainId} className="seal-earlier__commit">
+                  {r.chainName}: <Hash value={r.txHash} head={6} tail={4} href={r.txUrl} label={`${r.chainName} commit for ${d.operatingDay}`} />{" "}
+                  <span className="num">{at.ct}</span>
+                  {at.yours && <span className="muted num"> · {at.yours}</span>}, <span className="num">{minSec(r.secondsBeforeGate)}</span> before its gate
+                </span>
+              );
+            })}
+          </li>
+        ))}
+      </ul>
+    </Section>
   );
 }

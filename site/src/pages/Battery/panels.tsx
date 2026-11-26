@@ -25,6 +25,7 @@ import {
   useHour,
   useNarrow,
   usdMwh,
+  weightingWords,
 } from "./kit";
 import { ARM_ORDER, scoreFormula, startSocMwh, tailPercent, type ArmFigures } from "./model";
 
@@ -46,7 +47,7 @@ export function Lead({ common, fig }: { common: DeskCommon; fig: ArmFigures }) {
       <div className="pk-lead__figure">
         <div className="pk-lead__value num">{money(fig.arm.expectedUsd)}</div>
         <p className="pk-lead__caption">
-          Expected revenue over the operating day, the mean over {common.scenarios.count} equally weighted price scenarios.
+          Expected revenue over the operating day, the mean over {common.scenarios.count} {weightingWords(common.scenarios.weighting)} price scenarios.
         </p>
       </div>
       <StatRow className="bt-lead__stats">
@@ -243,7 +244,14 @@ export function Asset({ desk, common }: { desk: Desk; common: DeskCommon }) {
       <Fact label="Wear charge" assumed={assumed} note="per MWh discharged">
         <span className="num">${perMwh(a.wear_cents_per_mwh)}/MWh</span>
       </Fact>
-      <Fact label="Hedge limit" note="no more than the hour's scheduled energy">
+      <Fact
+        label="Hedge limit"
+        note={
+          desk.cournot?.status === "applied" && common.cournot?.planCap != null && common.cournot.planCap !== a.max_contracts_per_hour
+            ? `the weather rule's cap, down from ${common.cournot.planCap}; no more than the hour's scheduled energy`
+            : "no more than the hour's scheduled energy"
+        }
+      >
         <span className="num">{a.max_contracts_per_hour} contracts an hour</span>
       </Fact>
     </Facts>

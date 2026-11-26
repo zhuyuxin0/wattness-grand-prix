@@ -13,8 +13,8 @@ import { FLAP_FEE_BPS, ROUND3_TERMS, TAX_DAYS, termsOf } from "./terms";
 import { bpsText, odDay, usd } from "./view";
 import "./styles.css";
 
-// Season: the Flap season from modules/flap. How a season works, the launched
-// round and round 3 read live from BSC testnet, how round 3 works (its terms,
+// Season: the Flap season from modules/flap. How a season works, round 1 (the
+// first launched round) and round 3 read live from BSC testnet, how round 3 works (its terms,
 // each once), and a worked example computed from round 3's own configuration.
 
 const SOURCE = (
@@ -110,7 +110,7 @@ function RoundRules({ round }: { round?: RoundView }) {
           A <span className="num">{bpsText(t.taxBps)}</span> tax for <span className="num">{TAX_DAYS}</span> days.
         </strong>{" "}
         Buys and sells of PRIX pay <span className="num">{bpsText(t.taxBps)}</span> for the first <span className="num">{TAX_DAYS}</span> days after the launch; the first sell
-        after that ends the tax. Flap's protocol fee comes off first: <span className="num">{bpsText(FLAP_FEE_BPS)}</span> of the tax on the launched round's PRIX. Of the
+        after that ends the tax. Flap's protocol fee comes off first: <span className="num">{bpsText(FLAP_FEE_BPS)}</span> of the tax on round 1's PRIX. Of the
         rest, <span className="num">{bpsText(t.vaultShareBps)}</span> goes to the vault and <span className="num">{bpsText(10_000 - t.vaultShareBps)}</span> is burned.
       </li>
       <li>
@@ -160,7 +160,8 @@ function Stamp({ live, first = false }: { live: Live<SeasonRead>; first?: boolea
 /** Round 3's lede follows its state: open, launched, or past its deadline without a launch. */
 function roundThreeLede(s: SeasonRead | undefined): string {
   const day = s ? formatOperatingDay(odDay(s.round3.milestone.od)).replace(/, \d{4}$/, "") : "Fri, Nov 27";
-  if (s?.round3.status === "launched") return `It launched once the Wattness agent's plan for ${day} was sealed before that day's gate and the round had raised its minimum.`;
+  if (s?.round3.status === "launched")
+    return `It launched once the Wattness agent's plan for ${day} was sealed in GateRecord before that day's gate and the raise had reached its minimum. The vault counts each season day from GateRecord.`;
   if (s?.round3.status === "refunding") return `It did not launch by its deadline, so every deposit can be refunded.`;
   return `Open now. It launches only once the Wattness agent's plan for ${day} is sealed before that day's gate and the round has raised its minimum.`;
 }
@@ -183,8 +184,8 @@ export default function SeasonPage() {
 
       <Section
         id="season-launched"
-        title="The Launched Round"
-        lede="This round launched once the Wattness agent's plan for Nov 26 was sealed and the raise had passed its minimum. The vault counts each season day from GateRecord."
+        title="Round 1"
+        lede="Round 1 launched once the Wattness agent's plan for Nov 26 was sealed in GateRecord before that day's gate and the raise had passed its minimum. The vault counts each season day from GateRecord."
         source={SOURCE}
       >
         {s ? (
@@ -218,8 +219,8 @@ export default function SeasonPage() {
         variant="panel"
         source={
           <>
-            Round 3's terms as its Launcher holds them on BSC testnet; the launched round runs the same code with the same caps. Flap's fee as the launched round's tax
-            processor holds it. {CONTRACTS}
+            Round 3's terms as its Launcher holds them on BSC testnet; round 1 runs the same code with the same caps. Flap's fee as round 1's tax processor
+            holds it. {CONTRACTS}
           </>
         }
       >

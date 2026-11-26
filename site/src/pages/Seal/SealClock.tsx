@@ -3,20 +3,26 @@ import { formatInZone, dualTime } from "../../lib/time";
 import { CENTRAL_TZ } from "../../config";
 import { Glyph } from "../../ui";
 
-// The seal clock: the 50 minutes before the gate on one linear scale, then the
-// first minute after it drawn ten times wider, so the refused commit 22 s past
-// the gate does not sit on the gate line. The break is the gate itself and the
-// caption says so. Every mark is labeled once; the table under the clock holds
-// the same times.
+// The seal clock: the minutes before the gate that hold the day's plans and
+// commits (at least 50) on one linear scale, then the first minute after it
+// drawn wider, so the refused commit 22 s past the gate does not sit on the
+// gate line. The break is the gate itself and the caption says so, with the
+// scale. Every mark is labeled once; the table under the clock holds the same
+// times.
 
-const BEFORE = 50 * 60;
+const MIN_BEFORE = 50 * 60;
 const AFTER = 60;
-/** 50 min on 5/6 of the width and 1 min on 1/6: the minute after the gate is drawn at 10x. */
+/** The span before the gate on 5/6 of the width and 1 min on 1/6: 50 min puts the minute after the gate at 10x. */
 const SPLIT = 5 / 6;
 
-function at(t: number, gate: number): number {
+/** Seconds shown before the gate: at least 50 min, in whole 10 min, with 5 min clear of the earliest mark. */
+function spanBefore(gate: number, earliest: number): number {
+  return Math.max(MIN_BEFORE, Math.ceil((gate - earliest + 300) / 600) * 600);
+}
+
+function at(t: number, gate: number, before: number): number {
   const d = t - gate;
-  if (d <= 0) return SPLIT * (1 + Math.max(d, -BEFORE) / BEFORE);
+  if (d <= 0) return SPLIT * (1 + Math.max(d, -before) / before);
   return SPLIT + ((1 - SPLIT) * Math.min(d, AFTER)) / AFTER;
 }
 
@@ -34,8 +40,12 @@ export function SealClock({ day, receipts, late }: SealClockProps) {
   const main = receipts.find((r) => r.mainnet) ?? receipts[0];
   if (!main) return null;
   const test = receipts.find((r) => r !== main);
-  const x = (t: number) => at(t, gate);
-  const ticks = [-50, -40, -30, -20, -10].map((m) => gate + m * 60);
+  const before = spanBefore(gate, Math.min(day.planUnix, ...receipts.map((r) => r.blockTime)));
+  const x = (t: number) => at(t, gate, before);
+  const step = before <= 3600 ? 600 : before <= 7200 ? 1200 : 1800;
+  const ticks = Array.from({ length: Math.floor(before / step) }, (_, i) => gate - before + i * step);
+  // How much wider a second after the gate is drawn than one before it.
+  const wider = Math.round((before * (1 - SPLIT)) / (AFTER * SPLIT));
   const date = formatInZone(gate, CENTRAL_TZ, { seconds: false }).replace(/, \d\d:\d\d$/, "");
   const tip = (what: string, unix: number) => {
     const t = dualTime(unix);
@@ -100,8 +110,8 @@ export function SealClock({ day, receipts, late }: SealClockProps) {
         </span>
       </div>
       <figcaption className="sclock__caption">
-        Times in CT on {date}. Sealed: {main.chainName} (chain {main.chainId}){test ? `; testnet: ${test.chainName} (chain ${test.chainId})` : ""}. The 50
-        minutes before the gate share one scale; the minute after it, where GateRecord refuses every commit, is drawn ten times wider.
+        Times in CT on {date}. Sealed: {main.chainName} (chain {main.chainId}){test ? `; testnet: ${test.chainName} (chain ${test.chainId})` : ""}. The{" "}
+        {before / 60} minutes before the gate share one scale; the minute after it, where GateRecord refuses every commit, is drawn {wider} times wider.
         <span className="visually-hidden">
           {" "}
           {tip("Plans made", day.planUnix)}. {tip(`Sealed on ${main.chainName}`, main.blockTime)}.

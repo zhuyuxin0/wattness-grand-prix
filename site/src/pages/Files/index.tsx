@@ -13,7 +13,7 @@ import "./styles.css";
 
 type File = GreenfieldIndex["files"][number];
 
-const RECORD_KINDS = new Set(["index", "root", "salt", "receipt"]);
+const RECORD_KINDS = new Set(["index", "root", "salt", "receipt", "outside-input"]);
 const KINDS: { id: string; label: string; match: (f: File) => boolean }[] = [
   { id: "record", label: "Record", match: (f) => RECORD_KINDS.has(f.kind) },
   { id: "leaf", label: "Plans", match: (f) => f.kind === "leaf" },
@@ -27,6 +27,7 @@ const KIND_LABEL: Record<string, string> = {
   root: "Root",
   salt: "Salt",
   receipt: "Chain receipt",
+  "outside-input": "Cournot reading",
   leaf: "Plan",
   scenarios: "Price scenarios",
   sync: "Inputs read",

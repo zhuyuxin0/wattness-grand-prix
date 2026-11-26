@@ -6,7 +6,7 @@ import { useDesk, useDeskCommon, type Desk } from "../../data/plan";
 import { formatOperatingDay } from "../../lib/time";
 import { useSelectedBattery } from "../../shell/battery";
 import { BATTERY_NAMES, BatteryPicker, ErrorNote, Glyph, Loading, PageHeader, Section } from "../../ui";
-import { ColumnsChart, FanChart, HourContext, HOURS, Key, Legend, PlanSeg, planLabel, SocChart, useHourState } from "./kit";
+import { ColumnsChart, FanChart, HourContext, HOURS, Key, Legend, PlanSeg, planLabel, SocChart, useHourState, weightingWords } from "./kit";
 import { allFigures, ARM_ORDER, differences, startSocMwh, tailPercent } from "./model";
 import { Asset, Compare, Differences, HourReadout, HourTable, Lead, Record } from "./panels";
 import "./styles.css";
@@ -130,7 +130,7 @@ export default function BatteryPage() {
               className="bt-plan"
               title={`Plan ${active} by Hour`}
               lede={`${planLabel(active)}${active === desk.selectedArm ? ", the sealed plan" : ""}. Every chart shares the hour axis, so a column lines up across all four.`}
-              source={`${SOURCE_LINE} Operating day ${day0}, hours in CT. Prices: day-ahead forecast at ${desk.settlementPoint} and its ${c.scenarios.count} equally weighted scenarios. Contracts are a comparison at an assumed entry price, not executed trades.`}
+              source={`${SOURCE_LINE} Operating day ${day0}, hours in CT. Prices: day-ahead forecast at ${desk.settlementPoint} and its ${c.scenarios.count} ${weightingWords(c.scenarios.weighting)} scenarios. Contracts are a comparison at an assumed entry price, not executed trades.`}
             >
               <div className="bt-readout">
                 <HourReadout desk={desk} common={c} fig={fig} />
@@ -210,7 +210,7 @@ export default function BatteryPage() {
               <Section
                 title="The Three Plans Compared"
                 lede="Same battery, same prices. Choose a plan's column to show it."
-                source={`Means over ${c.scenarios.count} equally weighted scenarios, in dollars for the day. Worst ${tail}%: the mean revenue of the worst ${tail}% of scenarios. ${SOURCE_LINE}`}
+                source={`Means over ${c.scenarios.count} ${weightingWords(c.scenarios.weighting)} scenarios, in dollars for the day. Worst ${tail}%: the mean revenue of the worst ${tail}% of scenarios. ${SOURCE_LINE}`}
               >
                 <Compare common={c} figs={figs} active={active} sealed={desk.selectedArm} onPick={pick} />
               </Section>

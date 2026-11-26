@@ -1,5 +1,5 @@
 import { useCallback, useLayoutEffect, useRef, useState } from "react";
-import type { SealReceipt } from "@world/game";
+import type { Field, SealReceipt } from "@world/game";
 import { TABS } from "../../shell/tabs";
 import { PageHeader } from "../../ui";
 import { Cabinet } from "./Cabinet";
@@ -39,6 +39,7 @@ function useWidth<T extends HTMLElement>() {
 
 export default function OnePlanPage() {
   const [seal, setSeal] = useState<SealReceipt | null>(lastSeal);
+  const [field, setField] = useState<Field | null>(null);
   const onSeal = useCallback((receipt: SealReceipt) => {
     lastSeal = receipt;
     setSeal(receipt);
@@ -50,14 +51,14 @@ export default function OnePlanPage() {
     <div className="page page--one-plan">
       <PageHeader title="ONE PLAN" lede={tab?.summary} />
       <div ref={box} className={`arcade${wide ? " arcade--rail" : ""}`}>
-        {!wide && <HowItPlays folded />}
+        {!wide && <HowItPlays folded field={field} />}
         <div className="arcade__main">
-          <Cabinet onSeal={onSeal} />
+          <Cabinet onSeal={onSeal} onField={setField} />
           {seal && <SealedPlan receipt={seal} />}
         </div>
         {wide && (
           <aside className="arcade__rail">
-            <HowItPlays />
+            <HowItPlays field={field} />
           </aside>
         )}
       </div>

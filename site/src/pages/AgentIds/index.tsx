@@ -4,7 +4,7 @@ import { now } from "../../lib/capture";
 import { dualTime } from "../../lib/time";
 import { Glyph, Hash, Loading, PageHeader, Ready, Section } from "../../ui";
 import { LiveRead } from "../../ui/LiveRead";
-import { Flow, TabLink } from "../Battery/kit";
+import { Flow, shortDay, TabLink } from "../Battery/kit";
 import { useAgents, useCards, useChain, useHostedCard, type Agent, type AgentsFile, type CardRead, type ChainState, type IdentityRead, type Job, type JobRead, type LiveState, type Party } from "./data";
 import { addressUrl, txUrl } from "./rpc";
 import "./styles.css";
@@ -13,7 +13,8 @@ import "./styles.css";
 // roles of a day's plan and the evaluator), each read back from the registry
 // in the browser and held to the record (contracts/deployments, the stack's
 // integrations record); where each one runs, as the repository records it;
-// and the three ERC-8183 jobs between them, with who paid whom and every step.
+// and the ERC-8183 jobs between them, each with its operating day, who paid
+// whom and every step.
 
 const SOURCE = "Data: BSC testnet (chain 97), the ERC-8004 registry and the ERC-8183 commerce contract, read with eth_call; cards from BNB Greenfield. Display: Wattness.";
 
@@ -32,6 +33,28 @@ const STEP: Record<string, string> = {
 };
 
 const registryEntry = (f: AgentsFile, id: number) => `${f.explorer}/nft/${f.registry}/${id}`;
+const WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+const word = (n: number) => WORDS[n] ?? String(n);
+/** "1871", "1871 and 1873", "1871, 1872 and 1873" */
+const listIds = (ids: number[]) => (ids.length <= 1 ? ids.join("") : `${ids.slice(0, -1).join(", ")} and ${ids[ids.length - 1]}`);
+/** "Nov 26", "Nov 26 and Nov 27": each role-to-role job's day, in order. */
+const listDays = (days: string[]) => {
+  const names = [...new Set(days)].sort().map(shortDay);
+  return names.length <= 1 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+};
+
+/** The paid jobs in one sentence, from the record: the jobs between two roles by day, then the evaluations. */
+function jobsSentence(f: AgentsFile): string {
+  const roles = f.jobs.filter((j) => j.task === "price-scenarios");
+  const evals = f.jobs.filter((j) => j.task === "evaluation");
+  const parts: string[] = [];
+  if (roles.length)
+    parts.push(
+      `${roles.length === 1 ? "one" : word(roles.length).toLowerCase()} between two roles, the planner buying Desert Willow's price scenarios from the forecaster for ${listDays(roles.map((j) => j.operatingDay))}`,
+    );
+  if (evals.length) parts.push(`${word(evals.length).toLowerCase()} evaluations of Desert Willow's ${listDays(evals.map((j) => j.operatingDay))} plan bought by Wattness's test wallet`);
+  return `${word(f.jobs.length)} paid ERC-8183 jobs: ${parts.join(", and ")}.`;
+}
 const units = (wei: string | bigint, decimals: number) => {
   const v = typeof wei === "bigint" ? wei : BigInt(wei);
   const whole = v / 10n ** BigInt(decimals);
@@ -69,8 +92,7 @@ export default function AgentIdsPage() {
         lede={
           <>
             Seven identities on the ERC-8004 registry on BSC testnet: the six roles of the planner's one process, registered on Nov 25 after the Nov 26 plan was sealed, and
-            Wattness's own evaluator, which checks a sealed plan against its GateRecord commitment. Three paid ERC-8183 jobs: one between two roles, opened after the seal, and two
-            evaluations of Desert Willow's Nov 26 plan bought by Wattness's test wallet.
+            Wattness's own evaluator, which checks a sealed plan against its GateRecord commitment.{state.status === "ready" ? ` ${jobsSentence(state.data)}` : ""}
             <Flow>
               A plan's parts are on <TabLink to="/agents/forecast">Forecast</TabLink> to <TabLink to="/agents/risk">Risk</TabLink>; the check the evaluator sells is the one anyone
               can run on <TabLink to="/verify">Verify</TabLink>.
@@ -112,12 +134,22 @@ function Agents({ f }: { f: AgentsFile }) {
 
       <Section
         id="ids-jobs"
-        title="Three Paid Jobs"
+        title={`${word(f.jobs.length)} Paid Jobs`}
         lede={`An ERC-8183 job escrows the client's payment, takes the provider's deliverable as a fingerprint on chain, and pays the provider when it settles. Each job here paid ${units(f.jobs[0]?.amountWei ?? "0", f.paymentToken.decimals)} ${f.paymentToken.symbol}, a testnet stablecoin with no cash value.`}
         source={
           <>
-            {SOURCE} Commerce contract {f.erc8183.commerce}, router {f.erc8183.router}. Steps: job 1872 from contracts/deployments/agents.bsc-testnet.json; jobs 1871 and 1873 from
-            their receipts, read back on BSC testnet.
+            {SOURCE} Commerce contract {f.erc8183.commerce}, router {f.erc8183.router}. Steps:{" "}
+            {(() => {
+              const dep = f.jobs.filter((j) => j.task === "price-scenarios").map((j) => j.jobId);
+              const read = f.jobs.filter((j) => j.task !== "price-scenarios").map((j) => j.jobId);
+              return [
+                dep.length ? `${dep.length === 1 ? "job" : "jobs"} ${listIds(dep)} from contracts/deployments/agents.bsc-testnet.json` : "",
+                read.length ? `${read.length === 1 ? "job" : "jobs"} ${listIds(read)} from ${read.length === 1 ? "its" : "their"} receipts, read back on BSC testnet` : "",
+              ]
+                .filter(Boolean)
+                .join("; ");
+            })()}
+            .
           </>
         }
       >
@@ -316,10 +348,34 @@ function PartyName({ p }: { p: Party }) {
   );
 }
 
+/** How a job between two roles stands to its own day's seal: before or after it, from its steps' block times. */
+function timingNote(j: Job): string | null {
+  const day = shortDay(j.operatingDay);
+  const sealUnix = j.sealed?.firstCommitUnix ?? null;
+  const at = (step: string) => j.transactions.find((t) => t.step === step)?.blockTime ?? null;
+  const open = at("createJob");
+  const submit = at("submit");
+  const settle = at("settle");
+  if (sealUnix != null && open != null && submit != null && settle != null && submit < sealUnix) {
+    const seal = dualTime(sealUnix, { date: false, seconds: false });
+    return `Opened, funded and delivered before the ${day} record was sealed at ${seal.ct}${seal.yours ? ` (${seal.yours})` : ""}; settled after the seal.`;
+  }
+  if (j.timing === "sealed") return `Opened after the ${day} record was sealed; it delivers the scenarios as sealed.`;
+  return null;
+}
+
 function JobCard({ f, j, read, loading }: { f: AgentsFile; j: Job; read: ChainState["jobs"][number] | undefined; loading: boolean }) {
   const manifest = useShowcaseManifest(j.resource);
   const live = read && !isErr(read) ? (read as JobRead) : null;
-  const digest = j.fingerprint === "sha256" && manifest.status === "ready" ? `0x${manifest.data.scenarios.digest_sha256.replace(/^0x/, "")}` : null;
+  // The digest the job's own day sealed: the published leaf when it is that day's, else the build's read of that day's record.
+  const sameDay = manifest.status === "ready" && manifest.data.operating_day === j.operatingDay;
+  const digest =
+    j.fingerprint !== "sha256"
+      ? null
+      : sameDay && manifest.status === "ready"
+        ? `0x${manifest.data.scenarios.digest_sha256.replace(/^0x/, "")}`
+        : (j.sealed?.scenariosDigest ?? null);
+  const day = shortDay(j.operatingDay);
   const amount = `${units(j.amountWei, f.paymentToken.decimals)} ${f.paymentToken.symbol}`;
   const allMatch = live ? live.matches.parties && live.matches.amount && live.matches.deliverable && live.matches.status : null;
   const served =
@@ -335,7 +391,7 @@ function JobCard({ f, j, read, loading }: { f: AgentsFile; j: Job; read: ChainSt
           <h3 className="ids-job__name">
             Job <span className="num">{j.jobId}</span>
           </h3>
-          <span className="ids-job__task">{j.task === "price-scenarios" ? "Desert Willow's price scenarios" : "An evaluation of Desert Willow's sealed plan"}</span>
+          <span className="ids-job__task">{j.task === "price-scenarios" ? `Desert Willow's price scenarios for ${day}` : `An evaluation of Desert Willow's ${day} plan`}</span>
         </div>
         <span className="ids-status">{live ? live.status : j.status}</span>
       </header>
@@ -352,7 +408,13 @@ function JobCard({ f, j, read, loading }: { f: AgentsFile; j: Job; read: ChainSt
                 ? "The SHA-256 of the scenarios file's RFC 8785 canonical JSON."
                 : "The Keccak-256 of the deliverable's canonical JSON: the request, the record's root and receipt, and the report with checks V1 to V10 and its SHA-256."}
             </span>
-            {digest && <Ok ok={digest.toLowerCase() === j.deliverable.toLowerCase()} yes="equals the scenarios digest Desert Willow's sealed plan commits" no="differs from the sealed plan's scenarios digest" />}
+            {digest && (
+              <Ok
+                ok={digest.toLowerCase() === j.deliverable.toLowerCase()}
+                yes={`equals the scenarios digest Desert Willow's sealed ${day} plan commits`}
+                no={`differs from the scenarios digest Desert Willow's sealed ${day} plan commits`}
+              />
+            )}
           </dd>
         </div>
         <div>
@@ -369,7 +431,7 @@ function JobCard({ f, j, read, loading }: { f: AgentsFile; j: Job; read: ChainSt
           <dt>Served</dt>
           <dd>
             {served}
-            {j.timing === "sealed" && j.task === "price-scenarios" && <span className="muted">Opened after the Nov 26 record was sealed; it delivers the scenarios as sealed.</span>}
+            {j.task === "price-scenarios" && timingNote(j) && <span className="muted">{timingNote(j)}</span>}
           </dd>
         </div>
       </dl>

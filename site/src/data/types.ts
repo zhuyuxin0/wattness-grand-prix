@@ -74,10 +74,21 @@ export interface ChainReceipt {
   source: string;
 }
 
+/** An earlier sealed day: its root and both commits, from that day's own record. */
+export interface EarlierDay {
+  operatingDay: string;
+  root: `0x${string}`;
+  leafCount: number;
+  gateUnix: number;
+  receipts: ChainReceipt[];
+}
+
 export interface Receipts {
   schema: "grand-prix.receipts.v1";
   operatingDay: string;
   receipts: ChainReceipt[];
+  /** Earlier sealed days, newest first; absent in files built before the list existed. */
+  earlier?: EarlierDay[];
 }
 
 export interface LateSeal {

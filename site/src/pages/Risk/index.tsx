@@ -5,7 +5,7 @@ import { useDesk, useDeskCommon } from "../../data/plan";
 import { formatOperatingDay } from "../../lib/time";
 import { BatteryBar, Glyph, PageHeader, Ready, Section, Stat, StatRow, Table, useBatteryChoice, type Column } from "../../ui";
 import { allFigures, lambda, scoreFormula, tailPercent, type ArmFigures } from "../Battery/model";
-import { count, delta, Fact, Facts, Flow, Key, Legend, money, moneyWords, num2, planColor, PlanName, PLANS, Readout, TabLink, useNarrow } from "../Battery/kit";
+import { count, delta, Fact, Facts, Flow, Key, Legend, money, moneyWords, num2, planColor, PlanName, PLANS, Readout, TabLink, useNarrow, weightingWords } from "../Battery/kit";
 import { Dumbbell, type Bell } from "./Dumbbell";
 import "./styles.css";
 
@@ -143,7 +143,7 @@ export default function RiskPage() {
               <Section
                 title="Mean and Worst Case by Plan"
                 lede={`Each row runs from the plan's worst-${tail}% average to its mean revenue; the tick is its score. The further left a row starts, the more its score gives up.`}
-                source={`${SOURCE_LINE} Operating day ${day0}. Over ${count(n)} equally weighted price scenarios.`}
+                source={`${SOURCE_LINE} Operating day ${day0}. Over ${count(n)} ${weightingWords(common.scenarios.weighting)} price scenarios.`}
               >
                 <Readout
                   className="rk-readout"
@@ -192,7 +192,9 @@ export default function RiskPage() {
                     <span className="num">{scoreFormula(common)}</span>
                   </Fact>
                   <Fact label="Scenarios" note="from Forecast">
-                    <span className="num">{count(n)}, equally weighted</span>
+                    <span className="num">
+                      {count(n)}, {weightingWords(common.scenarios.weighting)}
+                    </span>
                   </Fact>
                   <Fact label="Which plan is sealed" note="a tie goes to the earlier plan">
                     The highest score
