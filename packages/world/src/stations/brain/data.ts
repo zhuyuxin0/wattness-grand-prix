@@ -100,6 +100,12 @@ export const PLAIN: Record<BrainId, string> = {
   'battery-review': "Desert Willow's review",
   terminal: 'Terminal brain',
 };
+/** The plain names in a sentence: "the Grand Prix brain", but "Desert Willow's review" (a possessive takes no "the"). */
+export const THE: Record<BrainId, string> = {
+  'grand-prix': 'the Grand Prix brain',
+  'battery-review': "Desert Willow's review",
+  terminal: 'the Terminal brain',
+};
 
 /** A page's key, unique across brains (slugs repeat: wattness-terminal is in two). */
 export const keyOf = (brain: BrainId, slug: string) => `${brain}/${slug}`;

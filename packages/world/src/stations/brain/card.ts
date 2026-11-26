@@ -4,7 +4,7 @@
 // host's), the conflict across brains, the connections in its brain and across brains (each row selects its page), and
 // "Open <tab>" where the page is a tab's own. Also the small hover card, and the page list (the keyboard's path, and the
 // fallback without WebGL or at phone width).
-import { BRAINS, PLAIN, acrossOf, brainOf, conflictOf, linksOf, pagesOf, tabsOf, type BrainId, type Page, type Strength } from './data';
+import { BRAINS, PLAIN, THE, acrossOf, brainOf, conflictOf, linksOf, pagesOf, tabsOf, type BrainId, type Page, type Strength } from './data';
 
 const two = (n: number) => String(n).padStart(2, '0');
 const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) => {
@@ -66,7 +66,8 @@ function glyph(kind: keyof typeof GLYPH, px: number): SVGSVGElement {
 /** The pinned card for a page. */
 export function pageCard(p: Page, host: CardHost): HTMLElement {
   const card = el('section', 'lbm-card');
-  card.setAttribute('aria-label', `${p.title}, page ${two(p.n)} of the ${PLAIN[p.brain]}`);
+  // Living Brain's own name for the brain is said here; the card shows the plain one
+  card.setAttribute('aria-label', `${p.title}, page ${two(p.n)} of ${THE[p.brain]} (${brainOf(p.brain).name} in Living Brain)`);
   card.dataset.brain = p.brain; card.dataset.page = p.slug;
   const head = el('header', 'lbm-head');
   const h = el('h3', 'lbm-title');
@@ -76,7 +77,7 @@ export function pageCard(p: Page, host: CardHost): HTMLElement {
   x.addEventListener('click', () => host.close());
   head.append(h, x);
   const own = linksOf(p.brain, p.slug), across = acrossOf(p.brain, p.slug);
-  const meta = el('p', 'lbm-meta', [`${PLAIN[p.brain]} (${brainOf(p.brain).name})`, `page ${two(p.n)}`, `${p.connections} ${p.connections === 1 ? 'connection' : 'connections'}`, ...(p.across ? [`${p.across} across brains`] : [])].join(' · '));
+  const meta = el('p', 'lbm-meta', [PLAIN[p.brain], `page ${two(p.n)}`, `${p.connections} ${p.connections === 1 ? 'connection' : 'connections'}`, ...(p.across ? [`${p.across} across brains`] : [])].join(' · '));
   card.append(head, meta);
   // where the page belongs on the site
   const tabs = tabsOf(p.brain, p.slug);
@@ -149,14 +150,14 @@ export function pageCard(p: Page, host: CardHost): HTMLElement {
 export function hoverCard(p: Page): HTMLElement {
   const c = el('div', 'lbm-hover');
   const h = el('p', 'lbm-htitle'); h.append(badge(p), document.createTextNode(p.title));
-  c.append(h, el('p', 'lbm-meta', `${PLAIN[p.brain]} (${brainOf(p.brain).name}) · ${p.connections} ${p.connections === 1 ? 'connection' : 'connections'}${p.across ? ` · ${p.across} across` : ''}`));
+  c.append(h, el('p', 'lbm-meta', `${PLAIN[p.brain]} · ${p.connections} ${p.connections === 1 ? 'connection' : 'connections'}${p.across ? ` · ${p.across} across brains` : ''}`));
   return c;
 }
 
 /** A brain's pages as rows (number order): the keyboard's path and the fallback list. */
 export function pageRows(brain: BrainId, onPick: (p: Page) => void, onFocus?: (p: Page | null) => void): HTMLElement {
   const ul = el('ul', 'lbm-list');
-  ul.setAttribute('aria-label', `The ${PLAIN[brain]}'s pages`);
+  ul.setAttribute('aria-label', `Pages of ${THE[brain]}`);
   for (const p of pagesOf(brain)) {
     const li = el('li');
     const b = el('button', 'lbm-listbtn'); b.type = 'button'; b.dataset.brain = p.brain; b.dataset.page = p.slug;

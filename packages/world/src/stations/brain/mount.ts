@@ -16,7 +16,7 @@ import { BrainWorld, restPose, REST, ORBIT, VFOV } from './world';
 import { BrainBloomPass } from './bloom';
 import { makeRibbons } from './ribbons';
 import { Chrome, memberScreen, projectorNow } from './tags';
-import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, keyOf, fmt, PLAIN, scopeLine } from './data';
+import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, keyOf, fmt, PLAIN, THE, scopeLine } from './data';
 import { pageCard, hoverCard, pageRows, brainChips, setChips, fixOf } from './card';
 import { T_SHARED } from './moments';
 
@@ -174,7 +174,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   const navBtns = new Map<BrainFocus, HTMLButtonElement>();
   let navRows: HTMLElement | null = null, navRowsFor = '';
   for (const id of ['all', ...BRAIN_IDS] as BrainFocus[]) {
-    const bt = document.createElement('button'); bt.type = 'button'; bt.textContent = id === 'all' ? 'All brains' : `Focus the ${PLAIN[id]}`;
+    const bt = document.createElement('button'); bt.type = 'button'; bt.textContent = id === 'all' ? 'All brains' : `Focus ${THE[id]}`;
     // the keyboard's path goes on into the brain's pages
     bt.addEventListener('click', () => keepFocus(() => { focusBrain(id, 'user'); navRows?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true }); }));
     nav.appendChild(bt); navBtns.set(id, bt);
