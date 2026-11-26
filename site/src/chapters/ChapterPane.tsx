@@ -101,7 +101,8 @@ function Pane({ chapter }: { chapter: Chapter }) {
           {still ? (
             <img src={poster} alt="" width={960} height={540} decoding="async" loading="lazy" />
           ) : (
-            <video ref={video} poster={poster} muted loop playsInline preload="none" disablePictureInPicture disableRemotePlayback aria-hidden="true" tabIndex={-1}>
+            // the poster too waits until the pane is near the view: a pane never shown (a floating preview's) asks for nothing
+            <video ref={video} poster={near ? poster : undefined} muted loop playsInline preload="none" disablePictureInPicture disableRemotePlayback aria-hidden="true" tabIndex={-1}>
               {near && <source src={chapterFile(chapter.loop, `-${size}.webm`)} type='video/webm; codecs="vp9"' />}
               {near && <source src={chapterFile(chapter.loop, `-${size}.mp4`)} type="video/mp4" />}
             </video>
