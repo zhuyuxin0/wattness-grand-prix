@@ -71,7 +71,7 @@ Contracts compile with Hardhat (solc 0.8.28, cancun, optimizer 200, via IR). The
 ## Run a launch
 
 1. Deploy a developer-owned proxy set on BSC testnet with the OpenFour fork toolkit (`developer/fork-deploy` in [openfour-docs](https://github.com/four-meme-community/openfour-docs), `npm run fork:dry`, then `npm run fork`). Its `out/fork-deployment.json` is the `--fork` input below; the deployer owns the Registry and signs creates.
-2. Run the steps in order. Each reads the key `OPENFOUR_TESTNET_PRIVATE_KEY` through `loadSecrets`, refuses any chain but 97 and 31337, and writes what it sent and read to `--evidence`. Keep that directory outside the repository.
+2. Run the steps in order, one launch per evidence directory. Each reads the key `OPENFOUR_TESTNET_PRIVATE_KEY` through `loadSecrets`, refuses any chain but 97 and 31337, simulates each call before sending it, and writes what it sent and read to `--evidence`. Keep that directory outside the repository.
 
 ```sh
 cd modules/openfour
@@ -81,10 +81,31 @@ node scripts/launch.ts buy      --fork <…> --evidence <dir>
 node scripts/launch.ts graduate --fork <…> --evidence <dir> --expect-revert   # evidence missing: mined, reverts
 node scripts/launch.ts bind     --fork <…> --evidence <dir> --od 20261126 --root <root>
 node scripts/launch.ts graduate --fork <…> --evidence <dir>
-node scripts/launch.ts verify   --fork <…> --evidence <dir>                   # re-read from a second RPC
+node scripts/launch.ts verify   --fork <…> --evidence <dir>                   # every receipt re-read from a second RPC
 ```
 
-`deploy` registers the module on the fork's Registry and adds a preset that copies Bonding V1 with this Migrate. `create` launches the placeholder token Grand Prix Planner (PLNR): 10 billion supply, 8 billion on the curve, a 0.1 WBNB raise, anti-sniper off. `--rpc http://127.0.0.1:<port>` runs the same steps on a local fork of BSC testnet.
+`deploy` registers the module on the fork's Registry and adds a preset that copies Bonding V1 with this Migrate. `create` launches Grand Prix Planner (PLNR, testnet): 10 billion supply, 8 billion on the curve, a 0.1 WBNB raise, anti-sniper off. `--rpc http://127.0.0.1:<port>` runs the same steps on a local fork of BSC testnet.
+
+A launch that also sells back to the curve before graduating reuses the deployed preset (`--preset` checks that the Registry still resolves it to the recorded module):
+
+```sh
+node scripts/launch.ts create   --fork <…> --evidence <dir2> --preset 1795634196178 --name "Grand Prix Planner 27 Nov" --symbol PLNR27 \
+                                --agent <committer> --min-od 20261127 --min-leaves 300 --code-hash <bytes32>
+node scripts/launch.ts buy      --fork <…> --evidence <dir2> --tokens 1000000000   # Core.buy of an exact amount; the sale stays open
+node scripts/launch.ts sell     --fork <…> --evidence <dir2> --percent 90          # Core.sell back to the curve, quote kept as WBNB
+node scripts/launch.ts buy      --fork <…> --evidence <dir2>                       # buyByBudget to sell-out
+```
+
+then `graduate --expect-revert`, `bind`, `graduate` and `verify` as above.
+
+## Submission records
+
+`submission/` holds what OpenFour's developer workflow asks to submit for review:
+
+- `tokens.json`: OpenFour's Workbench token list (`developer/workbench/data/tokens.json`, newest first) for every launch in `deployments/bsc-testnet.json`, each row extended with its create, buy, sell and migrate records, the bound record, the pool and failure paths checked by `eth_call`. `node scripts/tokens-json.ts` rebuilds it without a key: every transaction, receipt and block is read from at least two of three public RPCs run by different operators, and they must agree.
+- `submit-pack.json`: the same material in the shape of OpenFour's `pack-submit.js` (`node scripts/submit-pack.ts`).
+
+The gameplay proposal and the AI-assisted audit are in `docs/sponsors/openfour-gameplay.md` and `docs/sponsors/openfour-ai-audit.md`.
 
 ## BSC testnet
 
@@ -97,8 +118,10 @@ node scripts/launch.ts verify   --fork <…> --evidence <dir>                   
 | Tools | `0x4a60f097A2f39a007bd92737B6c80aEE30992072` |
 | Migrate implementation | `0xfc2E00dCfC39C71F97Ce0e6ba9C52717Ed8fbA8e` (beacon `0xd57B39899b3bb33d85ACAAe705d571a1559F30C6`) |
 | Preset | `1795634196178`, Evidence-gated Bonding V1 |
-| PLNR | `0xB1e792b2C6Bf7Ae7A1D972af313442039422ef14`, migrate instance `0xD23E368C50b8F5E8624Adfc30cdE2D4dE8E87735` |
+| Grand Prix Planner (PLNR, testnet) | `0xB1e792b2C6Bf7Ae7A1D972af313442039422ef14`, migrate instance `0xD23E368C50b8F5E8624Adfc30cdE2D4dE8E87735` |
 | PLNR / WBNB pair | `0xe54cDdE2d4A28b0131C5Dc6b9E5Afb20701680Ee` |
+| Grand Prix Planner 27 Nov (PLNR27, testnet) | `0x027C1A8D15ceb3048F5EC787D5e1E64B1043cE47`, migrate instance `0xF3Cb2A05dF23A4464A8A7606229e150552b71871` |
+| PLNR27 / WBNB pair | `0x28Fb374c51B89c7D58c5849a478339BFda640879` |
 | GateRecord | `0x2922c68cE15EB3e83B7f43b136e981dDc4262876` |
 
 ## Discovery probe and encoding
