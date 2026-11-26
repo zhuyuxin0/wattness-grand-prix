@@ -12,6 +12,9 @@
   grid-template-columns: minmax(0, 1fr);
   gap: var(--t-space-3);
 }
+.start-here__grid--sponsors {
+  margin-top: var(--t-space-4);
+}
 .start-here__head {
   display: grid;
   align-content: start;

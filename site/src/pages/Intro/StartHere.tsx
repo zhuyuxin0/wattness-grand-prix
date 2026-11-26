@@ -4,11 +4,11 @@ import type { LogoSpec } from "@world/kit/logos";
 import { tabAt } from "../../shell/tabs";
 import { Glyph } from "../../ui";
 import { LogoChip } from "../../ui/LogoChip";
-import { ROLES, splitTarget, type Role, type RoleLogo } from "./roles";
+import { AUDIENCES, SPONSORS, splitTarget, type Role, type RoleLogo } from "./roles";
 import "./start-here.css";
 
-// "Start where you are": one entry for each kind of visitor (the sponsors, each by its logo chip, then battery owners
-// and QSEs, developers and investors), each a link to the page that answers them first, named after its line. It
+// "Start where you are", then "Judging a track?": one entry for each kind of visitor (by name), then one for each
+// sponsor (by its logo chip), each a link to the page that answers them first, named after its line. It
 // takes the tokens of the ground it sits on: the landing shows it on the night ground under the hero
 // (data-atmosphere="dark"), and any page can place it as it is, in the visitor's theme.
 
@@ -48,7 +48,18 @@ export function StartHere({ id = "start-here", className }: StartHereProps) {
           </h2>
           <p className="start-here__lede">For each kind of visitor, the page to open first.</p>
         </div>
-        {ROLES.map((r) => (
+        {AUDIENCES.map((r) => (
+          <Entry key={r.id} role={r} logos={logos} />
+        ))}
+      </div>
+      <div className="start-here__grid start-here__grid--sponsors">
+        <div className="start-here__head">
+          <h2 id={`${id}-sponsors`} className="start-here__title">
+            Judging a track?
+          </h2>
+          <p className="start-here__lede">Each sponsor's part, where it runs.</p>
+        </div>
+        {SPONSORS.map((r) => (
           <Entry key={r.id} role={r} logos={logos} />
         ))}
       </div>

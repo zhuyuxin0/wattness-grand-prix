@@ -9,7 +9,7 @@ import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { hashId } from "../src/lib/follow-hash.ts";
-import { ROLES, splitTarget } from "../src/pages/Intro/roles.ts";
+import { AUDIENCES, ROLES, SPONSORS, splitTarget } from "../src/pages/Intro/roles.ts";
 import { TABS } from "../src/shell/tabs.ts";
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -45,10 +45,13 @@ function registryIds() {
   };
 }
 
-test("one entry per kind of visitor, in the brief's order", () => {
+test("one entry per kind of visitor, then one per sponsor, in the brief's order", () => {
   assert.deepEqual(
     ROLES.map((r) => r.name),
-    ["BNB Chain", "Flap", "OpenFour", "CoinMarketCap × Atlas", "Cournot", "Living Brain", "Battery owners and QSEs", "Developers", "Investors"],
+    [
+      "New to power markets", "Web3 players", "Traders and analysts", "Battery owners and QSEs", "Developers", "Researchers and students", "Investors",
+      "BNB Chain", "Flap", "OpenFour", "CoinMarketCap × Atlas", "Cournot", "Living Brain",
+    ],
   );
   assert.equal(new Set(ROLES.map((r) => r.id)).size, ROLES.length);
 });
@@ -74,14 +77,14 @@ test("an in-page place is an id its page sets", () => {
 test("each sponsor's entry carries its logo from the registry, each reader's none", () => {
   const { registry, declared } = registryIds();
   assert.ok(registry.size > 0 && declared.size > 0);
-  for (const r of ROLES.slice(0, 6)) {
+  for (const r of SPONSORS) {
     assert.ok(r.logos?.length, `${r.name} has no logo`);
     for (const l of r.logos) {
       assert.ok(registry.has(l), `${r.name}: "${l}" is not in the registry`);
       assert.ok(declared.has(l), `${r.name}: "${l}" is not in src/ui/world-logos.d.ts`);
     }
   }
-  for (const r of ROLES.slice(6)) assert.equal(r.logos, undefined, `${r.name} is a reader, not a sponsor`);
+  for (const r of AUDIENCES) assert.equal(r.logos, undefined, `${r.name} is a reader, not a sponsor`);
 });
 
 test("each line is one short sentence with no figure, two lines in a column with its page's name", () => {
