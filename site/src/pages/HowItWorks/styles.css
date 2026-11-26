@@ -340,3 +340,15 @@
     gap: 2px;
   }
 }
+
+/* each step opens on its chapter of the introduction, as a still (ui/object-still.css); the three stand at one
+   height so the steps' names line up (the first column is wider by its missing left padding) */
+.hw-steps .hw-still {
+  margin-bottom: var(--t-space-1);
+}
+@media (min-width: 900px) {
+  .hw-steps .hw-still {
+    aspect-ratio: auto;
+    height: clamp(150px, 12vw, 240px);
+  }
+}

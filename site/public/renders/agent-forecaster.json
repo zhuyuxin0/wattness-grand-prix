@@ -1,0 +1,82 @@
+{
+ "schema": "grand-prix.render-still.v1",
+ "what": "The Forecaster's instrument as the garage stands it: the hub's and the node's day-ahead forecast for Desert Willow's Nov 26 plan as hourly steps over the 301 scenarios' node-price fan, plan C's power below.",
+ "frame": "_objects.agent-forecaster",
+ "code": {
+  "base": "d90c8e55d3b7116dcb6e97e94a4dc539719ad9b1",
+  "rig": {
+   "path": "packages/world/src/stations/_objects/index.ts",
+   "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
+  },
+  "world_tree": "14243947e9c415e102e4dbf29972bb7c7834fc87",
+  "note": "packages/world as on main (base), plus the rig named here (src/stations/_objects): the stations' own builders and frames from the frame data, with the rig's camera, or the chapter's own with its lens narrowed onto the object where the frame is a crop"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.agent-forecaster --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
+  "lab": "lab.html?frame=_objects.agent-forecaster&w=1280&h=720&theme=dark&plates=0",
+  "rendered": {
+   "bangkok": "2026-11-27 03:10",
+   "ct": "2026-11-26 14:10"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max",
+  "deterministic": "2 draws in fresh pages, byte-identical",
+  "master": {
+   "size": "2560 x 1440",
+   "sha256": "7c5645911b594c00b8ed891f195d89bb070affb4f30c883c5b67d45978c5ff6d"
+  },
+  "png_1280": {
+   "size": "1280 x 720, render.mjs's Lanczos from the master",
+   "sha256": "874b5a760cd7c7df9ddd526130bf496bf8a43806f03ad79b4bb7edb9cfd4b9aa"
+  },
+  "png_640": {
+   "size": "640 x 360, ffmpeg's Lanczos from the master",
+   "sha256": "50351a776725d0b2547bf04aff3f4aade53b76b14dd7478f2722c44028eee386"
+  },
+  "webp": "cwebp 1.6.0 -q 88 -m 6 -sharp_yuv -metadata none"
+ },
+ "files": {
+  "agent-forecaster-640.webp": {
+   "width": 640,
+   "height": 360,
+   "bytes": 14798,
+   "sha256": "faeef351eceb5b365d4801f9c18b047f02acbe5cdd0ae6c36e488f171b186870"
+  },
+  "agent-forecaster-1280.webp": {
+   "width": 1280,
+   "height": 720,
+   "bytes": 41036,
+   "sha256": "a2716da1291eb9142e190f659186dfda535c008c52d6496f28909c8db6dd81bf"
+  },
+  "agent-forecaster-loop.mp4": {
+   "width": 960,
+   "height": 540,
+   "bytes": 108863,
+   "sha256": "1fe624ff255f35374ef8dc1ce9b333eed6cf7b0d5f5118a802708c738f526d76",
+   "seconds": 4,
+   "fps": 30
+  }
+ },
+ "rerender_when": "the garage's chart wall (stations/garage/bays.ts forecastWall, kit/chartwall.ts), the rig, or the frame data changes",
+ "loop": {
+  "what": "The same picture with the camera swung 8 degrees round the object and back over 4 s, played over the still while its card is hovered or focused.",
+  "code": {
+   "base": "d90c8e55d3b7116dcb6e97e94a4dc539719ad9b1",
+   "rig": {
+    "path": "packages/world/src/stations/_objects/index.ts",
+    "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
+   },
+   "world_tree": "14243947e9c415e102e4dbf29972bb7c7834fc87"
+  },
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/spin.mjs --port <port> --frame _objects.agent-forecaster --name agent-forecaster-loop --out <dir> --w 960 --h 540 --scale 2 --seconds 4 --fps 30 --swing 8 --formats mp4",
+  "lab": "lab.html?frame=_objects.agent-forecaster&w=960&h=540&theme=dark&plates=0",
+  "frames": 120,
+  "shot": "1920 x 1080 device px a frame, Lanczos to 960 x 540",
+  "encode": "h264 crf 27 yuv420p faststart",
+  "rendered": {
+   "bangkok": "2026-11-27 03:08",
+   "ct": "2026-11-26 14:08"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max"
+ }
+}

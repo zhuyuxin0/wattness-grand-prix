@@ -1,0 +1,53 @@
+{
+ "schema": "grand-prix.render-still.v1",
+ "what": "The season's machine as the introduction builds it (towers.T02-season), without its display.",
+ "frame": "_objects.tower-season",
+ "code": {
+  "base": "d90c8e55d3b7116dcb6e97e94a4dc539719ad9b1",
+  "rig": {
+   "path": "packages/world/src/stations/_objects/index.ts",
+   "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
+  },
+  "world_tree": "14243947e9c415e102e4dbf29972bb7c7834fc87",
+  "note": "packages/world as on main (base), plus the rig named here (src/stations/_objects): the stations' own builders and frames from the frame data, with the rig's camera, or the chapter's own with its lens narrowed onto the object where the frame is a crop"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.tower-season --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
+  "lab": "lab.html?frame=_objects.tower-season&w=1280&h=720&theme=dark&plates=0",
+  "rendered": {
+   "bangkok": "2026-11-27 03:11",
+   "ct": "2026-11-26 14:11"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max",
+  "deterministic": "2 draws in fresh pages, byte-identical",
+  "master": {
+   "size": "2560 x 1440",
+   "sha256": "b5e71570ad61ac04cee1b1e1cdc3e9661bd26069f5d38ca98b7001e96b3bf3b6"
+  },
+  "png_1280": {
+   "size": "1280 x 720, render.mjs's Lanczos from the master",
+   "sha256": "f173a69365ffdf1bec358d17472b5ae6fd59438426059b08928a9bda2091c72d"
+  },
+  "png_640": {
+   "size": "640 x 360, ffmpeg's Lanczos from the master",
+   "sha256": "b4fe7ddd0506e7237efcdf9761069c855c78f2c56f0174cc77b6d80d25f8828e"
+  },
+  "webp": "cwebp 1.6.0 -q 86 -m 6 -sharp_yuv -metadata none"
+ },
+ "files": {
+  "tower-season-640.webp": {
+   "width": 640,
+   "height": 360,
+   "bytes": 11802,
+   "sha256": "05c5f16764b9ed3270d42653c596d3cf0ee7b56c3296944dd59e33947d74073e"
+  },
+  "tower-season-1280.webp": {
+   "width": 1280,
+   "height": 720,
+   "bytes": 29978,
+   "sha256": "c8b58017a224005645ab474c5befd8eb2e2aebb7e817df9a9335f8fecae6bfc2"
+  }
+ },
+ "rerender_when": "the season tower (stations/towers/season.ts), the rig, or the frame data changes"
+}

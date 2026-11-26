@@ -11,6 +11,7 @@ import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { OPENFOUR, type StepId } from "./addresses";
 import { readLaunch, type LaunchRead, type StepView } from "./chain";
 import { LaunchCard } from "./LaunchCard";
+import { LaunchObject } from "./LaunchObject";
 import { LAUNCHES } from "./replay";
 import "./styles.css";
 
@@ -538,6 +539,8 @@ export default function LaunchpadPage() {
           }
         />
       </Section>
+
+      <LaunchObject />
 
       <Section
         id="launch-gate"

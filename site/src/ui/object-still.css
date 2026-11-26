@@ -1,0 +1,112 @@
+/* ObjectStill: a rendered 3D still in a dark glass frame, in either theme (the 3D holds dark, as the Memory tab's
+   stage does). The ground under the picture is the renders' own night, so the frame shows no seam while it loads. */
+
+.object-still {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  background: radial-gradient(120% 90% at 50% 62%, #171b1f 0%, #111417 55%, #0d1012 100%);
+  isolation: isolate;
+}
+:root[data-theme="dark"] .object-still {
+  border-color: #2b3036;
+}
+.object-still img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+/* the loop over the still: shown once it is playing, so the still never blinks to black while the clip loads */
+.object-still__loop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--m-dur-s, 180ms) ease-out;
+  pointer-events: none;
+}
+.object-still__loop.is-playing {
+  opacity: 1;
+}
+/* the glass: a top sheen and a hairline inner edge, over the picture and under the caption */
+.object-still::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 34%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+.object-still__caption {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  z-index: 2;
+  max-width: calc(100% - 16px);
+  padding: 2px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--t-radius-pill);
+  background: rgba(13, 16, 18, 0.62);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #c4c9cf;
+  font-size: var(--t-fs-2xs);
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ObjectLead: a tab's first view, the still and a few plain lines beside it. It lays out by its own width (a container
+   query), so a tab opened in a floating pane stacks the still over the words as a phone does. */
+.object-lead {
+  container-type: inline-size;
+  margin: 0 0 var(--gp-space-7, 32px);
+}
+.object-lead__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: var(--t-space-5) var(--gp-space-7, 32px);
+  align-items: center;
+}
+.object-lead__text {
+  display: grid;
+  align-content: center;
+  gap: var(--t-space-3);
+  max-width: 52ch;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+.object-lead__text > p {
+  margin: 0;
+}
+.object-lead__from {
+  font-size: var(--t-fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.object-lead__aside {
+  max-width: 300px;
+}
+@container (max-width: 700px) {
+  .object-lead__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--t-space-3);
+  }
+  .object-lead__text {
+    max-width: none;
+  }
+}

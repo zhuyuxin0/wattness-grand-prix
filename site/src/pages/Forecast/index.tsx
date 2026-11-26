@@ -30,6 +30,7 @@ import {
   type HubBands,
 } from "../Battery/kit";
 import { CournotCard, weightingWords } from "./Cournot";
+import { RadarObject } from "./RadarObject";
 import "./styles.css";
 
 // Forecast: the prices a plan is solved against. The node's day-ahead forecast
@@ -141,6 +142,7 @@ export default function ForecastPage() {
             </>
           }
         />
+        <RadarObject />
         <BatteryBar choice={choice} />
         <Ready state={all} label="Loading the scenarios">
           {([desk, common, hubs, digest]) => {

@@ -1,0 +1,53 @@
+{
+ "schema": "grand-prix.render-still.v1",
+ "what": "The record coin as chapter 17 draws it: a gold coin with BNB Chain's symbol, the day's root on BNB Chain, at the top of the proof.",
+ "frame": "_objects.record-coin",
+ "code": {
+  "base": "d90c8e55d3b7116dcb6e97e94a4dc539719ad9b1",
+  "rig": {
+   "path": "packages/world/src/stations/_objects/index.ts",
+   "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
+  },
+  "world_tree": "14243947e9c415e102e4dbf29972bb7c7834fc87",
+  "note": "packages/world as on main (base), plus the rig named here (src/stations/_objects): the stations' own builders and frames from the frame data, with the rig's camera, or the chapter's own with its lens narrowed onto the object where the frame is a crop"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.record-coin --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
+  "lab": "lab.html?frame=_objects.record-coin&w=1280&h=720&theme=dark&plates=0",
+  "rendered": {
+   "bangkok": "2026-11-27 03:11",
+   "ct": "2026-11-26 14:11"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max",
+  "deterministic": "2 draws in fresh pages, byte-identical",
+  "master": {
+   "size": "2560 x 1440",
+   "sha256": "2a57dba61a714535973fb3ebf297e6e95228b9f57c82639ecdc3cc51e2adc8f7"
+  },
+  "png_1280": {
+   "size": "1280 x 720, render.mjs's Lanczos from the master",
+   "sha256": "7c84e772d851a72fa99b8e475c774d9c8373a4b2e4a1c05b19b105df342e186b"
+  },
+  "png_640": {
+   "size": "640 x 360, ffmpeg's Lanczos from the master",
+   "sha256": "b1eba5be1d53ddc7d7cd4c79bdcb9c06c883c0b9a573512cab818ac4b5970194"
+  },
+  "webp": "cwebp 1.6.0 -q 86 -m 6 -sharp_yuv -metadata none"
+ },
+ "files": {
+  "record-coin-640.webp": {
+   "width": 640,
+   "height": 360,
+   "bytes": 9052,
+   "sha256": "d2a223067071e01c4d14045d5fabb092f20266317e67082836f34e5a8c1a8b41"
+  },
+  "record-coin-1280.webp": {
+   "width": 1280,
+   "height": 720,
+   "bytes": 21460,
+   "sha256": "988f08e423b7ce30ad5b8435dbdd7056d69fd708f45f1818b0ef1168195857d5"
+  }
+ },
+ "rerender_when": "the stewards' bay (stations/grid/r03.ts), the rig, or the frame data changes"
+}

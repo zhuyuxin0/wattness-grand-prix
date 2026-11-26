@@ -1,11 +1,14 @@
-import type { ReactNode } from "react";
+import { useState, type CSSProperties, type FocusEvent, type ReactNode } from "react";
 import { useShowcaseManifest } from "../../data";
 import { now } from "../../lib/capture";
 import { dualTime } from "../../lib/time";
 import { Glyph, Hash, Loading, PageHeader, Ready, Section, type CheckItem } from "../../ui";
 import { LiveRead } from "../../ui/LiveRead";
+import { ObjectStill } from "../../ui/ObjectStill";
+import { TabIcon } from "../../ui/TabIcon";
 import { Flow, shortDay, TabLink } from "../Battery/kit";
 import { useAgents, useCards, useChain, useHostedCard, type Agent, type AgentsFile, type CardRead, type ChainState, type IdentityRead, type Job, type JobRead, type LiveState, type Party } from "./data";
+import { FACES } from "./roles";
 import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { addressUrl, txUrl } from "./rpc";
 import "./styles.css";
@@ -263,81 +266,130 @@ function hostingState(a: Agent): { hosted: boolean; since: number; until: number
   return { hosted: now() / 1000 < a.runs.until, since: a.runs.since, until: a.runs.until };
 }
 
+/** A role's icon: the stack's role glyph in its flow's color, or for the evaluator Verify's tab icon. */
+function RoleIcon({ role, size = 18 }: { role: string; size?: number }) {
+  const face = FACES[role];
+  if (!face) return null;
+  const style = { "--ids-icon-dark": face.color.dark, "--ids-icon-light": face.color.light } as CSSProperties;
+  return (
+    <span className="ids-icon" style={style} aria-hidden="true">
+      {face.glyph ? (
+        <svg viewBox="0 0 16 16" width={size} height={size} fill="none" stroke="currentColor" strokeWidth={1.3} strokeLinecap="round" strokeLinejoin="round" focusable="false">
+          <path d={face.glyph} />
+        </svg>
+      ) : (
+        <TabIcon name="check-badge" size={size} />
+      )}
+    </span>
+  );
+}
+
 function AgentCard({ f, a, id, card, loading }: { f: AgentsFile; a: Agent; id: ChainState["identities"][number] | undefined; card: CardRead | { error: string } | undefined; loading: boolean }) {
   const hosting = hostingState(a);
   const live = id && !isErr(id) ? (id as IdentityRead) : null;
   const allMatch = live ? live.matches.owner && live.matches.wallet && live.matches.uri && live.matches.role : null;
+  const face = FACES[a.role];
+  // the card hovered or focused: its instrument's loop plays over the still (ObjectStill decides whether loops play)
+  const [active, setActive] = useState(false);
+  const leave = (e: FocusEvent<HTMLElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setActive(false);
+  };
   return (
-    <article className={`ids-card${hosting ? " ids-card--hosted" : ""}`} aria-label={`${a.title}, agent ${a.agentId}`}>
-      <header className="ids-card__head">
-        <div className="ids-card__titles">
-          <h3 className="ids-card__name">{a.title}</h3>
-          <span className="ids-card__id num">agent {a.agentId}</span>
-        </div>
-        <span className={`ids-runs${hosting ? " ids-runs--hosted" : ""}`}>{hosting ? (hosting.hosted ? "Hosted" : "Was hosted") : "In the planner's process"}</span>
-      </header>
-      <dl className="ids-rows">
-        <div>
-          <dt>Wallet</dt>
-          <dd>
-            <Hash value={a.wallet} href={addressUrl(a.wallet)} label={`${a.title}'s wallet`} />
-          </dd>
-        </div>
-        <div>
-          <dt>{hosting ? "Agent card" : "Card"}</dt>
-          <dd>
-            {hosting && !hosting.hosted ? (
-              <span className="muted">served while hosted; the address stays on chain</span>
-            ) : (
-              <a className="ids-link" href={a.card} target="_blank" rel="noreferrer" title={a.card}>
-                {hosting ? "the hosted agent card" : `${a.card.split("/").slice(-1)[0]} on BNB Greenfield`}
-                <Glyph name="popout" />
-              </a>
-            )}
-            {!hosting &&
-              (card === undefined ? (
-                <span className="muted">hashing</span>
-              ) : isErr(card) ? (
-                <span className="muted">not checked</span>
-              ) : (
-                <Ok ok={card.matches} yes="its SHA-256 matches the record" no="its SHA-256 differs from the record" />
-              ))}
-          </dd>
-        </div>
-        <div>
-          <dt>On the registry</dt>
-          <dd>
-            <a className="ids-link" href={registryEntry(f, a.agentId)} target="_blank" rel="noreferrer">
-              Agent {a.agentId} on testnet.bscscan.com
-              <Glyph name="popout" />
-            </a>
-            {live ? (
-              <Ok ok={allMatch} yes={hosting ? "owner, wallet and card address as recorded" : "owner, wallet, card address and role as recorded"} no="differs from the record" />
-            ) : loading ? (
-              <span className="muted">reading</span>
-            ) : (
-              <span className="muted">not read</span>
-            )}
-          </dd>
-        </div>
-        <div>
-          <dt>Registered</dt>
-          <dd>
-            <When unix={a.registered.blockTime} seconds={false} />
-            <Hash value={a.registered.hash} href={txUrl(a.registered.hash)} label="registration transaction" />
-          </dd>
-        </div>
-        {hosting && (
-          <div>
-            <dt>Runs</dt>
-            <dd className="ids-runs-text">
-              {a.runs.record}: {a.runs.where === "hosted" ? a.runs.backend : ""}. {hosting.hosted ? "Since" : "From"} {both(hosting.since)} {hosting.hosted ? "until" : "to"}{" "}
-              {both(hosting.until)}.
-            </dd>
+    <article
+      className={`ids-card${hosting ? " ids-card--hosted" : ""}`}
+      aria-label={`${a.title}, agent ${a.agentId}`}
+      onPointerEnter={() => setActive(true)}
+      onPointerLeave={() => setActive(false)}
+      onFocus={() => setActive(true)}
+      onBlur={leave}
+    >
+      {face && (
+        <ObjectStill
+          className="ids-card__still"
+          name={face.still}
+          alt={face.alt}
+          caption={face.scope}
+          loop
+          active={active}
+          sizes={hosting ? "(max-width: 999px) calc(100vw - 32px), 46vw" : "(max-width: 719px) calc(100vw - 32px), (max-width: 1279px) 46vw, 440px"}
+        />
+      )}
+      <div className="ids-card__body">
+        <header className="ids-card__head">
+          <RoleIcon role={a.role} />
+          <div className="ids-card__titles">
+            <h3 className="ids-card__name">{a.title}</h3>
+            <span className="ids-card__id num">agent {a.agentId}</span>
           </div>
-        )}
-      </dl>
-      {hosting && <Hosted a={a} hosted={hosting.hosted} id={live} loading={loading} />}
+          <span className={`ids-runs${hosting ? " ids-runs--hosted" : ""}`}>{hosting ? (hosting.hosted ? "Hosted" : "Was hosted") : "In the planner's process"}</span>
+        </header>
+        {face && <p className="ids-card__does">{face.does}</p>}
+        <p className="ids-card__reg">
+          <a className="ids-link" href={registryEntry(f, a.agentId)} target="_blank" rel="noreferrer">
+            Agent {a.agentId} on the registry, testnet.bscscan.com
+            <Glyph name="popout" />
+          </a>
+          {live ? (
+            <Ok ok={allMatch} yes={hosting ? "owner, wallet and card address as recorded" : "owner, wallet, card address and role as recorded"} no="differs from the record" />
+          ) : loading ? (
+            <span className="muted">reading</span>
+          ) : (
+            <span className="muted">not read</span>
+          )}
+        </p>
+        <details className="ids-more">
+          <summary>
+            <Glyph name="caret" className="ids-more__caret" />
+            {hosting ? "Wallet, card, registration and hosting" : "Wallet, card and registration"}
+          </summary>
+          <dl className="ids-rows">
+            <div>
+              <dt>Wallet</dt>
+              <dd>
+                <Hash value={a.wallet} href={addressUrl(a.wallet)} label={`${a.title}'s wallet`} />
+              </dd>
+            </div>
+            <div>
+              <dt>{hosting ? "Agent card" : "Card"}</dt>
+              <dd>
+                {hosting && !hosting.hosted ? (
+                  <span className="muted">served while hosted; the address stays on chain</span>
+                ) : (
+                  <a className="ids-link" href={a.card} target="_blank" rel="noreferrer" title={a.card}>
+                    {hosting ? "the hosted agent card" : `${a.card.split("/").slice(-1)[0]} on BNB Greenfield`}
+                    <Glyph name="popout" />
+                  </a>
+                )}
+                {!hosting &&
+                  (card === undefined ? (
+                    <span className="muted">hashing</span>
+                  ) : isErr(card) ? (
+                    <span className="muted">not checked</span>
+                  ) : (
+                    <Ok ok={card.matches} yes="its SHA-256 matches the record" no="its SHA-256 differs from the record" />
+                  ))}
+              </dd>
+            </div>
+            <div>
+              <dt>Registered</dt>
+              <dd>
+                <When unix={a.registered.blockTime} seconds={false} />
+                <Hash value={a.registered.hash} href={txUrl(a.registered.hash)} label="registration transaction" />
+              </dd>
+            </div>
+            {hosting && (
+              <div>
+                <dt>Runs</dt>
+                <dd className="ids-runs-text">
+                  {a.runs.record}: {a.runs.where === "hosted" ? a.runs.backend : ""}. {hosting.hosted ? "Since" : "From"} {both(hosting.since)} {hosting.hosted ? "until" : "to"}{" "}
+                  {both(hosting.until)}.
+                </dd>
+              </div>
+            )}
+          </dl>
+          {hosting && <Hosted a={a} hosted={hosting.hosted} id={live} loading={loading} />}
+        </details>
+      </div>
     </article>
   );
 }
@@ -390,6 +442,7 @@ function PartyName({ p }: { p: Party }) {
   if (p.agentId != null)
     return (
       <span className="ids-party">
+        {p.role && FACES[p.role] && <RoleIcon role={p.role} size={14} />}
         {p.title} <span className="muted num">({p.agentId})</span>
       </span>
     );
