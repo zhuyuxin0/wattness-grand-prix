@@ -83,6 +83,7 @@ cd workers/edge
 pnpm install
 pnpm test                                  # in the Workers runtime, in process; upstreams answered from fixtures
 EDGE_LIVE=1 pnpm test test/live.test.ts    # the same Worker against Greenfield and the public BSC RPCs
+pnpm test:deploy                           # the deploy script, with stand-in secrets; deploys nothing
 pnpm typecheck
 pnpm bundle                                # wrangler deploy --dry-run into dist/
 ```
@@ -95,14 +96,18 @@ installed and built (`pnpm install && pnpm --filter "@gatelock/verifier..." buil
 ## Deploy
 
 ```sh
+node scripts/deploy.ts --check             # whether the secrets file holds both names; deploys nothing
 pnpm run deploy
 node scripts/smoke.ts https://grand-prix-edge.<subdomain>.workers.dev --out <dir>
 ```
 
 `scripts/deploy.ts` reads `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` from the secrets file
 `GATE_SECRETS_ENV` names (see `.env.example`), passes them to wrangler in its environment, and masks both in
-wrangler's output. The token needs one permission, Account › Workers Scripts › Edit, for that account, and the
-account needs a workers.dev subdomain. `scripts/smoke.ts` calls every endpoint for 26 Nov and checks each file
+wrangler's output. wrangler's debug log records its API requests, and so the account ID; the script sends it to
+a temporary folder of its own (`edge-deploy-*` under the system's temporary folder) and removes that folder when
+wrangler exits, instead of letting it collect in the `logs/` folder under wrangler's global config. `--check`
+prints each name as present or missing, never a value, and starts no wrangler. The token needs one permission,
+Account › Workers Scripts › Edit, for that account, and the account needs a workers.dev subdomain. `scripts/smoke.ts` calls every endpoint for 26 Nov and checks each file
 against the SHA-256 the publisher recorded (`scripts/greenfield/published.json`).
 
 ## Limits
@@ -128,7 +133,7 @@ Worker runs; setting a `User-Agent` header avoids it.
 | `src/greenfield.ts` | Reads from the bucket |
 | `src/merkle.ts`, `src/jcs.ts`, `src/bytes.ts` | Core's leaf hash, RFC 6962 tree and RFC 8785 form, on the runtime's SHA-256 |
 | `src/respond.ts`, `src/page.ts`, `src/config.ts` | Responses and headers, the `/` page, bindings |
-| `scripts/` | `deploy.ts`, `smoke.ts`, `golden.ts` |
+| `scripts/` | `deploy.ts` and its test, `smoke.ts`, `golden.ts` |
 | `test/` | The tests, the chain answers and the verifier's output they compare against |
 
 The gate clock is `packages/core/src/gate.ts` itself, bundled from source.
