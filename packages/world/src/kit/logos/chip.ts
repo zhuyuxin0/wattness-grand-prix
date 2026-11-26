@@ -65,6 +65,8 @@ export function logoChip(ids: LogoId | LogoId[], opts: ChipOptions = {}): HTMLEl
   } else {
     chip = document.createElement('span');
     chip.className = `lg-chip is-group${extra}`;
+    // a click on the glass between two logos is the chip's too: it never reaches a frame's handlers (the story steps)
+    if (link) chip.addEventListener('click', (e) => e.stopPropagation());
     list.forEach((id, i) => {
       if (i) { const r = document.createElement('i'); r.className = 'lg-rule'; r.setAttribute('aria-hidden', 'true'); chip.appendChild(r); }
       const spec = LOGOS[id];
