@@ -102,19 +102,25 @@ carries to the rest; a link may name one with `#/battery/<resource>` or `?batter
 
 ## The 3D world (`packages/world`)
 
-The story, ONE PLAN and the stack are the package's three mounts: each takes an element, fills it and returns a
-handle (`packages/world/README.md`). The site imports the package from source as `@world` (`vite.config.ts`),
+The story, ONE PLAN, the stack and the brain are the package's four mounts: each takes an element, fills it and
+returns a handle (`packages/world/README.md`). The site imports the package from source as `@world` (`vite.config.ts`),
 dedupes three.js to its own 0.187.0, so the package builds from this install, and lets the dev server read
 `packages/world/src`.
 
 - A page loads its mount with a dynamic import inside an effect and disposes it in the effect's cleanup, so three.js
-  and the frames stay in that tab's chunks: the story in Intro, ONE PLAN in ONE PLAN, the stack in Tech Stack.
-  `test/world-tabs.test.mjs` fails on a static import of `@world` or on a load from outside `src/pages/`.
+  and the frames stay in that tab's chunks: the story in Intro, ONE PLAN in ONE PLAN, the stack in Tech Stack, the
+  brain in Memory. `test/world-tabs.test.mjs` fails on a static import of `@world` or on a load from outside
+  `src/pages/`.
 - `src/world.d.ts` declares the mounts' options and handles by hand, so the site never type-checks the package's
   sources. It changes when a mount's options or handle change.
 - `onRoute` names a tab by the package's id. `worldPath(id)` (`src/shell/world.ts`) gives its path here, for a battery
-  tab with the carried battery. `WORLD_TABS` in `src/shell/tabs.ts` holds the ids, and the test reads the story's and
-  the stack's own lists against it.
+  tab with the carried battery. `WORLD_TABS` in `src/shell/tabs.ts` holds the ids, and the test reads the story's,
+  the stack's and the brain's own lists against it.
+- Memory opens on `mountBrain` (`pages/Memory/BrainStage.tsx`), mounted once the build's `build-brain.json` has loaded,
+  for the corrections it carries beside Living Brain's text. The stage and the page view under it share one selection
+  in the URL, `#/agents/memory?brain=<all|grand-prix|terminal|battery-review>&page=<slug>` (`pages/Memory/select.ts`):
+  the mount asks through `onState` and the page writes it, and back, forward or a page picked below reach the stage
+  through `goTo`. The older `?page=<brain>:<slug>` still opens its page.
 - The mounts draw from `packages/world/src/data/`: the venue's `layout.json`, committed, and `frame-data.json`,
   synced there before the build and not committed (`sh packages/world/scripts/sync-data.sh <folder>`). Without the
   frame data each mount's `ready` rejects with a message that names the sync.
