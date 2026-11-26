@@ -1,186 +1,184 @@
-/* Ask Ness's panel: a glass panel at the right over a dimmed page on a
-   desktop, 420px and wider on request; a sheet from the bottom on a phone.
-   The header holds our three brains in Living Brain, dark in either theme.
+/* Ask Ness's panel (NessPanel.tsx, frame.ts) in wattness.tech's Ness modes. Beside: a column at the right under the
+   masthead on the Terminal's matte pane, which the page narrows for where it keeps room and which covers the page's
+   right side where it does not. Floating: a window on the Terminal's glass, moved by its header and sized from its
+   corner. Full screen: the whole view, the questions at its left and the brains as the conversation's backdrop. A
+   phone keeps the sheet from the bottom. Living Brain's stage holds dark in either theme.
+   Stacking: beside and floating sit over the float layer's panes (25), a battery picker's list (30) and the launcher
+   (40), and under the market day's popover and sheet (50) and the tab drawer (60); full screen and the sheet sit over
+   all of them, the page under them inert, and under only the introduction's top layer.
    Corners no rounder than 7px; hovers change color only. */
 
-html[data-ness-open] {
+html[data-ness-open="modal"] {
   overflow: hidden;
 }
 
-/* The dialog is the whole viewport; the panel sits inside it, and a press on the rest closes it. */
+/* The page beside the column: narrowed by its width, the float layer's panes kept left of it. */
+html[data-ness-beside="narrow"] .app__body {
+  margin-right: var(--ness-w);
+}
+html[data-ness-beside="narrow"] .gp-float {
+  right: var(--ness-w);
+}
+
+/* ---------------------------------------------------------------- the layer and the four frames */
+
+/* The layer is the view; only the panel (and the sheet's dim) takes the pointer, so the page beside it stays the
+   reader's. */
 .ness {
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
+  z-index: 45;
+  pointer-events: none;
   color: var(--w-fg);
-  overflow: hidden;
 }
-.ness::backdrop {
-  background: rgba(10, 12, 14, 0.32);
-}
-.ness:not([open]) {
+.ness:not([data-open]) {
   display: none;
 }
-
+.ness[data-mode="full"],
+.ness[data-mode="sheet"] {
+  z-index: 70;
+}
 .ness__panel {
+  --ness-ground: var(--t-pane);
   position: absolute;
-  top: 12px;
-  right: 12px;
-  bottom: 12px;
-  width: min(420px, calc(100vw - 24px));
+  pointer-events: auto;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--ness-hairline);
-  border-radius: var(--t-radius-paper);
-  background: var(--ness-frost);
-  -webkit-backdrop-filter: blur(22px) saturate(1.4);
-  backdrop-filter: blur(22px) saturate(1.4);
-  box-shadow: 0 0 0 1px var(--ness-graze), var(--ness-rim), var(--ness-lift);
   font-family: var(--w-font-sans);
   font-size: var(--t-fs);
   line-height: var(--t-lh);
+  color: var(--w-fg);
+}
+.ness__panel[hidden] {
+  display: none !important;
+}
+
+/* Beside: the column, its top and width set by the panel. Where it covers the page it casts the Terminal's lift. */
+.ness[data-mode="beside"] .ness__panel {
+  right: 0;
+  bottom: 0;
+  border-left: 1px solid var(--w-border);
+  background: var(--ness-ground);
   animation: ness-in var(--m-dur-m) var(--m-ease-out);
 }
-.ness__panel[data-wide] {
-  width: min(760px, calc(100vw - 24px));
+.ness[data-mode="beside"] .ness__panel[data-over] {
+  box-shadow: var(--t-shadow-2);
 }
+
+/* Floating: the window, its place and size set by the panel; the glass a little denser than the launcher's, since it
+   carries paragraphs over the page. */
+.ness[data-mode="float"] .ness__panel {
+  --ness-ground: color-mix(in srgb, var(--t-raised) 94%, transparent);
+  border: 1px solid var(--ness-hairline);
+  border-radius: var(--t-radius-paper);
+  background: color-mix(in srgb, var(--t-raised) 90%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--ness-graze), var(--ness-rim), var(--ness-lift);
+  animation: ness-in var(--m-dur-m) var(--m-ease-out);
+}
+
+/* Full screen: the page's own ground over the whole view. */
+.ness[data-mode="full"] .ness__panel {
+  --ness-ground: var(--t-pane);
+  inset: 0;
+  background: var(--w-bg);
+}
+
+/* The phone's sheet, over a dim that closes it. */
+.ness__scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  background: rgba(10, 12, 14, 0.32);
+}
+.ness[data-mode="sheet"] .ness__panel {
+  --ness-ground: var(--t-raised);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: min(86dvh, calc(100dvh - 48px));
+  border: 1px solid var(--ness-hairline);
+  border-bottom: 0;
+  border-radius: var(--t-radius-paper) var(--t-radius-paper) 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: color-mix(in srgb, var(--t-raised) 96%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--ness-graze), var(--ness-rim), var(--ness-lift);
+  animation: ness-up var(--m-dur-m) var(--m-ease-out);
+}
+
 @keyframes ness-in {
   from {
     opacity: 0;
     transform: translateX(16px);
   }
 }
-
-/* ---------------------------------------------------------------- the header */
-
-.ness__head {
-  position: relative;
-  flex: none;
-  height: 168px;
-  overflow: hidden;
-  /* the Memory stage's own ground, so the still and the live stage meet the header without an edge */
-  background: #000102;
-  color: var(--w-fg);
-}
-
-.ness-brains {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-/* The still keeps its own proportions, centered, so a lit spot stays on its brain at any width. */
-.ness-brains__frame {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: max(100%, 420px);
-  aspect-ratio: 840 / 323;
-  transform: translate(-50%, -50%);
-}
-.ness__panel[data-wide] .ness-brains__frame {
-  width: 560px;
-}
-.ness-brains__still {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  user-select: none;
-}
-/* The live stage: a picture, not a control (the Memory tab is where it is explored), so only its canvas shows. It is
-   taller than the header, as the stage's least height, and centered in it. */
-.ness-brains__live {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 320px;
-  transform: translateY(-50%);
-  opacity: 0;
-  transition: opacity var(--m-dur-l) var(--m-ease-out);
-}
-.ness-brains__live .lbm-root > :not(.lbm-canvas):not(.lbm-cardbox) {
-  display: none !important;
-}
-/* A pinned page's card stays measurable, just past the stage's corner, so the stage composes as if no card stood
-   beside it: the selected brain stays in the middle of the header. */
-.ness-brains__live .lbm-cardbox {
-  left: 100% !important;
-  top: 100% !important;
-  right: auto !important;
-  bottom: auto !important;
-  visibility: hidden !important;
-}
-.ness-brains[data-live] .ness-brains__live {
-  opacity: 1;
-}
-.ness-brains[data-live] .ness-brains__frame {
-  opacity: 0;
-  transition: opacity var(--m-dur-l) var(--m-ease-out);
-}
-.ness-brains__lit {
-  position: absolute;
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  border: 1.5px solid rgba(79, 227, 184, 0.85);
-  background: radial-gradient(circle, rgba(79, 227, 184, 0.22) 0%, rgba(79, 227, 184, 0.08) 55%, transparent 72%);
-  box-shadow:
-    0 0 18px rgba(79, 227, 184, 0.45),
-    inset 0 0 12px rgba(79, 227, 184, 0.25);
-  animation: ness-lit var(--m-dur-l) var(--m-ease-out);
-}
-@keyframes ness-lit {
+@keyframes ness-up {
   from {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(1.25);
+    transform: translateY(24px);
   }
 }
 
-/* The title row over the picture, and a shade under it so the words keep their contrast. */
-.ness__head::before,
-.ness__head::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  pointer-events: none;
-}
-.ness__head::before {
-  top: 0;
-  height: 56px;
-  background: linear-gradient(rgba(0, 1, 2, 0.78), rgba(0, 1, 2, 0));
-}
-.ness__head::after {
-  bottom: 0;
-  height: 52px;
-  background: linear-gradient(rgba(0, 1, 2, 0), rgba(0, 1, 2, 0.86));
-}
-.ness__bar {
-  position: relative;
-  z-index: 1;
+/* ---------------------------------------------------------------- the header: name, creed, modes */
+
+.ness__head {
+  flex: none;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 8px 0 12px;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 9px 8px 9px 12px;
+  border-bottom: 1px solid var(--t-rule);
+  background: var(--ness-ground);
+}
+.ness__head > .ness-mark {
+  margin-top: 4px;
+}
+.ness[data-mode="beside"] .ness__head,
+.ness[data-mode="float"] .ness__head {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+html[data-ness-drag],
+html[data-ness-drag] * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+html[data-ness-drag] .ness__head {
+  cursor: grabbing;
+}
+.ness__name {
+  flex: 1;
+  min-width: 0;
+  padding-top: 2px;
 }
 .ness__title {
-  flex: 1;
   margin: 0;
   font-family: var(--t-font-display);
   font-size: var(--t-fs-title);
   font-weight: var(--t-fw-strong);
+  line-height: 1.25;
   letter-spacing: -0.005em;
-  color: #f2f3f0;
+}
+.ness__title:focus {
+  outline: none;
+}
+.ness__creed {
+  margin: 2px 0 0;
+  font-size: var(--t-fs-xs);
+  line-height: 1.4;
+  color: var(--w-muted);
+}
+.ness__modes {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
 }
 .ness__icon {
   display: inline-flex;
@@ -189,19 +187,100 @@ html[data-ness-open] {
   width: 32px;
   height: 32px;
   padding: 0;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: var(--t-radius);
-  background: rgba(255, 255, 255, 0.06);
-  color: #e6e8e3;
+  background: transparent;
+  color: var(--w-muted);
   cursor: pointer;
-  transition: background var(--m-dur-s) ease-out;
+  transition:
+    background var(--m-dur-s) ease-out,
+    color var(--m-dur-s) ease-out;
 }
 .ness__icon:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--t-hover);
+  color: var(--w-fg);
+}
+.ness__icon[aria-pressed="true"] {
+  background: var(--t-selected);
+  color: var(--w-fg);
 }
 .ness__icon:focus-visible {
-  outline: 2px solid var(--w-accent);
-  outline-offset: 1px;
+  outline: 2px solid var(--t-focus);
+  outline-offset: -2px;
+}
+
+/* ---------------------------------------------------------------- the chat body */
+
+/* Beside, floating and on a phone, one scrolling column: the brains, then the search and the questions, or the
+   brains held at the top over the answer. Its own height sizes the stage (container units). */
+.ness__main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  container-type: size;
+}
+.ness__find {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--t-rule);
+  background: var(--ness-ground);
+}
+.ness__find input {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: color-mix(in srgb, var(--t-pane) 90%, transparent);
+  color: var(--w-fg);
+  font-size: var(--t-fs);
+}
+.ness__find input:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+.ness__list {
+  padding: 4px 14px 20px;
+}
+.ness__read {
+  padding: 4px 14px 24px;
+}
+.ness__panel[data-view="answer"] .ness__side {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- the brains in the middle of the chat */
+
+/* Large over the questions, as Living Brain's own site shows a brain; with an answer open, a band held at the top
+   while the answer scrolls under it, the answer's pages lit. */
+.ness__stage {
+  position: relative;
+  height: clamp(240px, 56cqh, 420px);
+  overflow: hidden;
+  background: #000102;
+  color: var(--w-fg);
+}
+.ness__panel[data-view="answer"] .ness__stage {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  height: 176px;
+}
+/* a shade under the words, so they keep their contrast over the brains */
+.ness__stage::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  background: linear-gradient(rgba(0, 1, 2, 0), rgba(0, 1, 2, 0.86));
+  pointer-events: none;
 }
 .ness__caption {
   position: absolute;
@@ -244,45 +323,352 @@ html[data-ness-open] {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
-
-/* ---------------------------------------------------------------- what it is, and the search */
-
-.ness__creed {
-  flex: none;
+.ness__caption-link:focus-visible {
+  outline: 2px solid var(--w-accent);
+  outline-offset: 2px;
+}
+.ness__hint {
+  position: absolute;
+  z-index: 1;
+  left: 16px;
+  right: 16px;
+  top: 18px;
   margin: 0;
-  padding: 10px 14px 9px;
-  border-bottom: 1px solid var(--t-rule);
+  text-align: center;
   font-size: var(--t-fs-sm);
-  font-weight: 500;
-  color: var(--w-fg);
-}
-.ness__find {
-  flex: none;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--t-rule);
-}
-.ness__find input {
-  width: 100%;
-  height: 32px;
-  padding: 0 10px;
-  border: 1px solid var(--w-border);
-  border-radius: var(--t-radius);
-  background: color-mix(in srgb, var(--t-pane) 90%, transparent);
-  color: var(--w-fg);
-  font-size: var(--t-fs);
-}
-.ness__find input:focus-visible {
-  outline: 2px solid var(--t-focus);
-  outline-offset: -1px;
-  border-color: transparent;
+  color: #c9ccc6;
 }
 
-.ness__body {
+.ness-brains {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+/* The still keeps its own proportions, centered, so a lit spot stays on its brain at any size. */
+.ness-brains__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, 420px);
+  aspect-ratio: 840 / 323;
+  transform: translate(-50%, -50%);
+}
+.ness-brains__still {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+/* The live stage, at least the mount's 320px tall and centered, so the band crops it about the brain in its middle. */
+.ness-brains__live {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: max(100%, 320px);
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity var(--m-dur-l) var(--m-ease-out);
+}
+.ness-brains__gl,
+.ness-brains__rings {
+  position: absolute;
+  inset: 0;
+}
+.ness-brains__rings {
+  pointer-events: none;
+}
+/* A picture, not a control (the Memory tab is where it is explored): only its canvas shows. */
+.ness-brains__live .lbm-root > :not(.lbm-canvas):not(.lbm-cardbox) {
+  display: none !important;
+}
+/* A pinned page's card stays measurable, just past the stage's corner, so the stage composes as if no card stood
+   beside it: the selected brain stays in the middle. */
+.ness-brains__live .lbm-cardbox {
+  left: 100% !important;
+  top: 100% !important;
+  right: auto !important;
+  bottom: auto !important;
+  visibility: hidden !important;
+}
+.ness-brains[data-live] .ness-brains__live {
+  opacity: 1;
+}
+.ness-brains[data-live] .ness-brains__frame {
+  opacity: 0;
+  transition: opacity var(--m-dur-l) var(--m-ease-out);
+}
+/* The still's light on a brain that holds a lit page. */
+.ness-brains__lit {
+  position: absolute;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1.5px solid rgba(79, 227, 184, 0.85);
+  background: radial-gradient(circle, rgba(79, 227, 184, 0.22) 0%, rgba(79, 227, 184, 0.08) 55%, transparent 72%);
+  box-shadow:
+    0 0 18px rgba(79, 227, 184, 0.45),
+    inset 0 0 12px rgba(79, 227, 184, 0.25);
+  animation: ness-lit var(--m-dur-l) var(--m-ease-out);
+}
+@keyframes ness-lit {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.25);
+  }
+}
+/* A lit page's ring on the live stage, where its dot is drawn, with its name beside it; the answer's own page the
+   larger. A dark keyline holds it apart from the particles around it. */
+.ness-ring {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(111, 240, 200, 0.95);
+  background: radial-gradient(circle, rgba(79, 227, 184, 0.28) 0%, rgba(79, 227, 184, 0.06) 60%, transparent 72%);
+  box-shadow:
+    0 0 0 2px rgba(0, 1, 2, 0.55),
+    0 0 16px rgba(79, 227, 184, 0.7);
+  transition:
+    border-color 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+.ness-ring--first {
+  width: 32px;
+  height: 32px;
+}
+.ness-ring[data-far="1"] {
+  border-width: 1.5px;
+  border-color: rgba(111, 240, 200, 0.6);
+  box-shadow:
+    0 0 0 2px rgba(0, 1, 2, 0.45),
+    0 0 10px rgba(79, 227, 184, 0.4);
+}
+.ness-ring::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(111, 240, 200, 0.7);
+  animation: ness-ring 2.4s var(--m-ease-out) infinite;
+}
+@keyframes ness-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+.ness-ring__name {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
+  padding: 2px 8px;
+  border: 1px solid rgba(111, 240, 200, 0.45);
+  border-radius: 999px;
+  background: rgba(0, 1, 2, 0.78);
+  color: #eafff8;
+  font-size: var(--t-fs-xs);
+  font-weight: var(--t-fw-strong);
+  line-height: 1.5;
+  white-space: nowrap;
+}
+.ness-ring[data-side="left"] .ness-ring__name {
+  left: auto;
+  right: calc(100% + 8px);
+}
+.ness-ring:not(.ness-ring--first) .ness-ring__name {
+  font-weight: 500;
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------------------- full screen */
+
+/* The questions at the left (as wattness.tech keeps its threads there), the brains as the conversation's backdrop;
+   an answer opens between them, the brains at its right with its pages lit. */
+.ness[data-mode="full"] .ness__main {
+  display: grid;
+  overflow: hidden;
+  container-type: normal;
+  grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-areas: "side stage";
+}
+.ness[data-mode="full"] .ness__panel .ness__side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-right: 1px solid var(--t-rule);
+  background: var(--t-pane);
+}
+.ness[data-mode="full"] .ness__find {
+  position: static;
+}
+.ness[data-mode="full"] .ness__list {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 4px 14px 20px;
+}
+.ness[data-mode="full"] .ness__panel .ness__stage {
+  grid-area: stage;
+  position: relative;
+  height: auto;
+  min-height: 0;
+}
+.ness[data-mode="full"] .ness__panel[data-view="answer"] .ness__main {
+  grid-template-columns: 340px minmax(0, 1fr) minmax(300px, 38%);
+  grid-template-areas: "side read stage";
+}
+.ness[data-mode="full"] .ness__read {
+  grid-area: read;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 32px 40px;
+}
+.ness[data-mode="full"] .ness__answer {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.ness[data-mode="full"] .ness__question {
+  font-size: 22px;
+}
+@media (max-width: 1099px) {
+  .ness[data-mode="full"] .ness__main {
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+  .ness[data-mode="full"] .ness__panel[data-view="answer"] .ness__main {
+    grid-template-columns: 300px minmax(0, 1fr);
+    grid-template-rows: 220px minmax(0, 1fr);
+    grid-template-areas:
+      "side stage"
+      "side read";
+  }
+}
+
+/* ---------------------------------------------------------------- resizing and docking */
+
+/* Floating, the corner sizes the window. */
+.ness__corner {
+  position: absolute;
+  z-index: 4;
+  right: 1px;
+  bottom: 1px;
+  width: 16px;
+  height: 16px;
+  cursor: nwse-resize;
+  touch-action: none;
+  background: linear-gradient(
+    135deg,
+    transparent 52%,
+    var(--w-muted) 52%,
+    var(--w-muted) 58%,
+    transparent 58%,
+    transparent 70%,
+    var(--w-muted) 70%,
+    var(--w-muted) 76%,
+    transparent 76%
+  );
+  opacity: 0.55;
+}
+.ness__corner:hover {
+  opacity: 1;
+}
+/* Beside, the column's left edge sets its width: a hairline in the accent while the pointer or the keyboard is on it. */
+.ness__edge {
+  position: absolute;
+  z-index: 4;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 6px;
+  cursor: col-resize;
+  touch-action: none;
+}
+.ness__edge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: transparent;
+  transition: background var(--m-dur-s) ease-out;
+}
+.ness__edge:hover::after,
+.ness__edge:focus-visible::after {
+  background: var(--t-accent-mark);
+}
+.ness__edge:focus-visible {
+  outline: none;
+}
+/* Where a window let go at the right edge goes: the column it would take, drawn under the pointer's path. */
+.ness__zone {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  border-left: 2px solid var(--t-accent-mark);
+  background: color-mix(in srgb, var(--t-accent-mark) 10%, transparent);
+  font-size: var(--t-fs-xs);
+  font-weight: var(--t-fw-strong);
+}
+.ness__zone > span {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--t-raised);
+  box-shadow: var(--t-shadow-2);
+}
+
+/* ---------------------------------------------------------------- a phone */
+
+@media (max-width: 767px) {
+  .ness__stage {
+    height: clamp(200px, 46cqh, 320px);
+  }
+  .ness__panel[data-view="answer"] .ness__stage {
+    height: 150px;
+  }
+  .ness__caption-brain {
+    display: none;
+  }
+  .ness-brains__frame {
+    width: max(100%, 380px);
+  }
+  .ness__list {
+    padding-bottom: 28px;
+  }
+  .ness__q {
+    min-height: 40px;
+  }
+  .ness__find input {
+    font-size: max(16px, var(--t-fs));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ness__panel,
+  .ness-brains__lit,
+  .ness-ring::after {
+    animation: none !important;
+  }
+  .ness-ring::after {
+    display: none;
+  }
+}
+[data-capture="1"] .ness-ring::after {
+  animation: none;
+  display: none;
 }
 
 /* ---------------------------------------------------------------- the questions */
@@ -500,61 +886,6 @@ html[data-ness-open] {
   font-size: var(--t-fs-sm);
 }
 
-/* ---------------------------------------------------------------- a phone: the sheet */
-
-@media (max-width: 767px) {
-  .ness__panel,
-  .ness__panel[data-wide] {
-    top: auto;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: min(86dvh, calc(100dvh - 48px));
-    border-bottom: 0;
-    border-radius: var(--t-radius-paper) var(--t-radius-paper) 0 0;
-    padding-bottom: env(safe-area-inset-bottom);
-    /* a sheet covers the page's own text, so it takes the Terminal's matte glass, not the frost */
-    background: color-mix(in srgb, var(--t-raised) 95%, transparent);
-    animation-name: ness-up;
-  }
-  .ness__panel[data-wide] {
-    height: 100dvh;
-    border-radius: 0;
-  }
-  .ness__head {
-    height: 150px;
-  }
-  .ness__caption-brain {
-    display: none;
-  }
-  .ness-brains__frame,
-  .ness__panel[data-wide] .ness-brains__frame {
-    width: max(100%, 380px);
-  }
-  .ness__wide {
-    display: none;
-  }
-  .ness__body {
-    padding-bottom: 28px;
-  }
-  .ness__q {
-    min-height: 40px;
-  }
-}
-@keyframes ness-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ness__panel,
-  .ness-brains__lit {
-    animation: none;
-  }
-}
 
 /* ---------------------------------------------------------------- the sponsors, at a glance */
 
@@ -590,4 +921,8 @@ html[data-ness-open] {
 }
 .ness__group--start .ness__q {
   font-weight: 500;
+}
+/* Full screen marks the open answer in the list beside it. */
+.ness__q[aria-current="true"] {
+  background: var(--t-selected);
 }

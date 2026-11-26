@@ -112,3 +112,24 @@ export function liveFocus(lit: string | null): LiveFocus {
   const brain = p ? LIVE_BRAINS.find((b) => b === p.brain) : undefined;
   return brain && p ? { brain, page: p.slug } : { brain: "all", page: null };
 }
+
+/**
+ * The pages an answer lights, its own page first: a prepared answer's brainPage, or a live answer's memory.brainPage
+ * and memory.pages[]; each page once, and only keys that name a brain and a page.
+ */
+export function litPages(primary?: string | null, more?: readonly string[] | null): string[] {
+  const out: string[] = [];
+  for (const k of [primary, ...(more ?? [])]) if (k && splitPageKey(k) && !out.includes(k)) out.push(k);
+  return out;
+}
+
+/**
+ * Where the live stage looks for an answer's pages: pages in one brain bring it to the center with the first pinned;
+ * pages in more than one brain show the combined brain, where every page has its place.
+ */
+export function liveFocusPages(keys: readonly string[]): LiveFocus {
+  const one = liveFocus(keys[0] ?? null);
+  if (one.brain === "all") return one;
+  const brains = new Set(keys.map((k) => splitPageKey(k)?.brain));
+  return brains.size === 1 ? one : { brain: "all", page: null };
+}
