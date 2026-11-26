@@ -38,7 +38,7 @@ motion stops and hover-only reveals show. Pages read the clock with `now()` from
 | `greenfield.json` | `GreenfieldIndex` (`pages/Files/data.ts`) | The sealed day's files on BNB Greenfield: path, kind, bytes, SHA-256 |
 | `agents.json` | `AgentsFile` (`pages/AgentIds/data.ts`) | The seven ERC-8004 identities and the three paid ERC-8183 jobs, each step with its transaction |
 | `prices.json` | `PricesFile` (`pages/Prices/data.ts`) | Atlas's signed reports and CoinMarketCap's quotes as the adapter's run recorded them, and the budget rule's decision |
-| `memory/build-brain.json` | `BuildBrain` (`pages/Memory/data.ts`) | The build's brain in Living Brain: a page for every tab, its connections and their corrections |
+| `memory/build-brain.json` | `BuildBrain` (`pages/Memory/data.ts`) | The build's brain in Living Brain: a page for each tab (or the page nearest it), its connections and their corrections |
 | `files.json` | `FilesIndex` | Every file above with its bytes, SHA-256 and source |
 
 Loaders are in `src/data/load.ts`, hooks in `src/data/hooks.ts` (`useDay`, `useReceipts`, `useLateSeal`,
@@ -91,8 +91,9 @@ carries to the rest; a link may name one with `#/battery/<resource>` or `?batter
   Prices and the seal's cost on Seal) reads over the verifier's mainnet nodes with plain JSON-RPC, one node and one
   block per read, and stamps with `LiveRead`. `node scripts/atlas-reads.mjs` makes every one of its reads once. The
   board's company logos are in `public/logos/`, each with its source in `SOURCES.md`.
-- Each tab's foot links to the tab's own page in the build's memory, opened on Memory (`src/shell/MemoryCue.tsx`,
-  drawn by `Pager`).
+- Each tab's foot links to the tab's page in the build's memory, opened on Memory (`src/shell/MemoryCue.tsx`, drawn by
+  `Pager`): its own page, or where the brain has none, the nearest page or the page it is a section of
+  (`src/shell/memory-pages.ts`, which `test/data-agents.test.mjs` holds to `build-brain.json`'s tab map).
 - New published data: add `scripts/data/<page>.mjs` whose default export takes the context documented in
   `scripts/build-data.mjs` (`day`, `batteries`, `leaf(resource)`, `writeJson`, ...). Modules run in name order;
   the size, credential and date checks cover their files too.
@@ -117,7 +118,9 @@ dedupes three.js to its own 0.187.0, so the package builds from this install, an
   tab with the carried battery. `WORLD_TABS` in `src/shell/tabs.ts` holds the ids, and the test reads the story's,
   the stack's and the brain's own lists against it.
 - Memory opens on `mountBrain` (`pages/Memory/BrainStage.tsx`), mounted once the build's `build-brain.json` has loaded,
-  for the corrections it carries beside Living Brain's text. The stage and the page view under it share one selection
+  for the corrections it carries beside Living Brain's text, and once `prepareBrain` has made the brains' particles in
+  a worker, so opening the tab never stalls the page. Its cards name every tab but Memory itself (an "Open Memory" there
+  would navigate to the tab the visitor is on and drop the selection). The stage and the page view under it share one selection
   in the URL, `#/agents/memory?brain=<all|grand-prix|terminal|battery-review>&page=<slug>` (`pages/Memory/select.ts`):
   the mount asks through `onState` and the page writes it, and back, forward or a page picked below reach the stage
   through `goTo`. The older `?page=<brain>:<slug>` still opens its page.

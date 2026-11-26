@@ -189,8 +189,9 @@ The routes (`ROUTES` in `pieces.ts`):
 ## mountBrain
 
 ```ts
-import { mountBrain } from '@world/stations/brain/mount';
+import { mountBrain, prepareBrain } from '@world/stations/brain/mount';
 
+await prepareBrain(el);                                   // the particles, made in a worker (never rejects)
 const brain = mountBrain(el, {
   theme,                                                  // the page's theme; the 3D holds dark in both
   tabs: TABS.map(({ id, label }) => ({ id, label })),     // which "Open <tab>" buttons may show
@@ -210,7 +211,7 @@ brain.dispose();
 | `onRoute(tabId)` | | "Open <tab>" or "Part of" clicked. |
 | `onState(state, { history })` | | The visitor changed the view: focusing a brain asks for `'push'`, selecting a page `'replace'`. The mount never writes the URL. |
 | `dpr` | `min(devicePixelRatio, 2)` | 1.5 at most on phones. |
-| `quality` | `'auto'` | Full clouds (60,000 particles each) on desktop, a member on its orbit drawing 24,000 of them at 1.25 times the brightness; under 720 px or on a coarse pointer 30,000, and 12,000 drawn for a brain on its orbit. |
+| `quality` | `'auto'` | Full clouds (60,000 particles each) on desktop, a member on its orbit drawing 32,000 of them at 1.1 times the brightness; under 720 px or on a coarse pointer 30,000, and 16,000 drawn for a brain on its orbit. `prepareBrain` takes the same option. |
 | `reducedMotion` | the visitor's `prefers-reduced-motion` | Formed at once; no turn, twinkle, breathing, motes or orbits (the members held where the films' short clock has them at 3.0 s); moves are 200 ms. |
 | `corrections` | none | The host's corrections beside Living Brain's text where brain-scene.json has none: a page's keyed `'brain/slug'`, a connection's `'brainA/a>brainB/b'` (either order). The site passes the ones its `build-brain.json` carries. |
 
@@ -219,26 +220,40 @@ The handle: `ready`, `state()` (`{ brain, page }`), `goTo({ brain, page })` (no 
 `on('state' | 'route' | 'ready' | 'error', fn)` (returns its unsubscribe), `screenOf(brain, slug)` and `dotOf(brain,
 slug)` (where a page's tag or dot is, for checks and recordings), `brainAt(brain)`, and `dispose()`.
 
-How it plays: the combined view forms from dust once per page load (3.2 s), the three member brains orbiting it and
-showing their profiles, as Living Brain's do; the links across brains settle to 0.6 of their brightness once formed and
-come back to full while a page is lit. A member clicked (its cloud, its name, or its chip top right) comes to the
-center over 1.4 s, turning to face the camera, and its tags resolve; "All brains" or Escape goes back. A page's tag (or
-dot) hovered lights its connections, wiping out from it over 2 s, and shows a small card; clicked, its card pins on the
-right (a bottom sheet in the narrow layout): Living Brain's summary as it wrote it, the correction beside it where the
-summary misstates the repository or the chain record (the scene's, or the host's `corrections`), the conflict across brains where the page is in it, and its connections in its brain and
-across brains, each with its strength and match; a row selects its page, in another brain after that brain comes to the
-center. While a page is selected, hovering another shows its small card and keeps the selection's connections lit, and a
-tag that slides under a still pointer as the view moves never takes the hover. A page with links across brains turns
-the view so the brains they reach stand to its sides. Drag, wheel and pinch are Living Brain's controls (damping,
-distance 1.4 to 7, or farther where a tall stage's framing needs it; a wheel's notch eased over about 120 ms); its slow
-turn pauses while the visitor moves it and for 4 s after. Every page is a button in a visually hidden list (focus shows
-its card, Enter selects); arrow keys turn the view when the stage has focus, and Escape keeps working after a chip, a
-card's row or a list button (they update in place, or focus returns to the stage). The narrow layout (under 800 px, or
-wherever the HUD and the chips would meet in their row) puts the chips at the bottom over the scope line and the card in
-a bottom sheet, and a "Pages" button opens the pages as a drawer; on a stage taller than it is wide the all-brains view
-is framed by the orbit, drawn in so the members and their names stay on the stage. Without WebGL the brains' pages are
-the view, as lists scrolling inside the host's box; a page picked there comes with its brain, as the deep link needs. It
-draws only while visible.
+How it plays: `prepareBrain(el, { quality })` makes the brains' particles in a module worker (the 90,000-point surface
+sample and each brain's particles and page places are pure functions of their seeds), so a host that awaits it before
+`mountBrain` opens the stage without a long task; without it the mount makes them itself. The combined view forms from
+dust once per page load (3.2 s, from the first frame that moves), the three member brains orbiting it and showing their
+profiles, as Living Brain's do; the links across brains settle to 0.6 of their brightness once formed and come back to
+full while a page is lit, and while the conflict's rose arc is drawn its two pages are tagged in rose (the HUD's
+"1 conflict" opens its page in the build's brain, whose card carries it). A member clicked (its cloud, its name, or its
+chip top right) comes to the center over 1.4 s, turning to face the camera, and its tags resolve; "All brains" or Escape
+goes back. A page's tag (or dot) hovered lights its connections, wiping out from it over 2 s, and shows a small card;
+clicked (in the all-brains view its brain comes to the center first, so the URL carries both), its card pins on the
+right (a bottom sheet in the narrow layout) and the scene is composed left of it (above the sheet): Living Brain's
+summary as it wrote it, the correction beside it where the summary misstates the repository or the chain record (the
+scene's, or the host's `corrections`), the conflict across brains where the page is in it, and its connections in its
+brain and across brains, each with its strength and match; a row selects its page, in another brain after that brain
+comes to the center. While a page is selected, hovering another shows its small card and keeps the selection's
+connections lit, and a tag that slides under a still pointer as the view moves never takes the hover. The camera never
+moves for a click (Living Brain's rule: a selection only lights things); with the pointer on the card's Across brains
+list (a row in it focused, or a Why in it opened) it eases out once for that selection until the brains the links reach
+are in the picture, turning only as far as keeps them in the stage left of the card. Drag and pinch are Living Brain's
+controls (damping, distance 1.4 to 7, or farther where a tall stage's framing needs it); the wheel zooms with Ctrl or ⌘
+held (a trackpad's pinch arrives so) or once the visitor has pressed on the stage, a notch eased over about 120 ms, and
+otherwise scrolls the page on, the hint saying how to zoom; on a phone a vertical swipe scrolls the page and a sideways
+drag turns the brain. Its slow turn pauses while the visitor moves it and for 4 s after. The keyboard's path: the HUD's
+conflict, the chips (the brains), the pinned card, then the focused brain's pages, each a button in a visually hidden
+list (focus shows its small card; Enter pins it and takes focus into its card, whose close gives focus back to the
+row); every control shows a focus ring, arrow keys turn the view when the stage has focus, and Escape closes the drawer,
+then the card, then the brain, focus staying on the stage. The narrow layout (under 800 px, or wherever the HUD and the
+chips would meet in their row) puts the chips at the bottom over the scope line and the card in a bottom sheet, and a
+"Pages" button opens the pages as a drawer with its own close (Escape, or a press outside it, closes it too); on a stage
+taller than it is wide the all-brains view is framed by the orbit, drawn in so the members and their names stay on the
+stage, and the members fade against that framing, so a focused brain shows alone. Page tags keep off the HUD, the
+chips, the scope line and the stage's edge, and a member whose center is off the stage draws no tags. Without WebGL the
+brains' pages are the view, as lists scrolling inside the host's box; a page picked there comes with its brain, as the
+deep link needs. It draws only while visible.
 
 The host gives the element its size (the Memory tab: full width, `height: clamp(480px, 70vh, 820px)`), with the tab's
 tables under it. The deep link is the host's: `#/agents/memory?brain=<all|grand-prix|terminal|battery-review>&page=<slug>`,

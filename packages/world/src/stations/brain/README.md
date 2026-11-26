@@ -42,9 +42,9 @@ core, the motes, the filaments, the orbit lights, the members' turn to their pro
 
 | File | |
 |---|---|
-| `shape.ts` | Our own brain: a signed distance field (two hemispheres split by the fissure in their upper part, fused below its floor and leaning in at the top, so the front reads as a dome; the temporal lobes, widest in the lower third, and the lateral fissure; the cerebellum and a short stem tucked under it; folded by narrow cracks along a noise's zero set), sampled evenly by area and scaled to Living Brain's 0.62 half-extent. No mesh file. A share of the inside particles sits deep round the core, where the hemispheres meet, so the core lights particles all round it as in Living Brain's anatomical mesh. Page dots sit only on the outer surface: none below the base, on the stem or on the medial faces. Each brain draws its particles from one pool by its seed (FNV-1a of its id), so the film, the lab and the site place everything the same way. |
-| `cloud.ts` | One brain: 60,000 particles flying home from dust (Living Brain's formation: 3.2 s, a quintic ease and a swirl), twinkling and breathing; the ray-marched core; the page dots; the connections as 1.15 px ribbons that light from a chosen page outward over 2 s; their pulses. `LOOK` holds the calibration. |
-| `world.ts` | The combined brain, the three members on their orbits (one turn in 46 s), the filaments and the dots flowing along them, the orbit lights, the motes, and the film's effects. The 55 links across brains are drawn at the spec's 1.6 px and 1.5 times an own connection's brightness. Posed from a plain description of one moment; the camera never moves, the world does, so one rest camera serves every frame. |
+| `shape.ts` | Our own brain: a signed distance field (two hemispheres split by the fissure in their upper part, fused below its floor and leaning in at the top, so the front reads as a dome; the temporal lobes, widest in the lower third, under a lateral fissure cut deep enough to read from the side; the frontal lobe's underside stepping up from the temporal pole; the cerebellum and a short stem tucked under it, with a crease between it and the occipital lobe; folded by narrow cracks along a noise's zero set, the shell keeping its clumps to the gyri between them, so it reads as streaks with dark lines between), sampled evenly by area and scaled to Living Brain's 0.62 half-extent. No mesh file. A share of the inside particles sits deep round the core, where the hemispheres meet, so the core lights particles all round it as in Living Brain's anatomical mesh. Page dots sit only on the outer surface: none below the base, on the stem or on the medial faces. Each brain draws its particles from one pool by its seed (FNV-1a of its id), so the film, the lab and the site place everything the same way. |
+| `cloud.ts` | One brain: 60,000 particles flying home from dust (Living Brain's formation: 3.2 s, a quintic ease and a swirl), twinkling and breathing; the ray-marched core; the page dots; the connections as 1.15 px ribbons that light from a chosen page outward over 2 s; their pulses. `LOOK` holds the calibration. A member tinted toward its color keeps its lower half lit (the bottom's darkening and its red cut by the untinted share only), pales toward its own luminance, and its own connections and pulses take its tint, as Living Brain tints a member 72 %. |
+| `world.ts` | The combined brain, the three members on their orbits (one turn in 46 s), the filaments and the dots flowing along them, the orbit lights (lilac-white orbs filled with moving filament noise, in a soft halo), the motes, and the film's effects. The 55 links across brains are drawn at the spec's 1.6 px and 1.5 times an own connection's brightness. Posed from a plain description of one moment; the camera never moves, the world does, so one rest camera serves every frame. |
 | `moments.ts`, `clock.ts` | The Living Brain sequence's one clock (LB1 to LB7) and the short clock of the films' beat; the world's pose at any second of either. On each clock the orbits' phase and each member's yaw were found together by a search, so the members show their profiles at the combined view's rests, as Living Brain's do: within 17 degrees of side-on at 13.0 and 23.0 s on the sequence's clock and within 7 over the short clock's hold (1.0 to 4.6 s), at least 2.6 member radii apart on screen, and none in front of the combined brain while the links draw (one may stand behind it, as Living Brain's Grand Prix member does). A member turns to its profile as it leaves LB1's row and back as it comes to the center. The links across brains are at full while they draw and settle to 0.6 after LB3's rest, so the combined brain reads as a brain under them. |
 | `tags.ts`, `brain.css` | The words over the canvas, as DOM: numbered tags centered on their dots (Living Brain's: no leader lines; faint on the far side; one under a heavier one hidden), the member brains' names, plain first ("Grand Prix brain", "Desert Willow's review", "Terminal brain"; Living Brain's own names are in the cards), and page counts, the HUD (a number never parts from its words), the scope line, the card and the review's plates. The member tags take part in the overlap rule: their names after the beat's own page tags and before the rest, their page counts last, the farther member's giving way to the nearer's. |
 | `bloom.ts` | A bright pass, bloom and vignette before the kit's output, as Living Brain's post chain. |
@@ -55,14 +55,20 @@ core, the motes, the filaments, the orbit lights, the members' turn to their pro
 | `mount.ts`, `card.ts`, `mount.css` | `mountBrain`, the Memory tab's view (the package README). |
 
 Calibrated against Living Brain's own Explore view, measured on its renders with the same tools (the Grand Prix brain
-alone, formed, at its distance 2.08 on a 37 degree lens, `render.mjs --scale 2`, Nov 26 after the dome): our side
-view's height over length is 0.75 and our front view's height over width 0.92, inside the targets set from Living
+alone, formed, at its distance 2.08 on a 37 degree lens, `render.mjs --scale 2`, Nov 27 after the anatomy pass): our
+side view's height over length is 0.75 and our front view's height over width 0.91, inside the targets set from Living
 Brain's (side 0.74 to 0.80, front 0.90 to 1.00; its own side view measures 0.76 to 0.77). At Living Brain's starting
 angle our brain shows more of its side than Living Brain's mesh does (height over width 0.79 there against its 0.94 to
 0.96): the two meshes do not face the same way, and ours is our own. The band medians at the calibration pose are within
-14 per channel of its measured colors (the largest differences: top 8, middle 14, bottom 5, core 8). The kit tone-maps with the
-Neutral curve at exposure 1 where Living Brain uses ACES at 1.05, so its shader constants are the starting point and
-`LOOK` brings the rendered colors back onto its measured ones.
+14 per channel of its measured colors (top #3F5396, middle #5D64B2, bottom #5747AC, around the core #919FD6; the
+largest differences: top 6, middle 13, bottom 6, core 4), the core a soft glow rather than a swarm of whitened
+particles. In the Memory stage's all-brains view at rest (1440 x 900, three moments) the members' medians are the Grand
+Prix brain's #B364A2, the review's #6B76B8 and the Terminal's #4F7F81 against Living Brain's #97569B, #635FB4 and
+#5E979D: within 28 per channel, where they were 27, 16 and 46 off with their lower halves dark. One brightness cannot
+bring pink and teal both within 14: the Neutral curve keeps a saturated color's hue where Living Brain's ACES pales
+it, and how much of a member's box its lines and its neighbors' fill moves with its place on the orbit. The kit
+tone-maps with the Neutral curve at exposure 1 where Living Brain uses ACES at 1.05, so its shader constants are the
+starting point and `LOOK` brings the rendered colors back onto its measured ones.
 
 ## Frames
 
@@ -76,7 +82,7 @@ Neutral curve at exposure 1 where Living Brain uses ACES at 1.05, so its shader 
 | `brain.page` | 39.0 | LB5: Battery Tab (page 02) selected, its 20 connections lit, its card |
 | `brain.across` | 48.0 | LB6: Battery Tab's 5 connections across brains, into the Terminal's brain and Desert Willow's review |
 | `brain.review` | 60.5 | LB7: the review's one page: remember (version 2, 10:58:36 CT), retrieve (0 citations, then 1), the plan's 09:12:46 CT cutoff (0 pages admitted) |
-| `brain.shared` | 5.0 (short clock) | The films' beat and the site's stop: the combined brain, the 55 links drawn at three times the pace, the conflict |
+| `brain.shared` | 5.0 (short clock) | The films' beat and the site's stop: the combined brain, the 55 links drawn at three times the pace, the conflict; it moves at its rest (FrameHandle.live), and on a stage narrower than it is tall it is framed as the Memory stage frames one, its words at 1x |
 | `brain.interface` | 6.5 | LB8: Living Brain's own interface, Battery Tab hovered (the recording; LB5's moment where the checkout lacks it) |
 | `brain.calibrate`, `-side`, `-front` | | The calibration pose, and the brain from its side and its front, without words |
 
