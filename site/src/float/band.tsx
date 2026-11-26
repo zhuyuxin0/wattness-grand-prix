@@ -69,6 +69,8 @@ export interface BandProps {
   foot?: ArrangeOptions["foot"];
   /** The room kept under the panes at the band's foot, in px, for what floats over the page there (band-model.ts). */
   bottom?: number;
+  /** The columns' least width, in px, for parts that need it (band-model.ts). */
+  column?: number;
   /** The band grows past the height the page gives it, as far as the default arrangement needs to open every pane at
    *  its contents' height. */
   grow?: boolean;
@@ -160,7 +162,7 @@ function writeSaved(key: string, state: BandState, specs: readonly BandSpec[]): 
 /** The panes menu's row in the top right corner: the button's height and the gap under it. */
 const MENU_ROW = 28 + 8;
 
-function DockBand({ storageKey, label, panes, bar, foot, bottom, grow, className, onNeed }: BandProps & { onNeed: (px: number) => void }) {
+function DockBand({ storageKey, label, panes, bar, foot, bottom, column, grow, className, onNeed }: BandProps & { onNeed: (px: number) => void }) {
   const area = useRef<HTMLDivElement>(null);
   const head = useRef<HTMLDivElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
@@ -171,7 +173,7 @@ function DockBand({ storageKey, label, panes, bar, foot, bottom, grow, className
   const [natural, setNatural] = useState<Readonly<Record<string, number>>>({});
   const sized = sizedPanes(panes, natural);
   // The latest of each, for the callbacks rc-dock holds.
-  const live = useRef({ panes: sized, bounds, storageKey, opts: { foot, bottom } as ArrangeOptions });
+  const live = useRef({ panes: sized, bounds, storageKey, opts: { foot, bottom, column } as ArrangeOptions });
   live.current = { ...live.current, panes: sized, bounds, storageKey };
 
   useEffect(() => {
@@ -194,16 +196,21 @@ function DockBand({ storageKey, label, panes, bar, foot, bottom, grow, className
       const b = { w: el.clientWidth, h: el.clientHeight };
       if (!(b.w > 0 && b.h > 0)) return;
       const h = head.current;
-      if (h) h.style.width = `${columnWidth(b).col}px`;
+      if (h) h.style.width = `${columnWidth(b, { column }).col}px`;
       const headH = h && h.childElementCount ? h.offsetHeight : 0;
       const opts: ArrangeOptions = {
         foot,
         bottom,
+        column,
         top: { left: BAND_EDGE + (headH ? headH + BAND_GAP : 0), right: BAND_EDGE + MENU_ROW },
       };
       const prev = live.current.opts;
       const same =
-        prev.foot === opts.foot && prev.bottom === opts.bottom && prev.top?.left === opts.top?.left && prev.top?.right === opts.top?.right;
+        prev.foot === opts.foot &&
+        prev.bottom === opts.bottom &&
+        prev.column === opts.column &&
+        prev.top?.left === opts.top?.left &&
+        prev.top?.right === opts.top?.right;
       live.current.opts = same ? live.current.opts : opts;
       live.current.bounds = b;
       setBounds((old) => (old.w === b.w && old.h === b.h ? old : b));
@@ -226,7 +233,7 @@ function DockBand({ storageKey, label, panes, bar, foot, bottom, grow, className
       ro.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [foot, bottom]);
+  }, [foot, bottom, column]);
 
   // Each pane's contents measured: until the reader changes the band, the default arrangement opens them at that
   // height, and a band that may grow grows to fit them.

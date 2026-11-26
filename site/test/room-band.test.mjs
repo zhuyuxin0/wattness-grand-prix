@@ -22,7 +22,7 @@ registerHooks({
   },
 });
 
-const { ROOM_BOTTOM_WITH_NESS, ROOM_KEY, ROOM_MIN_WIDTH, ROOM_PANES, roomPanes } = await import("../src/pages/Overview/room-band.ts");
+const { ROOM_BOTTOM_WITH_NESS, ROOM_COLUMN, ROOM_KEY, ROOM_MIN_WIDTH, ROOM_PANES, roomPanes } = await import("../src/pages/Overview/room-band.ts");
 const { arrange, BAND_EDGE, BAND_GAP, columnWidth, neededHeight } = await import("../src/float/band-model.ts");
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -52,11 +52,11 @@ test("a part the build leaves out is no pane; a part waiting for its data keeps 
 
 test("at 1440 wide the room keeps its own arrangement: the two sides, Ask Ness under the middle, the foot", () => {
   const b0 = { w: 1440 - 190, h: 0 }; // the room beside the side panel
-  const opts = { foot: "full", top: { left: BAND_EDGE + 186 + BAND_GAP, right: BAND_EDGE + 36 }, bottom: ROOM_BOTTOM_WITH_NESS };
+  const opts = { foot: "full", top: { left: BAND_EDGE + 186 + BAND_GAP, right: BAND_EDGE + 36 }, bottom: ROOM_BOTTOM_WITH_NESS, column: ROOM_COLUMN };
   const b = { w: b0.w, h: neededHeight(ROOM_PANES, b0, opts) };
   const r = arrange(ROOM_PANES, b, opts);
-  const { col } = columnWidth(b);
-  assert.ok(col >= 330 && col <= 350, `columns ${col} px, about the room's 340`);
+  const { col } = columnWidth(b, opts);
+  assert.equal(col, 340, "the room's own column width");
   for (const id of ["seal", "verify"]) assert.equal(r[id].x, BAND_EDGE, `${id} on the left`);
   for (const id of ["morph", "fleet"]) assert.equal(r[id].x + r[id].w, b.w - BAND_EDGE, `${id} on the right`);
   assert.deepEqual([r.start.x, r.start.w], [BAND_EDGE, b.w - 2 * BAND_EDGE], "the foot spans the room");
@@ -69,6 +69,10 @@ test("at 1440 wide the room keeps its own arrangement: the two sides, Ask Ness u
   assert.ok(middle.w >= 500 && middle.h >= 400, `the landscape's middle ${middle.w} x ${middle.h} px`);
   assert.ok(all.every((p) => !overlap(p, middle)), "the middle above Ask Ness open");
   for (const p of ROOM_PANES) assert.equal(r[p.id].h, p.h, `${p.id} at its height`);
+  // At 1280 wide the columns keep 340 px and Ask Ness still stands under the middle.
+  const n = arrange(ROOM_PANES, { w: 1280 - 190, h: 1400 }, opts);
+  assert.equal(n.seal.w, 340);
+  assert.ok(n.ness.x > n.seal.x + n.seal.w && n.ness.x + n.ness.w < n.morph.x, "Ask Ness in the middle at 1280");
 });
 
 test("ControlRoom draws the band from 1000px of room, with the room's own column under it", () => {
@@ -79,6 +83,8 @@ test("ControlRoom draws the band from 1000px of room, with the room's own column
   const band = read("RoomBand.tsx");
   assert.match(band, /minWidth=\{ROOM_MIN_WIDTH\}/);
   assert.match(band, /bottom=\{parts\.ness === undefined \? undefined : ROOM_BOTTOM_WITH_NESS\}/);
+  assert.match(band, /column=\{ROOM_COLUMN\}/);
+  assert.match(read("control-room.css"), /minmax\(300px, 340px\)/, "the room's own grid's column");
   assert.match(read("control-room.css"), new RegExp(`padding-bottom: ${ROOM_BOTTOM_WITH_NESS}px`), "the room's own grid keeps the same room");
   assert.equal(ROOM_MIN_WIDTH, 1000);
   assert.match(read("control-room.css"), /@container ov-room \(min-width: 1000px\)/, "the room's grid takes the same breakpoint");

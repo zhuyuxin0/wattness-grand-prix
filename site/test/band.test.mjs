@@ -236,6 +236,23 @@ test("a pane in the middle stands at its bottom, centered, on the foot; the room
   assert.ok(tight.ness.x === BAND_EDGE || tight.ness.x + tight.ness.w === 700 - BAND_EDGE, "in a column");
 });
 
+test("the columns keep the least width a page asks for, and a middle pane too wide for what is left joins a column", () => {
+  assert.equal(columnWidth({ w: 1090, h: 800 }).col, Math.round(1090 * 0.272));
+  assert.deepEqual(columnWidth({ w: 1090, h: 800 }, { column: 340 }), { col: 340, tight: false });
+  assert.deepEqual(columnWidth({ w: 1730, h: 800 }, { column: 340 }), { col: 400, tight: false }, "at most 400 on a wide band");
+  assert.deepEqual(columnWidth({ w: 1730, h: 800 }, { column: 480 }), { col: 480, tight: false }, "a least over 400 wins");
+  const specs = [
+    { id: "a", side: "left", h: 200 },
+    { id: "b", side: "right", h: 200 },
+    { id: "m", side: "middle", w: 470, h: 160, min: { w: 300, h: 120 } },
+  ];
+  const wide = arrange(specs, { w: 1090, h: 800 }, { column: 340 });
+  assert.equal(wide.a.w, 340);
+  assert.ok(wide.m.x > wide.a.x + wide.a.w && wide.m.x + wide.m.w < wide.b.x, "in the middle");
+  const narrow = arrange(specs, { w: 1000, h: 800 }, { column: 340 });
+  assert.ok(narrow.m.x === BAND_EDGE || narrow.m.x + narrow.m.w === 1000 - BAND_EDGE, "264 px of middle: it joins a column");
+});
+
 test("a band too narrow for a clear middle gets two columns that meet; one not laid out gets nothing", () => {
   const b = { w: 720, h: 560 };
   const r = arrange(SPECS, b);

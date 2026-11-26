@@ -28,6 +28,10 @@ export const ROOM_KEY = "gp.room";
 /** Narrower than this the room shows its own column (the room's grid takes the same breakpoint). */
 export const ROOM_MIN_WIDTH = 1000;
 
+/** The columns' least width: the room's own grid's (control-room.css, 340 px and 344 px), which the morph's stage needs
+ *  to frame its closing lockup. */
+export const ROOM_COLUMN = 340;
+
 /** The room kept under the foot's panes where Ask Ness is built: its launcher floats at the window's bottom right, and
  *  the room's own grid keeps the same 64 px (control-room.css). */
 export const ROOM_BOTTOM_WITH_NESS = 64;

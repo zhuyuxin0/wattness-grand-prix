@@ -34,6 +34,8 @@ export interface ArrangeOptions {
   /** The room kept under the panes at the band's foot, in px (for what floats over the page there). The band's edge
    *  when not given. */
   bottom?: number;
+  /** The columns' least width, in px, for parts that need it (260 when not given). */
+  column?: number;
 }
 
 /** A rectangle as fractions of the band's width and height. */
@@ -96,10 +98,12 @@ function split(total: number, weights: readonly number[], mins: readonly number[
 
 const tall = (s: BandSpec) => (typeof s.h === "number" && s.h > 0 && Number.isFinite(s.h) ? s.h : 0);
 
-/** The columns' width at a band's size, and whether they meet, leaving no middle clear. */
-export function columnWidth(b: Bounds): { col: number; tight: boolean } {
+/** The columns' width at a band's size (a little over a quarter of it, from their least to 400 px), and whether they
+ *  meet, leaving no middle clear. */
+export function columnWidth(b: Bounds, opts: ArrangeOptions = {}): { col: number; tight: boolean } {
   const inner = Math.max(0, b.w - 2 * BAND_EDGE);
-  const col = clamp(Math.round(b.w * 0.272), 260, 400);
+  const least = typeof opts.column === "number" && opts.column > 0 && Number.isFinite(opts.column) ? Math.round(opts.column) : 260;
+  const col = clamp(Math.round(b.w * 0.272), least, Math.max(least, 400));
   if (2 * col + 2 * BAND_GAP + CLEAR_MIN <= inner) return { col, tight: false };
   return { col: Math.max(0, Math.floor((inner - BAND_GAP) / 2)), tight: true };
 }
@@ -108,7 +112,7 @@ export function columnWidth(b: Bounds): { col: number; tight: boolean } {
  *  foot has no room for their smallest widths. */
 function assign(specs: readonly BandSpec[], b: Bounds, opts: ArrangeOptions) {
   const innerW = Math.max(0, b.w - 2 * BAND_EDGE);
-  const { col, tight } = columnWidth(b);
+  const { col, tight } = columnWidth(b, opts);
   const full = opts.foot === "full";
   const footRoom = full ? innerW : tight ? 0 : innerW - 2 * (col + BAND_GAP);
   const middleRoom = tight ? 0 : innerW - 2 * (col + BAND_GAP);

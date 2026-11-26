@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { PaneBand } from "../../float/band";
 import { Loading } from "../../ui";
-import { ROOM_BOTTOM_WITH_NESS, ROOM_KEY, ROOM_MIN_WIDTH, roomPanes, type RoomParts } from "./room-band";
+import { ROOM_BOTTOM_WITH_NESS, ROOM_COLUMN, ROOM_KEY, ROOM_MIN_WIDTH, roomPanes, type RoomParts } from "./room-band";
 import "./room-band.css";
 
 /**
@@ -18,6 +18,7 @@ export function RoomBand({ head, parts, stacked }: { head: ReactNode; parts: Roo
       minWidth={ROOM_MIN_WIDTH}
       foot="full"
       bottom={parts.ness === undefined ? undefined : ROOM_BOTTOM_WITH_NESS}
+      column={ROOM_COLUMN}
       grow
       bar={head}
       stacked={stacked}
