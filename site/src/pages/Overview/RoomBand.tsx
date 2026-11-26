@@ -17,7 +17,6 @@ export function RoomBand({ head, parts, stacked }: { head: ReactNode; parts: Roo
       label="Control room panes"
       panes={roomPanes(parts, <Loading />)}
       minWidth={ROOM_MIN_WIDTH}
-      foot="full"
       bottom={parts.ness === undefined ? undefined : ROOM_BOTTOM_WITH_NESS}
       column={ROOM_COLUMN}
       grow

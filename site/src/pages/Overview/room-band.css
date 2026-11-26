@@ -48,8 +48,7 @@
 .ov-room .gp-band__content > .ov-pane > .ov-pane__head:not(:has(.ov-pane__meta)) {
   display: contents;
 }
-.ov-room .gp-band__body .ov-pane__title,
-.ov-room .gp-band__body .start-here__grid:first-child .start-here__title {
+.ov-room .gp-band__body .ov-pane__title {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -61,7 +60,4 @@
 .ov-room .gp-band__body .ov-find__pop {
   position: static;
   margin-top: 4px;
-}
-.ov-room .gp-band__content > .start-here {
-  padding: 10px 16px 14px;
 }

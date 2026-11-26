@@ -73,17 +73,18 @@ test("the 3D comes after the page's text, fades in once drawn, and stays away wi
   assert.match(band, /\.ov-room \.gp-band__head,\s*\.ov-room \.gp-band__corner \{\s*pointer-events: auto;/);
 });
 
-test("the first paint loads no three.js: the morph's scene comes only through the lazy scenes index", () => {
-  for (const name of ["index.tsx", "ControlRoom.tsx", "Timeline.tsx", "room.ts"]) {
+test("the first paint loads no three.js, and the Overview keeps no copy of the Intro's parts", () => {
+  for (const name of ["index.tsx", "ControlRoom.tsx", "Timeline.tsx", "room.ts", "RoomBand.tsx", "room-band.ts"]) {
     const src = read(join(dir, name));
     for (const { from, type } of importsOf(src)) {
-      assert.ok(type || !/^three(\/|$)|^@world\/|scenes\/(StartingGrid|BrainMap|engine)/.test(from), `${name} imports ${from} on first paint`);
+      assert.ok(type || !/^three(\/|$)|^@world\/|scenes(\/|$)|scenes\/(StartingGrid|BrainMap|engine)/.test(from), `${name} imports ${from} on first paint`);
     }
   }
-  const scenes = read(join(site, "src", "scenes", "index.ts"));
-  assert.match(scenes, /export const StartingGrid = lazy\(\(\) => import\("\.\/StartingGrid\/StartingGrid"\)\)/);
   const room = read(join(dir, "ControlRoom.tsx"));
-  assert.ok(/idle && near/.test(room), "the morph mounts once the page is idle and the pane is near the screen");
+  // the role entries ("Start where you are", "Judging a track?") and the closing morph are the Intro's alone
+  assert.ok(!/StartHere|Intro\//.test(room), "no role entries on the Overview");
+  assert.ok(!/StartingGrid|GRID_CLOSE|MorphPane|ov-morph/.test(room), "no closing morph on the Overview");
+  assert.ok(!/ov-morph|ov-room__start|start-here/.test(read(join(dir, "control-room.css")) + read(join(dir, "room-band.css"))));
   // and nothing asks for the old loop
   assert.ok(!/home\/|tech-landscape|<video/.test(room));
   assert.ok(!existsSync(join(site, "public", "home", "tech-landscape.json")), "the loop's files are gone");

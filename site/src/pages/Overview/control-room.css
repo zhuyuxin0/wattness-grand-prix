@@ -1,11 +1,10 @@
-/* The control room: the Overview's first view. Blocks: ov-room*, ov-pane*, ov-seal*, ov-find*, ov-board*, ov-ness*,
-   ov-morph. Dark in either theme (data-atmosphere="dark"), full bleed under the masthead, about one view tall. Its
-   stage is the Tech Stack's 3D, live (StackSpace.tsx), over the stack's poster until it has drawn; the panes are the
-   Terminal's glass (a raised ground over the blurred scene, a hair of a border, a lit top edge, a soft lift), placed
-   round the stage: the page's head, the seal and Verify down its left, the morph and the Fleet board down its right,
-   Ask Ness under its middle (in a build that has it), the visitors' ways in along its foot, the middle above Ask Ness
-   left open. Under 1000px of room the stage sits on top at 16:9 and the panes follow it in one column (two from
-   640px). Hovers change color only. */
+/* The control room: the Overview's first view. Blocks: ov-room*, ov-pane*, ov-seal*, ov-find*, ov-board*, ov-ness*.
+   Dark in either theme (data-atmosphere="dark"), full bleed under the masthead, about one view tall. Its stage is the
+   Tech Stack's 3D, live (StackSpace.tsx), over the stack's poster until it has drawn; the panes are the Terminal's
+   glass (a raised ground over the blurred scene, a hair of a border, a lit top edge, a soft lift), standing down the
+   stage's two sides: the page's head, the seal and Verify down its left, the Fleet board and Ask Ness (in a build that
+   has it) down its right, the middle left to the 3D. Under 1000px of room the stage sits on top at 16:9 and the panes
+   follow it in one column (two from 640px). Hovers change color only. */
 
 /* The band spans the page's whole width; what follows it keeps the page's measure. */
 .app__page:has(> .page--overview) {
@@ -88,12 +87,9 @@
   .ov-room__panes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .ov-room__start {
-    grid-column: 1 / -1;
-  }
 }
 
-/* With room, the stage fills the band and the panes stand round it. */
+/* With room, the stage fills the band and the panes stand down its sides. */
 @container ov-room (min-width: 1000px) {
   .ov-room__stage {
     position: absolute;
@@ -104,10 +100,7 @@
   .ov-room__panes {
     min-height: max(640px, calc(100svh - var(--gp-masthead-h)));
     grid-template-columns: minmax(300px, 340px) minmax(0, 1fr) minmax(300px, 344px);
-    grid-template-rows: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "left ness right"
-      "start start start";
+    grid-template-areas: "left . right";
     gap: var(--t-space-4) var(--gp-space-7);
     padding: var(--t-space-5) var(--gp-space-7) var(--t-space-5);
   }
@@ -123,30 +116,13 @@
     grid-area: right;
     padding-top: var(--t-space-3);
   }
-  /* the last pane of each side stands down by the visitors' row, the middle of the landscape open above it */
+  /* the last pane of each side stands down at the foot, the stage's middle open */
   .ov-room__side > .ov-pane:last-child {
     margin-top: auto;
   }
-  .ov-room__start {
-    grid-area: start;
-  }
-  /* Ask Ness's launcher floats at the window's bottom right: the visitors' row ends above it */
+  /* Ask Ness's launcher floats at the window's bottom right: the sides end above it */
   .ov-room:has(.ov-pane--ness) .ov-room__panes {
     padding-bottom: 64px;
-  }
-  /* Ask Ness stands under the landscape's middle, its questions in a row, the middle above it left open */
-  .ov-pane--ness {
-    grid-area: ness;
-    align-self: end;
-    justify-self: center;
-    width: min(100%, 470px);
-  }
-  .ov-pane--ness .ov-ness {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .ov-pane--ness .ov-ness__q {
-    width: auto;
   }
 }
 
@@ -462,31 +438,4 @@
 .ov-ness__q:hover {
   border-color: color-mix(in srgb, var(--t-accent-mark) 60%, transparent);
   background: color-mix(in srgb, var(--t-chrome) 80%, transparent);
-}
-
-/* ---------------------------------------------------------------- the morph */
-
-.ov-morph {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  margin-inline: -8px;
-  border-radius: var(--t-radius);
-  overflow: hidden;
-  background: var(--t-chrome);
-}
-.ov-morph > * {
-  width: 100%;
-  height: 100%;
-}
-/* The pane says the scene's line in its own words under it, and at this size the scene's tags (the showcase's place,
-   the root) would stand at its edges, cut: the marks and the names carry it. */
-.ov-morph .sg-lockup__line,
-.ov-morph .scene-tag {
-  display: none;
-}
-
-/* ---------------------------------------------------------------- the visitors' ways in */
-
-.ov-room__start .start-here__head {
-  text-shadow: 0 1px 10px rgb(0 0 0 / 0.6);
 }

@@ -1,12 +1,10 @@
-import { Component, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
+import { useCallback, useEffect, useId, useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { combine, useDay, useReceipts, type BatterySummary, type ChainReceipt, type DayIndex } from "../../data";
 import { minSec } from "../../lib/clock";
 import { formatInt } from "../../lib/format";
 import { dualTime } from "../../lib/time";
-import { GRID_CLOSE, StartingGrid } from "../../scenes";
 import { BATTERY_NAMES, Glyph, Hash, PageHeader } from "../../ui";
-import { StartHere } from "../Intro/StartHere";
 import { Strip } from "../Fleet/Strip";
 import { hubLabel, plainName } from "../Fleet/names";
 import { StackSpace } from "../TechStack/StackSpace";
@@ -21,9 +19,8 @@ import "./control-room.css";
 // text is in and the page is idle, and fades in over the poster once it has drawn. With reduced motion or Save-Data
 // the poster stays alone. Leaving the tab disposes the 3D, which releases its WebGL context. Over the stage, glass
 // panes, each a small live preview that opens its tab: the latest seal, a battery search that opens Verify, the Fleet
-// board's first rows, the closing morph of the introduction (Wattness into BNB Chain's seal), Ask Ness's prepared
-// questions (in a build that has Ask Ness), and "Start where you are". The first paint loads no three.js: the morph's
-// scene is fetched once the page is idle and the pane nears the screen.
+// board's first rows, and Ask Ness's prepared questions (in a build that has Ask Ness). The first paint loads no
+// three.js.
 
 const posterSrc = `${import.meta.env.BASE_URL}${STAGE_POSTER.file}`;
 
@@ -73,23 +70,6 @@ function useIdle(): boolean {
     };
   }, []);
   return idle;
-}
-
-/** Whether the element is on screen (rootMargin widens the screen); without IntersectionObserver, always. */
-function useOnScreen(ref: RefObject<Element>, rootMargin = "0px", threshold = 0): boolean {
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setOn(true);
-      return;
-    }
-    const io = new IntersectionObserver((entries) => setOn(entries.some((e) => e.isIntersecting)), { rootMargin, threshold });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ref, rootMargin, threshold]);
-  return on;
 }
 
 /**
@@ -346,44 +326,6 @@ function NessPane() {
   );
 }
 
-/** A scene that fails takes only its own box. */
-class Contain extends Component<{ children: ReactNode }, { failed: boolean }> {
-  override state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  override render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
-
-/** The introduction's close, as on the Intro's last band: the sealed plans leave the grid for the Wattness mark while
- *  the root's ring becomes BNB Chain's. It plays when it comes on screen and rewinds once off it. */
-function MorphPane() {
-  const stage = useRef<HTMLDivElement>(null);
-  const idle = useIdle();
-  const near = useOnScreen(stage, "25% 0px 25% 0px");
-  const inView = useOnScreen(stage, "0px", 0.6);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    if (idle && near) setMounted(true);
-  }, [idle, near]);
-  return (
-    <Pane area="morph" title="Sealed on BNB Chain" to="/seal" toLabel="Seal">
-      <div ref={stage} className="ov-morph" data-atmosphere="dark">
-        {mounted && (
-          <Contain>
-            <Suspense fallback={null}>
-              <StartingGrid name="ov-morph" hud={false} playback="once" from={GRID_CLOSE - 0.8} hold={!inView} />
-            </Suspense>
-          </Contain>
-        )}
-      </div>
-      <p className="ov-pane__line">Every plan of the day, under one root.</p>
-    </Pane>
-  );
-}
-
 export function ControlRoom() {
   const all = combine(useDay(), useReceipts());
   const ready = all.status === "ready" ? all.data : null;
@@ -393,14 +335,12 @@ export function ControlRoom() {
   const parts = {
     seal: day && seal ? <SealPane day={day} seal={seal} /> : null,
     verify: day ? <VerifyPane day={day} /> : null,
-    morph: <MorphPane />,
     fleet: day ? <FleetPane day={day} /> : null,
     ness: NESS_IN_BUILD ? <NessPane /> : undefined,
-    start: <StartHere id="ov-start" />,
   };
-  // Two sides round the stage's middle, Ask Ness under it, and the visitors' ways in along its foot; a phone reads them
-  // in order under the stage. From 1000px of room the same parts are dock panes in that arrangement (RoomBand.tsx). The
-  // stage comes after them in the page's order, so the keyboard reaches the panes before the stack's pieces.
+  // The panes stand down the stage's two sides, its middle left to the 3D; a phone reads them in order under it. From
+  // 1000px of room the same parts are dock panes in that arrangement (RoomBand.tsx). The stage comes after them in the
+  // page's order, so the keyboard reaches the panes before the stack's pieces.
   return (
     <section className="ov-room" data-atmosphere="dark" aria-label="Control room">
       <RoomBand
@@ -414,11 +354,9 @@ export function ControlRoom() {
               {parts.verify}
             </div>
             <div className="ov-room__side ov-room__side--right">
-              {parts.morph}
               {parts.fleet}
+              {parts.ness}
             </div>
-            {parts.ness}
-            <div className="ov-room__start">{parts.start}</div>
           </div>
         }
       />
