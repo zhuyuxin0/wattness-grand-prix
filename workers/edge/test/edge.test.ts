@@ -30,7 +30,7 @@ describe("a good file passes", () => {
       "x-gate-block": "135677078",
       "x-gate-sha256": "690ae05bf4d238858cbb88f2479ee6426bd9a907d9f747a00671434387332581",
       "x-gate-source": `https://gnfd-testnet-sp3.nodereal.io/view/wattness-grand-prix-records/${DAY}/manifest.json`,
-      "x-gate-not-covered": "exclusions, showcase, plan_unix, leaves[].manifest, leaves[].scenarios",
+      "x-gate-not-covered": "exclusions, showcase, plan_unix",
       "x-gate-cache": "miss",
     });
     expect(res.headers.get("x-gate-checks")).toBe("byte form, index shape, root recomputes, RPC chain, record key, on-chain record, gate");
@@ -208,6 +208,56 @@ describe("a wrong root is refused", () => {
     const res = await call(freshOrigin(), "/day/2026-11-26/index.json");
     expect(res.status).toBe(502);
     expect(await res.text()).toContain(`root: on chain 0x${"cd".repeat(32)}, index ${ROOT}`);
+  });
+});
+
+type IndexDoc = { leaves: { resource: string; manifest: string; scenarios: string }[] };
+const pretty = (doc: unknown) => `${JSON.stringify(doc, null, 2)}\n`;
+
+describe("each index entry names its own battery's files", () => {
+  it("refuses an index that swaps two batteries' files, with the objects swapped to match, and serves neither under the other's name", async () => {
+    // Every hash still holds: the root covers the leaf hashes, the leaves are the published ones, and
+    // each served leaf would match the entry it was fetched by. Only the rule that R's files are
+    // leaves/<R>.json and leaves/<R>.scenarios.json ties the battery in the URL to the document.
+    const u = upstreams();
+    const swapped = JSON.parse(text.index) as IndexDoc;
+    const dswl = swapped.leaves.find((l) => l.resource === "DSWL_ESS_ESR1")!;
+    const clo = swapped.leaves.find((l) => l.resource === "CLO_ESR1")!;
+    [dswl.manifest, clo.manifest] = [clo.manifest, dswl.manifest];
+    [dswl.scenarios, clo.scenarios] = [clo.scenarios, dswl.scenarios];
+    u.objects.set(`${DAY}/manifest.json`, pretty(swapped));
+    u.objects.set(`${DAY}/leaves/CLO_ESR1.json`, text.dswl);
+    u.objects.set(`${DAY}/leaves/DSWL_ESS_ESR1.json`, text.clo);
+    u.objects.set(`${DAY}/leaves/CLO_ESR1.scenarios.json`, text.dswlScenarios);
+    u.objects.set(`${DAY}/leaves/DSWL_ESS_ESR1.scenarios.json`, text.cloScenarios);
+    const origin = freshOrigin();
+    for (const [path, ofTheFile] of [
+      ["leaves/CLO_ESR1.json", '"energy_kwh"'],
+      ["leaves/CLO_ESR1.scenarios.json", '"basis_days"'],
+    ] as const) {
+      const res = await call(origin, `/day/2026-11-26/${path}`);
+      expect.soft(res.status, path).toBe(502);
+      expect.soft(res.headers.get("x-gate-verified"), path).toBe("fail");
+      expect.soft(res.headers.get("cache-control"), path).toBe("no-store");
+      const body = await res.text();
+      expect.soft(body.slice(0, 600), path).toContain('leaves: CLO_ESR1 names "leaves/DSWL_ESS_ESR1.json" as its manifest, not leaves/CLO_ESR1.json');
+      expect.soft(body.slice(0, 600), path).toContain('leaves: CLO_ESR1 names "leaves/DSWL_ESS_ESR1.scenarios.json" as its scenario set, not leaves/CLO_ESR1.scenarios.json');
+      expect.soft(body.includes(ofTheFile), `${path} carries a byte of the file`).toBe(false);
+    }
+    expect.soft((await call(origin, "/day/2026-11-26/index.json")).status).toBe(502);
+  });
+
+  it("refuses an index that names a battery's leaf anywhere but leaves/<R>.json", async () => {
+    const u = upstreams();
+    const moved = JSON.parse(text.index) as IndexDoc;
+    moved.leaves.find((l) => l.resource === "DSWL_ESS_ESR1")!.manifest = "plans/DSWL_ESS_ESR1.json";
+    u.objects.set(`${DAY}/manifest.json`, pretty(moved));
+    u.objects.set(`${DAY}/plans/DSWL_ESS_ESR1.json`, text.dswl);
+    const origin = freshOrigin();
+    const index = await call(origin, "/day/2026-11-26/index.json");
+    expect.soft(index.status).toBe(502);
+    expect.soft((await index.text()).slice(0, 600)).toContain('leaves: DSWL_ESS_ESR1 names "plans/DSWL_ESS_ESR1.json" as its manifest, not leaves/DSWL_ESS_ESR1.json');
+    expect.soft((await call(origin, "/day/2026-11-26/plans/DSWL_ESS_ESR1.json")).status).toBe(502);
   });
 });
 

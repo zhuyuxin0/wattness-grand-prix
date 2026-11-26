@@ -87,8 +87,11 @@ export interface FleetIndex {
   exclusions: { resource: string; reason: string }[];
 }
 
-/** The index fields no hash covers: the publisher's statements, served as published. */
-export const INDEX_NOT_COVERED = ["exclusions", "showcase", "plan_unix", "leaves[].manifest", "leaves[].scenarios"] as const;
+/**
+ * The index fields no hash covers: the publisher's statements, served as published. An entry's file
+ * paths are not among them: they must be leaves/<R>.json and leaves/<R>.scenarios.json for its battery R.
+ */
+export const INDEX_NOT_COVERED = ["exclusions", "showcase", "plan_unix"] as const;
 
 export interface Parsed {
   object: StoredObject;
@@ -152,13 +155,12 @@ export function indexShapeErrors(doc: unknown, day: string): { problems: string[
   for (let i = 1; i < names.length; i++) {
     if (!((names[i - 1] as string) < (names[i] as string))) out.push(`leaves: ${names[i]} is out of order or repeated`);
   }
-  const paths = new Set<string>();
+  // No hash covers the paths, so they are fixed by the battery's name: a request for leaves/<R>.json can
+  // then only reach R's entry, and the leaf's own battery.resource, checked when it is served, must be R.
   for (const l of entries) {
-    for (const p of [l.manifest, l.scenarios]) {
-      if (typeof p !== "string" || !isPlainPath(p)) out.push(`leaves: ${l.resource} names ${JSON.stringify(p)}, not a plain relative path`);
-      else if (paths.has(p)) out.push(`leaves: ${p} is named twice`);
-      else paths.add(p);
-    }
+    const r = String(l.resource);
+    if (l.manifest !== `leaves/${r}.json`) out.push(`leaves: ${r} names ${JSON.stringify(l.manifest)} as its manifest, not leaves/${r}.json`);
+    if (l.scenarios !== `leaves/${r}.scenarios.json`) out.push(`leaves: ${r} names ${JSON.stringify(l.scenarios)} as its scenario set, not leaves/${r}.scenarios.json`);
   }
   if (d.leaf_count !== leaves.length) out.push(`leaf_count ${d.leaf_count}, ${leaves.length} leaves listed`);
   let root: Hex | null = null;
@@ -261,7 +263,7 @@ export async function sealedIndex(day: Day, network: NetworkName): Promise<Seale
   const gate = gateTs(day.od);
   const checks: Check[] = [
     form,
-    check("index shape", "schema, leaves in resource order, leaf_count, code_tree, scope_label, operating_day, gate_unix, plan_unix before the gate, plain paths", [
+    check("index shape", "schema, leaves in resource order, leaf_count, code_tree, scope_label, operating_day, gate_unix, plan_unix before the gate, each battery's files at leaves/<R>.json and leaves/<R>.scenarios.json", [
       comparison("fields", true, { checked: `${index.leaves.length} leaves` }),
     ]),
     check("root recomputes", "the RFC 6962 root over the index's leaf hashes, in order, is the index's root", [
@@ -604,7 +606,10 @@ export async function sealedReceipt(day: Day, network: NetworkName): Promise<Ser
   };
 }
 
-/** Which file of the day a path names, once the index is verified; null when nothing in the record covers it. */
+/**
+ * Which file of the day a path names, once the index is verified; null when nothing in the record covers
+ * it. The verified index names R's files leaves/<R>.json and leaves/<R>.scenarios.json, so the path finds R.
+ */
 export function leafEntryAt(index: FleetIndex, path: string): { position: number; kind: "leaf" | "scenarios" } | null {
   for (let i = 0; i < index.leaves.length; i++) {
     const l = index.leaves[i] as FleetLeaf;

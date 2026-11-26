@@ -32,7 +32,7 @@ the code that produced it. Everything else hangs from that root.
 
 | File | Served once |
 |---|---|
-| index | its shape holds (core's `fleetIndexErrors`); the RFC 6962 root over its leaf hashes, in order, is its root; `GateRecord.keyOf` returns the key computed here; `GateRecord.get(key)` holds that root, leaf count, code tree, day, scope and committer; the gate, computed as `GateRecord.gateTs` computes it, agrees with the contract's answer and the index, and the record was committed before it |
+| index | its shape holds (core's `fleetIndexErrors`, and battery R's files are `leaves/<R>.json` and `leaves/<R>.scenarios.json`); the RFC 6962 root over its leaf hashes, in order, is its root; `GateRecord.keyOf` returns the key computed here; `GateRecord.get(key)` holds that root, leaf count, code tree, day, scope and committer; the gate, computed as `GateRecord.gateTs` computes it, agrees with the contract's answer and the index, and the record was committed before it |
 | `leaves/<R>.json` | SHA-256(0x00 ‖ RFC 8785 form) is the index's leaf for R, and the document is R's plan for that day by the served wallet |
 | `leaves/<R>.scenarios.json` | SHA-256 of its RFC 8785 form is the digest R's verified leaf names |
 | `record.<network>.json` | every field is what GateRecord holds on that network, there are no other fields, and the transaction it names succeeded in the record's block and logged one matching `Committed` event |
@@ -47,10 +47,12 @@ determine, including a duplicate key that one parser would read one way and anot
 GateRecord accepts records from any wallet. The Worker serves those of the agent wallet named in
 `wrangler.jsonc` (`COMMITTER`), under the scope `gate-record/ercot-da-energy`.
 
-No hash covers the index's `exclusions`, `showcase` and `plan_unix`, or its file paths; the response names them
-in `x-gate-not-covered`. A leaf's own `battery.resource` is checked whenever the leaf is served, so the index
-cannot serve one battery's plan under another's name. Files no hash names, such as `sync/<R>.json`, answer 404
-with their Greenfield URL.
+No hash covers the index's `exclusions`, `showcase` and `plan_unix`; the response names them in
+`x-gate-not-covered`. No hash covers its file paths either, so they are fixed: battery R's files must be
+`leaves/<R>.json` and `leaves/<R>.scenarios.json`, and an index that names any other path is refused. A request
+for `leaves/<R>.json` can then reach only R's entry, and the leaf's own `battery.resource`, checked whenever the
+leaf is served, must be R, so the index cannot serve one battery's plan under another's name. Files no hash
+names, such as `sync/<R>.json`, answer 404 with their Greenfield URL.
 
 The verdict's checks follow the repository verifier's V1 (the root from the leaf and its audit path), V2 (the
 record key and the record at it) and V3 (the gate) and print the same lines. `test/verify.test.ts` compares them
