@@ -1,6 +1,6 @@
-// The world's stage: the kit's createStage (kit/stage.ts, unchanged) with the three settings stills need, made from
-// outside it. The drawing buffer is preserved (a canvas read after compositing still sees the frame), the ground disc
-// is the region stage's 4200 m (its rim never shows at a high, wide framing), and shader errors are reported.
+// The world's stage: the kit's createStage (kit/stage.ts) with the three settings stills need, made from outside it.
+// The drawing buffer is preserved (a canvas read after compositing still sees the frame), the ground disc is the
+// region stage's 4200 m (its rim never shows at a high, wide framing), and shader errors are reported.
 // WorldStage types the kit's untyped API for station code.
 import * as THREE from 'three';
 import type { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';

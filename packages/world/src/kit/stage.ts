@@ -96,6 +96,42 @@ class LayerPass extends RenderPass {
   }
 }
 
+/** Point and spot lights that cast no shadow and project no map are lit in a plain loop that passes over a light
+ *  which does not reach the fragment (outside its cone or past its distance, where three's own code adds zero), in
+ *  place of three's unrolled block, which runs every light's BRDF for every fragment. The picture is the same (at most
+ *  one level apart, from rounding, at every rest and leg of the story); the shader is a fraction of the size. Three
+ *  unrolls the loop only to index shadow maps and light maps by a constant, so a light with either keeps three's
+ *  code. The garage's 35 high bays and 4 pit lamps drew the pit wall's leg in about 200 ms a frame at DPR 2 on an
+ *  M1 Max with the unrolled block and 25 ms with the loop (lane E's probe, 27 Nov, under load). Done once, before
+ *  any program is built; if three's chunk is not the one this was written for, it is left as it is. */
+export function installLightLoop() {
+  const chunks = THREE.ShaderChunk, src = chunks.lights_fragment_begin;
+  if (typeof src !== 'string' || src.includes('LIGHT_LOOP_PLAIN')) return;
+  const pointAt = src.indexOf('#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )');
+  const spotAt = src.indexOf('#if ( NUM_SPOT_LIGHTS > 0 ) && defined( RE_Direct )');
+  const nextAt = spotAt < 0 ? -1 : src.indexOf('#if ( NUM_', spotAt + 1);
+  const point = src.slice(pointAt, spotAt), spot = src.slice(spotAt, nextAt);
+  const RE = 'RE_Direct( directLight, geometryPosition, geometryNormal, geometryViewDir, geometryClearcoatNormal, material, reflectedLight );';
+  if (pointAt < 0 || spotAt < pointAt || nextAt < 0 || ![point, spot].every((b) => b.includes('#pragma unroll_loop_start') && b.includes(RE))) {
+    console.warn('stage: three\'s lights_fragment_begin is not the one installLightLoop knows; left unrolled');
+    return;
+  }
+  const plain = (kind, type, when) => `#if ( NUM_${kind}_LIGHTS > 0 ) && defined( RE_Direct ) && ${when} // LIGHT_LOOP_PLAIN
+	${type} ${type[0].toLowerCase()}${type.slice(1)};
+	for ( int i = 0; i < NUM_${kind}_LIGHTS; i ++ ) {
+		${type[0].toLowerCase()}${type.slice(1)} = ${type[0].toLowerCase()}${type.slice(1)}s[ i ];
+		get${type}Info( ${type[0].toLowerCase()}${type.slice(1)}, geometryPosition, directLight );
+		if ( ! directLight.visible ) continue;
+		${RE}
+	}
+#else
+`;
+  chunks.lights_fragment_begin = src.slice(0, pointAt)
+    + plain('POINT', 'PointLight', '( ! defined( USE_SHADOWMAP ) || NUM_POINT_LIGHT_SHADOWS == 0 )') + point + '#endif\n'
+    + plain('SPOT', 'SpotLight', '( NUM_SPOT_LIGHT_MAPS == 0 ) && ( ! defined( USE_SHADOWMAP ) || NUM_SPOT_LIGHT_SHADOWS == 0 )') + spot + '#endif\n'
+    + src.slice(nextAt);
+}
+
 /** Redraws the shadow map at the start of a frame: every frame while `auto`, otherwise only when asked (a scene
  *  that knows when its lights or casters changed asks; the camera alone never needs it). */
 class ShadowOncePass extends Pass {
@@ -104,6 +140,7 @@ class ShadowOncePass extends Pass {
 }
 
 export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', stage = null, ao = true }) {
+  installLightLoop();
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: false });
   renderer.setPixelRatio(dpr);
   // no link check per program (three reads the program's and both shaders' logs on first use: three round trips to the
