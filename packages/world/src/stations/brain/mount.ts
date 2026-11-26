@@ -689,6 +689,8 @@ function flatView(root, S, tabs, fix, opts, emit, listeners, kill): BrainHandle 
     // a page picked in the all-brains list focuses its brain
     const moved = S.focus !== b;
     S.focus = b; S.sel = { brain: b, slug }; render(); tell(moved ? 'push' : 'replace');
+    // the card opens over the list's top: a row picked far down brings the box back up to it
+    root.scrollTop = 0;
   };
   const render = () => {
     box.replaceChildren();
