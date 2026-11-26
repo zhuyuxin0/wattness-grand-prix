@@ -1,8 +1,9 @@
 // The Memory tab's card (SPEC 5): ours, in Living Brain's card shape (dark navy, a cyan hairline, radius 16, 320 px; a
 // bottom sheet under 720 px), with our type. The badge and title, the meta line, Living Brain's summary as it wrote
-// it, the check against the repository where the summary misstates it, the conflict across brains, the connections in
-// its brain and across brains (each row selects its page), and "Open <tab>" where the page is a tab's own. Also the
-// small hover card, and the page list (the keyboard's path, and the fallback without WebGL or at phone width).
+// it, the correction beside it where the summary misstates the repository or the chain record (the scene's, or the
+// host's), the conflict across brains, the connections in its brain and across brains (each row selects its page), and
+// "Open <tab>" where the page is a tab's own. Also the small hover card, and the page list (the keyboard's path, and the
+// fallback without WebGL or at phone width).
 import { BRAINS, PLAIN, acrossOf, brainOf, conflictOf, linksOf, pagesOf, tabsOf, type BrainId, type Page, type Strength } from './data';
 
 const two = (n: number) => String(n).padStart(2, '0');
@@ -24,6 +25,40 @@ export interface CardHost {
   close(): void;
   /** The host's tabs, by id: which "Open <tab>" buttons may show. */
   tabs: Map<string, string>;
+  /** The host's corrections, where it holds one the scene's data does not (mount.ts BrainOptions.corrections). */
+  fix?: Fix;
+}
+
+/** Corrections beside Living Brain's text: a page's, and a connection's (either order). */
+export interface Fix {
+  page(p: Page): string | undefined;
+  link(aBrain: BrainId, a: string, bBrain: BrainId, b: string): string | undefined;
+}
+
+/** The host's corrections as a Fix: pages keyed 'brain/slug', connections 'brainA/a>brainB/b'. */
+export function fixOf(c?: { pages?: Record<string, string>; connections?: Record<string, string> }): Fix | undefined {
+  if (!c) return undefined;
+  const pages = c.pages ?? {}, links = c.connections ?? {};
+  const own = (o: Record<string, string>, k: string) => (Object.prototype.hasOwnProperty.call(o, k) ? o[k] : undefined);
+  return {
+    page: (p) => own(pages, `${p.brain}/${p.slug}`),
+    link: (aBrain, a, bBrain, b) => own(links, `${aBrain}/${a}>${bBrain}/${b}`) ?? own(links, `${bBrain}/${b}>${aBrain}/${a}`),
+  };
+}
+
+const SVG = 'http://www.w3.org/2000/svg';
+/** The site's drawn glyphs (the Terminal's close and next, as site/src/ui/glyph.css publishes them), in the text's color. */
+function glyph(kind: 'close' | 'next', px: number): SVGSVGElement {
+  const svg = document.createElementNS(SVG, 'svg');
+  const box = kind === 'close' ? 10 : 12;
+  svg.setAttribute('viewBox', `0 0 ${box} ${box}`); svg.setAttribute('width', String(px)); svg.setAttribute('height', String(px));
+  svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('class', `lbm-glyph is-${kind}`);
+  const path = document.createElementNS(SVG, 'path');
+  path.setAttribute('d', kind === 'close' ? 'M2 2l6 6M8 2l-6 6' : 'M4.5 3l3 3-3 3');
+  path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'currentColor'); path.setAttribute('stroke-width', kind === 'close' ? '1.4' : '1.5');
+  path.setAttribute('stroke-linecap', 'round'); path.setAttribute('stroke-linejoin', 'round');
+  svg.appendChild(path);
+  return svg;
 }
 
 /** The pinned card for a page. */
@@ -35,7 +70,7 @@ export function pageCard(p: Page, host: CardHost): HTMLElement {
   const h = el('h3', 'lbm-title');
   h.append(badge(p), document.createTextNode(p.title));
   const x = el('button', 'lbm-close'); x.type = 'button'; x.setAttribute('aria-label', 'Close');
-  x.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  x.appendChild(glyph('close', 12));
   x.addEventListener('click', () => host.close());
   head.append(h, x);
   const own = linksOf(p.brain, p.slug), across = acrossOf(p.brain, p.slug);
@@ -46,6 +81,7 @@ export function pageCard(p: Page, host: CardHost): HTMLElement {
   const actions = el('div', 'lbm-actions');
   if (tabs.own && host.tabs.has(tabs.own)) {
     const b = el('button', 'lbm-open', `Open ${host.tabs.get(tabs.own)}`); b.type = 'button'; b.dataset.tab = tabs.own;
+    b.appendChild(glyph('next', 10));
     b.addEventListener('click', () => host.route(tabs.own!));
     actions.append(b);
   }
@@ -62,9 +98,10 @@ export function pageCard(p: Page, host: CardHost): HTMLElement {
   }
   if (actions.childElementCount) card.append(actions);
   if (p.summary) card.append(el('p', 'lbm-label', "Living Brain's summary"), el('p', 'lbm-text', p.summary));
-  if (p.correction) {
+  const correction = host.fix?.page(p) ?? p.correction;
+  if (correction) {
     const c = el('div', 'lbm-check');
-    c.append(el('p', 'lbm-label', 'Checked against the repository'), el('p', 'lbm-text', p.correction));
+    c.append(el('p', 'lbm-label', 'Correction'), el('p', 'lbm-text', correction));
     card.append(c);
   }
   const conflict = conflictOf(p.brain, p.slug);
@@ -91,15 +128,17 @@ export function pageCard(p: Page, host: CardHost): HTMLElement {
       b.addEventListener('click', () => host.select(r.other.brain, r.other.slug));
       const more = el('details', 'lbm-why');
       more.append(el('summary', undefined, 'Why'), el('p', 'lbm-text', r.reasoning ?? 'Living Brain gave no reason.'));
-      if (r.correction) more.append(el('p', 'lbm-label', 'Checked against the repository'), el('p', 'lbm-text', r.correction));
+      if (r.correction) more.append(el('p', 'lbm-label', 'Correction'), el('p', 'lbm-text', r.correction));
       li.append(b, more);
       ul.append(li);
     }
     sec.append(ul);
     card.append(sec);
   };
-  list('In this brain', own.map(({ other, c }) => ({ other, strength: c.strength, similarity: c.similarity, reasoning: c.reasoning, correction: c.correction })), false);
-  list('Across brains', across.map(({ other, x }) => ({ other, strength: x.strength, similarity: x.similarity, reasoning: x.reasoning, correction: x.correction })), true);
+  list('In this brain', own.map(({ other, c }) => ({ other, strength: c.strength, similarity: c.similarity, reasoning: c.reasoning,
+    correction: host.fix?.link(c.brain, c.a, c.brain, c.b) ?? c.correction })), false);
+  list('Across brains', across.map(({ other, x }) => ({ other, strength: x.strength, similarity: x.similarity, reasoning: x.reasoning,
+    correction: host.fix?.link(x.aBrain, x.a, x.bBrain, x.b) ?? x.correction })), true);
   return card;
 }
 

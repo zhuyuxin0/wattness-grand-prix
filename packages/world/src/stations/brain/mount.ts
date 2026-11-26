@@ -3,7 +3,7 @@
 // in its visual language, from brain-scene.json (bundled; the browser never calls Living Brain). All brains first: the
 // combined brain with the three members on their orbits; a member brain clicked (or its chip) comes to the center; a
 // page's tag hovered lights its connections and shows a small card; clicked, its card pins, with its connections in
-// its brain and across brains, Living Brain's summary and our check of it, and "Open <tab>" where the page is a tab's
+// its brain and across brains, Living Brain's summary and the correction beside it, and "Open <tab>" where the page is a tab's
 // own. Drag, wheel and pinch orbit and zoom as Living Brain's controls do. Every page is also a button in a visually
 // hidden list (the keyboard's path); without WebGL the list is the view, and under 720 px it opens as a drawer. The
 // mount never writes the URL: it calls onState and the host does. The 3D holds dark in either site theme.
@@ -16,8 +16,8 @@ import { BrainWorld, restPose, REST, ORBIT, VFOV } from './world';
 import { BrainBloomPass } from './bloom';
 import { makeRibbons } from './ribbons';
 import { Chrome, memberScreen, projectorNow } from './tags';
-import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, keyOf, ctShort, fmt, PLAIN } from './data';
-import { pageCard, hoverCard, pageRows, brainChips, setChips } from './card';
+import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, keyOf, fmt, PLAIN, scopeLine } from './data';
+import { pageCard, hoverCard, pageRows, brainChips, setChips, fixOf } from './card';
 import { T_SHARED } from './moments';
 
 export type BrainFocus = 'all' | 'grand-prix' | 'battery-review' | 'terminal';
@@ -38,11 +38,17 @@ export interface BrainOptions {
   quality?: 'auto' | 'high' | 'low';
   /** Default: the visitor's prefers-reduced-motion. */
   reducedMotion?: boolean;
+  /** The host's corrections beside Living Brain's text, where it holds one brain-scene.json does not (the site's
+   *  build-brain.json carries its own): a page's keyed 'brain/slug', a connection's 'brainA/a>brainB/b' (either order).
+   *  The card shows the host's where there is one. */
+  corrections?: { pages?: Record<string, string>; connections?: Record<string, string> };
 }
 export interface BrainHandle {
   readonly ready: Promise<void>;
   state(): BrainState;
   goTo(s: Partial<BrainState>): void;
+  /** The page's theme changed: the stage holds dark; the list without WebGL follows it. */
+  setTheme(theme: 'light' | 'dark'): void;
   on(ev: 'state' | 'route' | 'ready' | 'error', fn: (x: any) => void): () => void;
   /** For checks and recordings: a page's tag (or dot) on screen, CSS px from el's top left, or null when not shown. */
   screenOf(brain: string, slug: string): { x: number; y: number } | null;
@@ -72,6 +78,7 @@ let visited = false;
 export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandle {
   const reduced = opts.reducedMotion ?? (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
   const tabs = new Map((opts.tabs ?? []).map((t) => [t.id, t.label]));
+  const fix = fixOf(opts.corrections);
   const listeners = new Map<string, Set<(x: any) => void>>();
   const emit = (ev: string, x?: any) => { for (const f of listeners.get(ev) ?? []) { try { f(x); } catch (e) { console.error(e); } } };
   const cleanups: (() => void)[] = [];
@@ -123,7 +130,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   } catch (e) {
     canvas?.remove(); canvas = null; stage = null;
   }
-  if (!stage) return flatView(root, S, tabs, opts, emit, listeners, () => { disposed = true; root.remove(); });
+  if (!stage) return flatView(root, S, tabs, fix, opts, emit, listeners, () => { disposed = true; root.remove(); });
 
   const dpr = stage.__dpr;
   cleanups.push(() => stage.dispose());
@@ -185,9 +192,8 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   const pagesBtn = document.createElement('button'); pagesBtn.type = 'button'; pagesBtn.className = 'lbm-pagesbtn'; root.appendChild(pagesBtn);
   const drawer = document.createElement('div'); drawer.className = 'lbm-drawer'; drawer.hidden = true; root.appendChild(drawer);
   pagesBtn.addEventListener('click', () => { drawer.hidden = !drawer.hidden; if (!drawer.hidden) fillDrawer(); });
-  const read = SCENE.source.crossChecked;
-  const yours = (() => { try { return new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(read.utc)); } catch { return null; } })();
-  chrome.scope(`Living Brain: our three brains, drawn from its API · read ${ctShort(read)}${yours ? ` (${yours} your time)` : ''}`);
+  // CT, with the reader's own clock beside it (data.ts scopeLine)
+  chrome.scope(scopeLine(false));
 
   // ── the words: chips, hint, HUD, card, hover card, lists ──────────────────────────────────────────────────
   const renderChrome = () => {
@@ -238,7 +244,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     if (!s) return;
     const p = page(s.brain, s.slug);
     if (!p) return;
-    cardbox.appendChild(pageCard(p, { select: (b, slug) => keepFocus(() => select(b, slug, 'user')), route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => keepFocus(() => select(null, null, 'user')), tabs }));
+    cardbox.appendChild(pageCard(p, { select: (b, slug) => keepFocus(() => select(b, slug, 'user')), route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => keepFocus(() => select(null, null, 'user')), tabs, fix }));
   };
   const setHover = (h: null | { brain: string; slug: string }) => {
     if ((h?.brain ?? '') + (h?.slug ?? '') === (S.hover?.brain ?? '') + (S.hover?.slug ?? '')) return;
@@ -651,11 +657,14 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     goTo(s) {
       const b = valid(s.brain) ? s.brain : S.focus;
       if (b !== S.focus) focusBrain(b, 'host');
-      // a page needs its brain (slugs repeat across brains)
-      if (s.page === null) select(null, null, 'host');
-      else if (s.page && b !== 'all') select(b, s.page, 'host');
+      // a page needs its brain (slugs repeat across brains); the selection the view already has is left as it is, so a
+      // host that writes the URL from onState and reads it back never moves the camera twice
+      const cur = S.sel && S.sel.brain === b ? S.sel.slug : null;
+      if (s.page === null) { if (S.sel) select(null, null, 'host'); }
+      else if (s.page && b !== 'all' && s.page !== cur) select(b, s.page, 'host');
       kick();
     },
+    setTheme(t) { root.dataset.siteTheme = t === 'light' ? 'light' : 'dark'; },
     on(ev, fn) { if (!listeners.has(ev)) listeners.set(ev, new Set()); listeners.get(ev)!.add(fn); return () => listeners.get(ev)?.delete(fn); },
     screenOf, brainAt, dotOf,
     dispose() {
@@ -670,7 +679,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
 
 /** Without WebGL: the brains as chips and their pages as a list; a row opens the card. A page always comes with its
  *  brain (slugs repeat across brains), as the deep links need. */
-function flatView(root, S, tabs, opts, emit, listeners, kill): BrainHandle {
+function flatView(root, S, tabs, fix, opts, emit, listeners, kill): BrainHandle {
   root.classList.add('is-flat');
   const box = document.createElement('div'); box.className = 'lbm-flat'; root.appendChild(box);
   const tell = (history: 'push' | 'replace') => { const s = st(); emit('state', s); opts.onState?.(s, { history }); };
@@ -683,7 +692,7 @@ function flatView(root, S, tabs, opts, emit, listeners, kill): BrainHandle {
     box.replaceChildren();
     box.appendChild(brainChips(S.focus, (b) => { S.focus = b; S.sel = null; render(); tell('push'); }));
     const note = document.createElement('p'); note.className = 'lbm-note';
-    note.textContent = `Living Brain: our three brains, drawn from its API · read ${ctShort(SCENE.source.crossChecked)}. This browser has no WebGL, so the pages are listed.`;
+    note.textContent = `${scopeLine(false)}. This browser has no WebGL, so the pages are listed.`;
     box.appendChild(note);
     const cardbox = document.createElement('div'); cardbox.className = 'lbm-cardbox';
     const ids = S.focus === 'all' ? BRAIN_IDS : [S.focus];
@@ -693,7 +702,7 @@ function flatView(root, S, tabs, opts, emit, listeners, kill): BrainHandle {
     }
     if (S.sel) {
       const p = page(S.sel.brain, S.sel.slug);
-      if (p) cardbox.appendChild(pageCard(p, { select: (b, slug) => pick(b, slug), route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => { S.sel = null; render(); tell('replace'); }, tabs }));
+      if (p) cardbox.appendChild(pageCard(p, { select: (b, slug) => pick(b, slug), route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => { S.sel = null; render(); tell('replace'); }, tabs, fix }));
       box.prepend(cardbox);
     }
   };
@@ -708,6 +717,7 @@ function flatView(root, S, tabs, opts, emit, listeners, kill): BrainHandle {
       if (s.page !== undefined) S.sel = s.page && S.focus !== 'all' && page(S.focus, s.page) ? { brain: S.focus, slug: s.page } : null;
       render();
     },
+    setTheme(t) { root.dataset.siteTheme = t === 'light' ? 'light' : 'dark'; },
     on(ev, fn) { if (!listeners.has(ev)) listeners.set(ev, new Set()); listeners.get(ev).add(fn); return () => listeners.get(ev)?.delete(fn); },
     screenOf: () => null, brainAt: () => null, dotOf: () => null,
     dispose: kill,

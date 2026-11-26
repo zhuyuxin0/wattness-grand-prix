@@ -210,8 +210,10 @@ brain.dispose();
 | `dpr` | `min(devicePixelRatio, 2)` | 1.5 at most on phones. |
 | `quality` | `'auto'` | Full clouds (60,000 particles each) on desktop, a member on its orbit drawing 24,000 of them at 1.25 times the brightness; under 720 px or on a coarse pointer 30,000, and 12,000 drawn for a brain on its orbit. |
 | `reducedMotion` | the visitor's `prefers-reduced-motion` | Formed at once; no turn, twinkle, breathing, motes or orbits (the members held where the films' short clock has them at 3.0 s); moves are 200 ms. |
+| `corrections` | none | The host's corrections beside Living Brain's text where brain-scene.json has none: a page's keyed `'brain/slug'`, a connection's `'brainA/a>brainB/b'` (either order). The site passes the ones its `build-brain.json` carries. |
 
 The handle: `ready`, `state()` (`{ brain, page }`), `goTo({ brain, page })` (no `onState` for the host's own moves),
+`setTheme(theme)` (the list without WebGL follows it),
 `on('state' | 'route' | 'ready' | 'error', fn)` (returns its unsubscribe), `screenOf(brain, slug)` and `dotOf(brain,
 slug)` (where a page's tag or dot is, for checks and recordings), `brainAt(brain)`, and `dispose()`.
 
@@ -220,8 +222,8 @@ showing their profiles, as Living Brain's do; the links across brains settle to 
 come back to full while a page is lit. A member clicked (its cloud, its name, or its chip top right) comes to the
 center over 1.4 s, turning to face the camera, and its tags resolve; "All brains" or Escape goes back. A page's tag (or
 dot) hovered lights its connections, wiping out from it over 2 s, and shows a small card; clicked, its card pins on the
-right (a bottom sheet in the narrow layout): Living Brain's summary as it wrote it, our check against the repository
-where the summary misstates it, the conflict across brains where the page is in it, and its connections in its brain and
+right (a bottom sheet in the narrow layout): Living Brain's summary as it wrote it, the correction beside it where the
+summary misstates the repository or the chain record (the scene's, or the host's `corrections`), the conflict across brains where the page is in it, and its connections in its brain and
 across brains, each with its strength and match; a row selects its page, in another brain after that brain comes to the
 center. While a page is selected, hovering another shows its small card and keeps the selection's connections lit, and a
 tag that slides under a still pointer as the view moves never takes the hover. A page with links across brains turns

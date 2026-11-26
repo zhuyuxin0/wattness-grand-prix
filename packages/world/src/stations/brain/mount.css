@@ -37,7 +37,8 @@
 .lbm-close:hover, .lbm-close:focus-visible { color: #fff; background: rgba(255, 255, 255, 0.08); outline: none; }
 .lbm-meta { margin: 6px 0 0; font: 500 11px/1.5 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); letter-spacing: 0.12em; text-transform: uppercase; color: rgb(50, 185, 205); font-variant-numeric: tabular-nums; }
 .lbm-actions { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.lbm-open { height: 32px; padding: 0 14px; border-radius: 12px; border: 0; cursor: pointer; font: 600 12px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: #04121a; background: rgba(34, 211, 238, 0.9); }
+.lbm-open { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 14px; border-radius: 12px; border: 0; cursor: pointer; font: 600 12px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: #04121a; background: rgba(34, 211, 238, 0.9); }
+.lbm-glyph { flex: none; display: block; }
 .lbm-open:hover, .lbm-open:focus-visible { background: rgb(103, 232, 249); outline: none; }
 .lbm-part { margin: 0; font: 400 12px/1.5 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: rgb(166, 170, 186); }
 .lbm-link { padding: 0; border: 0; background: none; cursor: pointer; font: inherit; color: #a5f3fc; text-decoration: underline; text-underline-offset: 2px; }
