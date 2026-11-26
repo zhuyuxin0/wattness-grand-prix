@@ -58,8 +58,8 @@ const headOnly = (request: Request, res: Response): Response => (request.method 
 
 /**
  * The edge cache, keyed by the request in its canonical form and the Worker's version. A verified file stays
- * verified (GateRecord is write-once), though more than one byte form of it can verify; the edge keeps the first
- * it served for a day. A verdict, an envelope or a header can change from one version to the next.
+ * verified (GateRecord is write-once), though more than one copy of it can verify (README, Caching): the edge
+ * keeps the first it served for a day. A verdict, an envelope or a header can change from one version to the next.
  * Only a 200 whose Cache-Control says it was verified on a record deep enough to stay is put; a refusal,
  * a 404 or a fresh record never is.
  */
