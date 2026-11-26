@@ -5,6 +5,8 @@
 // weekend's word comes second, as a small line (Jo, 26 Nov, about 02:20 Bangkok). The films' words are films.json's,
 // copied from the storyboard's index.json; the figures in them are the storyboard's, read from frame-data.json.
 import films from './films.json';
+import brainFilm from '../stations/brain/film.json';
+import { BRAIN_KEYS, BRAIN_CUT, brainMaster, brainCut90, brainSite } from '../stations/brain/film';
 
 /** The Grand Prix site's tab ids (gatelock site/src/shell/tabs.ts). */
 export type TabId = 'intro' | 'overview' | 'fleet' | 'battery' | 'forecast' | 'state' | 'hedge' | 'risk' | 'memory' | 'seal' | 'verify' | 'files'
@@ -66,6 +68,8 @@ export const KEYS = {
   witness: { frame: 'stack.seal', part: 'IV', name: 'Sealed on BNB Chain, checked by anyone', term: null, tab: 'seal' },
   'late-stops': { frame: 'stack.seal-late', part: 'IV', name: 'A late seal stops at the gate', term: null, tab: 'seal' },
   end: { frame: 'stack.close', part: 'IV', name: 'Wattness Grand Prix', term: null, tab: 'about' },
+  // Living Brain: our three brains on one clock (stations/brain/film.ts)
+  ...BRAIN_KEYS,
 } satisfies Record<string, KeyDef>;
 export type KeyId = keyof typeof KEYS;
 
@@ -129,11 +133,14 @@ export const MASTER: FilmKey[] = [
   // then the pit wall's frame takes over; the bays' screens and the boards ride the whole way (one world)
   { key: 'pit-wall', at: 38.6, until: 41, leg: { cam: 'dolly', fade: [0.88, 0.98], screens: 'both' } },
   // out of the pit wall's hall: its side backs off a little, so the camera never leaves through the roof
-  { key: 'no-hedge', at: 43.6, until: 47, leg: { cam: 'hop', back: [0.12, 1] } },
-  { key: 'fixed-hedge', at: 50, until: 54, leg: { fade: [0.15, 0.85] } },
-  { key: 'meet', at: 57, until: 61, leg: { fade: [0.15, 0.85] } },
-  { key: 'chosen-together', at: 64, until: 70, leg: { fade: [0.15, 0.85] } },
-  { key: 'your-turn', at: 72.6, until: 75, leg: { fade: [0.3, 0.7] } },
+  // Living Brain (0:41 to 0:49): retrieve, connect, then its own interface (brain/film.ts brainMaster). Its 8 s come
+  // from X05 "Your turn" (5 s; the cabinet plays on the site), X01's hold and the legs into X02 and X03 (1 s each), so
+  // the leg into Parc fermé still starts at 1:15
+  ...brainMaster(41),
+  { key: 'no-hedge', at: 51.6, until: 54, leg: { cam: 'hop' } },
+  { key: 'fixed-hedge', at: 56, until: 60, leg: { fade: [0.15, 0.85] } },
+  { key: 'meet', at: 62, until: 66, leg: { fade: [0.15, 0.85] } },
+  { key: 'chosen-together', at: 69, until: 75, leg: { fade: [0.15, 0.85] } },
   // Parc fermé's clock under its two lines: the plans made at 09:12:46 CT, sealed at 09:15:17 (1:20.1) and held on the
   // seal, the clock ticking on at half pace, then running on to 09:51:43 (local 9.08) as the line turns to the weather
   // odds' "09:51 CT" and the picture hops to the radar (STORY.md row 14); after them, 09:59:56 running in real time to
@@ -169,9 +176,10 @@ export const CUT_90: FilmKey[] = [
   // screens under the line about the six crews) and the dolly carries on along the back straight to the boards
   { key: 'garage', at: 18.3, until: 18.8, leg: { cam: 'hop' } },
   { key: 'pit-wall', at: 22.2, until: 25, leg: { cam: 'dolly', fade: [0.88, 0.98], screens: 'both' } },
-  { key: 'no-hedge', at: 27.4, until: 28, leg: { cam: 'hop', back: [0.12, 1] } },
-  { key: 'fixed-hedge', at: 30, until: 31, leg: { fade: [0.15, 0.85] } },
-  { key: 'meet', at: 33, until: 34, leg: { fade: [0.15, 0.85] } },
+  // Living Brain (0:25 to 0:31): our three brains linked across, then its own interface. Its 6 s come from X02 and X03
+  // (1 s holds whose plans the row's line does not name), so the arcade runs no hedge (A) to chosen together (C)
+  ...brainCut90(25),
+  { key: 'no-hedge', at: 33.4, until: 34, leg: { cam: 'hop' } },
   { key: 'chosen-together', at: 36, until: 40, leg: { fade: [0.15, 0.85] } },
   // the whole time-lapse under one line: sealed at 09:15:17 (0:44.7) and held while the line names it, the clock run on
   // to 09:59:56 (0:47.0), the gate (0:47.5), the late plan refused at 10:00:22 (0:49.8) and held to the line's end
@@ -191,25 +199,49 @@ export interface FilmRow { start_s: number; end_s: number; beats: number[]; fram
  *  rests on the same Parc fermé as 'sealed', and the stack's 'late-stops' shows the refusal. */
 export const SITE_LEFT_OUT: ReadonlySet<KeyId> = new Set<KeyId>(['late-seal', 'season', 'refused', 'graduated']);
 
-/** The site's stops: the master's keys in its order, less SITE_LEFT_OUT. The key after a run left out keeps its own
- *  leg's length, and every key from it on comes forward by the time the run took, so a step never plays a long leg. */
+/** The site's stops (mountStory's site mode): a list of its own, not the master film's. The master's keys as they were
+ *  before Living Brain's beat, X05 "Your turn" kept (the cabinet plays on the site), with Living Brain's one stop after
+ *  the pit wall (brain/film.ts brainSite); never Living Brain's own interface, a recording kept out of git that a site's
+ *  checkout does not hold; and less SITE_LEFT_OUT. The site rests at each key's local time and leaves the holds out, so
+ *  only the keys and their legs count: the keys after the brain's stop are the master's, moved on by its legs, and the
+ *  key after a run left out keeps its own leg's length, every key from it on coming forward by the time the run took,
+ *  so a step never plays a long leg. A key met twice, as Parc fermé is, is two stops only where its words differ
+ *  ('sealed' and 'late-seal' are two keys on one frame). */
 export const SITE_KEYS: FilmKey[] = (() => {
+  const at = (key: KeyId) => MASTER.findIndex((k) => k.key === key);
+  const before = MASTER.slice(0, at('pit-wall') + 1);
+  const from = before[before.length - 1]!.until;
+  const brain = brainSite(from);
+  // the arcade as the master ran it before the beat; its hop backs out of the brain in full (the pit wall's hall did not)
+  const arcade: FilmKey[] = [
+    { key: 'no-hedge', at: 43.6, until: 47, leg: { cam: 'hop' } },
+    { key: 'fixed-hedge', at: 50, until: 54, leg: { fade: [0.15, 0.85] } },
+    { key: 'meet', at: 57, until: 61, leg: { fade: [0.15, 0.85] } },
+    { key: 'chosen-together', at: 64, until: 70, leg: { fade: [0.15, 0.85] } },
+    { key: 'your-turn', at: 72.6, until: 75, leg: { fade: [0.3, 0.7] } },
+  ];
+  const d = brain[brain.length - 1]!.until - from;
+  const later = (k: FilmKey): FilmKey => ({ ...k, at: k.at + d, until: k.until + d });
+  const all = [...before, ...brain, ...arcade.map(later), ...MASTER.slice(at('sealed')).map(later)];
   const out: FilmKey[] = [];
   let shift = 0;
-  MASTER.forEach((k, i) => {
+  all.forEach((k, i) => {
     if (SITE_LEFT_OUT.has(k.key)) return;
-    const before = MASTER[i - 1], prev = out[out.length - 1];
+    const prior = all[i - 1], prev = out[out.length - 1];
     // after a run left out: this key's own leg (from the last key left out), from the last key kept
-    if (before && prev && SITE_LEFT_OUT.has(before.key)) shift = k.at - (prev.until + (k.at - before.until));
+    if (prior && prev && SITE_LEFT_OUT.has(prior.key)) shift = k.at - (prev.until + (k.at - prior.until));
     out.push(shift ? { ...k, at: k.at - shift, until: k.until - shift } : k);
   });
   return out;
 })();
 
-export type CutId = 'master' | '90s' | 'site';
+export type CutId = 'master' | '90s' | 'brain' | 'site';
 export const CUTS: Record<CutId, { keys: FilmKey[]; rows: FilmRow[]; seconds: number }> = {
   master: { keys: MASTER, rows: films.master as FilmRow[], seconds: 180 },
   '90s': { keys: CUT_90, rows: films.cut_90s as FilmRow[], seconds: 90 },
-  // the site's way through: its own captions (the frames'), so the master's rows are kept only for the film's line
-  site: { keys: SITE_KEYS, rows: films.master as FilmRow[], seconds: SITE_KEYS[SITE_KEYS.length - 1]!.until },
+  // the Living Brain cut (SPEC 4.1): LB1 to LB8 on the brain's clock, 69 s
+  brain: { keys: BRAIN_CUT, rows: brainFilm.brain as FilmRow[], seconds: 69 },
+  // the site's stops: no film lines (the site shows each frame's own caption, and the master's rows would not line up
+  // with its stops)
+  site: { keys: SITE_KEYS, rows: [], seconds: SITE_KEYS[SITE_KEYS.length - 1]!.until },
 };

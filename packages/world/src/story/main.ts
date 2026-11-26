@@ -1,5 +1,5 @@
 // story.html's entry. ?mode=site (the default) plays the story in the window as the site would mount it;
-// ?mode=capture&cut=master|90s&w=1920&h=1080[&captions=film|frame|none] holds the film for the video pipeline:
+// ?mode=capture&cut=master|90s|brain&w=1920&h=1080[&captions=film|frame|none] holds the film for the video pipeline:
 //
 //   window.__gpClock(t, dt?)  poses the film at t seconds; window.__ready is false until that frame has settled
 //   window.__gpStory          the film's keys, rows and seconds, and the shots the proof renders (rests, mid-legs)
@@ -25,7 +25,7 @@ declare global {
 
 const q = new URLSearchParams(location.search);
 const mode = q.get('mode') === 'capture' ? 'capture' : 'site';
-const cut: CutId = q.get('cut') === '90s' ? '90s' : 'master';
+const cut: CutId = q.get('cut') === '90s' ? '90s' : q.get('cut') === 'brain' ? 'brain' : 'master';
 const cap = q.get('captions');
 const captions: Captions | undefined = cap === 'frame' || cap === 'film' || cap === 'none' ? cap : undefined;
 const host = document.getElementById('story')!;
