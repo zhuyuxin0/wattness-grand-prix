@@ -1,37 +1,37 @@
 {
  "schema": "grand-prix.render-still.v1",
- "what": "Chapter 17 of the introduction at its rest: the proof tower, Desert Willow's sealed Nov 26 plan climbing its hashes to the day's root, every check passing.",
+ "what": "Chapter 17 of the introduction at its rest: the proof tower, Desert Willow's sealed Nov 26 plan at its foot climbing its hashes to the record coin, beside the board's five checks, all passing.",
  "frame": "_objects.chapter-check",
  "code": {
-  "base": "ab0e8ffb73fe760cc1c382a56f522d495d945859",
+  "base": "7ff01507be78bd70ca423445854a4171fa393666",
   "rig": {
    "path": "packages/world/src/stations/_objects/index.ts",
-   "git_blob": "c6fd405140bae0bc25799af53da2c2ab35fbb89b"
+   "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
   },
-  "world_tree": "6a2b350bb4f0f959cc1063391b496af5990276d4",
-  "note": "packages/world as on main (base), plus the rig named here: the stations' own builders and frames from the frame data, with the rig's camera or the chapter's own"
+  "world_tree": "6ac4c591c479b580e84134393b6d3cac9307ca72",
+  "note": "packages/world as on main (base), plus the rig named here: the stations' own frames from the frame data, with the chapter's own camera, its lens narrowed onto the object where the frame is a crop"
  },
  "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
  "render": {
   "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.chapter-check --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
   "lab": "lab.html?frame=_objects.chapter-check&w=1280&h=720&theme=dark&plates=0",
   "rendered": {
-   "bangkok": "2026-11-27 01:36",
-   "ct": "2026-11-26 12:36"
+   "bangkok": "2026-11-27 02:12",
+   "ct": "2026-11-26 13:12"
   },
   "gpu": "ANGLE Metal Renderer: Apple M1 Max",
   "deterministic": "2 draws in fresh pages, byte-identical",
   "master": {
    "size": "2560 x 1440",
-   "sha256": "4528ae792942834739a2ba54c0406a25fb0b7930bf739b5a2302eb3496669ee0"
+   "sha256": "354736920dbe3d69af1496ccaa0fb8277107aa182258baa23c5237cacfd2a7eb"
   },
   "png_1280": {
    "size": "1280 x 720, render.mjs's Lanczos from the master",
-   "sha256": "822425dbce1ba4d42ecac39992c811ecc749d337343500b865fd348bf1d53709"
+   "sha256": "fd8889e75eb63fed9de0d9fba8920810fd0d4709c17577b5014eff8d6c45e104"
   },
   "png_640": {
    "size": "640 x 360, ffmpeg's Lanczos from the master",
-   "sha256": "f287a4498f08a5523fb5f2afb634986763f6f2fb998cc8e5a65eba10cbb8585d"
+   "sha256": "a92386ca4532d11104277b5a5271e1fdd802311e01d82cead4e0d348c4b4c7fa"
   },
   "webp": "cwebp 1.6.0 -q 86 -m 6 -sharp_yuv -metadata none"
  },
@@ -39,15 +39,15 @@
   "chapter-check-640.webp": {
    "width": 640,
    "height": 360,
-   "bytes": 9788,
-   "sha256": "9ef0ddf63d4d09883f4c789b2151f25163ee75e13d9e07f424447c1e77a524a6"
+   "bytes": 10346,
+   "sha256": "4ffeb495186c01a5fb6ef06e3ac62fa1149eac79edc8f1c3f482b66c9ae486fb"
   },
   "chapter-check-1280.webp": {
    "width": 1280,
    "height": 720,
-   "bytes": 24922,
-   "sha256": "7ccd4dd4f6418d1823a3ce7f9fccd3371befa879677d90ba8c681b1f318df195"
+   "bytes": 27346,
+   "sha256": "38c94cf1df81a00c48e5e1a7e7ec5cdf89575739a445363c3519eea1e643f237"
   }
  },
- "rerender_when": "the stewards' frame (stations/grid/r03.ts), the rig, or the frame data changes"
+ "rerender_when": "the stewards' bay (stations/grid/r03.ts), the rig, or the frame data changes"
 }
