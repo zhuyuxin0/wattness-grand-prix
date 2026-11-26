@@ -73,10 +73,12 @@ document's JCS form. Each document cites the release files its prices came from,
 4. Any value that differs is named: `prices.da_node_cents[18] 13350, published 3450`, or
    `arm C: energy_uusd 2625780000, recomputed 2624780000`.
 
+Against the day's files as `pnpm outcome` writes them, or a published copy of `outcomes/` given with `--outcomes <dir>`:
+
 ```
-pnpm verify out/od-20261126/manifest.json --network bsc-mainnet                       # the showcase battery
-pnpm verify out/od-20261126/manifest.json --network bsc-mainnet --battery CLO_ESR1    # any other
-pnpm verify out/od-20261126/manifest.json --no-chain                                  # before the link
+pnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet --outcomes <dir>                      # the showcase battery
+pnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet --battery CLO_ESR1 --outcomes <dir>   # the fixture's other leaf
+pnpm verify out/od-20261126/manifest.json --no-chain                                                       # the committer, before the link
 ```
 
 A stage linked on chain whose files are not given fails V10: a verifier cannot pass a record whose committer
