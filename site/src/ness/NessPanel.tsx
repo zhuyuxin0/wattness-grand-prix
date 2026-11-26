@@ -35,13 +35,17 @@ import {
   type FrameState,
   type NessMode,
 } from "./frame";
+import { LiveComposer, LiveThread } from "./live/LiveNess";
+import { useLiveNess } from "./live/useLiveNess";
 import { filterByQuery, hostOf, isExternal, litPages, splitTimes, writeAsk } from "./logic";
 import { NessMark } from "./NessMark";
 import "./ness.css";
 
-// Ask Ness's panel. Ness is Wattness's one AI system; this site has no server,
-// model or sign-in, so here Ness gives prepared answers from the record, and
-// the panel says so under its name. Its frame is wattness.tech's Ness window
+// Ask Ness's panel. Ness is Wattness's one AI system. Here it answers in two
+// layers, and the panel says both under its name: prepared answers, checked
+// against the record ahead of time, and, under them, a question of the
+// reader's own, answered live by Ness's service on Azure (live/: no sign-in,
+// no cookie, the thread kept in memory only). Its frame is wattness.tech's Ness window
 // (frame.ts): beside the page, a column at the right that the page narrows
 // for (or that covers the page where it has no room); floating, a window
 // dragged by its header and sized from its corner; or full screen, over the
@@ -172,6 +176,7 @@ function Questions({
   current,
   onShow,
   onClear,
+  onAsk,
 }: {
   query: string;
   logos: Partial<Record<LogoKey, ChipLogo>> | null;
@@ -179,15 +184,24 @@ function Questions({
   current: string | null;
   onShow: (id: string) => void;
   onClear: () => void;
+  /** Asks the search's words live, when Ness can take a question now. */
+  onAsk?: (text: string) => void;
 }) {
   const shown = useMemo(() => filterByQuery(ANSWERS, query, searchText), [query]);
   if (shown.length === 0)
     return (
       <div className="ness__none" role="status">
         <p>No prepared answer matches “{query.trim()}”.</p>
-        <button type="button" className="btn" onClick={onClear}>
-          Show every question
-        </button>
+        <div className="ness__none-acts">
+          <button type="button" className="btn" onClick={onClear}>
+            Show every question
+          </button>
+          {onAsk && (
+            <button type="button" className="btn" onClick={() => onAsk(query)}>
+              Ask Ness live
+            </button>
+          )}
+        </div>
       </div>
     );
   const jump = (id: string) => {
@@ -425,9 +439,13 @@ export default function NessPanel({ open, id, onShow, onList, onClose, onLeave }
   const onMemory = useLocation().pathname.startsWith("/agents/memory");
   const answer = id ? (ANSWERS.find((a) => a.id === id) ?? null) : null;
   const missing = id !== null && answer === null;
-  // A prepared answer lights its page; a live answer (lane L) will name its pages too, the first its own.
-  const lit = useMemo(() => litPages(answer?.brainPage ?? null), [answer]);
-  const caption = brainCaption(lit);
+  // A prepared answer lights its page; with none open, the latest live answer lights the pages it rests on, its own
+  // page first, named as Living Brain titles them.
+  const liveNess = useLiveNess();
+  const liveLight = liveNess.light;
+  const lit = useMemo(() => (answer ? litPages(answer.brainPage ?? null) : litPages(null, liveLight?.pages)), [answer, liveLight]);
+  const titles = answer ? undefined : liveLight?.titles;
+  const caption = brainCaption(lit, titles);
 
   // The frame is kept in this browser as it rests (a drag moves it every frame).
   useEffect(() => {
@@ -491,6 +509,12 @@ export default function NessPanel({ open, id, onShow, onList, onClose, onLeave }
     // A change of mode keeps the view and the focus where they are.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, answer]);
+
+  // Full screen's columns scroll on their own: the chat body's scroll from beside or floating is let go as it opens,
+  // so the columns start in view.
+  useLayoutEffect(() => {
+    if (mode === "full") main.current?.scrollTo({ top: 0 });
+  }, [mode]);
 
   // Esc steps down: a search with words clears first; full screen goes back to the reader's other mode; otherwise the
   // panel closes to its launcher. Tab stays inside while the panel is modal.
@@ -622,7 +646,7 @@ export default function NessPanel({ open, id, onShow, onList, onClose, onLeave }
               Ask Ness
             </h2>
             <p className="ness__creed" id="ness-creed">
-              Prepared answers from the record. Each links to what it rests on.
+              Pick a question for an answer checked against the record, or ask Ness anything about the Grand Prix.
             </p>
           </div>
           <div className="ness__modes">
@@ -656,7 +680,7 @@ export default function NessPanel({ open, id, onShow, onList, onClose, onLeave }
         </header>
         <div className="ness__main" ref={main}>
           <div className="ness__stage" data-atmosphere="dark">
-            <NessBrain pages={lit} live={open && !onMemory} />
+            <NessBrain pages={lit} live={open && !onMemory} titles={titles} />
             <p className="ness__caption">
               <span className="ness__caption-text">
                 {caption.lead}
@@ -677,7 +701,7 @@ export default function NessPanel({ open, id, onShow, onList, onClose, onLeave }
                 <Glyph name="next" />
               </Link>
             </p>
-            {mode === "full" && !answer && <p className="ness__hint">Pick a question: the page its answer rests on lights up here.</p>}
+            {mode === "full" && !answer && lit.length === 0 && <p className="ness__hint">Pick a question: the page its answer rests on lights up here.</p>}
           </div>
           <div className="ness__side">
             <div className="ness__find">
@@ -699,8 +723,17 @@ export default function NessPanel({ open, id, onShow, onList, onClose, onLeave }
                   That link names no answer here. Every question is below.
                 </p>
               )}
-              <Questions query={query} logos={logos} current={answer?.id ?? null} onShow={onShow} onClear={clear} />
+              <Questions
+                query={query}
+                logos={logos}
+                current={answer?.id ?? null}
+                onShow={onShow}
+                onClear={clear}
+                onAsk={liveNess.waiting || liveNess.hold ? undefined : (text) => liveNess.send(text)}
+              />
+              <LiveThread live={liveNess} mode={phone ? "sheet" : mode} onLeave={onLeave} />
             </div>
+            <LiveComposer live={liveNess} />
           </div>
           {view}
         </div>

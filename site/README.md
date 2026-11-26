@@ -143,6 +143,15 @@ carries to the rest; a link may name one with `/battery/<resource>` or `?battery
   (beside it in full screen) with the answer's pages ringed and named; it loads with the panel and gives up its WebGL
   context when the panel closes. Stacking: beside and floating 45, full screen and the sheet 70.
   `test/ness-frame.test.mjs` holds the frame.
+- Ask Ness live (`src/ness/live/`): under the prepared questions, "Ask Ness about the Grand Prix" sends the reader's
+  own question to Ness's live service (`NESS_LIVE_URL` in `src/config.ts`, POST `/ask`) with the thread's last four
+  answered turns and the reader's time zone, without credentials, one question at a time. The answer reads as a
+  prepared one, with What it rests on (a page of this site opens beside the panel, anything else in a new tab, and the
+  Living Brain pages it rests on link to the Memory tab, which the stage lights). Enter asks, Shift+Enter is a new
+  line; Stop, and Try again in place. A refusal (429) shows the service's own words and holds the input as long as it
+  asks; any other failure is one line ("Ness can't answer live right now. The answers above are checked against the
+  record."). The thread lives in memory only: no cookie, no storage, nothing in the address. A search no prepared
+  answer matches can be asked live. `test/ness-live.test.mjs` holds it.
 - Related (`src/shell/related.ts`, one set per tab; drawn by `PageHeader` and under the Intro's hero by
   `src/shell/RelatedStrip.tsx`): the two to four tabs each page leads to. A click previews the tab as a floating pane
   over the page; a link held with ⌘, Ctrl or Shift, or a middle click, opens it in a new browser tab; the pane's Open

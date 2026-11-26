@@ -99,7 +99,7 @@ test("the panel keeps its creed, its three modes and the brains in the chat, and
   const panel = readFileSync(join(site, "src", "ness", "NessPanel.tsx"), "utf8");
   for (const label of ["Float Ask Ness as a window", "Put Ask Ness beside the page", "Full screen", "Exit full screen", "Minimize Ask Ness"])
     assert.ok(panel.includes(label), label);
-  assert.match(panel, /<NessBrain pages=\{lit\} live=\{open && !onMemory\} \/>/);
+  assert.match(panel, /<NessBrain pages=\{lit\} live=\{open && !onMemory\}[^>]*\/>/);
   const live = readFileSync(join(site, "src", "ness", "BrainLive.tsx"), "utf8");
   assert.match(live, /import\("@world\/stations\/brain\/mount"\)/, "the stage loads by dynamic import");
   assert.match(live, /h\?\.dispose\(\)/, "the stage lets go of its context when the panel closes");

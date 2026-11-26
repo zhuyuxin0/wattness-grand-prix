@@ -23,7 +23,10 @@ const SPOTS: Record<string, { x: number; y: number; r: number }> = {
   terminal: { x: 0.757, y: 0.718, r: 0.1 },
 };
 
-export function NessBrain({ pages, live }: { pages: readonly string[]; live: boolean }) {
+/** A page's name: its title in Living Brain as a live answer gives it, else as a prepared answer names it, else its slug. */
+const nameOf = (k: string, titles?: Readonly<Record<string, string>>) => titles?.[k] ?? BRAIN_PAGES[k] ?? splitPageKey(k)?.slug ?? k;
+
+export function NessBrain({ pages, live, titles }: { pages: readonly string[]; live: boolean; titles?: Readonly<Record<string, string>> }) {
   const [drawn, setDrawn] = useState(false);
   const brains = [...new Set(pages.map((k) => splitPageKey(k)?.brain).filter((b): b is string => !!b && b in SPOTS))];
   return (
@@ -41,15 +44,18 @@ export function NessBrain({ pages, live }: { pages: readonly string[]; live: boo
           );
         })}
       </div>
-      {live && <BrainLive pages={pages} names={pages.map((k) => BRAIN_PAGES[k] ?? splitPageKey(k)?.slug ?? k)} onReady={setDrawn} />}
+      {live && <BrainLive pages={pages} names={pages.map((k) => nameOf(k, titles))} onReady={setDrawn} />}
     </div>
   );
 }
 
 /** The words with the brains: what the picture is, or the page an answer comes from (and how many more it lights). */
-export function brainCaption(pages: readonly string[]): { lead: string; page: string | null; brain: string | null; more: number } {
+export function brainCaption(
+  pages: readonly string[],
+  titles?: Readonly<Record<string, string>>,
+): { lead: string; page: string | null; brain: string | null; more: number } {
   const first = pages[0] ?? null;
   const page = first ? splitPageKey(first) : null;
   if (!page || !first) return { lead: "Living Brain: how the Grand Prix is built", page: null, brain: null, more: 0 };
-  return { lead: "From Living Brain", page: BRAIN_PAGES[first] ?? page.slug, brain: BRAINS[page.brain] ?? page.brain, more: pages.length - 1 };
+  return { lead: "From Living Brain", page: nameOf(first, titles), brain: BRAINS[page.brain] ?? page.brain, more: pages.length - 1 };
 }

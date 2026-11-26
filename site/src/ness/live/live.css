@@ -1,0 +1,195 @@
+/* Ask Ness live (LiveNess.tsx): the thread after the prepared questions and the input at the foot of their column, in
+   the panel's own type and rules. Beside the page, floating and on a phone the column scrolls under the input, which
+   holds at the panel's bottom; in full screen the input stands under the questions' list. Corners no rounder than
+   7px; hovers change color only. */
+
+/* A search no prepared answer matches: show every question, or ask its words live. */
+.ness__none-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- the thread */
+
+/* Positioned, so the hidden words of its links ("opens in a new tab") stay inside the list that scrolls them and do
+   not stretch the chat body around it (full screen's columns would then stand above the view). */
+.ness-live {
+  position: relative;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--t-rule);
+}
+.ness-live__turn {
+  padding: 4px 0 12px;
+  /* brought into view clear of the search above and the input below */
+  scroll-margin-top: 64px;
+  scroll-margin-bottom: 120px;
+}
+.ness-live__turn + .ness-live__turn {
+  padding-top: 12px;
+  border-top: 1px solid var(--t-rule);
+}
+.ness-live__q {
+  margin: 0 0 8px;
+  font-family: var(--t-font-display);
+  font-size: 15px;
+  font-weight: var(--t-fw-strong);
+  line-height: 1.35;
+  letter-spacing: -0.005em;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.ness-live__turn .ness__p {
+  overflow-wrap: anywhere;
+}
+.ness-live__line {
+  margin: 0 0 8px;
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.ness-live__note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.ness-live__note .ness-live__line {
+  flex: 1 1 200px;
+  margin: 0;
+}
+.ness-live__note .btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* The progress line: three dots that breathe, still under reduced motion. */
+.ness-live__dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+.ness-live__dots > i {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.35;
+  animation: ness-live-dot 1.4s ease-in-out infinite;
+}
+.ness-live__dots > i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.ness-live__dots > i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes ness-live-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------- the input */
+
+.ness-live__ask {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 10px 14px 8px;
+  border-top: 1px solid var(--t-rule);
+  background: var(--ness-ground);
+}
+.ness-live__box {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.ness-live__input {
+  flex: 1;
+  min-width: 0;
+  min-height: 34px;
+  max-height: 132px;
+  margin: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: color-mix(in srgb, var(--t-pane) 90%, transparent);
+  color: var(--w-fg);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs);
+  line-height: 1.4;
+  resize: none;
+  overflow-y: auto;
+}
+.ness-live__input::placeholder {
+  color: var(--w-muted);
+  opacity: 1;
+}
+.ness-live__input:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+.ness-live__act {
+  flex: none;
+  height: 34px;
+  min-width: 60px;
+}
+/* Nothing to ask yet, a question out or a wait asked for: the button stands back, plain, in either theme. */
+.ness-live__act:disabled,
+.ness-live__act:disabled:hover {
+  border-color: var(--w-border);
+  background: transparent;
+  color: var(--w-muted);
+  box-shadow: none;
+  cursor: default;
+}
+.ness-live__act:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+}
+.ness-live__how {
+  margin: 5px 0 0;
+  font-size: var(--t-fs-xs);
+  line-height: 1.35;
+  color: var(--w-muted);
+}
+.ness-live__how[data-hold] {
+  color: var(--w-fg);
+}
+/* A touch keyboard has no Shift+Enter: the hint is for a keyboard's reader. */
+@media (pointer: coarse) {
+  .ness-live__how[data-keys] {
+    display: none;
+  }
+}
+
+/* Full screen: under the list, at the foot of the questions' column. */
+.ness[data-mode="full"] .ness-live__ask {
+  position: static;
+  flex: none;
+}
+
+@media (max-width: 767px) {
+  .ness-live__input {
+    font-size: max(16px, var(--t-fs));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ness-live__dots > i {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+[data-capture="1"] .ness-live__dots > i {
+  animation: none;
+  opacity: 0.7;
+}
