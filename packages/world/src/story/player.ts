@@ -79,6 +79,12 @@ export class StoryPlayer {
   private insts = new Map<string, FrameInstance>();
   private queue: Promise<unknown> = Promise.resolve();
   private building = new Set<string>();
+  /** Frames whose setup is writing the shared stage, until their programs are queued: nothing else may draw meanwhile. */
+  private writing = new Set<string>();
+  /** Frames built whose programs are still compiling: not drawn until they have (a first draw would compile them). */
+  private compiling = new Set<string>();
+  /** Each build queued or under way, by frame, so a second ask joins it. */
+  private pending = new Map<string, Promise<FrameInstance>>();
   private rises = new Map<FrameInstance, Rise>();
   private underOn = false;
   private lineKey = '';
@@ -128,17 +134,21 @@ export class StoryPlayer {
     return i;
   }
 
-  /** Builds a frame (one build at a time: a setup writes the shared stage) and compiles its programs. `why` names the
-   *  caller for a measuring harness's log: a picture that needs it now, or a build ahead of the visitor. */
+  /** Builds a frame (one build at a time: a setup writes the shared stage) and compiles its programs; resolves once they
+   *  have compiled. The stage is free again once they are queued, so the story draws its other frames while they
+   *  compile (isBuilding), and this one from then on (drawable). `why` names the caller for a measuring harness's log:
+   *  a picture that needs it now, or a build ahead of the visitor. */
   ensure(frame: string, why: 'need' | 'prefetch' = 'need'): Promise<FrameInstance> {
     const inst = this.inst(frame);
+    const queued = this.pending.get(frame);
+    if (queued) return queued;
     if (inst.ready) return Promise.resolve(inst);
     if (inst.error) return Promise.reject(new Error(inst.error));
     const asked = performance.now();
     const run = this.queue.then(async () => {
       if (inst.ready || inst.disposed) return inst;
       if (this.dead) throw new Error('story: the player was disposed');
-      this.building.add(frame);
+      this.building.add(frame); this.writing.add(frame);
       const b0 = performance.now();
       try {
         await inst.build();
@@ -156,8 +166,11 @@ export class StoryPlayer {
         let compiled: ReturnType<WorldStage['preparePrograms']>;
         try { compiled = this.stage.preparePrograms([() => inst.pose(inst.restLocal, 0)], () => !this.dead && !inst.disposed); }
         finally { for (const x of parked) scene.add(x.root); }
-        const prep = await compiled;
+        // the programs are queued and the stage is free: the other frames may draw while they compile (a draw takes the
+        // stage and keeps this frame's state, which its next turn puts back)
         inst.root.visible = false;
+        this.writing.delete(frame); this.compiling.add(frame);
+        const prep = await compiled;
         const b2 = performance.now();
         inst.readyMs = Math.round(b2 - b0);
         perfLog()?.events.push({ e: 'build', frame, why, asked, start: b0, built: b1, ready: b2, buildMs: inst.buildMs, readyMs: inst.readyMs, programs: prep.programs, prep: prep.state });
@@ -166,13 +179,21 @@ export class StoryPlayer {
         this.errors.set(frame, e instanceof Error ? (e.stack ?? e.message) : String(e));
         this.o.onError?.(e, frame);
         throw e;
-      } finally { this.building.delete(frame); }
+      } finally { this.building.delete(frame); this.writing.delete(frame); this.compiling.delete(frame); }
       return inst;
     });
     this.queue = run.catch(() => undefined);
+    const done = () => { if (this.pending.get(frame) === run) this.pending.delete(frame); };
+    this.pending.set(frame, run);
+    run.then(done, done);
     return run;
   }
-  isBuilding() { return this.building.size > 0; }
+  /** Whether a build is writing the shared stage now (its setup, up to its programs queued): nothing else may draw. */
+  isBuilding() { return this.writing.size > 0; }
+  /** Whether any build is queued or under way. */
+  isBusy() { return this.pending.size > 0; }
+  /** Whether a frame can be drawn: built, and its programs compiled. */
+  private drawable(inst: FrameInstance | undefined): inst is FrameInstance { return !!inst && inst.ready && !this.compiling.has(inst.id); }
 
   /** A key's run through its hold, when the holds run (the films) and it has one. */
   private runOf(k: FilmKey): Run | null { return this.holds === 'run' && k.run?.length ? k.run : null; }
@@ -190,7 +211,7 @@ export class StoryPlayer {
     const instOf = (k: FilmKey) => this.insts.get(keyDef(k.key).frame);
     if (where.kind === 'hold') {
       const k = keyAt(where.i), inst = instOf(k);
-      if (!inst?.ready) return null;
+      if (!this.drawable(inst)) return null;
       const local = this.holdLocal(k, inst, where.since);
       const stop = keyDef(k.key).stop !== false;
       const span = k.until - k.at;
@@ -202,7 +223,7 @@ export class StoryPlayer {
     }
     const A = keyAt(where.i - 1), B = keyAt(where.i);
     const ia = instOf(A), ib = instOf(B);
-    if (!ia?.ready || !ib?.ready) return null;
+    if (!this.drawable(ia) || !this.drawable(ib)) return null;
     const leg = F.leg(where.i), e = where.e;
     const mode = leg.cam ?? 'glide';
     // the outgoing frame held where its hold ended; the incoming one plays its own motion into its rest, or, when its
@@ -373,7 +394,7 @@ export class StoryPlayer {
       const shares = [1 - smooth((w.e - 0.5) / 0.25), smooth((w.e - 0.4) / 0.3)];
       for (const [j, k] of [this.film.keys[w.i - 1]!, this.film.keys[w.i]!].entries()) {
         const inst = this.insts.get(keyDef(k.key).frame);
-        if (!inst?.ready || inst.screens === false) continue;
+        if (!this.drawable(inst) || inst.screens === false) continue;
         if (shares[j]! <= 0.002) { sets.push([inst, 0, 0]); continue; }
         await layout(inst, pose, `leg:${pic.t}`);
         sets.push([inst, inst.screens ? shares[j]! : 0, 0]);
@@ -432,7 +453,7 @@ export class StoryPlayer {
       const k = F.keys[j];
       if (!k) continue;
       const inst = this.insts.get(keyDef(k.key).frame);
-      if (inst?.ready) return { draws: [{ inst, local: this.holdLocal(k, inst, Math.max(0, Math.min(k.until - k.at, t - k.at))), alpha: 1, pose: inst.restPose! }], plates: null, where, t };
+      if (this.drawable(inst)) return { draws: [{ inst, local: this.holdLocal(k, inst, Math.max(0, Math.min(k.until - k.at, t - k.at))), alpha: 1, pose: inst.restPose! }], plates: null, where, t };
     }
     return null;
   }

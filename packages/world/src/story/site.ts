@@ -255,7 +255,8 @@ export class SiteController {
     const dt = Math.min(0.1, Math.max(0, (now - this.last) / 1000));
     this.last = now;
     if (this.decorating) return;
-    // while a frame builds, the position holds: the build writes the shared stage
+    // while a frame's setup runs, the position holds: it writes the shared stage (its programs compile after, while the
+    // story moves on through frames already drawable)
     if (this.P.isBuilding()) { if (this.play || this.wheelAt >= 0 || this.touch) this.showWait(now, 'building'); return; }
     this.advance(dt, now);
     const p = this.pos;
@@ -319,7 +320,7 @@ export class SiteController {
    *  time. A frame the story has passed is let go once it is neither round the rest nor among the six drawn last (at
    *  each new rest, and after each build), so the frames built stay bounded however quickly the visitor steps. */
   private prefetch(stop: number) {
-    if (this.P.isBuilding()) return;
+    if (this.P.isBusy()) return;
     const F = this.P.film, around = [stop + 1, stop - 1, stop + 2];
     const want: string[] = [];
     for (const s of [stop, ...around]) {
