@@ -13,7 +13,7 @@ import { Timeline } from "./Timeline";
 import "./styles.css";
 
 // Overview: the Terminal's home, then where the day stands. It opens on the
-// control room (ControlRoom.tsx): the Tech Stack's 3D in motion behind glass
+// control room (ControlRoom.tsx): the Tech Stack's 3D, live, behind glass
 // panes that open the tabs. Under it ERCOT's next gate leads; then the latest
 // sealed record at a glance, the day in order with a line at now, and a path
 // into every tab.

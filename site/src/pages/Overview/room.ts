@@ -1,6 +1,6 @@
 // The control room's pure parts: which receipt is the day's seal, the Fleet board's first rows, the battery search
-// that opens Verify, the address that opens Ask Ness, and the loop behind the panes. No imports, so the tests run it
-// in Node as it is (test/control-room.test.mjs).
+// that opens Verify, the address that opens Ask Ness, and the stage's poster. No imports, so the tests run it in Node
+// as it is (test/control-room.test.mjs).
 
 /** The fields of a chain receipt the seal pane reads (src/data/types.ts ChainReceipt). */
 export interface SealReceipt {
@@ -84,10 +84,7 @@ export function askSearch(search: string, id: string | null): string {
   return `?${params.toString()}`;
 }
 
-/** The loop behind the panes: the Tech Stack's 3D in motion (public/home/, its receipt tech-landscape.json). */
-export const LOOP = {
-  name: "tech-landscape",
-  files: { webm: "tech-landscape.webm", mp4: "tech-landscape.mp4", poster: "tech-landscape-poster.webp" },
-  width: 1920,
-  height: 1080,
-} as const;
+/** The stage's poster, shown until the live 3D has drawn and alone with reduced motion: the stack at rest, chapter 21
+ *  of the introduction ("What it is built from"), as the chapter panes show it (public/chapters/stack.webp, its
+ *  receipt stack.json beside it). */
+export const STAGE_POSTER = { file: "chapters/stack.webp", receipt: "chapters/stack.json", width: 960, height: 540 } as const;

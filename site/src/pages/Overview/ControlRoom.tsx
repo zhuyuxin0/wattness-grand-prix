@@ -1,27 +1,28 @@
-import { Component, Suspense, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
+import { useCallback, useEffect, useId, useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { combine, useDay, useReceipts, type BatterySummary, type ChainReceipt, type DayIndex } from "../../data";
 import { minSec } from "../../lib/clock";
 import { formatInt } from "../../lib/format";
 import { dualTime } from "../../lib/time";
-import { GRID_CLOSE, StartingGrid } from "../../scenes";
 import { BATTERY_NAMES, Glyph, Hash, PageHeader } from "../../ui";
-import { StartHere } from "../Intro/StartHere";
 import { Strip } from "../Fleet/Strip";
 import { hubLabel, plainName } from "../Fleet/names";
-import { LOOP, NESS_QUESTIONS, askSearch, boardTop, findBatteries, sealOf, verifyPath } from "./room";
+import { StackSpace } from "../TechStack/StackSpace";
+import { NESS_QUESTIONS, STAGE_POSTER, askSearch, boardTop, findBatteries, sealOf, verifyPath } from "./room";
 import { RoomBand } from "./RoomBand";
 import "./control-room.css";
 
-// The control room: the Overview's first view, the Terminal's home. Behind it the Tech Stack's 3D in motion, a
-// seamless 12 s loop rendered by packages/world's loop lab (public/home/tech-landscape.json says how), muted, inline,
-// playing only while on screen; with reduced motion or Save-Data only its first frame shows. Over it, glass panes
-// placed round the landscape, each a small live preview that opens its tab: the latest seal, a battery search that
-// opens Verify, the Fleet board's first rows, the closing morph of the introduction (Wattness into BNB Chain's seal),
-// Ask Ness's prepared questions (in a build that has Ask Ness), and "Start where you are". The first paint loads no
-// three.js: the morph's scene is fetched once the page is idle and the pane nears the screen.
+// The control room: the Overview's first view, the Terminal's home. Its stage is the Tech Stack's 3D itself, live (the
+// same mount the Tech Stack tab draws, TechStack/StackSpace.tsx): its lines flow at rest, a piece's card opens under
+// the pointer wherever no pane covers it, and a click opens the piece's tab. The first paint shows the stack's poster
+// (chapter 21 of the introduction, public/chapters/stack.webp with its receipt); the 3D is fetched once the page's
+// text is in and the page is idle, and fades in over the poster once it has drawn. With reduced motion or Save-Data
+// the poster stays alone. Leaving the tab disposes the 3D, which releases its WebGL context. Over the stage, glass
+// panes, each a small live preview that opens its tab: the latest seal, a battery search that opens Verify, the Fleet
+// board's first rows, and Ask Ness's prepared questions (in a build that has Ask Ness). The first paint loads no
+// three.js.
 
-const media = (file: string) => `${import.meta.env.BASE_URL}home/${file}`;
+const posterSrc = `${import.meta.env.BASE_URL}${STAGE_POSTER.file}`;
 
 /** Ask Ness's panel (site/src/ness) opens from the address (?ask=, ?ask=<id>); the pane shows only where it is built. */
 const NESS_IN_BUILD = Object.keys(import.meta.glob("../../ness/NessPanel.tsx")).length > 0;
@@ -71,52 +72,38 @@ function useIdle(): boolean {
   return idle;
 }
 
-/** Whether the element is on screen (rootMargin widens the screen); without IntersectionObserver, always. */
-function useOnScreen(ref: RefObject<Element>, rootMargin = "0px", threshold = 0): boolean {
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setOn(true);
-      return;
-    }
-    const io = new IntersectionObserver((entries) => setOn(entries.some((e) => e.isIntersecting)), { rootMargin, threshold });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ref, rootMargin, threshold]);
-  return on;
-}
-
-/** The landscape behind the panes: the loop while on screen and the tab is shown, its first frame otherwise. */
-function Landscape() {
+/**
+ * The stage behind the panes: the stack's poster on the first paint, and over it the Tech Stack's 3D, live, once the
+ * page's text is in (`settled`) and the page is idle; it fades in once it has drawn its first frame. With reduced
+ * motion or Save-Data, or where the 3D cannot start, the poster alone.
+ */
+function HomeStage({ settled }: { settled: boolean }) {
   const reduced = useMedia("(prefers-reduced-motion: reduce)");
   const still = reduced || saveData();
-  const video = useRef<HTMLVideoElement>(null);
-  const box = useRef<HTMLDivElement>(null);
-  const onScreen = useOnScreen(box, "0px", 0.05);
+  const idle = useIdle();
+  const [failed, setFailed] = useState(false);
+  const [drawn, setDrawn] = useState(false);
+  const live = !still && !failed && idle && settled;
   useEffect(() => {
-    const v = video.current;
-    if (!v || still) return;
-    const sync = () => {
-      if (onScreen && !document.hidden) v.play().catch(() => undefined);
-      else v.pause();
-    };
-    sync();
-    document.addEventListener("visibilitychange", sync);
-    return () => document.removeEventListener("visibilitychange", sync);
-  }, [onScreen, still]);
-  const poster = media(LOOP.files.poster);
+    if (!live) setDrawn(false);
+  }, [live]);
+  // ready settles as the first frame is asked for: shown after it is drawn, so the poster never gives way to a blank
+  const onReady = useCallback(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setDrawn(true)));
+  }, []);
+  const onFail = useCallback(() => setFailed(true), []);
   return (
-    <div ref={box} className="ov-room__media" aria-hidden="true">
-      {still ? (
-        <img className="ov-room__still" src={poster} alt="" width={LOOP.width} height={LOOP.height} decoding="async" {...{ fetchpriority: "high" }} />
-      ) : (
-        <video ref={video} className="ov-room__loop" poster={poster} width={LOOP.width} height={LOOP.height} muted loop playsInline preload="auto" tabIndex={-1} disablePictureInPicture>
-          <source src={media(LOOP.files.webm)} type='video/webm; codecs="vp9"' />
-          <source src={media(LOOP.files.mp4)} type="video/mp4" />
-        </video>
-      )}
+    <div className={`ov-room__stage${live && drawn ? " is-live" : ""}`}>
+      <img
+        className="ov-room__poster"
+        src={posterSrc}
+        alt=""
+        width={STAGE_POSTER.width}
+        height={STAGE_POSTER.height}
+        decoding="async"
+        {...{ fetchpriority: "high" }}
+      />
+      {live && <StackSpace className="ov-room__space" onReady={onReady} onFail={onFail} />}
     </div>
   );
 }
@@ -339,44 +326,6 @@ function NessPane() {
   );
 }
 
-/** A scene that fails takes only its own box. */
-class Contain extends Component<{ children: ReactNode }, { failed: boolean }> {
-  override state = { failed: false };
-  static getDerivedStateFromError() {
-    return { failed: true };
-  }
-  override render() {
-    return this.state.failed ? null : this.props.children;
-  }
-}
-
-/** The introduction's close, as on the Intro's last band: the sealed plans leave the grid for the Wattness mark while
- *  the root's ring becomes BNB Chain's. It plays when it comes on screen and rewinds once off it. */
-function MorphPane() {
-  const stage = useRef<HTMLDivElement>(null);
-  const idle = useIdle();
-  const near = useOnScreen(stage, "25% 0px 25% 0px");
-  const inView = useOnScreen(stage, "0px", 0.6);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    if (idle && near) setMounted(true);
-  }, [idle, near]);
-  return (
-    <Pane area="morph" title="Sealed on BNB Chain" to="/seal" toLabel="Seal">
-      <div ref={stage} className="ov-morph" data-atmosphere="dark">
-        {mounted && (
-          <Contain>
-            <Suspense fallback={null}>
-              <StartingGrid name="ov-morph" hud={false} playback="once" from={GRID_CLOSE - 0.8} hold={!inView} />
-            </Suspense>
-          </Contain>
-        )}
-      </div>
-      <p className="ov-pane__line">Every plan of the day, under one root.</p>
-    </Pane>
-  );
-}
-
 export function ControlRoom() {
   const all = combine(useDay(), useReceipts());
   const ready = all.status === "ready" ? all.data : null;
@@ -386,16 +335,14 @@ export function ControlRoom() {
   const parts = {
     seal: day && seal ? <SealPane day={day} seal={seal} /> : null,
     verify: day ? <VerifyPane day={day} /> : null,
-    morph: <MorphPane />,
     fleet: day ? <FleetPane day={day} /> : null,
     ness: NESS_IN_BUILD ? <NessPane /> : undefined,
-    start: <StartHere id="ov-start" />,
   };
-  // Two sides round the landscape's middle, Ask Ness under it, and the visitors' ways in along its foot; a phone reads
-  // them in order. From 1000px of room the same parts are dock panes in that arrangement (RoomBand.tsx).
+  // The panes stand down the stage's two sides, its middle left to the 3D; a phone reads them in order under it. From
+  // 1000px of room the same parts are dock panes in that arrangement (RoomBand.tsx). The stage comes after them in the
+  // page's order, so the keyboard reaches the panes before the stack's pieces.
   return (
     <section className="ov-room" data-atmosphere="dark" aria-label="Control room">
-      <Landscape />
       <RoomBand
         head={head}
         parts={parts}
@@ -407,14 +354,13 @@ export function ControlRoom() {
               {parts.verify}
             </div>
             <div className="ov-room__side ov-room__side--right">
-              {parts.morph}
               {parts.fleet}
+              {parts.ness}
             </div>
-            {parts.ness}
-            <div className="ov-room__start">{parts.start}</div>
           </div>
         }
       />
+      <HomeStage settled={all.status !== "loading"} />
     </section>
   );
 }

@@ -1,7 +1,8 @@
 /* Intro: chapter 01's still across the main column, dark, with the hero line
    and the ways in, and under it "Start where you are"; then the page in the
-   visitor's theme, the plain steps beside the racing words; then the dark
-   closing band, the starting grid's close. */
+   visitor's theme, the plain steps beside the racing words, each over its own
+   frame of the introduction; then the dark closing band, the starting grid's
+   close. */
 
 .app__page:has(.page--intro) {
   max-width: none;
@@ -399,6 +400,82 @@
   font-weight: 600;
   color: var(--w-fg);
 }
+/* The racing term over its own frame of the introduction (index.tsx RaceCell): the chapter's poster fills the cell
+   under a dark scrim, dark in either theme (data-atmosphere="dark"), so the words read over any part of the frame at
+   4.5:1 or more; the way into the chapter at the foot. Our own renders only: no photographs, no marks of a racing
+   series. */
+.story__race--framed {
+  position: relative;
+  isolation: isolate;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--t-space-3);
+  min-height: 8.5rem;
+  padding: 12px 14px 10px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--w-fg) 12%, transparent);
+  border-radius: var(--t-radius-paper);
+  background: var(--t-chrome);
+}
+.story__frame {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.story__race--framed::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to bottom,
+    rgb(12 14 16 / 0.82) 0%,
+    rgb(12 14 16 / 0.68) 58%,
+    rgb(12 14 16 / 0.4) 76%,
+    rgb(12 14 16 / 0.78) 92%
+  );
+}
+.story__race--framed .story__race-text {
+  color: var(--w-fg);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+}
+.story__race--framed b {
+  color: #f3f4f2;
+}
+/* The way into the chapter: a small dark tag on the frame, so it reads over the frame's brightest part too. */
+.story__cue {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  margin-left: -6px;
+  padding: 2px 8px 2px 6px;
+  border-radius: 999px;
+  background: rgb(12 14 16 / 0.78);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--t-link);
+  text-decoration: none;
+}
+a.story__cue:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--t-accent-mark);
+  text-underline-offset: 3px;
+}
+a.story__cue:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+.story__cue-icon {
+  flex: none;
+}
 .story__tech {
   list-style: none;
   margin: 0;
@@ -449,6 +526,11 @@
     font-size: var(--t-fs-xs);
     font-weight: 600;
     color: var(--w-muted);
+  }
+  /* the framed cell's own label sits inside the frame, over the scrim, as the card's eyebrow */
+  .story__race--framed::before {
+    margin-bottom: -6px;
+    color: #b4bac0;
   }
   .story__tabs {
     display: flex;

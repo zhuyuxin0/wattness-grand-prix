@@ -8,6 +8,8 @@ import { RelatedStrip } from "../../shell/RelatedStrip";
 import { dualTime, formatInZone } from "../../lib/time";
 import { CENTRAL_TZ } from "../../config";
 import { Glyph, Section } from "../../ui";
+import { TabIcon } from "../../ui/TabIcon";
+import { CHAPTERS, chapterHref, type Chapter } from "../../chapters/map";
 import { Closing } from "./Closing";
 import { Hero } from "./Hero";
 import { STORY_MARK, STORY_PLAYABLE, markStory, warmStory, warmWhenIdle } from "./story";
@@ -23,7 +25,9 @@ import "./styles.css";
 // live here and in the glossary, never in the app's names. The page ends on
 // the starting grid's close, played as it comes on screen, with the ways on
 // beneath. Play opens the introduction (packages/world's mountStory) over the
-// whole viewport.
+// whole viewport. Each step's racing term stands over its own frame of the
+// introduction (the chapter's poster in public/chapters/, under a dark scrim),
+// with the way into that chapter.
 
 /** A time in a sentence: CT, then the reader's own in brackets (with its date when the reader's day differs). */
 function Clock({ unix }: { unix: number }) {
@@ -51,9 +55,17 @@ interface Step {
   /** The Grand Prix's word for the step, and what it means at a race. */
   term: string;
   race: string;
+  /** The introduction's beat whose frame stands behind the racing term: the chapter that shows the step
+   *  (src/chapters/map.ts; its poster in public/chapters/ with its receipt). */
+  frame: string;
   builtOn: string[];
   tabs: { to: string; label: string }[];
 }
+
+const BASE = import.meta.env.BASE_URL;
+
+/** The chapter that shows a beat whole (not one part of it), from the chapter panes' own map. */
+const chapterOf = (beat: string): Chapter | undefined => Object.values(CHAPTERS).find((c) => c.beat === beat && !c.part);
 
 const STEPS: Step[] = [
   {
@@ -63,6 +75,8 @@ const STEPS: Step[] = [
       "Agents plan tomorrow for every battery with complete public data: when to charge and when to discharge, hour by hour, within its power and energy limits. A forecast, the state of charge, a hedge and the risk each have an agent; their memory keeps what they know.",
     term: "Qualifying",
     race: "the session before the race, where every car sets its order.",
+    // the order it sets: every battery's plan for tomorrow on the starting grid
+    frame: "starting-grid",
     builtOn: ["Wattness Terminal: public ERCOT data", "HiGHS: the solver", "ElectronX: published hedge terms", "Living Brain: the agents' memory"],
     tabs: [
       { to: "/fleet", label: "Fleet" },
@@ -77,6 +91,7 @@ const STEPS: Step[] = [
       "Each plan becomes one leaf of a single Merkle root. GateRecord holds the root on BNB Smart Chain, committed before ERCOT's 10:00 CT day-ahead gate, and refuses any commit for the day after it.",
     term: "Parc fermé",
     race: "after qualifying the cars are locked away, and no one may change them before the race.",
+    frame: "sealed",
     builtOn: ["BNB Smart Chain: GateRecord, mainnet and testnet", "BNB Greenfield: the sealed day's files"],
     tabs: [
       { to: "/seal", label: "Seal" },
@@ -90,6 +105,7 @@ const STEPS: Step[] = [
       "Anyone checks any plan in the browser: the leaf, its proof to the root, the record on chain, the seal against the gate, and the battery's limits hour by hour. Change one number and the check fails.",
     term: "The stewards",
     race: "the officials who check every car against the rules.",
+    frame: "check",
     builtOn: ["BNB Smart Chain: the record, read from a public node"],
     tabs: [{ to: "/verify", label: "Verify" }],
   },
@@ -99,10 +115,50 @@ const STEPS: Step[] = [
     plain: "GateRecord takes any committer. Another agent seals its own plans under its own wallet, with the same scope and schema, against the same gate.",
     term: "The garage",
     race: "where a team builds its car before it takes the grid.",
+    frame: "garage",
     builtOn: ["GateRecord: open to any wallet"],
     tabs: [{ to: "/about/agents", label: "Add Your Agent" }],
   },
 ];
+
+/**
+ * A step's racing term over its frame of the introduction: the chapter's poster under a dark scrim, dark in either
+ * theme, the term and its meaning over it, and the way into that chapter (the Intro opens /?chapter=<beat>; in a build
+ * without the story, the chapter's name alone).
+ */
+function RaceCell({ step, playable, onCue }: { step: Step; playable: boolean; onCue?: (el: HTMLElement) => void }) {
+  const c = chapterOf(step.frame);
+  const number = c ? String(c.chapter).padStart(2, "0") : "";
+  const cue = c && (
+    <>
+      <TabIcon name="play" size={12} className="story__cue-icon" />
+      <span>
+        Chapter <span className="num">{number}</span> of the introduction
+      </span>
+    </>
+  );
+  return (
+    <div className={`story__race${c ? " story__race--framed" : ""}`} data-label="In racing terms" data-atmosphere={c ? "dark" : undefined}>
+      {c && <img className="story__frame" src={`${BASE}chapters/${c.loop}.webp`} alt="" width={960} height={540} loading="lazy" decoding="async" />}
+      <p className="story__race-text">
+        <b>{step.term}:</b> {step.race}
+      </p>
+      {c &&
+        (playable ? (
+          <Link
+            to={chapterHref(c.beat)}
+            className="story__cue"
+            aria-label={`Open the introduction at chapter ${number}: ${c.name}`}
+            onClick={(e) => onCue?.(e.currentTarget)}
+          >
+            {cue}
+          </Link>
+        ) : (
+          <span className="story__cue">{cue}</span>
+        ))}
+    </div>
+  );
+}
 
 export default function IntroPage() {
   const state = combine(useDay(), useReceipts());
@@ -111,8 +167,14 @@ export default function IntroPage() {
   const play = useRef<HTMLButtonElement>(null);
   // The button that opened the introduction (the hero's, or the closing band's), for focus on the way back.
   const opener = useRef<HTMLElement | null>(null);
+  // A step's chapter link, which opens the introduction through the address: focus goes back to it on Close.
+  const cueFrom = useRef<HTMLElement | null>(null);
+  const onCue = useCallback((el: HTMLElement) => {
+    cueFrom.current = el;
+  }, []);
   const openStory = useCallback((from?: HTMLElement) => {
-    opener.current = from ?? play.current;
+    opener.current = from ?? cueFrom.current ?? play.current;
+    cueFrom.current = null;
     markStory(STORY_MARK.open);
     setStory(true);
   }, []);
@@ -205,9 +267,7 @@ export default function IntroPage() {
               <li key={s.id} className="story__row">
                 <h3 className="story__name">{s.name}</h3>
                 <p className="story__plain">{s.plain}</p>
-                <p className="story__race" data-label="In racing terms">
-                  <b>{s.term}:</b> {s.race}
-                </p>
+                <RaceCell step={s} playable={STORY_PLAYABLE} onCue={onCue} />
                 <ul className="story__tech" data-label="Built on">
                   {s.builtOn.map((t) => (
                     <li key={t}>{t}</li>

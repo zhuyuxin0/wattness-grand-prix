@@ -1,0 +1,50 @@
+/* The stack's 3D as the site mounts it (StackSpace.tsx), on every page that shows it: the Tech Stack's stage and the
+   Overview's home stage. The space is a container, so the scene's words follow its width, not the window's. */
+
+.stack-space {
+  container: stack / inline-size;
+}
+
+/* The scene's words are drawn at the 1,920 px cut's sizes, and the mount places
+   each label by its measured size. In a space under 1,500 px they step down a
+   size, so neighbors keep apart; under 720 px the package drops them. */
+@container stack (max-width: 1499px) {
+  .stack-space .stk-lab {
+    font-size: 12.5px;
+    line-height: 15px;
+  }
+  .stack-space .stk-lab.stk-pod {
+    font-size: 12px;
+  }
+  .stack-space .stk-lab span {
+    font-size: 11px;
+    line-height: 13px;
+  }
+  .stack-space .stk-zone {
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+  }
+  .stack-space .intro-tick.stk-after {
+    padding: 1px 7px 2px;
+    font-size: 11px;
+    line-height: 14px;
+  }
+  /* The "after the seal" notes are pinned to points in the scene, the last two
+     beside Living Brain's label and over the State keeper's: as the scene
+     shrinks they close on those labels, so they step down clear of them. */
+  .stack-space .stk-labels > .stk-after:nth-last-child(2) {
+    margin-top: 7px;
+  }
+  .stack-space .stk-labels > .stk-after:last-child {
+    margin-top: 11px;
+  }
+}
+
+/* The stack is mounted dark on either page theme, but one of the package's card
+   rules for a light stack keys on any ancestor's theme (dom.ts:
+   [data-theme="light"] .stk-card dd), so on a light page it set the dark card's
+   values (contract, records) in near-black on the card's near-black. They keep
+   the dark card's own value color here. */
+:root[data-theme="light"] .stack-space [data-stk-theme="dark"] .stk-card dd {
+  color: #e6e8ea;
+}
