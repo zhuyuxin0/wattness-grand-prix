@@ -156,7 +156,11 @@ The site is a sibling of wattness.tech and wattness.ai: the same mark, type, tok
 - Libre Franklin, self-hosted with its licence (`src/assets/fonts/OFL.txt`), sets the brand word and display
   headings; the interface is the system face at 12 to 13 px; figures that change or line up use tabular figures;
   monospace is for hashes and code only.
-- Icons are wattness.tech's drawn glyphs (`src/ui/Glyph.tsx`, `glyph.css`), never typed characters.
+- Icons are wattness.tech's drawn glyphs (`src/ui/Glyph.tsx`, `glyph.css`), never typed characters. Each tab has
+  one more, beside its label in the side panel and the phone menu (`icon` in `src/shell/tabs.ts`, drawn by
+  `src/ui/TabIcon.tsx` from `src/ui/tab-icons.ts`): 16 px at the Terminal's 1.3 px stroke, the Terminal's own drawing
+  where it has one and Lucide's otherwise (ISC License, `THIRD-PARTY-NOTICES.md`). `test/tab-icons.test.mjs` fails
+  on a tab without one.
 
 Shared components (`src/ui`): `Hash`, `Receipt`, `Countdown`, `Stat`/`StatRow`, `Section`, `Table` (three-click
 sort, positions, sticky head), `ParcFerme` (the sealed state as a word and the seal mark), `PageHeader`, `Logo`,

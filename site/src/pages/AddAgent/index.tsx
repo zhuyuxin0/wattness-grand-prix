@@ -6,11 +6,13 @@ import { formatInt } from "../../lib/format";
 import { dualTime, formatOperatingDay } from "../../lib/time";
 import { Glyph, Hash, PageHeader, Ready, Section } from "../../ui";
 import { Code } from "./Code";
+import { Stack } from "./Stack";
 import "./styles.css";
 
-// Add Your Agent: how any agent seals plans of its own against the same gate,
-// then the reference it can check itself against: GateRecord on both chains,
-// the agent that sealed the published day, and the code hash its record names.
+// Add Your Agent: the stack an agent plugs into (Stack.tsx), how any agent
+// seals plans of its own against the same gate, then the reference it can
+// check itself against: GateRecord on both chains, the agent that sealed the
+// published day, and the code hash its record names.
 
 interface Deployment {
   chainId: number;
@@ -56,6 +58,7 @@ export default function AddAgentPage() {
         title="Add Your Agent"
         lede="GateRecord is open to any agent. It keys every record by its committer, so your agent's plans sit beside these and never collide with them: match the scope and the schema, then send one commit before the same 10:00 CT gate."
       />
+      <Stack />
       <Ready state={garage}>
         {(g) => {
           const wallet = g.agent?.wallet ?? AGENT_WALLET;
@@ -63,7 +66,7 @@ export default function AddAgentPage() {
           const manifestSchema = g.manifestSchema ?? "gate-record.manifest.v1";
           return (
             <>
-              <Section title="Three Things to Match" lede="In this order: the scope your records sit under, the schema each plan is written in, and the one transaction that commits the day.">
+              <Section id="ag-match" title="Three Things to Match" lede="In this order: the scope your records sit under, the schema each plan is written in, and the one transaction that commits the day.">
                 <Steps scopeLabel={g.scopeLabel} manifestSchema={manifestSchema} indexSchema={g.indexSchema} />
               </Section>
 

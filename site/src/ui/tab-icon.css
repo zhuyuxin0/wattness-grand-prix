@@ -1,0 +1,20 @@
+/* A tab's icon (TabIcon.tsx, tab-icons.ts): a 16 px line drawing in the text's color. */
+.tab-icon {
+  display: block;
+  flex: none;
+}
+
+/* In the side panel and the phone menu, before the label: in the muted ink at rest (5.46:1 on the light pane, 6.12:1
+   on the dark one), in the label's own ink on the open tab and under the pointer. */
+.sidenav-icon {
+  margin-right: 9px;
+  color: var(--w-muted);
+}
+.sidenav-item[aria-current="page"] .sidenav-icon {
+  color: var(--w-fg);
+}
+@media (hover: hover) {
+  .sidenav-item:hover .sidenav-icon {
+    color: var(--w-fg);
+  }
+}

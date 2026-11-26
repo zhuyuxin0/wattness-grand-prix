@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import { Glyph } from "../ui/Glyph";
+import { TabIcon } from "../ui/TabIcon";
 import { batteryPath, useSelectedBattery } from "./battery";
 import { Brand } from "./Brand";
 import { panelSections, tabAt } from "./tabs";
@@ -36,6 +37,7 @@ function TabList({ onPick }: { onPick?: () => void }) {
               title={t.summary}
               onClick={onPick}
             >
+              <TabIcon name={t.icon} className="sidenav-icon" />
               <span className="sidenav-label">{t.label}</span>
             </Link>
           ))}

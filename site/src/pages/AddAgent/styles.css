@@ -371,3 +371,85 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ---------------------------------------------------------------- the stack */
+
+/* One row a piece, divided by rules like the steps: its number, its name over its owners' logo chips, what it does
+   here, and where it is shown working. On a phone the line and the links fold under the name. */
+.ag-stack {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: ag-stack;
+}
+.ag-stack__row {
+  counter-increment: ag-stack;
+  display: grid;
+  grid-template-columns: 1.75rem minmax(12rem, 16rem) minmax(0, 1fr) 10rem;
+  gap: var(--t-space-2) var(--t-space-5);
+  align-items: baseline;
+  padding: var(--t-space-4) 0;
+  border-bottom: 1px solid var(--t-rule);
+}
+.ag-stack__row:first-child {
+  padding-top: 0;
+}
+.ag-stack__row::before {
+  content: counter(ag-stack, decimal-leading-zero);
+  font-size: var(--t-fs-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--w-muted);
+}
+.ag-stack__piece {
+  display: grid;
+  gap: var(--t-space-2);
+  justify-items: start;
+  min-width: 0;
+}
+.ag-stack__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ag-stack__words {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.ag-stack__text {
+  max-width: 64ch;
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.ag-stack__text code {
+  color: var(--w-fg);
+}
+.ag-stack__see {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+.ag-stack__go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+#ag-match {
+  scroll-margin-top: calc(var(--gp-masthead-h) + var(--t-space-4));
+}
+@media (max-width: 899px) {
+  .ag-stack__row {
+    grid-template-columns: 1.75rem minmax(0, 1fr);
+  }
+  .ag-stack__text,
+  .ag-stack__see {
+    grid-column: 2;
+  }
+  .ag-stack__see {
+    grid-auto-flow: column;
+    justify-content: start;
+    gap: var(--t-space-5);
+  }
+}
