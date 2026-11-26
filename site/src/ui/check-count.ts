@@ -1,6 +1,6 @@
 // The words of a "Check it" line (CheckIt.tsx), apart from the component so the tests can read them in Node.
 
-export type CheckKind = "file" | "record" | "transaction" | "address" | "root" | "key" | "hash" | "signature";
+export type CheckKind = "file" | "record" | "transaction" | "address" | "root" | "key" | "hash" | "payload" | "signature";
 
 /** Each kind's word, one and many. */
 export const CHECK_WORDS: Record<CheckKind, readonly [string, string]> = {
@@ -11,11 +11,12 @@ export const CHECK_WORDS: Record<CheckKind, readonly [string, string]> = {
   root: ["root", "roots"],
   key: ["key", "keys"],
   hash: ["hash", "hashes"],
+  payload: ["payload", "payloads"],
   signature: ["signature", "signatures"],
 };
 
 /** The order the closed line counts them in. */
-export const CHECK_ORDER: readonly CheckKind[] = ["file", "record", "transaction", "address", "root", "key", "hash", "signature"];
+export const CHECK_ORDER: readonly CheckKind[] = ["file", "record", "transaction", "address", "root", "key", "hash", "payload", "signature"];
 
 /** The closed line's count, in that order: "3 files · 2 transactions". */
 export function countLine(items: readonly { kind: CheckKind }[]): string {
