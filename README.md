@@ -181,7 +181,7 @@ Cournot's Intelligence Oracle gives the risk officer one probability before the 
 - What is Cournot's: p, the matched market (its title, rules and outcome price), the matching confidence and the basis (source, summary, time and link). What is ours, labeled as ours: the 0.80 and 0.25 conditionals, the 50 MWh base, the 50% cut, the stress bucket, and the link from a cold dawn to price stress. A probability of a cold dawn is not a probability of a price spike; the rule states the link.
 
 **Where users see the claim and the evidence.**
-- The [Forecast tab](https://gp.wattness.tech/agents/forecast)'s "Weather Odds from Cournot" card shows a recorded reading, the Nov 25 call (Cournot market 24962617): the exact claim (market, station, threshold and date), Cournot's probability, its basis (Kalshi's YES quote and its time), when it was received, and what the rule did with it, worked through on the battery's own stress days, with our assumptions labeled.
+- The [Forecast tab](https://gp.wattness.tech/agents/forecast)'s "Weather Odds from Cournot" card shows the reading sealed into every Nov 27 plan (Cournot market 28288699, received 08:05:04 CT on Nov 26): the exact claim (market, station, threshold and date), Cournot's probability, its basis (Kalshi's YES quote and its time), when it was received, and what the rule did with it, worked through on the battery's own stress days, with our assumptions labeled. The browser hashes the saved response against the plans' record.
 - Every Nov 27 plan carries the same fields as sealed, under `outside_inputs.cournot`: the claim, p in parts per million, Cournot's basis as returned, the receipt time, the response's SHA-256, and the stress weight and hedge cap before and after.
 - The response itself sits beside the record on BNB Greenfield.
 
@@ -191,7 +191,7 @@ Cournot's Intelligence Oracle gives the risk officer one probability before the 
 - The response, with the caller's IP removed: [`od-20261127/cournot/probability.json`](https://gnfd-testnet-sp3.nodereal.io/view/wattness-grand-prix-records/od-20261127/cournot/probability.json) on Greenfield. `curl -s <that URL> | shasum -a 256` prints the hash above.
 - The verifier's input check (V7) holds the response to the plan by that hash, and its shape and rule check (V8) recomputes the weights, the hedge cap and the stress bucket from it.
 - A call through the official Skill itself, on Nov 26 at 09:31:18 CT: resolve, then probability, for the same Kalshi market (Cournot market 25380188). It answered HTTP 200, `"Success"`, p = 0.01, with Kalshi's YES price, 0.0100 at 09:30:51 CT, as its basis. <!-- R3: link evidence/cournot/official-skill/probability-od26m-20261126T153118Z.json here once it is published. -->
-- An earlier live call on Nov 25, for the same Kalshi market (Cournot market 24962617, p = 0.01), is the reading the Forecast tab's card works through.
+- An earlier live call on Nov 25, for the same Kalshi market (Cournot market 24962617, p = 0.01), came the day before the reading the Nov 27 plans sealed.
 
 ## Roadmap and business model
 
