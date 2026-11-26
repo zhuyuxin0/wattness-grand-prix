@@ -3,8 +3,9 @@
 //
 //   node scripts/perf-story.mjs --dist dist --port 15197 [--out dir] [--label baseline]
 //   node scripts/perf-story.mjs --url http://127.0.0.1:15197/ [--out dir] [--label baseline]
-//        [--w 1440 --h 900 --dpr 2] [--dwell film|<ms>] [--back <steps>] [--to <chapter>] [--headless new|shell]
-//        [--shots <dir>] [--note "text"]
+//        [--w 1440 --h 900 --dpr 2] [--dwell film|<ms>] [--back <steps>] [--to <chapter>] [--reduced]
+//        [--headless new|shell] [--shots <dir>] [--note "text"]
+//   node scripts/perf-story.mjs --compare before=a.json,b.json after=c.json,d.json
 //
 // It opens the Intro, clicks its Play button and steps through every chapter with the arrow key, resting at each
 // for the film's own hold there (beats.ts MASTER, as the site cut times it) or for --dwell ms, then, with --back N,
@@ -30,22 +31,24 @@
 // temporary folder, with the mock keychain, and WebGL runs on the GPU through ANGLE's Metal backend. Every request
 // outside the served origin is refused and listed. Playwright is resolved from this project, or from the folder in
 // PLAYWRIGHT_DIR (a node_modules directory that holds it), as capture-scene.mjs does.
+//
+// --compare reads receipts this script wrote (--out) and prints, per chapter, each group's mean over its runs side by
+// side (groups named before the "=", their receipts after it, comma-separated), then every run's totals.
 import { execFileSync, execFile } from 'node:child_process';
-import { createReadStream, existsSync, mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { loadavg, tmpdir } from 'node:os';
-import { extname, join, resolve, sep } from 'node:path';
+import { basename, extname, join, resolve, sep } from 'node:path';
 
 const RESERVED = new Set([5184, 5185, 15190, 15193, 15199]);
 /** site.ts STEP_PACE: a step plays the film's leg 1.15 times as fast. */
 const STEP_PACE = 1.15;
-/** site.ts: the wait's words show once the position has held this long. */
-const WAIT_WORDS_MS = 400;
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback = null) => { const i = argv.indexOf(`--${name}`); return i >= 0 && argv[i + 1] != null && !argv[i + 1].startsWith('--') ? argv[i + 1] : fallback; };
-const usage = 'usage: node scripts/perf-story.mjs (--dist <dir> --port <p> | --url <served site>) [--out <dir>] [--label <name>] [--w 1440 --h 900 --dpr 2] [--dwell film|<ms>] [--back <steps>] [--note <text>]';
+const usage = 'usage: node scripts/perf-story.mjs (--dist <dir> --port <p> | --url <served site>) [--out <dir>] [--label <name>] [--w 1440 --h 900 --dpr 2] [--dwell film|<ms>] [--back <steps>] [--to <chapter>] [--reduced] [--headless new|shell] [--shots <dir>] [--note <text>]\n       node scripts/perf-story.mjs --compare <name>=<receipt.json>[,<receipt.json>...] ...';
+if (argv.includes('--compare')) { compare(); process.exit(0); }
 const dist = opt('dist');
 const port = Number(opt('port', '0'));
 let url = opt('url');
@@ -65,8 +68,11 @@ const arriveTimeout = Number(opt('timeout', '90')) * 1000;
 const shotsDir = opt('shots');
 /** The last chapter to step to (1-based; all of them by default), for a short check. */
 const toChapter = Number(opt('to', '0')) || Infinity;
-/** 'new': Chromium's own headless mode, which paces animation frames as a display does; 'shell': the headless shell. */
+/** 'new': Chromium's own headless mode (the browser's full rendering path); 'shell': the headless shell. Neither paces
+ *  animation frames by a display: at a rest both run well past 60 a second. */
 const headless = opt('headless', 'new') === 'shell' ? 'shell' : 'new';
+/** The visitor's setting for reduced motion: the rests as stills, a step cross-fading from one to the next. */
+const reduced = argv.includes('--reduced');
 
 // ---- the clock and the machine's load ----
 
@@ -185,7 +191,7 @@ const tmp = mkdtempSync(join(tmpdir(), 'gp-perf-'));
 const profile = join(tmp, 'profile');
 const ctx = await chromium.launchPersistentContext(profile, {
   headless: true, ...(headless === 'new' ? { channel: 'chromium' } : {}),
-  viewport: { width: W, height: H }, deviceScaleFactor: DPR, colorScheme: 'dark', serviceWorkers: 'block',
+  viewport: { width: W, height: H }, deviceScaleFactor: DPR, colorScheme: 'dark', serviceWorkers: 'block', reducedMotion: reduced ? 'reduce' : 'no-preference',
   timezoneId: 'America/Chicago', locale: 'en-US',
   args: ['--use-mock-keychain', '--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--hide-scrollbars', '--force-color-profile=srgb'],
   env: { ...process.env, TMPDIR: tmp },
@@ -365,7 +371,7 @@ const loadWhy = [gpuBefore > 10 ? `the GPU read ${gpuBefore}% before the run` : 
 const fwd = rows.filter((r) => r.dir > 0);
 const summary = {
   label, note, url: base, viewport: `${W} x ${H} CSS px at ${DPR}x`, canvas: raw.canvas, gpu: raw.gpu, parallelCompile: raw.parallelCompile,
-  dwell: dwellArg === 'film' ? "the film's hold at each chapter" : `${dwellArg} ms`, back,
+  dwell: dwellArg === 'film' ? "the film's hold at each chapter" : `${dwellArg} ms`, back, reduced,
   started: stamp(started), ended: stamp(ended),
   load: { underLoad, why: loadWhy || null, gpuBefore: loads.before, gpuDuring: { n: loads.during.length, median: median(loads.during), max: Math.max(...loads.during.filter(Number.isFinite), 0) }, gpuAfter: loads.after, loadavgBefore: load0.map((x) => +x.toFixed(2)), loadavgAfter: loadavg().map((x) => +x.toFixed(2)), othersBefore, othersDuring, othersAfter },
   open: raw.marks ? { codeMs: raw.marks['gp-story:code'] - raw.marks['gp-story:open'], readyMs: raw.marks['gp-story:ready'] - raw.marks['gp-story:open'], firstBeatMs: raw.marks['gp-story:first-beat'] - raw.marks['gp-story:open'] } : null,
@@ -388,7 +394,7 @@ const fps = (x) => (x == null || !Number.isFinite(x) ? '' : x.toFixed(0));
 const lines = [];
 lines.push(`### Story speed: ${label}${underLoad ? ' (under load)' : ''}`);
 lines.push('');
-lines.push(`${summary.started} to ${summary.ended.replace(/^.*?, /, '')}. ${summary.viewport} (canvas ${raw.canvas?.w ?? '?'} x ${raw.canvas?.h ?? '?'}), ${raw.gpu ?? 'GPU unknown'}, parallel shader compile ${raw.parallelCompile ? 'on' : 'off'}. Dwell: ${summary.dwell}${back ? `; then ${back} steps back` : ''}.${note ? ` ${note}` : ''}`);
+lines.push(`${summary.started} to ${summary.ended.replace(/^.*?, /, '')}. ${summary.viewport} (canvas ${raw.canvas?.w ?? '?'} x ${raw.canvas?.h ?? '?'}), ${raw.gpu ?? 'GPU unknown'}, parallel shader compile ${raw.parallelCompile ? 'on' : 'off'}. Dwell: ${summary.dwell}${back ? `; then ${back} steps back` : ''}.${reduced ? ' Reduced motion.' : ''}${note ? ` ${note}` : ''}`);
 lines.push(`GPU load before ${loads.before.join('/')}%, during median ${summary.load.gpuDuring.median}% (max ${summary.load.gpuDuring.max}%, with this run), after ${loads.after}%.${underLoad ? ` Under load: ${loadWhy}.` : ' No other job ran.'}`);
 if (summary.open) lines.push(`Open: the story's code ${ms(summary.open.codeMs)} ms after the click, ready ${ms(summary.open.readyMs)} ms, first beat drawn ${ms(summary.open.firstBeatMs)} ms.`);
 lines.push('');
@@ -414,3 +420,41 @@ if (outDir) {
   console.log(`\nwrote ${join(out, `${name}.md`)} and .json`);
 }
 process.exit(summary.error ? 1 : 0);
+
+// ---- --compare: receipts side by side ----
+
+function compare() {
+  const i = argv.indexOf('--compare'), specs = [];
+  for (let j = i + 1; j < argv.length && !argv[j].startsWith('--'); j++) specs.push(argv[j]);
+  if (!specs.length) { console.error(usage); process.exit(2); }
+  const groups = specs.map((s) => {
+    const at = s.indexOf('='), files = (at > 0 ? s.slice(at + 1) : s).split(',').filter(Boolean);
+    return { name: at > 0 ? s.slice(0, at) : basename(files[0] ?? s, '.json'), runs: files.map((f) => JSON.parse(readFileSync(f, 'utf8'))) };
+  });
+  for (const g of groups) if (!g.runs.length) { console.error(`--compare: the group ${g.name} names no receipt`); process.exit(2); }
+  const mean = (xs) => { const v = xs.filter(Number.isFinite); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : NaN; };
+  const r0 = (x) => (Number.isFinite(x) ? String(Math.round(x)) : '');
+  const cells = (f) => groups.map((g) => r0(mean(g.runs.map((r) => r.rows.filter((x) => x.dir >= 0)).map((rows) => f(rows))))).join(' / ');
+  const out = [`Per chapter, forward: each group's mean over its runs (${groups.map((g) => `${g.name}: ${g.runs.length}`).join(', ')}), as ${groups.map((g) => g.name).join(' / ')}.`, '',
+    '| # | Chapter | Build ms | Ready ms | Held ms | Wait shown ms | Leg fps | Leg worst gap ms | Rest worst gap ms | Long tasks (n) |', '|---|---|---|---|---|---|---|---|---|---|'];
+  const chapters = groups.flatMap((g) => g.runs).find((r) => r.rows?.length)?.rows.filter((x) => x.dir >= 0) ?? [];
+  for (const c of chapters) {
+    const at = (f) => (rows) => { const x = rows.find((y) => y.n === c.n); return x ? f(x) : NaN; };
+    out.push(`| ${String(c.n).padStart(2, '0')} | ${c.id} | ${cells(at((x) => (x.frames.length ? x.buildMs : NaN)))} | ${cells(at((x) => (x.frames.length ? x.readyMs : NaN)))} | ${cells(at((x) => x.heldMs))} | ${cells(at((x) => x.shownMs))} | ${cells(at((x) => x.legFps ?? NaN))} | ${cells(at((x) => x.legGapMs ?? NaN))} | ${cells(at((x) => x.restGapMs))} | ${cells(at((x) => x.longLeg.n + x.longRest.n))} |`);
+  }
+  out.push('', 'Every run:', '', '| Group | Run | Started | Load | Held ms | Words shown ms (chapters) | Legs late ms | Leg fps median (lowest) | 60 Hz frames missed: legs / rests | Worst gap ms: leg / rest | Long tasks: n, total ms, longest | Setup ms / with programs ms | Most frames alive |',
+    '|---|---|---|---|---|---|---|---|---|---|---|---|---|');
+  for (const g of groups) for (const r of g.runs) {
+    const s = r.summary, T = s.totals, L = s.load, m = s.started.match(/(\d\d:\d\d):\d\d CT \(.*?(\d\d:\d\d):\d\d (\S+)\)/);
+    out.push(`| ${g.name} | ${s.label} | ${m ? `${m[1]} CT (${m[2]} ${m[3]})` : s.started} | ${L.underLoad ? `under load (GPU ${L.gpuBefore.join('/')}% before)` : `GPU ${L.gpuBefore.join('/')}% before`} | ${r0(T.heldMs)} | ${r0(T.shownMs)} (${T.chaptersWithWords}) | ${r0(T.lateMs)} | ${r0(T.legFpsMedian)} (${r0(T.legFpsMin)}) | ${T.legMissed ?? ''} / ${T.restMissed ?? ''} | ${r0(T.worstLegGapMs)} / ${r0(T.worstRestGapMs)} | ${T.longTasks}, ${r0(T.longTaskMs)}, ${r0(T.longestTaskMs)} | ${r0(T.buildMs)} / ${r0(T.readyMs)} | ${T.maxLive} |`);
+  }
+  const backs = groups.flatMap((g) => g.runs.map((r) => ({ g: g.name, r }))).filter(({ r }) => r.rows.some((x) => x.dir < 0));
+  if (backs.length) {
+    out.push('', 'Steps back:', '', '| Group | Run | Frames built again on the way back | Held ms on the way back |', '|---|---|---|---|');
+    for (const { g, r } of backs) {
+      const b = r.rows.filter((x) => x.dir < 0);
+      out.push(`| ${g} | ${r.summary.label} | ${b.reduce((n, x) => n + x.frames.length, 0)}${b.some((x) => x.frames.length) ? ` (${b.flatMap((x) => x.frames).join(', ')})` : ''} | ${r0(b.reduce((n, x) => n + x.heldMs, 0))} |`);
+    }
+  }
+  console.log(out.join('\n'));
+}
