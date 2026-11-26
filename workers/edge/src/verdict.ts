@@ -96,7 +96,7 @@ export async function verdictFor(day: Day, network: NetworkName, battery: string
     ],
     {
       verifier: "V1",
-      details: [...v1Problems, walked ? `root ${walked} from leaf ${position} of ${size} and its audit path` : `the leaf cannot be hashed: ${hashProblem}`],
+      details: [...v1Problems, walked ? `root ${walked} from leaf ${position + 1} of ${size} and its audit path` : `the leaf cannot be hashed: ${hashProblem}`],
     },
   );
 

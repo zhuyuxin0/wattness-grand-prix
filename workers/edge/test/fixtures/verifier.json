@@ -11,7 +11,7 @@
         "V1": {
           "status": "PASS",
           "details": [
-            "root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 from leaf 93 of 316 and its audit path"
+            "root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 from leaf 94 of 316 and its audit path"
           ]
         },
         "V2": {
@@ -39,7 +39,7 @@
         "V1": {
           "status": "PASS",
           "details": [
-            "root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 from leaf 93 of 316 and its audit path"
+            "root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 from leaf 94 of 316 and its audit path"
           ]
         },
         "V2": {
@@ -68,7 +68,7 @@
           "status": "FAIL",
           "details": [
             "record.json says 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7",
-            "root 0x83a15f0131f2641ced8236c63cae3bc8aa4c03bd2a4877e7884418ebb591e97b from leaf 93 of 316 and its audit path"
+            "root 0x83a15f0131f2641ced8236c63cae3bc8aa4c03bd2a4877e7884418ebb591e97b from leaf 94 of 316 and its audit path"
           ]
         },
         "V2": {
