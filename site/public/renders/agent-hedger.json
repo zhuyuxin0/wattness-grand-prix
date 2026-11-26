@@ -47,7 +47,36 @@
    "height": 720,
    "bytes": 18648,
    "sha256": "798e3902373f7efa5f821cce67d0a4060178c43333faf9b5c3e549092d2c05c3"
+  },
+  "agent-hedger-loop.mp4": {
+   "width": 960,
+   "height": 540,
+   "bytes": 65751,
+   "sha256": "5eec8e6f12191a9371d7e702c4ca27428017f92d09dd0ffd604f490ab6145b76",
+   "seconds": 4,
+   "fps": 30
   }
  },
- "rerender_when": "the garage's setup strip (stations/garage/bays.ts setupStrip, kit/hedge/fields.ts), the rig, or the frame data changes"
+ "rerender_when": "the garage's setup strip (stations/garage/bays.ts setupStrip, kit/hedge/fields.ts), the rig, or the frame data changes",
+ "loop": {
+  "what": "The same picture with the camera swung 8 degrees round the object and back over 4 s, played over the still while its card is hovered or focused.",
+  "code": {
+   "base": "cea55fafb66dfdade8c3da09ec11aaf385077ce4",
+   "rig": {
+    "path": "packages/world/src/stations/_objects/index.ts",
+    "git_blob": "ffcd2fe0520560dde9aa3af59b155bc505206981"
+   },
+   "world_tree": "58911adcb399c283f4d475a5949f656f6b41cc13"
+  },
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/spin.mjs --port <port> --frame _objects.agent-hedger --name agent-hedger-loop --out <dir> --w 960 --h 540 --scale 2 --seconds 4 --fps 30 --swing 8 --formats mp4",
+  "lab": "lab.html?frame=_objects.agent-hedger&w=960&h=540&theme=dark&plates=0",
+  "frames": 120,
+  "shot": "1920 x 1080 device px a frame, Lanczos to 960 x 540",
+  "encode": "h264 crf 27 yuv420p faststart",
+  "rendered": {
+   "bangkok": "2026-11-27 01:52",
+   "ct": "2026-11-26 12:52"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max"
+ }
 }

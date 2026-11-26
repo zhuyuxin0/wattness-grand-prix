@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type FocusEvent, type ReactNode } from "react";
 import { useShowcaseManifest } from "../../data";
 import { now } from "../../lib/capture";
 import { dualTime } from "../../lib/time";
@@ -289,14 +289,28 @@ function AgentCard({ f, a, id, card, loading }: { f: AgentsFile; a: Agent; id: C
   const live = id && !isErr(id) ? (id as IdentityRead) : null;
   const allMatch = live ? live.matches.owner && live.matches.wallet && live.matches.uri && live.matches.role : null;
   const face = FACES[a.role];
+  // the card hovered or focused: its instrument's loop plays over the still (ObjectStill decides whether loops play)
+  const [active, setActive] = useState(false);
+  const leave = (e: FocusEvent<HTMLElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setActive(false);
+  };
   return (
-    <article className={`ids-card${hosting ? " ids-card--hosted" : ""}`} aria-label={`${a.title}, agent ${a.agentId}`}>
+    <article
+      className={`ids-card${hosting ? " ids-card--hosted" : ""}`}
+      aria-label={`${a.title}, agent ${a.agentId}`}
+      onPointerEnter={() => setActive(true)}
+      onPointerLeave={() => setActive(false)}
+      onFocus={() => setActive(true)}
+      onBlur={leave}
+    >
       {face && (
         <ObjectStill
           className="ids-card__still"
           name={face.still}
           alt={face.alt}
           caption={face.scope}
+          loop
+          active={active}
           sizes={hosting ? "(max-width: 999px) calc(100vw - 32px), 46vw" : "(max-width: 719px) calc(100vw - 32px), (max-width: 1279px) 46vw, 440px"}
         />
       )}

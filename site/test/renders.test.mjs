@@ -1,7 +1,8 @@
 // The tabs' 3D stills (public/renders/): each pair of WebPs, at 640 and 1280 across, is named byte for byte by its
 // receipt (<name>.json: the frame, the code it was rendered from, the command, every file's SHA-256), as the Intro's
-// hero still is (intro-hero.test.mjs). Every still a page names has its receipt and files, every file in the folder
-// belongs to a receipt, each still stays under 150 KB, and each receipt's frame is one the 3D package defines.
+// hero still is (intro-hero.test.mjs), and so is a still's loop (<name>-loop.mp4) where it has one. Every still a page
+// names has its receipt and files, every file in the folder belongs to a receipt, each still stays under 150 KB and
+// each loop under 300 KB, each receipt's frame is one the 3D package defines, and every Agent IDs card has its loop.
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -15,6 +16,7 @@ const dir = join(site, "public", "renders");
 const stations = resolve(site, "..", "packages", "world", "src", "stations");
 const read = (p) => readFileSync(p, "utf8");
 const MAX_BYTES = 150 * 1024;
+const MAX_LOOP_BYTES = 300 * 1024;
 
 /** A WebP's canvas size from its first chunk: VP8 (lossy), VP8L (lossless) or VP8X (extended). */
 function webpSize(buf) {
@@ -48,13 +50,22 @@ test("each still's receipt names its files byte for byte", () => {
     assert.match(r.frame_data_sha256, /^[0-9a-f]{64}$/, `${name}: the frame data`);
     assert.match(r.render.command, /scripts\/render\.mjs .*--frames \S+ .*--plates 0/, `${name}: the command`);
     assert.ok(r.render.lab.includes(`frame=${r.frame}`), `${name}: the lab's address names the frame`);
-    assert.deepEqual(Object.keys(r.files).sort(), [`${name}-1280.webp`, `${name}-640.webp`], `${name}: its two files`);
+    const loop = `${name}-loop.mp4`;
+    const names = Object.keys(r.files).sort();
+    assert.deepEqual(names.filter((f) => f !== loop), [`${name}-1280.webp`, `${name}-640.webp`], `${name}: its two stills`);
     for (const [file, f] of Object.entries(r.files)) {
       const buf = readFileSync(join(dir, file));
       assert.equal(buf.length, f.bytes, `${file}: bytes`);
       assert.equal(createHash("sha256").update(buf).digest("hex"), f.sha256, `${file}: sha256`);
-      assert.deepEqual(webpSize(buf), { width: f.width, height: f.height }, `${file}: size`);
       assert.equal(f.width / f.height, 16 / 9, `${file}: 16:9`);
+      if (file === loop) {
+        assert.equal(buf.toString("ascii", 4, 8), "ftyp", `${file}: an MP4`);
+        assert.ok(buf.length <= MAX_LOOP_BYTES, `${file}: ${buf.length} bytes, over 300 KB`);
+        assert.match(r.loop?.command ?? "", /scripts\/spin\.mjs .*--frame \S+/, `${name}: the loop's command`);
+        assert.match(r.loop?.code?.world_tree ?? "", /^[0-9a-f]{40}$/, `${name}: the loop's code`);
+        continue;
+      }
+      assert.deepEqual(webpSize(buf), { width: f.width, height: f.height }, `${file}: size`);
       assert.ok(buf.length <= MAX_BYTES, `${file}: ${buf.length} bytes, over 150 KB`);
     }
   }
@@ -85,4 +96,12 @@ test("every still a page names has its receipt", () => {
   assert.ok(names.size > 0, "the pages name stills");
   const have = new Set(receipts.map((x) => x.name));
   for (const n of names) assert.ok(have.has(n), `${n} is named on a page but has no receipt in public/renders/`);
+});
+
+test("every Agent IDs card's instrument has its loop", () => {
+  const roles = read(join(site, "src", "pages", "AgentIds", "roles.ts"));
+  const stills = [...roles.matchAll(/\bstill:\s*"([a-z0-9-]+)"/g)].map((m) => m[1]);
+  assert.equal(stills.length, 7, "seven agents");
+  const byName = new Map(receipts.map((x) => [x.name, x.r]));
+  for (const n of stills) assert.ok(byName.get(n)?.files[`${n}-loop.mp4`], `${n}: no loop in its receipt`);
 });

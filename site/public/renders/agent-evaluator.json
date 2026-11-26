@@ -47,7 +47,36 @@
    "height": 720,
    "bytes": 11496,
    "sha256": "0c536605cc71fda6f3c8b6ec4a0e6a10ce8f8af13dedbb95c4ce29061dffa4ec"
+  },
+  "agent-evaluator-loop.mp4": {
+   "width": 960,
+   "height": 540,
+   "bytes": 52486,
+   "sha256": "74370806dd1b5692b122bd977ce433e09b99eb8053b56aa1256b607e49d0296c",
+   "seconds": 4,
+   "fps": 30
   }
  },
- "rerender_when": "the garage's workshop (stations/garage/workshop.ts), the rig, or the frame data changes"
+ "rerender_when": "the garage's workshop (stations/garage/workshop.ts), the rig, or the frame data changes",
+ "loop": {
+  "what": "The same picture with the camera swung 8 degrees round the object and back over 4 s, played over the still while its card is hovered or focused.",
+  "code": {
+   "base": "cea55fafb66dfdade8c3da09ec11aaf385077ce4",
+   "rig": {
+    "path": "packages/world/src/stations/_objects/index.ts",
+    "git_blob": "ffcd2fe0520560dde9aa3af59b155bc505206981"
+   },
+   "world_tree": "58911adcb399c283f4d475a5949f656f6b41cc13"
+  },
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/spin.mjs --port <port> --frame _objects.agent-evaluator --name agent-evaluator-loop --out <dir> --w 960 --h 540 --scale 2 --seconds 4 --fps 30 --swing 8 --formats mp4",
+  "lab": "lab.html?frame=_objects.agent-evaluator&w=960&h=540&theme=dark&plates=0",
+  "frames": 120,
+  "shot": "1920 x 1080 device px a frame, Lanczos to 960 x 540",
+  "encode": "h264 crf 27 yuv420p faststart",
+  "rendered": {
+   "bangkok": "2026-11-27 01:53",
+   "ct": "2026-11-26 12:53"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max"
+ }
 }

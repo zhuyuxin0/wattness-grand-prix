@@ -21,6 +21,20 @@
   object-fit: cover;
   user-select: none;
 }
+/* the loop over the still: shown once it is playing, so the still never blinks to black while the clip loads */
+.object-still__loop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--m-dur-s, 180ms) ease-out;
+  pointer-events: none;
+}
+.object-still__loop.is-playing {
+  opacity: 1;
+}
 /* the glass: a top sheen and a hairline inner edge, over the picture and under the caption */
 .object-still::after {
   content: "";
