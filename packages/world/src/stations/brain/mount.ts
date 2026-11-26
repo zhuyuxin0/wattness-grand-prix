@@ -2,7 +2,8 @@
 // The Memory tab's Living Brain view (SPEC 6): mountBrain(el, opts) draws our three brains as Living Brain holds them,
 // in its visual language, from brain-scene.json (bundled; the browser never calls Living Brain). All brains first: the
 // combined brain with the three members on their orbits; a member brain clicked (or its chip) comes to the center; a
-// page's tag hovered lights its connections and shows a small card; clicked, its card pins, with its connections in
+// page's tag hovered lights its connections and shows a small card; clicked, its brain comes to the center (from the
+// combined view too, as Living Brain's combined view opens a page) and its card pins, with its connections in
 // its brain and across brains, Living Brain's summary and the correction beside it, and "Open <tab>" where the page is a tab's
 // own. Drag and pinch orbit and zoom as Living Brain's controls do; the wheel zooms with Ctrl or ⌘ held (a trackpad's
 // pinch arrives so) or once the visitor has pressed on the stage, and otherwise scrolls the page past it, and a vertical
@@ -313,8 +314,9 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   };
   const select = (b: string | null, slug: string | null, who: 'user' | 'host') => {
     if (b && slug && !page(b, slug)) return;
-    // a page in another brain: that brain comes to the center first (in the combined view, the page is selected there)
-    if (b && S.focus !== 'all' && b !== S.focus) focusBrain(b, who);
+    // a page in another brain, or picked in the combined view: its brain comes to the center first, so the selection is
+    // one the URL and the page view share (a history entry for the brain, then the page replacing it)
+    if (b && slug && b !== S.focus) focusBrain(b, who);
     S.sel = b && slug ? { brain: b, slug } : null;
     setHover(null); holdHover();
     setBridges(); renderCard();
