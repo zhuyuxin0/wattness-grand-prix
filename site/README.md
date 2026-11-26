@@ -77,8 +77,9 @@ carries to the rest; a link may name one with `#/battery/<resource>` or `?batter
 - New published data: add `scripts/data/<page>.mjs` whose default export takes the context documented in
   `scripts/build-data.mjs` (`day`, `batteries`, `leaf(resource)`, `writeJson`, ...). Modules run in name order;
   the size, credential and date checks cover their files too.
-- In-browser verification: `src/lib/merkle.ts` re-exports `packages/core`'s own `canonicalJson`, `leafHash`,
-  `merkleRoot` and `rootFromProof`, so the site hashes exactly as the sealed record did.
+- In-browser verification: the Verify tab hashes with `src/pages/Verify/verify/core.ts`, a second implementation
+  written apart from `packages/core`; `test/stewards.test.mjs` holds it to the sealed leaves and, once
+  `packages/core` is built, to core's own `leafHash`.
 
 ## Design
 
