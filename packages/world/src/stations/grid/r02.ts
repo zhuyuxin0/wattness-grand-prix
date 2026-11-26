@@ -7,10 +7,12 @@
 // 09:15:17 (the ring and the root light, the pylon reads its receipt; the testnet's at 09:17:00), the clock running on
 // to ERCOT's gate at 10:00:00 (the barrier comes down), and the late plan arriving to be refused at 10:00:22. The
 // frame's rest (the storyboard's still) is the end of it; the story's films play it under their lines (beats.ts run).
+// With sound on (lib/sound), the seal stamps as the frame's clock runs on through it: on the site, in the leg in.
 import * as THREE from 'three';
 import { createMaterials } from '../../kit/materials';
 import { lin } from '../../kit/region/geo';
 import { exactColor } from '../../kit/tone';
+import * as sound from '../../lib/sound';
 import type { Vec3 } from '../../lib/stage';
 import type { FrameContext, FrameHandle } from '../types';
 import { HEX, apron, plinth, track, poleLights, glow, emissive, screen, glassKit, finish, pulse, detail, counted, nightRig, poseFrom, livery, rectOf, boxCorners, fmt, floorAt, resample, type Footprint } from './venue';
@@ -344,7 +346,15 @@ export async function r02(ctx: FrameContext): Promise<FrameHandle> {
   return {
     time: LAPSE.rest,
     note: `Real: the root ${sd.root} over ${sd.leaf_count} leaves (one tick a leaf), both receipts (frame-data.json sealed_day.receipts: BSC block ${fmt.int(main.block)} at ${CT(main.block_time.ct)}, ${fmt.int(main.seconds_before_gate)} s before the gate; testnet block ${fmt.int(test.block)} at ${CT(test.block_time.ct)}, ${fmt.int(test.seconds_before_gate)} s before), GateRecord ${main.contract} and the refusal ${sd.late_seal.error_text} from the rule "${sd.late_seal.rule}". The late seal was simulated through the commit script, never mined: ${notes}. The capsule is a drawing of that refused call; the clock shows the mainnet attempt's chain time. The frame's clock plays the day as a time-lapse ending at this still: the plans made at ${CT(sd.plan_time.ct)} (sealed_day.plan_time), sealed at ${CT(main.block_time.ct)}, the testnet receipt at ${CT(test.block_time.ct)}, the gate at ${gateCt}, the late attempt at ${CT(late.chain_time.ct)}; only the pace between those times is the film's. Illustrative: the hall's architecture, lights and comets, the boom raised before the gate and the late plan's drive in.`,
-    update(t) { stage.setCamera(cam); detail(ctx, M); pulse(root, t - COMETS); pose(t); lastT = t; showPlates(t); },
+    update(t) {
+      stage.setCamera(cam); detail(ctx, M); pulse(root, t - COMETS); pose(t);
+      // the root lands on chain: the stamp, as the clock runs on through it, or as the frame is first drawn a moment
+      // after it (the site's leg in fades it in just then); never on a step back or a jump to a rest
+      const ran = t > lastT && t - lastT < 0.5 && lastT < LAPSE.sealed && t >= LAPSE.sealed;
+      const cameIn = lastT - t > 0.5 && t >= LAPSE.sealed && t < LAPSE.sealed + 0.15;
+      if (ran || cameIn) sound.stamp();
+      lastT = t; showPlates(t);
+    },
     decorate() {
       const p = ctx.plates;
       litType(ctx);
