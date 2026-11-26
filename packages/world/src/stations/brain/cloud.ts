@@ -17,6 +17,15 @@ export const DOT = '#4c8fff';
  *  brightness, the core's light whitening the particles round it, and the connections dimmer. */
 export const LOOK = { desat: 0.5, gain: 1.31, white: 0.2, whiteMax: 0.6, hi: 0.25, low: 0.04, edge: 0.8, dot: 1.0, core: 0.8 };
 
+/** The sprites' sizes are drawn for the brain station's 37 degree lens (world.ts VFOV). Under another lens a host
+ *  scales sizeK by this, so the particles stay as fine against the brain's shape as the station draws them (the
+ *  venue's hub and the stack look through 5 degrees, where the station's sizes come out a seventh as large). */
+export function lensK(cam: THREE.Camera): number {
+  const c = cam as THREE.PerspectiveCamera;
+  if (!c.isPerspectiveCamera || !(c.fov > 0)) return 1;
+  return Math.tan((37 / 2) * (Math.PI / 180)) / Math.tan((c.fov / 2) * (Math.PI / 180));
+}
+
 const BODY_VERT = /* glsl */`
 attribute vec3 aStart;
 attribute float aSize;

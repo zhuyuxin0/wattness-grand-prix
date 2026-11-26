@@ -6,7 +6,7 @@
 // of its length): seen from the hall above it reads as a brain from the top. Brighter than in the brain station: it is
 // seen through the floor's frosted glass in a lit hall. Still: no clock in the garage moves it.
 import * as THREE from 'three';
-import { Cloud, type CloudEdge } from './cloud';
+import { Cloud, lensK, type CloudEdge } from './cloud';
 import { makeRibbons } from './ribbons';
 import { BRAIN_IDS, SCENE, brainOf, connectionsOf, pagesOf, seedFor, type BrainId } from './data';
 
@@ -20,8 +20,10 @@ export interface PitBrains {
   dw: [number, number, number];
 }
 
-/** fp: the pit's footprint (x0, x1, z0, z1); res: the drawing buffer's size in px. */
-export function pitBrains(fp: { x0: number; x1: number; z0: number; z1: number }, res: THREE.Vector2, o: { count?: number } = {}): PitBrains {
+/** fp: the pit's footprint (x0, x1, z0, z1); res: the drawing buffer's size in px. o.lens: size the sprites for the
+ *  camera that draws them (cloud.ts lensK), for a host far off on a long lens (the venue's hub); the garage's frames,
+ *  whose lenses are near the brain station's, keep the sizes they were drawn with. */
+export function pitBrains(fp: { x0: number; x1: number; z0: number; z1: number }, res: THREE.Vector2, o: { count?: number; lens?: boolean } = {}): PitBrains {
   const group = new THREE.Group(); group.name = 'livingBrainPit';
   const cz = (fp.z0 + fp.z1) / 2;
   // along the pit, in the garage's x: the Terminal over its parts, the Grand Prix brain, the review at the east end
@@ -63,7 +65,7 @@ export function pitBrains(fp: { x0: number; x1: number; z0: number; z1: number }
     const c = clouds[b];
     const st = { time: 0, form: 1, coreForm: 1, breath: 0, tint: new THREE.Color(brainOf(b).color), tintK: 0.72, bright: 2.6, coreK: 0, pageFade: 1, sel: -1, selT: 0, eye, pixelRatio: 1, height: res.y, sizeK: S.xz * 1.3 };
     c.pose(st);
-    c.body.onBeforeRender = (_r, _s, cam) => { cam.getWorldPosition(eye); c.pose({ ...st, eye }); };
+    c.body.onBeforeRender = (_r, _s, cam) => { cam.getWorldPosition(eye); c.pose({ ...st, eye, sizeK: st.sizeK * (o.lens ? lensK(cam) : 1) }); };
     states.push({ c, st });
   }
   const pos = new Map<string, [number, number, number]>();

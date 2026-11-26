@@ -45,7 +45,7 @@ export async function buildVenue(ctx: FrameContext, o: VenueOptions = {}) {
   const grid = buildGrid(L, d); root.add(grid.group);
   const radar = buildRadar(HW); root.add(radar.group);
   const bays = buildBays(d, HW); root.add(bays.group);
-  const team = buildTeamData(d, HW); root.add(team.group);
+  const team = buildTeamData(HW, new THREE.Vector2(W * dpr, H * dpr)); root.add(team.group);
   const parc = buildParcFerme(d, HW); root.add(parc.group);
   const race = buildRaceDay(d, HW); root.add(race.group);
   if (o.stewards !== false) root.add(buildStewardsFar(HW).group);

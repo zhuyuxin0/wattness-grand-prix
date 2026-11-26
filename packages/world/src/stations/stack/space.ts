@@ -12,6 +12,7 @@ import outline from './ercot-outline.json';
 import GF from './greenfield-record.json';
 import TN from './integrations.json';
 import { bnbMarkTexture, pathTexture, brainTexture, smileTexture, flapTexture, cournotDots, atlasTexture, cmcTexture, fourTexture } from './marks';
+import { insetBrain } from '../brain/inset';
 import { glyphTexture, GLYPH_COLOR } from './glyphs';
 import { hosting } from './pieces';
 import bnbRaw from './marks/bnbchain.svg?raw';
@@ -151,6 +152,13 @@ function recipes(m, P, theme = 'dark') {
     files: { core: 1.1, glow: 4.5, glowA: 0.12 * gk, period: 15 * m, speed: 35 * m, arrows: [], fade: [10 * m, 10 * m], beads: B({ core: 1.6, glow: 6, glowA: 0.28, tail: 0.5 }) },
   };
 }
+
+/** The combined brain's pose in the sphere: rolled by the camera's down-angle (ISO) about its own front-to-back axis,
+ *  then turned about the vertical so its left side faces the stack's camera (az 180, from the south), its front to the
+ *  east and its top up the screen. It reads as a brain in profile, not the round dome its front makes or the oval its
+ *  top makes from above. pose() swings the turn 0.32 either way, as the mark it replaces on the night ground. */
+const INSET_YAW = Math.PI / 2 - 0.2;
+const INSET_ROLL = -Math.atan(1 / Math.SQRT2);   // common.ts ISO, 35.26 degrees, in radians
 
 /** A rounded rectangle's outline at height y, offset outward by off (a halo or a shade's outline). */
 const rectPoly = (cx, cz, w, d, r, off = 0) => roundRect(cx, cz, w + 2 * off, d + 2 * off, r + off, 8);
@@ -327,7 +335,9 @@ export async function buildSpace(ctx, o) {
   piece('memory', null);
   solid('memory', (b) => b.prism(roundRect((SP.x0 + SP.x1) / 2, SP.z, SP.x1 - SP.x0, 8, 3, 4), DK.y + DK.t, SP.y + 1, { top: P.spineTop, side: P.spineSide, edge: P.memory, verticals: false }));
 
-  // ── Living Brain: a glass sphere over the agents, the brain turning inside the Wattness Brain's constellation ──
+  // ── Living Brain: a glass sphere over the agents. On the night ground the combined brain of our three turns inside it
+  // in Living Brain's own look (stations/brain/inset.ts, from brain-scene.json, as the brain station draws it); on the
+  // light ground, where a glow washes out, its mark inside the Wattness Brain's constellation, as before ─────────────
   const BR = POS.brain;
   piece('brain', [BR.x + BR.r + 4, BR.y - 10, BR.z], { center: new THREE.Vector3(BR.x, BR.y, BR.z) });
   const sphere = new THREE.Mesh(new THREE.SphereGeometry(BR.r, 72, 48), shellMaterial({ blur: o.blur, res: o.res, theme, tint: P.memory, tintA: P.sphereTintA,
@@ -344,14 +354,21 @@ export async function buildSpace(ctx, o) {
   haloFace('brain', new THREE.Vector3(BR.x, BR.y, BR.z), BR.r + 6);
   pickBall('brain', new THREE.Vector3(BR.x, BR.y, BR.z), BR.r);
   pickBox('brain', POS.spine.x0, POS.deck.y + POS.deck.t, POS.spine.z - 5, POS.spine.x1, POS.spine.y + 1.5, POS.spine.z + 5);
-  const brainMark = (() => {
+  const brainInset = theme === 'light' ? null : (() => {
+    // the brain a little under three quarters of the sphere's radius, drawn over the shell (10) with the lines' order
+    const b = insetBrain(new THREE.Vector3(BR.x, BR.y, BR.z), BR.r * 0.74, { count: 30000, renderOrder: 12, bright: 1.25 });
+    b.group.rotation.order = 'YXZ'; b.group.rotation.set(0, INSET_YAW, INSET_ROLL);
+    marks.add(b.group); dimmable('brain', b.dimmer);
+    return b;
+  })();
+  const brainMark = theme !== 'light' ? null : (() => {
     const t = brainTexture();
     const w = 34, mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, w / t.aspect), basic('#ffffff', { map: t.texture, transparent: true }));
     mesh.material.toneMapped = false; mesh.material.side = THREE.DoubleSide;
     mesh.position.set(BR.x, BR.y, BR.z); overlay(mesh, 13); marks.add(mesh); dimmable('brain', mesh.material);
     return mesh;
   })();
-  {
+  if (theme === 'light') {
     // the 18 pages and their 53 connections (brain_graph), laid out by a seeded force run inside radius 40
     const pages = d.brain_graph.pages, conns = d.brain_graph.connections, r = rng(seedOf('stack.brain'));
     const ix = new Map(pages.map((p, i) => [p.slug, i]));
@@ -931,13 +948,14 @@ export async function buildSpace(ctx, o) {
 
   // every line at its CSS widths
   return {
-    root, solids, marks, flows, pieces, edges, states: st, cube, cubeMat, aimCube, aimLens, lensG, rim, setTiles, tiles, blocks, brainMark,
+    root, solids, marks, flows, pieces, edges, states: st, cube, cubeMat, aimCube, aimLens, lensG, rim, setTiles, tiles, blocks, brainMark, brainInset,
     sphere, dishG, coinG, lateLine, lateRing, scanLine, plane, reach, beadP, dTop, fleetMapped: fleet.length,
     counts, tileLeaf: leafAt, pickers, halos, pools, shades: shadeGroup, pieceShades, palette: P, theme,
     /** Pose at time t: comets, the turning marks and the scan, as pure functions of t. */
     pose(t, camPos) {
       tickPulses(flows, t);
-      brainMark.rotation.y = Math.sin(t * 0.14) * 0.32;
+      if (brainMark) brainMark.rotation.y = Math.sin(t * 0.14) * 0.32;
+      if (brainInset) { brainInset.group.rotation.y = INSET_YAW + Math.sin(t * 0.14) * 0.32; brainInset.setTime(t); }
       coinG.rotation.y = -0.42 + Math.sin(t * 0.17) * 0.12;
       const sweep = (t % 2) / 2; scanLine.position.y = 2 + sweep * (POS.cmc.h - 4); scanLine.material.opacity = 0.8 * Math.sin(Math.PI * sweep);
       if (camPos) aimLens(camPos);
