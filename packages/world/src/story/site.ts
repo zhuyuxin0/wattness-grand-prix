@@ -6,7 +6,7 @@
 // motion the rests are stills and a step cross-fades from one to the next.
 import { keyDef } from './clock';
 import { PARTS, TAB_LABEL, type KeyDef, type TabId } from './beats';
-import type { StoryPlayer, Picture } from './player';
+import { perfLog, type StoryPlayer, type Picture } from './player';
 import { smooth } from './moves';
 
 export interface Beat { index: number; id: string; name: string; term: string | null; part: string; tab: TabId | null; frame: string }
@@ -57,6 +57,10 @@ export class SiteController {
   private wait: HTMLParagraphElement;
   private touch: { x: number; y: number; target: number; t: number } | null = null;
   private waitingSince = -1;
+  /** Why the position first held (a measuring harness's log): a build under way, or a picture not built. */
+  private waitWhy = '';
+  /** The time the position came to rest at its stop (-1 while it moves). */
+  private restedAt = -1;
   private prefetchIdx = 0;
   private dead = false;
   private told = new Set<string>();
@@ -107,6 +111,8 @@ export class SiteController {
       const a = el.getBoundingClientRect(), b = this.root.getBoundingClientRect();
       return { x: a.left - b.left - 6, y: a.top - b.top - 6, w: a.width + 12, h: a.height + 12 };
     });
+    const log = perfLog();
+    if (log) log.site = this;
   }
 
   start(at = 0) {
@@ -121,6 +127,7 @@ export class SiteController {
   goTo(k: number) {
     const n = this.beats.length;
     const to = Math.max(0, Math.min(n - 1, Math.round(k)));
+    perfLog()?.events.push({ e: 'go', t: performance.now(), from: this.pos, to });
     if (Math.abs(to - this.pos) > 1.001) this.pos = to - Math.sign(to - this.pos);
     this.target = to; this.vel = 0; this.wheelAt = -1;
     this.play = { to };
@@ -248,7 +255,7 @@ export class SiteController {
     this.last = now;
     if (this.decorating) return;
     // while a frame builds, the position holds: the build writes the shared stage
-    if (this.P.isBuilding()) { if (this.play || this.wheelAt >= 0 || this.touch) this.showWait(now); return; }
+    if (this.P.isBuilding()) { if (this.play || this.wheelAt >= 0 || this.touch) this.showWait(now, 'building'); return; }
     this.advance(dt, now);
     const p = this.pos;
     let pic = this.pictureAt(p);
@@ -261,12 +268,14 @@ export class SiteController {
       }
       if (!pic) {
         for (const f of need) if (!this.P.errors.has(f)) this.P.ensure(f).catch(() => undefined);
-        this.showWait(now);
+        this.showWait(now, 'missing');
         return;
       }
     }
-    this.waitingSince = -1; this.wait.classList.remove('is-on');
+    this.endWait(now);
     const atRest = Math.abs(p - Math.round(p)) < 1e-6 && !this.play && this.wheelAt < 0;
+    if (!atRest) this.restedAt = -1;
+    else if (this.restedAt < 0) { this.restedAt = now; perfLog()?.events.push({ e: 'rest', t: now, k: Math.round(p) }); }
     if (p !== this.drawnAt) {
       this.P.render(pic, 0);
       this.drawnAt = p;
@@ -279,7 +288,11 @@ export class SiteController {
       if (this.settledAt < 0) this.settledAt = now;
       if (restPic.plates.inst.decoratedFor !== restPic.plates.key) {
         this.decorating = true;
-        this.P.plates({ ...restPic, plates: { ...restPic.plates, k: 0.001 } }).finally(() => { this.decorating = false; this.P.render(restPic, 0); });
+        const from = now, k = Math.round(p);
+        this.P.plates({ ...restPic, plates: { ...restPic.plates, k: 0.001 } }).finally(() => {
+          this.decorating = false; this.P.render(restPic, 0);
+          perfLog()?.events.push({ e: 'plates', from, to: performance.now(), k });
+        });
       } else {
         this.platesK = Math.min(1, this.platesK + dt / 0.3);
         restPic.plates.inst.showPlates(smooth(this.platesK));
@@ -290,9 +303,15 @@ export class SiteController {
     if (atRest && now - this.settledAt > 400) this.prefetch(stop);
   };
 
-  private showWait(now: number) {
-    if (this.waitingSince < 0) this.waitingSince = now;
+  private showWait(now: number, why: string) {
+    if (this.waitingSince < 0) { this.waitingSince = now; this.waitWhy = why; }
     this.wait.classList.toggle('is-on', now - this.waitingSince > 400);
+  }
+  /** The position moves again: the wait goes (and a measuring harness's log gets the hold, and how long its words showed). */
+  private endWait(now: number) {
+    if (this.waitingSince < 0) return;
+    perfLog()?.events.push({ e: 'hold', from: this.waitingSince, to: now, shown: Math.max(0, now - this.waitingSince - 400), why: this.waitWhy, pos: this.pos });
+    this.waitingSince = -1; this.wait.classList.remove('is-on');
   }
 
   /** In idle time at a rest: the frames of the stops round it, one build at a time; the far ones let go. */
@@ -306,7 +325,7 @@ export class SiteController {
       for (let i = lo; i <= hi; i++) want.push(keyDef(F.keys[i]!.key).frame);
     }
     const next = want.find((f) => !this.P.inst(f).ready && !this.P.errors.has(f));
-    if (next) { this.P.ensure(next).catch(() => undefined); return; }
+    if (next) { this.P.ensure(next, 'prefetch').catch(() => undefined); return; }
     if (this.prefetchIdx !== stop) { this.prefetchIdx = stop; this.P.prune(want); }
   }
 

@@ -48,6 +48,15 @@ export function runAt(run: Run, s: number): number {
 interface Draw { inst: FrameInstance; local: number; alpha: number; pose: CameraPose | 'own'; rise?: number }
 export interface Picture { draws: Draw[]; plates: { inst: FrameInstance; key: string; k: number } | null; where: Where; t: number }
 
+/** A measuring harness's log (site/scripts/perf-story.mjs puts window.__gpPerf on the page before it loads): the
+ *  player and the site push what they do onto it, timed by performance.now(). Without it (any visit) nothing is
+ *  recorded and nothing changes. `draws` holds each render's start and its CPU milliseconds, in pairs. */
+export interface PerfLog { events: Record<string, unknown>[]; draws: number[]; player?: StoryPlayer; site?: unknown }
+export function perfLog(): PerfLog | null {
+  const log = (globalThis as { __gpPerf?: PerfLog }).__gpPerf;
+  return log && Array.isArray(log.events) && Array.isArray(log.draws) ? log : null;
+}
+
 const dataFiles = import.meta.glob<unknown>('../data/*.json', { import: 'default' });
 export async function loadData() {
   const get = async (n: string) => { const f = dataFiles[`../data/${n}`]; return f ? f() : null; };
@@ -105,6 +114,8 @@ export class StoryPlayer {
       keepOut: () => this.keepOut?.() ?? [],
       captionOverride: () => (this.captions === 'film' ? { el: this.line.childElementCount ? this.line : null } : this.captions === 'none' ? { el: null } : null),
     };
+    const log = perfLog();
+    if (log) log.player = this;
   }
 
   setCut(cut: CutId) { this.film = film(cut); this.lineKey = ''; }
@@ -116,11 +127,13 @@ export class StoryPlayer {
     return i;
   }
 
-  /** Builds a frame (one build at a time: a setup writes the shared stage) and compiles its programs. */
-  ensure(frame: string): Promise<FrameInstance> {
+  /** Builds a frame (one build at a time: a setup writes the shared stage) and compiles its programs. `why` names the
+   *  caller for a measuring harness's log: a picture that needs it now, or a build ahead of the visitor. */
+  ensure(frame: string, why: 'need' | 'prefetch' = 'need'): Promise<FrameInstance> {
     const inst = this.inst(frame);
     if (inst.ready) return Promise.resolve(inst);
     if (inst.error) return Promise.reject(new Error(inst.error));
+    const asked = performance.now();
     const run = this.queue.then(async () => {
       if (inst.ready || inst.disposed) return inst;
       if (this.dead) throw new Error('story: the player was disposed');
@@ -128,15 +141,19 @@ export class StoryPlayer {
       const b0 = performance.now();
       try {
         await inst.build();
-        inst.buildMs = Math.round(performance.now() - b0);
+        const b1 = performance.now();
+        inst.buildMs = Math.round(b1 - b0);
         // only this frame's group visible while its programs compile
         for (const x of this.insts.values()) x.root.visible = x === inst;
         inst.pose(inst.restLocal, 0);
         if (inst.restPose) this.stage.setCamera(inst.restPose);
-        await this.stage.preparePrograms([() => inst.pose(inst.restLocal, 0)], () => !this.dead && !inst.disposed);
+        const prep = await this.stage.preparePrograms([() => inst.pose(inst.restLocal, 0)], () => !this.dead && !inst.disposed);
         inst.root.visible = false;
-        inst.readyMs = Math.round(performance.now() - b0);
+        const b2 = performance.now();
+        inst.readyMs = Math.round(b2 - b0);
+        perfLog()?.events.push({ e: 'build', frame, why, asked, start: b0, built: b1, ready: b2, buildMs: inst.buildMs, readyMs: inst.readyMs, programs: prep.programs, prep: prep.state });
       } catch (e) {
+        perfLog()?.events.push({ e: 'build', frame, why, asked, start: b0, failed: performance.now() });
         this.errors.set(frame, e instanceof Error ? (e.stack ?? e.message) : String(e));
         this.o.onError?.(e, frame);
         throw e;
@@ -219,7 +236,12 @@ export class StoryPlayer {
   /** Disposes every frame not in keep. */
   prune(keep: Iterable<string>) {
     const k = new Set(keep);
-    for (const [id, inst] of this.insts) if (!k.has(id) && inst.ready && !this.building.has(id)) { this.rises.delete(inst); inst.dispose(); this.insts.delete(id); }
+    for (const [id, inst] of this.insts) if (!k.has(id) && inst.ready && !this.building.has(id)) this.drop(id, inst);
+  }
+
+  private drop(id: string, inst: FrameInstance) {
+    this.rises.delete(inst); inst.dispose(); this.insts.delete(id);
+    perfLog()?.events.push({ e: 'drop', frame: id, t: performance.now() });
   }
 
   private riseFor(inst: FrameInstance): Rise {
@@ -262,6 +284,7 @@ export class StoryPlayer {
     this.last = pic;
     this.tick++;
     const cpu = performance.now() - t0;
+    perfLog()?.draws.push(t0, cpu);
     this.timings.cpu.push(cpu);
     if (this.measureGpu) { this.stage.renderer.getContext().finish(); this.timings.gpu.push(performance.now() - t0); }
     if (this.timings.cpu.length > 20000) { this.timings.cpu.splice(0, 10000); this.timings.gpu.splice(0, 10000); }
