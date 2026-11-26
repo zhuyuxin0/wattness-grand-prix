@@ -211,8 +211,11 @@ button.gate-tag[aria-expanded="true"] {
   display: grid;
   gap: 3px;
 }
+/* The now line sits in the strip's shape, clipped at its rounded ends, as wattness.tech's sits in its strip. */
 .gate-day__track {
   position: relative;
+  overflow: hidden;
+  border-radius: var(--t-radius);
 }
 .gate-day__strip {
   position: relative;
@@ -228,7 +231,8 @@ button.gate-tag[aria-expanded="true"] {
   display: flex;
   align-items: center;
   min-width: 0;
-  padding: 0 6px;
+  /* With the label's own 3px, its words stand 6px in from the stretch's edge. */
+  padding: 0 3px;
   border-right: 2px solid var(--t-raised);
   font-size: var(--t-fs-2xs);
   font-weight: 600;
@@ -236,24 +240,25 @@ button.gate-tag[aria-expanded="true"] {
 .gate-day__seg:last-child {
   border-right: 0;
 }
-/* A label is drawn over the now marker, so the line never cuts a word. */
+/* A label lies over the now line on its stretch's own ground, 3px wider than its words either side: the line stops at
+   the word, shows above and below it, and never cuts it. */
 .gate-day__seg-label {
   position: relative;
   z-index: 1;
   min-width: 0;
+  padding: 0 3px;
   overflow: hidden;
   white-space: nowrap;
+  background: inherit;
 }
-/* Now: ink, cut out of whatever stretch it crosses (the clearing stretch is ink itself). */
+/* Now: wattness.tech's red line (its .mc-now), the strip's full height and inside it. */
 .gate-day__marker {
   position: absolute;
-  top: -4px;
-  bottom: -4px;
+  top: 0;
+  bottom: 0;
   width: 2px;
   margin-left: -1px;
-  border-radius: 1px;
-  background: var(--w-fg);
-  box-shadow: 0 0 0 1.5px var(--t-raised);
+  background: var(--s-bad);
 }
 
 /* Every boundary's time, on two alternating rows so 13:30 and 14:30 never print over each other. */
