@@ -39,17 +39,17 @@ the code that produced it. Everything else hangs from that root.
 | `record.<network>.json` | every field is what GateRecord holds on that network, there are no other fields, and the transaction it names succeeded in the record's block and logged one matching `Committed` event |
 | `root.hex` | it is the root GateRecord holds |
 | `salt.txt` | it is the salt inside the showcase battery's verified leaf (the first leaf's when the index names no showcase) |
-| a file a leaf names | SHA-256 of its bytes is the digest the showcase battery's verified leaf records (the first leaf's when the index names no showcase), as for an outside input's saved response (`cournot/probability.json`; none on 26 Nov) |
+| a file a leaf names | SHA-256 of its bytes is the digest the showcase battery's verified leaf records (the first leaf's when the index names no showcase), as for an outside input's saved response (`cournot/probability.json`, which every leaf of 27 Nov names; none on 26 Nov) |
 
 Every JSON file checked as a document (the index, a leaf, a scenario set, a receipt) must also be its document's
 own rendering, pretty-printed with a final newline or in RFC 8785 form. A hash covers a document, not its
 whitespace; this rule means no byte is served that the document does not determine, other than the order of an
 object's keys, which no hash fixes: RFC 8785 sorts them, so a copy with its keys in another order hashes the same
 and is served. The rule refuses a duplicate key that one parser would read one way and another the other. Each of
-these must also nest at most 64 levels of arrays and objects (26 Nov's nest at most 4, the 27 Nov dry run's at
-most 5); a deeper one is refused with 502 before any check walks it. A file a leaf names is checked by the SHA-256
-of its bytes, which fixes every byte, and is served as it is; its envelope gives the document as null when it is
-not JSON or nests deeper than 64 levels.
+these must also nest at most 64 levels of arrays and objects (26 Nov's nest at most 4, 27 Nov's at most 5); a
+deeper one is refused with 502 before any check walks it. A file a leaf names is checked by the SHA-256 of its
+bytes, which fixes every byte, and is served as it is; its envelope gives the document as null when it is not
+JSON or nests deeper than 64 levels.
 
 GateRecord accepts records from any wallet. The Worker serves those of the agent wallet named in
 `wrangler.jsonc` (`COMMITTER`), under the scope `gate-record/ercot-da-energy`.
