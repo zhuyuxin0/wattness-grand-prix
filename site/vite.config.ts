@@ -6,9 +6,12 @@ import { defineConfig } from "vite";
 const here = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  // Hash routing plus a relative base lets the same build serve from any path,
-  // GitHub Pages included.
-  base: "./",
+  // Clean paths need an absolute base: a page at /battery/DSWL_ESS_ESR1 loads
+  // /assets/... and /data/... from the domain's root. So the build serves only
+  // from a root, gp.wattness.tech (the repository's github.io address
+  // redirects there); scripts/spa-routes.mjs then writes the page at every
+  // path the app answers, for GitHub Pages.
+  base: "/",
   plugins: [react()],
   resolve: {
     // packages/core is imported from source so the browser recomputes leaves

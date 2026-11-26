@@ -19,7 +19,7 @@ export interface PanelTab {
   label: string;
   /** The route, from the root. */
   path: string;
-  /** The page owns the paths under its own (#/battery/<resource>). */
+  /** The page owns the paths under its own: /battery/<resource>, one per battery (scripts/spa-routes.mjs writes each). */
   subpaths?: boolean;
   /** What the tab holds, in one line: its tooltip and its line on the overview. */
   summary: string;

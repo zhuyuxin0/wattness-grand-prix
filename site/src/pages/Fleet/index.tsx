@@ -70,7 +70,7 @@ function Fleet({ day }: { day: DayIndex }) {
   const [query, setQuery] = useState("");
   const [hub, setHub] = useState<string | null>(null);
   const [sort, setSort] = useState<SortState | null>({ key: "ev", desc: true });
-  // ?b= keeps the page in place when a row opens; #/fleet/<resource> deep-links one.
+  // ?b= keeps the page in place when a row opens; /fleet/<resource> deep-links one.
   const wanted = params.has("b") ? params.get("b") : splat;
   const open = day.batteries.some((b) => b.resource === wanted) ? wanted : null;
   const tableRef = useRef<HTMLTableElement>(null);

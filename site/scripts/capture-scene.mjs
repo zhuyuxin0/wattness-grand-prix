@@ -56,7 +56,10 @@ try {
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
   const q = new URLSearchParams({ scene, w: String(w), h: String(h), chrome: "0", quality: "high", t: "0", hud });
   if (dpr !== 1) q.set("dpr", String(dpr));
-  await page.goto(`${url.replace(/[#?].*$/, "")}?${q}#/scene-lab`, { waitUntil: "networkidle" });
+  // The scene lab is a path from the site's root (the build's base is "/"), whatever path --url names.
+  const lab = new URL("/scene-lab", url);
+  lab.search = q.toString();
+  await page.goto(lab.href, { waitUntil: "networkidle" });
   await page.waitForFunction((n) => window.__gpScenes?.[n], name, { timeout: 30000 });
   await page.evaluate((n) => window.__gpScenes[n].ready, name);
   const duration = await page.evaluate((n) => window.__gpScenes[n].duration, name);

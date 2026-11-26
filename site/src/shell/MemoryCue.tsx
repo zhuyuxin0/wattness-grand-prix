@@ -5,7 +5,7 @@ import "./memory-cue.css";
 
 /**
  * One quiet line at a tab's foot: the page the build's own brain in Living
- * Brain keeps on this tab, opened on the Memory tab (#/agents/memory?tab=<id>).
+ * Brain keeps on this tab, opened on the Memory tab (/agents/memory?tab=<id>).
  * It names the tab only, so no tab loads the brain to draw it.
  */
 export function MemoryCue({ tab }: { tab: PanelTab }) {

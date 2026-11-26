@@ -6,6 +6,30 @@
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#191d21" media="(prefers-color-scheme: dark)" />
+    <!-- Before anything reads the address: an old link (/#/verify, /?clock=...&capture=1#/stewards) becomes its path,
+         with the query from before the hash and the hash's own after it; a .html or index.html the server found
+         drops its name, and a path its trailing slash (a page reads /battery/<resource> to its end). A plain
+         fragment (#main) stays. -->
+    <script>
+      (function () {
+        var l = location, path = l.pathname, search = l.search, hash = l.hash;
+        if (hash.indexOf("#/") === 0) {
+          var t = hash.slice(1), f = t.indexOf("#");
+          hash = f < 0 ? "" : t.slice(f);
+          if (f >= 0) t = t.slice(0, f);
+          var q = t.indexOf("?"), a = search.slice(1), b = q < 0 ? "" : t.slice(q + 1);
+          path = q < 0 ? t : t.slice(0, q);
+          search = a && b ? "?" + a + "&" + b : a || b ? "?" + (a || b) : "";
+        }
+        path = path.replace(/^[\/\\]+/, "/").replace(/(^|\/)index\.html$/, "$1").replace(/\.html$/, "").replace(/(.)\/+$/, "$1") || "/";
+        var to = path + search + hash;
+        if (to !== l.pathname + l.search + l.hash) {
+          try {
+            history.replaceState(null, "", to);
+          } catch (e) {}
+        }
+      })();
+    </script>
     <!-- The theme before first paint, as wattness.tech keeps it (src/lib/theme.ts takes over): a saved choice, else
          the system's. -->
     <script>
@@ -22,17 +46,17 @@
       })();
     </script>
     <!-- The Intro opens on chapter 01's still (src/pages/Intro/Hero.tsx): fetched first, and only when the Intro is
-         the page asked for. The candidates and sizes match the img's, so it takes this fetch. -->
+         the page asked for (every path's copy of this page carries the script; only / runs it to the end). The
+         candidates and sizes match the img's, so it takes this fetch. -->
     <script>
       (function () {
-        var h = location.hash;
-        if (h && h !== "#" && h !== "#/" && h.indexOf("#/?") !== 0) return;
+        if (location.pathname !== "/") return;
         var l = document.createElement("link");
         l.rel = "preload";
         l.as = "image";
         l.type = "image/webp";
-        l.href = "hero/desert-willow-night-1920.webp";
-        l.setAttribute("imagesrcset", "hero/desert-willow-night-1920.webp 1920w, hero/desert-willow-night-2880.webp 2880w");
+        l.href = "/hero/desert-willow-night-1920.webp";
+        l.setAttribute("imagesrcset", "/hero/desert-willow-night-1920.webp 1920w, /hero/desert-willow-night-2880.webp 2880w");
         l.setAttribute("imagesizes", "(max-width: 767px) 100vw, calc(100vw - 190px)");
         l.setAttribute("fetchpriority", "high");
         document.head.appendChild(l);

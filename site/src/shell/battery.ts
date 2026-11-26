@@ -3,7 +3,7 @@ import { SHOWCASE } from "../config";
 
 // The battery the Battery and agent tabs show. Picking one on any of them
 // carries to the rest, and the viewer's last pick is remembered on this device
-// (a convenience: a page reads its own ?battery= or #/battery/<resource> first,
+// (a convenience: a page reads its own ?battery= or /battery/<resource> first,
 // and falls back to Desert Willow when the store is empty or blocked).
 
 const KEY = "gp.battery";
