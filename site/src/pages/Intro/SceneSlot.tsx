@@ -114,7 +114,7 @@ export function SceneSlot({ caption, paused = false, onPlay, onPlayIntent, playR
           {onPlay && (
             <>
               <span className="intro-stagebar__length" id="intro-story-length">
-                3 min, from one battery
+                3 min, from one battery to the whole stack
               </span>
               <button
                 ref={playRef}
@@ -127,7 +127,7 @@ export function SceneSlot({ caption, paused = false, onPlay, onPlayIntent, playR
                 onFocus={onPlayIntent}
                 onTouchStart={onPlayIntent}
               >
-                Play the story
+                Play the introduction
                 <Glyph name="expand" />
               </button>
             </>

@@ -85,13 +85,18 @@
     padding-bottom: 10px;
   }
   /* The actions take their own row under the caption: the replay at the
-     start, the story's length and its button at the end. */
+     start, the story's length and its button at the end; the length wraps
+     onto two lines before the row overflows. */
   .intro-stagebar__actions {
     flex: 1 1 100%;
     margin-left: 0;
   }
   .intro-stagebar__length {
+    flex: 0 1 auto;
+    min-width: 0;
     margin-left: auto;
+    white-space: normal;
+    text-align: right;
   }
 }
 @media (prefers-reduced-motion: reduce) {

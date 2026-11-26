@@ -5,7 +5,8 @@ import { Glyph, useTheme } from "../../ui";
 import { FIRST_BEAT_STILL, STORY_MARK, markStory, storyPath } from "./story";
 import "./story.css";
 
-// The story: packages/world's mountStory in site mode, over the whole viewport
+// The story, titled "Introduction" for the visitor (as wattness.tech's "Replay
+// the Intro"): packages/world's mountStory in site mode, over the whole viewport
 // in a modal dialog, dark in either site theme. The world's code (the player,
 // its stations and the frame data) is fetched when the dialog opens, never
 // with the Intro; three.js itself is the one copy the starting grid already
@@ -187,11 +188,11 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
     <dialog ref={dialog} className="story-dialog" data-atmosphere="dark" aria-labelledby="story-dialog-title" aria-describedby="story-dialog-length">
       <div className="story-dialog__bar">
         <p className="story-dialog__title">
-          <b id="story-dialog-title">The story</b>
-          <span id="story-dialog-length">3 min, from one battery</span>
+          <b id="story-dialog-title">Introduction</b>
+          <span id="story-dialog-length">3 min, from one battery to the whole stack</span>
         </p>
         {/* The first control, so the dialog opens with focus here; it moves into the story once that is ready. */}
-        <button type="button" className="btn story-dialog__close" onClick={() => live.current.onClose()} title="Close the story (Esc)" data-story-start="">
+        <button type="button" className="btn story-dialog__close" onClick={() => live.current.onClose()} title="Close the introduction (Esc)" data-story-start="">
           <Glyph name="close" />
           <span className="story-dialog__close-label">Close</span>
         </button>
@@ -203,7 +204,7 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
         </figure>
         {!shown && !failed && (
           <p className="story-dialog__status" role="status">
-            Loading the story
+            Loading the introduction
           </p>
         )}
         {failed && (
