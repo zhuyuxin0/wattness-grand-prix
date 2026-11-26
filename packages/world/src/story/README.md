@@ -5,7 +5,7 @@ whole film, one seekable time that drives everything, and the stations' own fram
 lab's contract (`../stations/README.md`); nothing in the kit or the stations is changed.
 
 ```
-story.html      the page: ?mode=site (the default) or ?mode=capture&cut=master|90s&w=1920&h=1080[&captions=film|frame|none]
+story.html      the page: ?mode=site (the default) or ?mode=capture&cut=master|90s|brain&w=1920&h=1080[&captions=film|frame|none]
 main.ts         its entry: the capture clock (window.__gpClock, window.__ready), the proof's shots, the frame-time probe
 mount.ts        mountStory(el, { mode, theme, startBeat, onRoute }) -> { dispose, goTo, on, beats, ready, seek, player }
 beats.ts        the story: its keys (stops and waypoints), their plain names, the tab each links to, the films' timings
@@ -22,8 +22,9 @@ story.css       the canvases, the layers, the film's line, the chrome; the dark 
 
 ## The model
 
-A **film** (`beats.ts`: `MASTER`, 3:00, and `CUT_90`, the 90-second cut, on `STORY.md`'s rows) is a list of keys on a
-line of seconds. Each key is a station frame at its rest (the frame's own `time`, as the lab renders it) and holds from
+A **film** (`beats.ts`: `MASTER`, 3:00, and `CUT_90`, the 90-second cut, on `STORY.md`'s rows; the Living Brain cut,
+69 s, the brain station's `film.ts`; and `SITE_KEYS`, the site's own stops, cut `site`, which site mode plays) is a list
+of keys on a line of seconds. Each key is a station frame at its rest (the frame's own `time`, as the lab renders it) and holds from
 `at` to `until`; into each key runs a **leg** from the key before:
 
 - **own**: each frame on its own clock and camera. The opening is built on one clock (`stations/opening/gather.ts` T),
@@ -103,6 +104,7 @@ screens (`leg.screens: 'both'`, the dive from the bays to the boards) each frame
 sh scripts/serve.sh 15191
 node scripts/capture-story.mjs --port 15191 --cut master --from 10 --to 30 --fps 60   # PNGs, then H.264 crf 14
 node scripts/capture-story.mjs --port 15191 --cut 90s                                 # the whole 90-second cut
+node scripts/capture-story.mjs --port 15191 --cut brain                               # the Living Brain cut, 69 s
 node scripts/capture-story.mjs --port 15191 --shots --scale 2                         # every rest and two mid-legs a part
 node scripts/capture-story.mjs --port 15191 --measure 10,30 --gpu                     # real-time frame intervals
 sh scripts/stop.sh 15191
