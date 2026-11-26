@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import { keccak256, stringToBytes } from "viem";
 import { formatAmount, formatPrice, ratio } from "../src/lib/amounts.ts";
 import { OPENFOUR } from "../src/pages/Launchpad/addresses.ts";
+import { candles, marketAt, pairPrice, percent, priceRange, ticks, tinyPrice, tinyText } from "../src/pages/Launchpad/market.ts";
 import { LAUNCHES, PLNR, PLNR27, stateAt } from "../src/pages/Launchpad/replay.ts";
 import { SCOPE, SEASON, WATTNESS_AGENT } from "../src/pages/Season/addresses.ts";
 import { sellInto, workedExample } from "../src/pages/Season/payouts.ts";
@@ -146,6 +147,14 @@ test("the launch card replays PLNR's recorded transactions", () => {
   same(f.graduated.hash, o.graduated.tx, "graduation");
   assert.equal(f.graduated.block, o.graduated.block);
   same(f.graduated.graduated.pair, o.graduated.pair, "pair");
+  // its create's and its buy's prices, and the buy's amounts, as tokens.json records them from the receipts
+  const t = tokensJson.tokens.find((x) => x.symbol === "PLNR");
+  const rec = (action) => t.records.find((r) => r.action === action);
+  assert.equal(f.create.price, rec("create").initialPrice);
+  assert.equal(f.buy.price, rec("buy").lastPrice);
+  same(f.buy.hash, rec("buy").txHash, "buy");
+  assert.equal(f.buy.trade.traderQuote, rec("buy").traderQuoteAmount);
+  assert.equal(f.buy.trade.curve, rec("buy").curveQuoteAmount);
   // the frames run in block order, each later than the one before
   for (let i = 1; i < PLNR.frames.length; i++) assert.ok(PLNR.frames[i].block > PLNR.frames[i - 1].block && PLNR.frames[i].time >= PLNR.frames[i - 1].time);
 
@@ -199,7 +208,9 @@ test("the launch card replays PLNR27 from tokens.json, every create, buy, sell a
     assert.equal(f.block, Number(r.blockNumber), `${f.kind} block`);
     assert.equal(f.time, r.time.unix, `${f.kind} time`);
     assert.equal(f.ok, r.status === "success", `${f.kind} status`);
+    if (f.kind === "create") assert.equal(f.price, r.initialPrice, "the curve's first price, TokenCreated's initialPrice");
     if (f.kind === "buy" || f.kind === "sell") {
+      assert.equal(f.price, r.lastPrice, `${f.kind}: the price after it, TradeExecuted's lastPrice`);
       assert.equal(f.trade.tokens, r.tokenAmount);
       assert.equal(f.trade.curve, r.curveQuoteAmount);
       assert.equal(f.trade.traderQuote, r.traderQuoteAmount);
@@ -208,6 +219,7 @@ test("the launch card replays PLNR27 from tokens.json, every create, buy, sell a
       assert.equal(BigInt(f.sold), BigInt(t.saleAmount) - BigInt(r.remainingForSaleAfter));
       same(f.trade.trader, r.from, "trader");
     }
+    if (!["create", "buy", "sell"].includes(f.kind)) assert.equal(f.price, undefined, `${f.kind} does not move the curve`);
     if (f.kind === "refused") {
       assert.equal(r.result, "refused");
       const replay = r.replayAtParentBlock.find((x) => x.reverted);
@@ -263,6 +275,68 @@ test("every replay's curve, holders and pool add up", () => {
   }
   const p = (i) => stateAt(PLNR27, i).progress;
   assert.deepEqual([0, 1, 2, 3].map(p), [0, 0.125, 0.0125, 1], "PLNR27's curve fills, gives back on the sale, then sells out");
+});
+
+test("the token page's market figures follow from the receipts", () => {
+  const t = tokensJson.tokens.find((x) => x.symbol === "PLNR27");
+  const trades = t.records.filter((r) => r.action === "buy" || r.action === "sell");
+  // the trades are the buys and sells, each from the price the last one left to its own
+  const ts = ticks(PLNR27);
+  assert.deepEqual(ts.map((x) => x.hash.toLowerCase()), trades.map((r) => r.txHash.toLowerCase()));
+  assert.deepEqual(ts.map((x) => [x.kind, x.before, x.after]), [
+    ["buy", 3188775n, 3877188n],
+    ["sell", 3877188n, 3248998n],
+    ["buy", 3248998n, 48999999n],
+  ]);
+  ts.forEach((x, i) => {
+    assert.equal(x.quote, BigInt(trades[i].traderQuoteAmount));
+    assert.equal(x.tokens, BigInt(trades[i].tokenAmount));
+  });
+
+  // price, change, market cap, liquidity and volume at each frame
+  const m = PLNR27.frames.map((_, i) => marketAt(PLNR27, i));
+  assert.deepEqual(m.map((x) => x.price), [3188775n, 3877188n, 3248998n, 48999999n, 48999999n, 48999999n, 49999999n]);
+  assert.deepEqual(m.map((x) => x.priceSource), ["create", "trade", "trade", "trade", "trade", "trade", "pair"]);
+  assert.deepEqual(m.map((x) => percent(x.change)), ["0.00%", "+21.59%", "+1.89%", "+1,436.64%", "+1,436.64%", "+1,436.64%", "+1,468.00%"]);
+  // the market cap is the price times the whole supply: 0.48999999 WBNB once the sale sold out
+  assert.equal(m[3].marketCap, 48999999n * 10_000_000_000n);
+  assert.equal(m[0].marketCap, (3188775n * BigInt(PLNR27.maxSupply)) / 10n ** 18n);
+  // the curve holds what it raised; once graduated, the pair holds it with the tokens kept back
+  assert.deepEqual(m.slice(0, 6).map((x) => [x.liquidity.where, x.liquidity.quote]), PLNR27.frames.slice(0, 6).map((f) => ["curve", BigInt(f.raised)]));
+  assert.deepEqual([m[6].liquidity.where, m[6].liquidity.quote, m[6].liquidity.tokens], ["pair", BigInt(t.pool.reserveQuote), BigInt(t.pool.reserveToken)]);
+  assert.equal(m[6].price, pairPrice(BigInt(t.pool.reserveQuote), BigInt(t.pool.reserveToken)), "the pair's first price is its reserves'");
+  // the volume is what the traders paid and got, fees included
+  const paid = trades.reduce((a, r) => a + BigInt(r.traderQuoteAmount), 0n);
+  assert.equal(m[6].volume, paid);
+  assert.equal(m[6].trades, 3);
+  assert.equal(m[0].created, t.records[0].time.unix);
+
+  // candles: a trade moves its candle from the last price to its own; a minute holds all three
+  const c15 = candles(PLNR27, PLNR27.frames.length - 1, 15);
+  assert.equal(c15.length, 3);
+  assert.deepEqual(c15.map((c) => c.close >= c.open), [true, false, true], "buy, sell, buy");
+  const [minute] = candles(PLNR27, PLNR27.frames.length - 1, 60);
+  assert.equal(minute.trades.length, 3);
+  assert.deepEqual([minute.open, minute.high, minute.low, minute.close], [3188775e-18, 48999999e-18, 3188775e-18, 48999999e-18]);
+  assert.equal(minute.volume, paid);
+  assert.equal(candles(PLNR27, 0, 15).length, 0, "no candle before the first trade");
+  assert.equal(candles(PLNR27, 2, 15).length, 2, "the replay draws the trades so far");
+  assert.deepEqual(priceRange(PLNR27), [3188775e-18, 49999999e-18]);
+
+  // PLNR sold out in one buy
+  assert.deepEqual(ticks(PLNR).map((x) => [x.kind, x.before, x.after]), [["buy", 3188775n, 48999999n]]);
+  assert.equal(marketAt(PLNR, PLNR.frames.length - 1).volume, BigInt(PLNR.frames[1].trade.traderQuote));
+});
+
+test("a tiny price is written with its zeros counted", () => {
+  assert.deepEqual(tinyPrice(48999999e-18), { head: "0.0", zeros: 10, tail: "49", plain: "0.000000000049" });
+  assert.equal(tinyText(48999999e-18), "0.0₁₀49");
+  assert.equal(tinyText(3188775e-18), "0.0₁₁3189");
+  assert.equal(tinyText(49999999e-18), "0.0₁₀5");
+  assert.equal(tinyText(9.99996e-12), "0.0₁₀1", "a rounding that carries adds a figure's place");
+  assert.equal(tinyText(0.5), "0.5");
+  assert.equal(tinyText(0), "0");
+  assert.equal(percent(-0.162), "−16.20%");
 });
 
 test("the replay's curve, holders and pool add up", () => {

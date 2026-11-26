@@ -49,6 +49,11 @@ export interface Frame {
   ok: boolean;
   moves: Move[];
   trade?: Trade;
+  /**
+   * The curve's display price after the frame, as Core logs it: WBNB per whole token at 1e18 precision (TokenCreated's
+   * initialPrice on the create, TradeExecuted's lastPrice on a buy or sell). Only those frames move the curve.
+   */
+  price?: string;
   /** The vault after the frame: tokens sold on the curve and WBNB raised, from the trade's own log. */
   sold: string;
   raised: string;
@@ -116,6 +121,7 @@ export const PLNR: LaunchReplay = {
       time: 1795634211,
       ok: true,
       moves: [{ from: ZERO, to: "0xD5AfAbB7B4C97B7a46a5282Ce44d4619EB3bc300", amount: `10000000000${E18}` }],
+      price: "3188775",
       sold: "0",
       raised: "0",
       phase: "Trading",
@@ -134,6 +140,7 @@ export const PLNR: LaunchReplay = {
         traderQuote: "100999999999999996",
         fees: "999999999999998",
       },
+      price: "48999999",
       sold: `8000000000${E18}`,
       raised: "99999999999999998",
       phase: "Sold out",
@@ -230,6 +237,7 @@ export const PLNR27: LaunchReplay = {
       time: 1795714786,
       ok: true,
       moves: [{ from: ZERO, to: "0x7bb1751A4f74215C6d66913Ab99c7aBdef5e7330", amount: `10000000000${E18}` }],
+      price: "3188775",
       sold: "0",
       raised: "0",
       phase: "Trading",
@@ -248,6 +256,7 @@ export const PLNR27: LaunchReplay = {
         traderQuote: "3551336146272853",
         fees: "35161744022502",
       },
+      price: "3877188",
       sold: `1000000000${E18}`,
       raised: "3516174402250351",
       phase: "Trading",
@@ -266,6 +275,7 @@ export const PLNR27: LaunchReplay = {
         traderQuote: "3162356806547665",
         fees: "31942998045934",
       },
+      price: "3248998",
       sold: `100000000${E18}`,
       raised: "321874597656752",
       phase: "Trading",
@@ -284,6 +294,7 @@ export const PLNR27: LaunchReplay = {
         traderQuote: "100674906656366678",
         fees: "996781254023432",
       },
+      price: "48999999",
       sold: `8000000000${E18}`,
       raised: "99999999999999998",
       phase: "Sold out",
