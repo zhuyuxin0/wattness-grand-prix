@@ -1,7 +1,10 @@
 // ONE PLAN's controls, read-out and seal panel in DOM: the schedule dial (21 detents, A to C), the rack of 24 hours
 // the glass is dragged onto (a tile's height is its contracts, 0 to the hour's cap; the light shows glass the schedule
 // does not deliver), the plan's score beside the planner's, and the seal. Plain words first; the market's hour codes
-// (HE) and the arms' letters second.
+// (HE) and the arms' letters second. With sound on (lib/sound), the controls sound as they move: a tick a detent or a
+// contract, a tink as glass lands on an hour, a press for each button, a chime as the plan passes the planner's, the
+// stamp once a seal is read back from the chain.
+import * as sound from '../lib/sound';
 import { BSC_TESTNET, dualClock, gateUnix } from './chain';
 import { DIAL_STEPS, HOURS, hourName, usd, usdCents, type ArmId, type Field, type Played, type PlayerPlan } from './model';
 import { planeSvg, type PlaneMark } from '../stations/game/screens';
@@ -14,6 +17,9 @@ const h = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, html?: s
   return e;
 };
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+/** Every button in a view presses (a disabled one sends no click). Caught on the way down, before a handler redraws
+ *  the view. */
+const pressing = (el: HTMLElement) => el.addEventListener('click', (e) => { if (e.target instanceof Element && e.target.closest('button')) sound.press(); }, true);
 const ICON_X = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 2.5l7 7M9.5 2.5l-7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
 /** The plans' names and colors, as every chart and table of the site names them (site/src/design/tokens.ts): the
@@ -58,17 +64,19 @@ export function dialView(onChange: (step: number) => void) {
     const ang = (Math.atan2(e.clientX - (r.left + r.width / 2), -(e.clientY - (r.top + r.height / 2))) * 180) / Math.PI;
     return Math.max(0, Math.min(DIAL_STEPS, Math.round(((Math.max(-75, Math.min(75, ang)) + 60) / 120) * DIAL_STEPS)));
   };
+  // a turn to a new detent ticks
+  const turn = (s: number) => { if (s === step) return; sound.tick(); onChange(s); };
   svg.addEventListener('pointerdown', (e) => {
     svg.setPointerCapture(e.pointerId); svg.focus();
-    const s = fromPointer(e); if (s !== step) onChange(s);
+    turn(fromPointer(e));
   });
-  svg.addEventListener('pointermove', (e) => { if (!svg.hasPointerCapture(e.pointerId)) return; const s = fromPointer(e); if (s !== step) onChange(s); });
-  svg.addEventListener('wheel', (e) => { e.preventDefault(); const s = Math.max(0, Math.min(DIAL_STEPS, step + (e.deltaY > 0 ? -1 : 1))); if (s !== step) onChange(s); }, { passive: false });
+  svg.addEventListener('pointermove', (e) => { if (!svg.hasPointerCapture(e.pointerId)) return; turn(fromPointer(e)); });
+  svg.addEventListener('wheel', (e) => { e.preventDefault(); turn(Math.max(0, Math.min(DIAL_STEPS, step + (e.deltaY > 0 ? -1 : 1)))); }, { passive: false });
   svg.addEventListener('keydown', (e) => {
     const k = e.key, s = k === 'ArrowRight' || k === 'ArrowUp' ? step + 1 : k === 'ArrowLeft' || k === 'ArrowDown' ? step - 1 : k === 'Home' ? 0 : k === 'End' ? DIAL_STEPS : k === 'PageUp' ? step + 5 : k === 'PageDown' ? step - 5 : null;
     if (s == null) return;
     e.preventDefault();
-    const c = Math.max(0, Math.min(DIAL_STEPS, s)); if (c !== step) onChange(c);
+    turn(Math.max(0, Math.min(DIAL_STEPS, s)));
   });
   return { el: box, set };
 }
@@ -158,7 +166,7 @@ export function rackView(dir: readonly number[], on: RackHandlers) {
     const up = () => {
       chip.removeEventListener('pointermove', move); chip.removeEventListener('pointerup', up); chip.removeEventListener('pointercancel', up);
       ghost.remove(); lanes.forEach((L) => L.lane.classList.remove('target'));
-      if (over != null) { on.glass(over, dir[over]! * (intentOf(over) || defaultGlass(over))); on.select(over); }
+      if (over != null) { sound.glass(); on.glass(over, dir[over]! * (intentOf(over) || defaultGlass(over))); on.select(over); }
     };
     chip.addEventListener('pointermove', move); chip.addEventListener('pointerup', up); chip.addEventListener('pointercancel', up);
   });
@@ -175,8 +183,9 @@ export function rackView(dir: readonly number[], on: RackHandlers) {
     const zeroY = plot.top + plot.height / 2, perContract = plot.height / 2 / LANE_FULL;
     const startOnTile = (e.target as HTMLElement).classList.contains('tile') || (e.target as HTMLElement).classList.contains('lit');
     const valueAt = (y: number) => Math.max(0, Math.min(capOf(hr), Math.round((d > 0 ? zeroY - y : y - zeroY) / perContract)));
-    if (!startOnTile && intentOf(hr) === 0) on.glass(hr, d * Math.max(1, valueAt(e.clientY)));
-    const move = (ev: PointerEvent) => on.glass(hr, d * valueAt(ev.clientY));
+    if (!startOnTile && intentOf(hr) === 0) { sound.glass(); on.glass(hr, d * Math.max(1, valueAt(e.clientY))); }
+    // each contract more or less ticks
+    const move = (ev: PointerEvent) => { const v = valueAt(ev.clientY); if (v !== intentOf(hr)) sound.tick(); on.glass(hr, d * v); };
     const up = () => { lane.removeEventListener('pointermove', move); lane.removeEventListener('pointerup', up); lane.removeEventListener('pointercancel', up); };
     lane.addEventListener('pointermove', move); lane.addEventListener('pointerup', up); lane.addEventListener('pointercancel', up);
   });
@@ -193,7 +202,9 @@ export function rackView(dir: readonly number[], on: RackHandlers) {
     e.preventDefault();
     on.select(hr);
     // up to the cap; glass already over it (the dial moved under it) can still come down
-    on.glass(hr, d * Math.max(0, Math.min(next < now ? now : cap, next)));
+    const v = Math.max(0, Math.min(next < now ? now : cap, next));
+    if (v !== now) { if (now === 0) sound.glass(); else sound.tick(); }
+    on.glass(hr, d * v);
   });
   rack.addEventListener('focusin', (e) => { const lane = (e.target as HTMLElement).closest<HTMLElement>('.op-lane'); if (lane && dir[Number(lane.dataset.h)] !== 0) on.select(Number(lane.dataset.h)); });
   return { el: box, set };
@@ -202,6 +213,7 @@ export function rackView(dir: readonly number[], on: RackHandlers) {
 /** The selected hour's line under the rack: its names, schedule, glass and cap, the entry, and one-tap amounts. */
 export function detailView(f: Field, dir: readonly number[], on: RackHandlers) {
   const el = h('div', 'op-detail');
+  pressing(el);
   const set = (played: Played, plan: PlayerPlan, hr: number | null) => {
     if (hr == null || dir[hr] === 0) { el.innerHTML = '<span class="grow">Pick an hour to set its glass: drag a tile’s edge, or use the arrow keys. Only hours where the battery moves energy take glass.</span>'; return; }
     const n = hourName(hr), d = dir[hr]!, kw = played.kw[hr]!, cap = played.caps[hr]!, q = Math.abs(played.q[hr]!), intent = Math.abs(plan.glass[hr] ?? 0);
@@ -225,9 +237,13 @@ export function readoutView(f: Field) {
   el.setAttribute('aria-live', 'polite');
   const C = f.arms.C.objectiveUusd, A = f.arms.A.objectiveUusd;
   const marks: PlaneMark[] = (['A', 'B', 'C'] as const).map((a) => ({ arm: a, wt: -f.arms[a].cvarUusd / 1e6, mean: f.arms[a].expectedUusd / 1e6, score: f.arms[a].objectiveUusd / 1e6, state: a === 'C' ? 'sealed' : 'lit' }));
+  // whether the last plan shown beat the planner: a plan that newly does chimes (the first one shown never does)
+  let ahead: boolean | null = null;
   const set = (p: Played, dot: { wt: number; mean: number }) => {
     const s = p.score, diff = s.objective - C;
     const cents = Math.round(diff / 10000);
+    if (cents > 0 && ahead === false) sound.chime();
+    ahead = cents > 0;
     const verdict = cents > 0 ? `You beat the planner by ${usd(diff)}` : cents === 0 ? 'Level with the planner' : `${usd(-diff)} behind the planner`;
     const progress = (s.objective - A) / (C - A);
     el.innerHTML = `<div class="op-h"><h3>Your plan</h3><small>${f.n} price scenarios</small></div>
@@ -264,9 +280,14 @@ const STEPS: [SealStep, string][] = [['connect', 'Connect your wallet'], ['netwo
 
 export function sealView(f: Field, onSeal: () => void, onDownload: (r: SealReceipt) => void, recordHref?: string) {
   const el = h('section', 'op-card op-seal');
+  pressing(el);
   const both = (t: { ct: string; yours: string | null }) => `${t.ct}${t.yours ? ` · ${t.yours}` : ''}`;
+  // the state last shown: a seal read back from the chain stamps once, as the panel turns to it
+  let shown: SealPanelState['kind'] | null = null;
   const set = (o: { played: Played; now: number; wallet: boolean; state: SealPanelState }) => {
     const gate = gateUnix(f.operatingDay), open = o.now < gate, st = o.state;
+    if (st.kind === 'sealed' && shown !== null && shown !== 'sealed') sound.stamp();
+    shown = st.kind;
     const [y, m, dd] = f.operatingDay.split('-').map(Number) as [number, number, number];
     const day = new Date(Date.UTC(y, m - 1, dd)).toLocaleString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
     if (!open && st.kind !== 'sealed' && st.kind !== 'busy') {
@@ -328,6 +349,7 @@ export function sealView(f: Field, onSeal: () => void, onDownload: (r: SealRecei
 
 export function startsView(onArm: (a: ArmId) => void, onClear: () => void) {
   const el = h('div', 'op-starts');
+  pressing(el);
   el.innerHTML = '<span>Start from</span>';
   for (const a of ['A', 'B', 'C'] as const) {
     const b = h('button', 'op-btn', `<i class="sw" style="background:${ARM_COLOR[a]}"></i>${ARM_NAME[a]} (${a})`); b.type = 'button'; b.dataset.arm = a;
@@ -340,6 +362,7 @@ export function startsView(onArm: (a: ArmId) => void, onClear: () => void) {
 
 export function lightView(onFit: () => void) {
   const el = h('div', 'op-light');
+  pressing(el);
   el.hidden = true;
   const set = (p: Played, plan: PlayerPlan) => {
     if (!p.lit) { el.hidden = true; return; }

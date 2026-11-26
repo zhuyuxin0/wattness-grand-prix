@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { StoryHandle } from "@world/story/mount";
 import { Glyph, useTheme } from "../../ui";
+import { SoundToggle } from "./SoundToggle";
 import { HERO_STILL, STORY_MARK, markStory, storyPath } from "./story";
 import "./story.css";
 
@@ -12,6 +13,7 @@ import "./story.css";
 // Intro's still has loaded, or when the pointer reaches Play, and at the latest
 // when the dialog opens; never on first paint. Until the story draws its first
 // beat, the dialog shows the Intro's still of that beat, already in the cache.
+// The bar's Sound switch is off until the visitor turns it on (SoundToggle).
 
 const NAV_KEYS = new Set(["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft", "PageDown", "PageUp", "Home", "End"]);
 const TABBABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -51,6 +53,7 @@ interface Props {
 
 export default function StoryOverlay({ onClose, onRoute }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const close = useRef<HTMLButtonElement>(null);
   const host = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>("loading");
   const [drawn, setDrawn] = useState(false);
@@ -62,7 +65,8 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
   live.current = { onClose, onRoute };
 
   // A modal dialog: the top layer over the masthead and the panel, the page
-  // behind it inert, and the page's own scroll held while it is open.
+  // behind it inert, and the page's own scroll held while it is open. It opens
+  // with focus on Close, not on the Sound switch before it.
   useLayoutEffect(() => {
     const d = dialog.current;
     if (!d) return;
@@ -70,6 +74,7 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
     const prior = html.style.overflow;
     html.style.overflow = "hidden";
     if (!d.open) d.showModal();
+    close.current?.focus();
     return () => {
       if (d.open) d.close();
       html.style.overflow = prior;
@@ -191,11 +196,14 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
           <b id="story-dialog-title">Introduction</b>
           <span id="story-dialog-length">3 min, from one battery to the whole stack</span>
         </p>
-        {/* The first control, so the dialog opens with focus here; it moves into the story once that is ready. */}
-        <button type="button" className="btn story-dialog__close" onClick={() => live.current.onClose()} title="Close the introduction (Esc)" data-story-start="">
-          <Glyph name="close" />
-          <span className="story-dialog__close-label">Close</span>
-        </button>
+        <div className="story-dialog__actions">
+          <SoundToggle className="story-dialog__sound" />
+          {/* The dialog opens with focus here; it moves into the story once that is ready. */}
+          <button ref={close} type="button" className="btn story-dialog__close" onClick={() => live.current.onClose()} title="Close the introduction (Esc)" data-story-start="">
+            <Glyph name="close" />
+            <span className="story-dialog__close-label">Close</span>
+          </button>
+        </div>
       </div>
       <div className="story-dialog__stage" aria-busy={!shown && !failed ? true : undefined}>
         <div ref={host} className="story-dialog__host" />
