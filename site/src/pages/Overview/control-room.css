@@ -1,9 +1,10 @@
 /* The control room: the Overview's first view. Blocks: ov-room*, ov-pane*, ov-seal*, ov-find*, ov-board*, ov-ness*,
-   ov-morph. Dark in either theme (data-atmosphere="dark"), full bleed under the masthead, about one view tall. The
-   Tech Stack's 3D loops behind, dimmed; the panes are the Terminal's glass (a raised ground over the blurred scene,
-   a hair of a border, a lit top edge, a soft lift), placed round the landscape: the page's head, the seal and Verify
-   down its left, the morph and the Fleet board down its right, Ask Ness under its middle (in a build that has it),
-   the visitors' ways in along its foot, the middle above Ask Ness left open. Under 1000px of room the picture sits on top and the panes follow it in one column (two from
+   ov-morph. Dark in either theme (data-atmosphere="dark"), full bleed under the masthead, about one view tall. Its
+   stage is the Tech Stack's 3D, live (StackSpace.tsx), over the stack's poster until it has drawn; the panes are the
+   Terminal's glass (a raised ground over the blurred scene, a hair of a border, a lit top edge, a soft lift), placed
+   round the stage: the page's head, the seal and Verify down its left, the morph and the Fleet board down its right,
+   Ask Ness under its middle (in a build that has it), the visitors' ways in along its foot, the middle above Ask Ness
+   left open. Under 1000px of room the stage sits on top at 16:9 and the panes follow it in one column (two from
    640px). Hovers change color only. */
 
 /* The band spans the page's whole width; what follows it keeps the page's measure. */
@@ -22,34 +23,49 @@
   container: ov-room / inline-size;
   position: relative;
   isolation: isolate;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   background: var(--t-chrome);
 }
 
-/* ---------------------------------------------------------------- the landscape */
+/* ---------------------------------------------------------------- the stage */
 
-.ov-room__media {
+/* The stack's poster, and over it the live 3D, on the scene's own ground (#14171a, as both draw it). The 3D stays
+   transparent and out of the pointer's way until it has drawn, then fades in over the poster. It comes after the
+   panes in the page's order (the keyboard reaches the panes first) and is drawn first. */
+.ov-room__stage {
+  order: -1;
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: var(--t-chrome);
+  background: #14171a;
 }
-.ov-room__loop,
-.ov-room__still {
+/* The poster is the stack at rest at 16:9, framed as the live mount frames it (the whole space across the stage's
+   width), so the 3D comes in over it nearly in place. */
+.ov-room__poster {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
-/* The dim the panes read over, and a fade into the ground below. */
-.ov-room__media::after {
-  content: "";
+.ov-room__space {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(ellipse 70% 65% at 50% 42%, transparent 35%, rgb(16 19 21 / 0.42) 100%),
-    linear-gradient(to bottom, rgb(16 19 21 / 0.18), rgb(16 19 21 / 0.08) 45%, rgb(16 19 21 / 0.9) 100%);
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 700ms var(--m-ease-out);
+}
+.ov-room__stage.is-live .ov-room__space {
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ov-room__space {
+    transition: none;
+  }
 }
 
 /* ---------------------------------------------------------------- the panes' places */
@@ -77,18 +93,13 @@
   }
 }
 
-/* With room, the picture fills the band and the panes stand round it. */
+/* With room, the stage fills the band and the panes stand round it. */
 @container ov-room (min-width: 1000px) {
-  .ov-room__media {
+  .ov-room__stage {
     position: absolute;
     inset: 0;
     aspect-ratio: auto;
-    z-index: -1;
-  }
-  .ov-room__media::after {
-    background:
-      radial-gradient(ellipse 62% 58% at 50% 44%, rgb(16 19 21 / 0.06) 30%, rgb(16 19 21 / 0.52) 100%),
-      linear-gradient(to bottom, rgb(16 19 21 / 0.34), rgb(16 19 21 / 0.06) 32%, rgb(16 19 21 / 0.12) 62%, rgb(16 19 21 / 0.78) 100%);
+    z-index: 0;
   }
   .ov-room__panes {
     min-height: max(640px, calc(100svh - var(--gp-masthead-h)));
@@ -145,6 +156,18 @@
   padding-bottom: 0;
   border-bottom: 0;
   text-shadow: 0 1px 12px rgb(0 0 0 / 0.55);
+}
+/* Over the live stage, the head reads on a feathered shade of the stage's own dark, which also quiets the scene's words
+   under it (the space's top left: its "Real world" title and the market data's label). */
+.ov-room .gp-band__head::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -14px -22px -12px -14px;
+  border-radius: 24px;
+  background: rgb(20 23 26 / 0.95);
+  filter: blur(14px);
+  pointer-events: none;
 }
 .ov-room__head .page-header__title {
   font-size: 30px;

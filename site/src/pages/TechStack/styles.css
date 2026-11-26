@@ -3,7 +3,9 @@
 /* ---------------------------------------------------------------- the stage */
 
 /* The 3D keeps its own dark in either theme, framed as one pane, at the
-   composition's 16:9. mountStack fills the space and follows its size. */
+   composition's 16:9. mountStack fills the space and follows its size; the
+   space's own rules (its words' sizes, the dark card on a light page) are the
+   shared mount's (stack-space.css). */
 .stack-stage {
   overflow: hidden;
   border: 1px solid var(--w-border);
@@ -14,51 +16,6 @@
   aspect-ratio: 16 / 9;
   min-height: 200px;
   background: var(--t-chrome);
-  container: stack / inline-size;
-}
-
-/* The scene's words are drawn at the 1,920 px cut's sizes, and the mount places
-   each label by its measured size. On a stage under 1,500 px they step down a
-   size, so neighbors keep apart; under 720 px the package drops them. */
-@container stack (max-width: 1499px) {
-  .stack-stage .stk-lab {
-    font-size: 12.5px;
-    line-height: 15px;
-  }
-  .stack-stage .stk-lab.stk-pod {
-    font-size: 12px;
-  }
-  .stack-stage .stk-lab span {
-    font-size: 11px;
-    line-height: 13px;
-  }
-  .stack-stage .stk-zone {
-    font-size: 11.5px;
-    letter-spacing: 0.12em;
-  }
-  .stack-stage .intro-tick.stk-after {
-    padding: 1px 7px 2px;
-    font-size: 11px;
-    line-height: 14px;
-  }
-  /* The "after the seal" notes are pinned to points in the scene, the last two
-     beside Living Brain's label and over the State keeper's: as the scene
-     shrinks they close on those labels, so they step down clear of them. */
-  .stack-stage .stk-labels > .stk-after:nth-last-child(2) {
-    margin-top: 7px;
-  }
-  .stack-stage .stk-labels > .stk-after:last-child {
-    margin-top: 11px;
-  }
-}
-
-/* The stack is mounted dark on either page theme, but one of the package's card
-   rules for a light stack keys on any ancestor's theme (dom.ts:
-   [data-theme="light"] .stk-card dd), so on a light page it set the dark card's
-   values (contract, records) in near-black on the card's near-black. They keep
-   the dark card's own value color here. */
-:root[data-theme="light"] .stack-stage [data-stk-theme="dark"] .stk-card dd {
-  color: #e6e8ea;
 }
 
 /* Under the scene: its key, then how to use it. */

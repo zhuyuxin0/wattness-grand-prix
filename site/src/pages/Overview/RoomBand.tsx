@@ -7,7 +7,8 @@ import "./room-band.css";
 /**
  * The control room's panes as dock panes from 1000px of room (room-band.ts): the page's head in the top left corner,
  * the Panes menu in the top right, the band at least one view tall and taller where the panes ask for it, the room for
- * Ask Ness's launcher kept at its foot. Narrower, the room's own column (`stacked`) as it was.
+ * Ask Ness's launcher kept at its foot. Narrower, the room's own column (`stacked`) as it was. The band passes the
+ * pointer through to the stage behind it wherever no pane, head or menu stands (room-band.css).
  */
 export function RoomBand({ head, parts, stacked }: { head: ReactNode; parts: RoomParts; stacked: ReactNode }) {
   return (

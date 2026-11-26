@@ -1,14 +1,22 @@
 /*
  * The control room's panes as dock panes (RoomBand.tsx, room-band.ts), from 1000px of room. The band fills the room
- * over the landscape, at least one view tall as the room's own grid and taller where the panes ask for it; the page's
- * head stands in its top left corner and the Panes menu in its top right. Each dock pane is the room's glass
- * (control-room.css .ov-pane) and names its part in its header, so the part inside drops its own glass and keeps the
- * title its header repeats for assistive tech only.
+ * over the stage (the Tech Stack's live 3D), at least one view tall as the room's own grid and taller where the panes
+ * ask for it; the page's head stands in its top left corner and the Panes menu in its top right. Each dock pane is the
+ * room's glass (control-room.css .ov-pane) and names its part in its header, so the part inside drops its own glass
+ * and keeps the title its header repeats for assistive tech only.
  */
 
-/* At least one view tall, as the room's own grid; taller where the panes ask for it (PaneBand grow). */
+/* At least one view tall, as the room's own grid; taller where the panes ask for it (PaneBand grow). Over the stage,
+   the band passes the pointer through to the 3D wherever no pane, the head or the menu stands: the panes take it
+   (rc-dock's float panels), and so do the head and the corner here. */
 .ov-room > .gp-band-host--docked {
+  z-index: 1;
   height: max(640px, calc(100svh - var(--gp-masthead-h)));
+  pointer-events: none;
+}
+.ov-room .gp-band__head,
+.ov-room .gp-band__corner {
+  pointer-events: auto;
 }
 
 .ov-room .gp-band {

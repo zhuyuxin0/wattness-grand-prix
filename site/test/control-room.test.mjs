@@ -1,45 +1,92 @@
-// The Overview's control room (src/pages/Overview/ControlRoom.tsx, room.ts): the files the page asks for are the
-// loop's receipt's (test/home-loop.test.mjs holds the files to it), its first paint loads no three.js, and the panes'
-// pure parts. Run with `pnpm test` (Node 22.18 or later runs the TypeScript modules directly).
+// The Overview's control room (src/pages/Overview/ControlRoom.tsx, room.ts): its stage is the Tech Stack's own live
+// 3D, the one mount both pages draw (TechStack/StackSpace.tsx), over the stack's poster, which is a chapter still with
+// its receipt; its first paint loads no three.js; the panes' pure parts. Run with `pnpm test` (Node 22.18 or later runs
+// the TypeScript modules directly).
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { LOOP, NESS_QUESTIONS, askSearch, boardTop, findBatteries, sealOf, verifyPath } from "../src/pages/Overview/room.ts";
+import { NESS_QUESTIONS, STAGE_POSTER, askSearch, boardTop, findBatteries, sealOf, verifyPath } from "../src/pages/Overview/room.ts";
 import { sortRows } from "../src/ui/sort.ts";
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (p) => readFileSync(p, "utf8");
-const receipt = JSON.parse(read(join(site, "public", "home", `${LOOP.name}.json`)));
+const dir = join(site, "src", "pages", "Overview");
+const stack = join(site, "src", "pages", "TechStack");
+/** A module's import specifiers (type-only imports included, marked). */
+const importsOf = (src) => [...src.matchAll(/^import\s+(type\s+)?[^;]*?from\s+"([^"]+)"/gm)].map((m) => ({ from: m[2], type: !!m[1] }));
 
-test("the control room asks for exactly the receipt's files, muted, inline, poster first", () => {
-  assert.deepEqual(Object.values(LOOP.files).sort(), Object.keys(receipt.files).sort());
-  assert.equal(LOOP.width, receipt.files[LOOP.files.mp4].width);
-  assert.equal(LOOP.height, receipt.files[LOOP.files.mp4].height);
-  const room = read(join(site, "src", "pages", "Overview", "ControlRoom.tsx"));
-  assert.ok(room.includes("`${import.meta.env.BASE_URL}home/${file}`"), "files under public/home, from the site's base");
-  for (const key of ["webm", "mp4", "poster"]) assert.ok(room.includes(`LOOP.files.${key}`), `the page uses LOOP.files.${key}`);
-  const video = /<video\b[^>]*>/.exec(room)?.[0] ?? "";
-  for (const attr of ["muted", "loop", "playsInline", "poster={poster}"]) assert.ok(video.includes(attr), `the video is ${attr}`);
-  assert.ok(!/\bautoPlay\b/.test(video), "played only while on screen, not by autoplay");
-  assert.ok(room.includes("(prefers-reduced-motion: reduce)"), "reduced motion shows the poster alone");
+test("the stage's poster is the stack at rest, a chapter still named byte for byte by its receipt", () => {
+  const receipt = JSON.parse(read(join(site, "public", STAGE_POSTER.receipt)));
+  const name = STAGE_POSTER.file.split("/").pop();
+  assert.equal(receipt.beat, "stack", "chapter 21: what it is built from");
+  assert.equal(receipt.frame, "stack.rest", "the Tech Stack's 3D at rest");
+  const f = receipt.files[name];
+  assert.ok(f, `the receipt names ${name}`);
+  assert.equal(f.kind, "poster");
+  assert.deepEqual([f.width, f.height], [STAGE_POSTER.width, STAGE_POSTER.height]);
+  const buf = readFileSync(join(site, "public", STAGE_POSTER.file));
+  assert.equal(buf.length, f.bytes, "bytes");
+  assert.equal(createHash("sha256").update(buf).digest("hex"), f.sha256, "sha256");
+  const room = read(join(dir, "ControlRoom.tsx"));
+  assert.ok(room.includes("`${import.meta.env.BASE_URL}${STAGE_POSTER.file}`"), "the poster from the site's base");
+  assert.match(room, /width=\{STAGE_POSTER\.width\}/);
+  assert.match(room, /fetchpriority: "high"/, "the poster is the first paint's picture");
+});
+
+test("the stage is the Tech Stack's own 3D: one mount for both pages, never a copy of the scene", () => {
+  const space = read(join(stack, "StackSpace.tsx"));
+  assert.match(space, /import\("@world\/stations\/stack\/mount"\)/, "mountStack by dynamic import");
+  assert.match(space, /handle\?\.dispose\(\)/, "disposed when the component goes (its WebGL context released)");
+  for (const { from, type } of importsOf(space)) assert.ok(type || !/^@world\/|^three(\/|$)/.test(from), `StackSpace imports ${from} on first paint`);
+  // the Tech Stack's stage and the Overview's both draw StackSpace; neither mounts the stack itself
+  const stage = read(join(stack, "Stage.tsx"));
+  const room = read(join(dir, "ControlRoom.tsx"));
+  assert.match(stage, /<StackSpace\s/);
+  assert.match(room, /import \{ StackSpace \} from "\.\.\/TechStack\/StackSpace";/);
+  assert.match(room, /<StackSpace\s/);
+  for (const src of [stage, room]) assert.ok(!/mountStack|stations\/stack\/mount"\)/.test(src), "no second mount of the scene");
+  // the space's own rules (its words' sizes, the dark card on a light page) live with the mount, for both pages
+  const css = read(join(stack, "stack-space.css"));
+  assert.match(css, /\.stack-space \{\s*container: stack \/ inline-size;/);
+  assert.match(css, /@container stack \(max-width: 1499px\)/);
+  assert.ok(!/@container stack/.test(read(join(stack, "styles.css"))), "not kept twice");
+});
+
+test("the 3D comes after the page's text, fades in once drawn, and stays away with reduced motion or Save-Data", () => {
+  const room = read(join(dir, "ControlRoom.tsx"));
+  assert.match(room, /const still = reduced \|\| saveData\(\);/);
+  assert.match(room, /const live = !still && !failed && idle && settled;/);
+  assert.match(room, /\{live && <StackSpace /, "mounted only when live, so leaving the tab or turning on reduced motion disposes it");
+  assert.match(room, /<HomeStage settled=\{all\.status !== "loading"\} \/>/, "after the panes' data has come in");
+  assert.ok(room.includes("(prefers-reduced-motion: reduce)"));
+  assert.match(room, /is-live/);
+  const css = read(join(dir, "control-room.css"));
+  assert.match(css, /\.ov-room__space \{[^}]*opacity: 0;[^}]*pointer-events: none;/, "unseen and out of the pointer's way until drawn");
+  assert.match(css, /\.ov-room__stage\.is-live \.ov-room__space \{[^}]*opacity: 1;[^}]*pointer-events: auto;/);
+  // the band over the stage passes the pointer through, except where a pane, the head or the menu stands
+  const band = read(join(dir, "room-band.css"));
+  assert.match(band, /\.ov-room > \.gp-band-host--docked \{[^}]*pointer-events: none;/);
+  assert.match(band, /\.ov-room \.gp-band__head,\s*\.ov-room \.gp-band__corner \{\s*pointer-events: auto;/);
 });
 
 test("the first paint loads no three.js: the morph's scene comes only through the lazy scenes index", () => {
-  const dir = join(site, "src", "pages", "Overview");
   for (const name of ["index.tsx", "ControlRoom.tsx", "Timeline.tsx", "room.ts"]) {
     const src = read(join(dir, name));
-    const imports = [...src.matchAll(/^import\s[^;]*?from\s+"([^"]+)"/gm)].map((m) => m[1]);
-    for (const from of imports) {
-      assert.ok(!/^three(\/|$)|^@world\/|scenes\/(StartingGrid|BrainMap|engine)/.test(from), `${name} imports ${from} on first paint`);
+    for (const { from, type } of importsOf(src)) {
+      assert.ok(type || !/^three(\/|$)|^@world\/|scenes\/(StartingGrid|BrainMap|engine)/.test(from), `${name} imports ${from} on first paint`);
     }
   }
   const scenes = read(join(site, "src", "scenes", "index.ts"));
   assert.match(scenes, /export const StartingGrid = lazy\(\(\) => import\("\.\/StartingGrid\/StartingGrid"\)\)/);
   const room = read(join(dir, "ControlRoom.tsx"));
   assert.ok(/idle && near/.test(room), "the morph mounts once the page is idle and the pane is near the screen");
+  // and nothing asks for the old loop
+  assert.ok(!/home\/|tech-landscape|<video/.test(room));
+  assert.ok(!existsSync(join(site, "public", "home", "tech-landscape.json")), "the loop's files are gone");
 });
 
 const B = (resource, ev, extra = {}) => ({
