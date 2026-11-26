@@ -14,8 +14,10 @@ export const DOT = '#4c8fff';
 /** The calibration (SPEC 3.4, 1.7). Living Brain's constants land on its measured colors through its ACES curve at
  *  1.05; ours run through the kit's Neutral curve at 1, which keeps the darks brighter and the blues more saturated. These
  *  bring our rendered bands back onto the measured table: the body's colors mixed toward their own luminance, its
- *  brightness, the core's light whitening the particles round it, and the connections dimmer. */
-export const LOOK = { desat: 0.5, gain: 1.31, white: 0.2, whiteMax: 0.6, hi: 0.25, low: 0.04, edge: 0.8, dot: 1.0, core: 0.8, tintDesat: 0.5 };
+ *  brightness, the core's light whitening the particles round it only a little (the core reads as Living Brain's soft
+ *  gas glow, the ray-marched core at full, not as a swarm of whitened particles), the connections' brightness, and a
+ *  member's paling toward its own luminance (tintDesat). */
+export const LOOK = { desat: 0.5, gain: 1.38, white: 0.14, whiteMax: 0.5, hi: 0.25, low: 0.04, edge: 0.8, dot: 1.0, core: 1.0, tintDesat: 0.5 };
 
 /** The sprites' sizes are drawn for the brain station's 37 degree lens (world.ts VFOV). Under another lens a host
  *  scales sizeK by this, so the particles stay as fine against the brain's shape as the station draws them (the

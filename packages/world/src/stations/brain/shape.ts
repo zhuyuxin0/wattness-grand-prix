@@ -226,8 +226,9 @@ export const hasPoints = (seed: number, count: number, shellShare = 0.7) => poin
 /** The shell's clumps: points per clump (one plus an exponential of this mean, at most max) and their radius. */
 export const CLUMP = { mean: 3.2, max: 10, radius: 0.02 };
 /** The inside's share placed deep round the core, the radius they reach (the pool's units), how they thin outward (a
- *  radius of radius x u^falloff), and their brightness. */
-export const DEEP = { share: 0.1, radius: 0.32, falloff: 0.8, bright: [0.65, 0.45] as const };
+ *  radius of radius x u^falloff), and their brightness: few, and spread wide, so the core's light falls on a sparse
+ *  field round it rather than a bright swarm. */
+export const DEEP = { share: 0.06, radius: 0.42, falloff: 0.8, bright: [0.65, 0.45] as const };
 
 /** The particles of one brain, by its seed (the same seed gives the same cloud on every load and machine). */
 export function brainPoints(seed: number, count = 60_000, shellShare = 0.7): BrainPoints {
