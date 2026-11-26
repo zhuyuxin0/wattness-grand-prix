@@ -30,10 +30,12 @@ GET /day/<day>/<path>
     record.<network>.json      every field against GateRecord on that network, no extra fields,
                                and the commit transaction's receipt and Committed event.
     root.hex                   the root GateRecord holds.
-    salt.txt                   the salt inside the showcase battery's verified leaf.
-    a file a leaf names        SHA-256 of the bytes is the digest the showcase battery's verified
-                               leaf records (an outside input's saved response, such as
-                               cournot/probability.json; none on 26 Nov).
+    salt.txt                   the salt inside the showcase battery's verified leaf (the first
+                               leaf's when the index names no showcase).
+    a file a leaf names        an outside input's saved response, such as cournot/probability.json
+                               (none on 26 Nov): SHA-256 of the bytes is the digest the showcase
+                               battery's verified leaf records (the first leaf's when the index
+                               names no showcase).
     Anything else, such as sync/<R>.json, is not covered by the record and answers 404.
 
 GET /verify/<battery>?od=<day>&network=bsc-mainnet

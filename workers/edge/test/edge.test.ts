@@ -714,7 +714,23 @@ describe("requests", () => {
   it("gives cournot/probability.json as an example of a file a leaf names, and says 26 Nov has none", async () => {
     upstreams();
     const page = (await (await call(freshOrigin(), "/")).text()).replace(/\s+/g, " ");
-    expect(page).toContain("(an outside input's saved response, such as cournot/probability.json; none on 26 Nov)");
+    expect(page).toContain("a file a leaf names an outside input's saved response, such as cournot/probability.json (none on 26 Nov):");
+  });
+
+  it("says salt.txt and a file a leaf names are read from the first leaf when the index names no showcase, as they are", async () => {
+    const u = upstreams();
+    const page = (await (await call(freshOrigin(), "/")).text()).replace(/\s+/g, " ");
+    expect.soft(page).toContain("salt.txt the salt inside the showcase battery's verified leaf (the first leaf's when the index names no showcase).");
+    expect.soft(page).toContain("SHA-256 of the bytes is the digest the showcase battery's verified leaf records (the first leaf's when the index names no showcase)");
+    // No hash covers showcase. With it null, salt.txt is read from the first leaf, ABINDUST_ESR1's, which the fixture lacks.
+    const doc = JSON.parse(text.index) as { showcase: string | null; leaves: { resource: string }[] };
+    doc.showcase = null;
+    u.objects.set(`${DAY}/manifest.json`, pretty(doc));
+    const origin = freshOrigin();
+    expect.soft((await call(origin, "/day/2026-11-26/index.json")).status).toBe(200);
+    const salt = await call(origin, "/day/2026-11-26/salt.txt");
+    expect.soft(salt.status).toBe(502);
+    expect.soft(await salt.text()).toContain(`names leaves/${doc.leaves[0]!.resource}.json, and Greenfield has no such object`);
   });
 
   it("answers HEAD with the headers alone and a CORS preflight with 204", async () => {
