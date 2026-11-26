@@ -128,6 +128,7 @@ export default function BatteryPage() {
           <div className="bt-grid">
             <Section
               className="bt-plan"
+              id="plan-by-hour"
               title={`Plan ${active} by Hour`}
               lede={`${planLabel(active)}${active === desk.selectedArm ? ", the sealed plan" : ""}. Every chart shares the hour axis, so a column lines up across all four.`}
               source={`${SOURCE_LINE} Operating day ${day0}, hours in CT. Prices: day-ahead forecast at ${desk.settlementPoint} and its ${c.scenarios.count} ${weightingWords(c.scenarios.weighting)} scenarios. Contracts are a comparison at an assumed entry price, not executed trades.`}

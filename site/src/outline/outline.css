@@ -1,0 +1,395 @@
+/* The sections menu (Outline.tsx), after wattness.tech's pane foot (apps/mms/src/ui/outline.css) in the Grand Prix's
+   tokens: the pill at the bottom right naming where you are, the contents it opens above it, the find bar at the
+   page's foot on the left. Stacking: over the float layer's panes (25), under Ask Ness's beside and floating panel
+   (45), the market day's popover and sheet (50) and the tab drawer (60). Hovers change color only. */
+
+.outline-dock {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  justify-content: flex-end;
+  max-width: calc(100vw - 32px);
+}
+/* Beside the page, Ask Ness's column takes the right edge: the pill keeps to the page's side of it. */
+html[data-ness-open="beside"] .outline-dock {
+  right: calc(var(--ness-w, 0px) + 16px);
+  max-width: calc(100vw - var(--ness-w, 0px) - 32px);
+}
+
+.outline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  height: 26px;
+  padding: 0 11px;
+  border: 1px solid var(--w-border);
+  border-radius: 14px;
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font: inherit;
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs-xs);
+  line-height: 18px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--w-fg) 14%, transparent);
+  cursor: pointer;
+  transition: border-color var(--m-dur-s) ease-out;
+}
+.outline-btn:hover,
+.outline-btn[aria-expanded="true"] {
+  border-color: var(--w-fg);
+}
+.outline-btn:focus-visible {
+  outline: 2px solid var(--t-accent-mark);
+  outline-offset: 2px;
+}
+.outline-where {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.crumb-sep {
+  color: var(--w-muted);
+}
+.outline-count {
+  color: var(--w-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The contents, above the pill and lined up with its right edge. */
+.outline-pop {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 4px);
+  box-sizing: border-box;
+  width: min(480px, calc(100vw - 16px));
+  max-height: min(72vh, 600px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh);
+  text-align: left;
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--w-fg) 22%, transparent);
+}
+.outline-grip {
+  display: none;
+}
+.outline-bar {
+  position: sticky;
+  top: -8px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: -2px 0 6px;
+  padding: 2px 0 6px;
+  background: var(--t-raised);
+}
+.outline-bar input {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  box-sizing: border-box;
+  padding: 3px 7px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font: inherit;
+  font-size: var(--t-fs-sm);
+}
+.outline-bar input:focus-visible {
+  outline: 2px solid var(--t-accent-mark);
+  outline-offset: -1px;
+}
+.outline-levels {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  color: var(--w-muted);
+  font-size: var(--t-fs-xs);
+}
+.outline-levels .seg {
+  height: 22px;
+}
+.outline-levels .seg button {
+  min-width: 30px;
+  padding: 0 9px;
+}
+.outline-none {
+  margin: 0;
+  padding: 4px 6px;
+  color: var(--w-muted);
+  font-size: var(--t-fs-sm);
+}
+.outline-tip {
+  margin: 8px 0 0;
+  color: var(--w-muted);
+  font-size: var(--t-fs-xs);
+}
+.outline-tip kbd {
+  display: inline-block;
+  min-width: 14px;
+  padding: 0 4px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-xs);
+  background: var(--t-chrome);
+  color: var(--w-fg);
+  font: inherit;
+  font-family: var(--t-font-code);
+  line-height: 15px;
+  text-align: center;
+}
+
+/* The tree, as VS Code's explorer draws one: a chevron per branch, a guide line under each open branch at its
+   chevron, a count on a folded one, the section you are in on the accent's tint. */
+.ot-root,
+.ot-kids {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ot-kids {
+  margin-left: 8px;
+  padding-left: 8px;
+  border-left: 1px solid color-mix(in srgb, var(--w-fg) 16%, var(--t-raised));
+}
+.ot-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: var(--t-radius-xs);
+}
+.ot-row:hover {
+  background: var(--t-hover);
+}
+.ot-row[data-here] {
+  background: color-mix(in srgb, var(--t-accent-mark) 14%, var(--t-raised));
+}
+.ot-row[data-here] .ot-go {
+  font-weight: var(--t-fw-strong);
+}
+.ot-chev {
+  all: unset;
+  box-sizing: border-box;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 22px;
+  border-radius: var(--t-radius-xs);
+  color: var(--w-muted);
+  cursor: pointer;
+}
+span.ot-chev {
+  cursor: default;
+}
+button.ot-chev:hover {
+  color: var(--w-fg);
+}
+.ot-chev .glyph {
+  width: 9px;
+  height: 9px;
+}
+.ot-go {
+  all: unset;
+  box-sizing: border-box;
+  flex: 1;
+  min-width: 0;
+  padding: 2px 4px;
+  overflow: hidden;
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.ot-chev:focus-visible,
+.ot-go:focus-visible {
+  outline: 2px solid var(--t-accent-mark);
+  outline-offset: -2px;
+}
+.ot-n {
+  flex: none;
+  padding: 0 6px;
+  color: var(--w-muted);
+  font-size: var(--t-fs-2xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Under the phone's sheet the page dims; the desk's popover needs none. */
+.outline-scrim {
+  display: none;
+}
+
+/* Find in this page, at the page's foot on the left. */
+.page-find {
+  position: fixed;
+  left: var(--find-left, 16px);
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  width: min(420px, calc(100vw - var(--find-left, 16px) - 220px));
+  min-width: 260px;
+  padding: 4px 6px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font-family: var(--w-font-sans);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--w-fg) 18%, transparent);
+}
+.page-find input {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  box-sizing: border-box;
+  padding: 3px 7px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font: inherit;
+  font-size: var(--t-fs-sm);
+}
+.page-find input:focus-visible {
+  outline: 2px solid var(--t-accent-mark);
+  outline-offset: -1px;
+}
+.page-find-n {
+  min-width: 64px;
+  color: var(--w-muted);
+  font-size: var(--t-fs-xs);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
+}
+.page-find-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--t-radius);
+  color: var(--w-fg);
+  cursor: pointer;
+}
+.page-find-btn:hover:not(:disabled) {
+  background: var(--t-hover);
+}
+.page-find-btn:disabled {
+  color: var(--w-muted);
+  cursor: default;
+}
+.page-find-btn:focus-visible {
+  outline: 2px solid var(--t-accent-mark);
+}
+::highlight(page-find) {
+  background-color: rgb(255 207 64 / 0.5);
+}
+::highlight(page-find-now) {
+  background-color: #ff9632;
+  color: #111111;
+}
+
+/* A phone: the pill stays in the corner with where you are alone, the contents open as a sheet from the bottom over
+   a dimmed page, and the find bar runs the width above the pill. */
+@media (max-width: 767px) {
+  .outline-dock {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    max-width: calc(100vw - 24px);
+  }
+  .outline-btn {
+    height: 30px;
+    max-width: min(240px, calc(100vw - 24px));
+    padding: 0 12px;
+  }
+  .outline-crumb:not(:last-child),
+  .crumb-sep {
+    display: none;
+  }
+  .outline-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: rgb(0 0 0 / 0.32);
+  }
+  .outline-pop {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: 78vh;
+    padding: 6px 12px max(12px, env(safe-area-inset-bottom));
+    border-width: 1px 0 0;
+    border-radius: 12px 12px 0 0;
+    font-size: var(--t-fs);
+    box-shadow: 0 -8px 28px rgb(0 0 0 / 0.22);
+  }
+  .outline-grip {
+    display: block;
+    width: 36px;
+    height: 4px;
+    margin: 2px auto 8px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--w-fg) 22%, transparent);
+  }
+  .outline-bar {
+    top: -6px;
+  }
+  .outline-bar input,
+  .page-find input {
+    height: 34px;
+    font-size: 16px;
+  }
+  .ot-chev {
+    width: 24px;
+    height: 34px;
+  }
+  .ot-go {
+    padding: 6px 4px;
+    font-size: var(--t-fs);
+  }
+  .page-find {
+    left: 12px;
+    right: 12px;
+    bottom: calc(max(12px, env(safe-area-inset-bottom)) + 38px);
+    width: auto;
+    min-width: 0;
+  }
+}
+
+/* A touch phone has no "/" to press. */
+@media (max-width: 767px) and (pointer: coarse) {
+  .outline-tip {
+    display: none;
+  }
+}
+
+@media print {
+  .outline-dock,
+  .outline-scrim,
+  .page-find {
+    display: none;
+  }
+}

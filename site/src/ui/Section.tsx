@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { SOURCE_LINE } from "../config";
+import { sectionSlug } from "../outline/tree";
 import { BuiltWith, type BuiltWithEntry } from "./BuiltWith";
 import { CheckIt, type CheckItProps } from "./CheckIt";
 
@@ -32,7 +33,10 @@ interface SectionProps {
   className?: string;
 }
 
-export function Section({ id, kicker, title, lede, actions, builtWith, check, source, variant = "plain", children, className }: SectionProps) {
+export function Section({ id: given, kicker, title, lede, actions, builtWith, check, source, variant = "plain", children, className }: SectionProps) {
+  // Every titled section has an id, for the sections menu (src/outline) and a link to it: the page's own, else one
+  // from its title ("Both Chains, One Record" is both-chains-one-record).
+  const id = given ?? ((typeof title === "string" && sectionSlug(title)) || undefined);
   const built = builtWith && builtWith.length > 0;
   const head = kicker || title || lede || actions || built;
   return (
