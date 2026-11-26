@@ -35,7 +35,12 @@ export interface PanelTab {
 
 export type PanelEntry = PanelGroup | PanelTab;
 
-const page = (load: () => Promise<{ default: ComponentType }>) => lazy(load);
+// A chunk gone after a deploy reloads the page once instead of failing it (lib/chunk-reload.ts). The helper is
+// imported only on a failure (it sits in the entry chunk, so that import cannot fail too), which keeps this list free
+// of runtime imports for the tests that read it in Node.
+type PageModule = { default: ComponentType };
+const page = (load: () => Promise<PageModule>) =>
+  lazy(() => load().catch((error: unknown) => import("../lib/chunk-reload").then((m) => m.onPageLoadError<PageModule>(error))));
 
 export const PANEL: PanelEntry[] = [
   {

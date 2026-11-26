@@ -1,14 +1,16 @@
 import { lazy, Suspense } from "react";
 import { Navigate, useLocation, useParams, type RouteObject } from "react-router-dom";
+import { loadPage } from "./lib/chunk-reload";
 import { Layout } from "./shell/Layout";
+import { RouteError } from "./shell/RouteError";
 import { TABS } from "./shell/tabs";
 
 // Every tab is its own chunk, so the 3D scenes and charts one page loads never
 // weigh on another. The routes come from the side panel's list (shell/tabs.ts):
 // a tab's page folder default-exports the page.
-const NotFound = lazy(() => import("./pages/NotFound"));
+const NotFound = lazy(loadPage(() => import("./pages/NotFound")));
 // The scene lab renders bare, outside the site chrome, so a capture holds only the scene.
-const SceneLab = lazy(() => import("./pages/SceneLab"));
+const SceneLab = lazy(loadPage(() => import("./pages/SceneLab")));
 
 const tabRoutes: RouteObject[] = TABS.map((t) =>
   t.path === "/" ? { index: true, element: <t.page /> } : { path: `${t.path.slice(1)}${t.subpaths ? "/*" : ""}`, element: <t.page /> },
@@ -48,9 +50,11 @@ export const routes: RouteObject[] = [
         <SceneLab />
       </Suspense>
     ),
+    errorElement: <RouteError />,
   },
   {
     element: <Layout />,
-    children: [...tabRoutes, ...movedRoutes, { path: "*", element: <NotFound /> }],
+    // A page that fails to render shows RouteError in the page's place, with the side panel kept.
+    children: [{ errorElement: <RouteError />, children: [...tabRoutes, ...movedRoutes, { path: "*", element: <NotFound /> }] }],
   },
 ];
