@@ -5,13 +5,15 @@
 // still per kind of piece (stack.hover.<piece>), each the live mount's hover state (mount.ts) at its end. The site
 // mounts the same space live with mountStack (mount.ts, re-exported here).
 import { THREE, GrabBlurPass, markTexture, setLineResolution, fitCamera, sr, setDraw } from './kit';
-import { buildSpace, POS, PAL, ZONES } from './space';
-import { injectCss, keyCard, zoneTitles, pointer, labelLayer } from './dom';
+import { buildSpace, POS, PAL, ZONES, boundsPoints } from './space';
+import { injectCss, keyCard, zoneTitles, pointer, labelLayer, logoStrip } from './dom';
 import { MARK_URLS } from './marks';
-import { cards, n0, short, ct, dayLabel, pathLen, WORDS, PIECE_IDS } from './pieces';
+import { cards, n0, short, ct, dayLabel, pathLen, WORDS, PIECE_IDS, LOGO_OF } from './pieces';
 import { ISO, stageLook, fitRest, labelItems, zoneItems, afterItems, keyRows, screenBox } from './common';
 import { hoverController } from './hover';
 import { GLYPH_COLOR } from './glyphs';
+import { chipsReady, logoChip } from '../../kit/logos';
+import { inFilm } from '../../lib/yours';
 import GF from './greenfield-record.json';
 import TN from './integrations.json';
 import { assignLayers } from '../../lib/stage';
@@ -21,6 +23,19 @@ export { mountStack } from './mount';
 export { ROUTES, TAB_LABEL } from './pieces';
 
 type Kind = 'rest' | 'seal' | 'seal-late' | 'inspect' | 'close' | 'cube-check' | 'hover';
+
+/** The owners' chips in the stack's reading order (the real world, the agents, the seal, the markets): a phone's row. */
+const STRIP = ['cournot', 'electronx', 'studio', 'brain', 'gate', 'greenfield', 'cloudflare', 'aws', 'atlas', 'cmc', 'flap', 'openfour'] as const;
+
+/** Where each owner's chip stands in the plan view (S04), on the ground plane (x, z): over its piece, or for Agent
+ *  Studio on the deck's open front right of Living Brain's sphere, and for GateRecord just south of the cube's pad
+ *  (the cube itself is BNB Chain's symbol, read from above). */
+const PLAN_AT: Record<(typeof STRIP)[number], [number, number]> = {
+  cournot: [POS.cournot.x + 4, POS.cournot.z + 2], electronx: [POS.electronx.x, POS.electronx.z],
+  studio: [60, POS.deck.z1 - 18], brain: [POS.brain.x, POS.brain.z],
+  gate: [POS.cube.x, POS.cube.z + POS.cube.pad + 12], greenfield: [POS.trays.x, POS.trays.z], cloudflare: [POS.edge.x, POS.edge.z], aws: [POS.evaluator.x, POS.evaluator.z],
+  atlas: [POS.atlas.x, POS.atlas.z], cmc: [POS.cmc.x, POS.cmc.z], flap: [(POS.coin.x + POS.vault.x) / 2, POS.coin.z], openfour: [POS.tower.x, POS.tower.z],
+};
 
 /** The kinds of piece a hover still is made for (the six agents are one kind: the Forecaster stands for them). */
 export const HOVER_STILLS = ['ercot', 'terminal', 'cournot', 'electronx', 'studio', 'aws', 'forecaster', 'brain', 'greenfield', 'verifier', 'cloudflare', 'atlas', 'cmc', 'arena', 'flap', 'openfour'];
@@ -152,19 +167,32 @@ async function setup(ctx: FrameContext, kind: Kind, hoverId: string | null = nul
     async decorate() {
       const pl = ctx.plates;
       const proj = (p: number[]) => pl.project(p as any);
-      // the labels: each piece's plain meaning, its name under it (none in S02's crop or the plan view)
-      if (kind === 'rest' || kind === 'inspect' || kind === 'hover') {
-        const skip = new Set<string>();
-        if (target && pieceCards[target]?.chip) skip.add(target);   // the chip names it
-        labelLayer(host).set(labelItems(space, d, proj, skip), W);
+      // the labels: each piece's plain meaning, under it its name or its owner's logo chip (none in S02's crop or the
+      // plan view); a hover adds only its card, beside the label. A phone's stage (the site's story under 720 px) is too
+      // small for them: there the owners' chips stand in one wrapped row under the space instead
+      const narrow = W < 720 && !inFilm(host);
+      if ((kind === 'rest' || kind === 'inspect' || kind === 'hover') && !narrow) {
+        labelLayer(host).set(labelItems(space, d, proj), W);
         zoneTitles(host, zoneItems(proj), theme);
         pl.ticks('after', afterItems(space), 'stk-after');
+      }
+      if (narrow && kind === 'rest') {
+        const ys = boundsPoints().map((p) => proj(p.toArray())?.y).filter((y) => y != null && y >= 0 && y <= H) as number[];
+        logoStrip(host, STRIP.map((id) => LOGO_OF[id]!), (ys.length ? Math.max(...ys) : H * 0.6) + 12);
       }
       if (kind === 'rest') {
         pl.caption({ head: 'This is the whole stack.', line: 'Real batteries on the left, the agents in the middle, the seal on BNB Chain to the right, the markets in front. Every solid line carries something real.' });
         pl.scope(`Operating day ${dayLabel(d.sealed_day.operating_day)} · ${n0(d.fleet.count)} batteries · Data: ERCOT. Calculation and display: Wattness.`);
         const k = keyCard(host, { title: 'The stack', rows: keyRows(P) }, theme);
         k.style.left = `${W - 96 - k.offsetWidth}px`; k.style.top = `${H - 76 - k.offsetHeight}px`;
+        // on a smaller screen than the films' 1920 cut the key, drawn at the cut's size, would stand over labels and
+        // their logo chips (links), or past the stage's edge: there the labels keep the room and the key is left out
+        // (a film keeps it)
+        if (!inFilm(host)) {
+          const kr = k.getBoundingClientRect(), hr = host.getBoundingClientRect();
+          const over = [...host.querySelectorAll('.stk-lab, .stk-strip')].some((e) => { const r = e.getBoundingClientRect(); return r.left < kr.right && r.right > kr.left && r.top < kr.bottom && r.bottom > kr.top; });
+          if (over || kr.left < hr.left) k.remove();
+        }
       }
 
       if (sealLoop) {
@@ -191,10 +219,7 @@ async function setup(ctx: FrameContext, kind: Kind, hoverId: string | null = nul
       }
 
       if (target) {
-        // the pointer, drawn for the still, on the piece; the card and chip already sit beside it (hover.ts)
-        hover.relayout();
-        const ch = host.querySelector(`.stk-chip.is-in img`) as HTMLImageElement | null;
-        if (ch) await ch.decode().catch(() => {});
+        // the pointer, drawn for the still, on the piece; the card already sits beside it (hover.ts)
         hover.relayout();
         const c = space.pieces[target].center;
         const bx = screenBox(space, target, proj)!;
@@ -244,9 +269,32 @@ async function setup(ctx: FrameContext, kind: Kind, hoverId: string | null = nul
         await bnb.decode().catch(() => {});
         const capR = (cap as HTMLElement | null)?.getBoundingClientRect(), hostR = host.getBoundingClientRect();
         const right = W - 96, left = capR ? capR.right - hostR.left + 40 : W * 0.66;
-        lk.style.transform = `translate3d(${Math.max(left, right - lk.offsetWidth).toFixed(1)}px, ${(capR ? capR.top - hostR.top + 34 : H - 230).toFixed(1)}px, 0)`;
+        // on a stage narrower than the cut the room right of the caption can be less than the lockup: it scales to fit
+        // (the story leaves the lockup out on a phone: story.css)
+        const lx = Math.max(left, right - lk.offsetWidth), room = W - 24 - lx, ks = Math.max(0.5, Math.min(1, room / lk.offsetWidth));
+        lk.style.transformOrigin = '0 0';
+        lk.style.transform = `translate3d(${lx.toFixed(1)}px, ${(capR ? capR.top - hostR.top + 34 : H - 230).toFixed(1)}px, 0)${ks < 1 ? ` scale(${ks.toFixed(3)})` : ''}`;
         zoneTitles(host, ZONES.map((zn) => { const p = proj(zn.at); return p ? { text: zn.text, x: p.x, y: p.y - 10 } : null; }).filter(Boolean), theme);
+        // the owners' logo chips, read from above: from straight overhead the 3D marks stand edge-on (CMC's plaque,
+        // Flap's coin, OpenFour's tokens), so each piece's chip stands over it. They are DOM, so each faces the camera
+        // and reads in full; a phone's plan is too small for them, so there they stand in one row under it
+        if (narrow) {
+          const ys = boundsPoints().map((p) => proj(p.toArray())?.y).filter((y) => y != null && y >= 0 && y <= H) as number[];
+          logoStrip(host, STRIP.map((id) => LOGO_OF[id]!), (ys.length ? Math.max(...ys) : H * 0.6) + 12);
+        } else {
+          const plan = document.createElement('div'); plan.className = 'stk-plan'; host.appendChild(plan);
+          // 16 px logos in the 1920 cut, smaller with the stage, never under 12
+          const lg = Math.round(Math.max(12, Math.min(16, 18.5 * (W / 1920))));
+          for (const id of STRIP) {
+            const [x, z] = PLAN_AT[id], p = proj([x, 0, z]); if (!p) continue;
+            const l = LOGO_OF[id]!, chip = logoChip(l.logo as any, { caption: l.caption, size: lg });
+            plan.appendChild(chip);
+            chip.style.transform = `translate3d(${(p.x - chip.offsetWidth / 2).toFixed(1)}px, ${(p.y - chip.offsetHeight / 2).toFixed(1)}px, 0)`;
+          }
+        }
       }
+      // a still or a film's frame is taken with the owners' logos drawn (a file that never comes holds it 1.5 s at most)
+      await chipsReady(host);
     },
   };
 
@@ -259,7 +307,7 @@ async function setup(ctx: FrameContext, kind: Kind, hoverId: string | null = nul
     : kind === 'seal' ? `S02 at t 3.7 s of its 6 s loop: the root's path lit, the rest dimmed to 0.3. Real: plan time, root, the mainnet receipt (block, time, seconds before the close), the ${GF.objects} objects downloaded back and matched (all_verified ${GF.all_verified}), leaf ${d.showcase.leaf_position + 1}'s check. The Greenfield bucket is on Greenfield testnet; the seal is on BSC mainnet. Comet timing is drawn.`
     : kind === 'seal-late' ? `S02 at t 4.5 s: the late seal. The red comet draws the simulated commit refused with ${late.refused_with} at chain time ${late.seconds_after_gate} s after the close (BSC mainnet; testnet ${d.sealed_day.late_seal.attempts[1]?.seconds_after_gate} s): a simulation, not a mined failed transaction. The cube does not change.`
     : kind === 'cube-check' ? 'Check, not a storyboard frame: the cube alone at S01\'s camera (a crop of the same projection), BNB Chain\'s symbol drawn over it in red as published (marks/bnbchain.svg). The cube shows the mark wherever the two agree.'
-    : kind === 'inspect' ? 'S03, GateRecord hovered: the live mount\'s hover state at its end (its halo, its own strands at full, the other strands at 0.25 and objects at 0.55; the chip and card beside it). Every line of the card is on file in frame-data.json sealed_day; the refusal is the simulated call. The pointer is drawn for the still.'
+    : kind === 'inspect' ? 'S03, GateRecord hovered: the live mount\'s hover state at its end (its halo, its own strands at full, the other strands at 0.25 and objects at 0.55; its card beside it, its label with the BNB Chain chip). Every line of the card is on file in frame-data.json sealed_day; the refusal is the simulated call. The pointer is drawn for the still.'
     : kind === 'hover' ? `Hover still: ${hoverId}, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's ${pieceCards[hoverId!]?.routeLabel} tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.`
     : `S04, the plan view and the end card: the space seen from above, as section 01's diagram; the cube's mark is carved along the iso view, so from above it reads as a cube. ${rest}`;
   return handle;

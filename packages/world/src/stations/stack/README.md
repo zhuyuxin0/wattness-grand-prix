@@ -20,9 +20,12 @@ stack.screenOf('gate');             // { x, y }: a point where that piece is und
 stack.dispose();
 ```
 
+- **Logos:** each sponsor piece's label carries its owner's logo chip from the registry (`kit/logos`, `pieces.ts`
+  `LOGO_OF`), a link to the owner's page in a new tab. Every logo is fetched and decoded at mount.
 - **Pointer:** hovering a piece opens its card beside it (its role and its real integration: endpoints, contracts and
-  transactions, linked to their explorers) and its chip; a click calls `onRoute(tab)`. With a card open, the pointer
-  can cross other pieces on its way to the card's links and its button for a short grace.
+  transactions, linked to their explorers); every card is made at mount, so the first hover opens at once. A click
+  calls `onRoute(tab)`. With a card open, the pointer can cross other pieces on its way to the card's links and its
+  button for a short grace.
 - **Touch:** the first tap opens the card, a second tap on the piece (or the card's button) routes; a tap elsewhere
   closes it.
 - **Keyboard:** every piece is a button in a visually hidden list; focus opens its card, Enter routes, Escape closes.

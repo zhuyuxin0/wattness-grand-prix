@@ -28,6 +28,8 @@ declare module "@world/stations/stack/pieces" {
 
   /** Each piece's site tab, by the package's tab ids. */
   export const ROUTES: Readonly<Record<string, string>>;
+  /** Each sponsor piece's owner, as the logo registry's ids (@world/kit/logos), with words beside the logo. */
+  export const LOGO_OF: Readonly<Record<string, { logo: string | string[]; caption?: string; lead?: string }>>;
   export const PIECE_IDS: readonly string[];
   /** Each piece's label: its plain meaning, and its name where it has one. Reads the fleet's count from the frame data. */
   export function labels(d: unknown): Record<string, { plain: string; name?: string }>;

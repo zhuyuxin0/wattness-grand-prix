@@ -120,6 +120,13 @@
   height: 18px;
   object-fit: contain;
 }
+/* With the page's logo chips loaded, each company's logo stands in the same white glass chip as the site's other
+   logos (kit/logos), a link to the company; one width for all four, so the names still line up. */
+.atlas-board__company .lg-chip.atlas-chip {
+  flex: none;
+  justify-content: center;
+  width: 100px;
+}
 .atlas-board__role {
   color: var(--w-muted);
 }

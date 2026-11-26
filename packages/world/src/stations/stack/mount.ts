@@ -1,5 +1,7 @@
 // @ts-nocheck
 // The stack, live, for the site: mountStack(el, { theme, onRoute }) builds S01's space in el at el's size and runs it.
+// Each sponsor piece's label carries its owner's logo chip, a link to the owner in a new tab (pieces.ts LOGO_OF); every
+// logo is fetched and decoded at mount and every card made before the first hover, so a hover shows at once.
 // Hover a piece (or tap it) and its card opens beside it with its role and real integration; click the piece (or the
 // card's button, or tap it again) and onRoute is called with the site tab that shows it (pieces.ts ROUTES). Keyboard:
 // every piece is a button in a visually hidden list; focus opens its card, Enter routes. The same hover state is
@@ -11,10 +13,11 @@ import { THREE, GrabBlurPass, markTexture, setLineResolution } from './kit';
 import { buildSpace, PAL, POS } from './space';
 import { injectCss, keyCard, zoneTitles, labelLayer } from './dom';
 import { MARK_URLS } from './marks';
-import { cards, labels, ROUTES, PIECE_IDS } from './pieces';
+import { cards, labels, ROUTES, PIECE_IDS, LOGO_OF } from './pieces';
 import { stageLook, fitRest, labelItems, zoneItems, afterItems, keyRows, screenBox } from './common';
 import { hoverController } from './hover';
 import { GLYPH_COLOR } from './glyphs';
+import { preloadLogos, type LogoId } from '../../kit/logos';
 import GF from './greenfield-record.json';
 import TN from './integrations.json';
 
@@ -69,6 +72,8 @@ export function mountStack(el: HTMLElement, opts: StackOptions = {}): StackHandl
   const nav = document.createElement('nav'); nav.className = 'stk-sr'; nav.setAttribute('aria-label', 'The pieces of the stack');
   root.append(canvas, host, nav); el.appendChild(root);
 
+  // the owners' logos, fetched and decoded while the space builds, so the labels' chips draw with it
+  void preloadLogos([...new Set(Object.values(LOGO_OF).flatMap((l) => l.logo))] as LogoId[]);
   const ready = (async () => {
     const d = opts.data ?? (await (dataFiles['../../data/frame-data.json']?.() ?? Promise.resolve(null)));
     if (!d) throw new Error('mountStack: no frame data (pass { data }, or sync src/data/frame-data.json)');
@@ -125,7 +130,8 @@ export function mountStack(el: HTMLElement, opts: StackOptions = {}): StackHandl
         const e = document.createElement('div'); e.className = 'intro-tick stk-after'; e.textContent = it.text;
         Object.assign(e.style, { position: 'absolute', left: '0', top: '0', whiteSpace: 'nowrap' }); labs.root.appendChild(e);
         const w = e.offsetWidth, h = e.offsetHeight;
-        const x = it.align === 'right' ? p.x + 6 : p.x - w / 2, y = it.align === 'right' ? p.y - h / 2 : p.y - h - 4;
+        const side = it.align === 'right' || it.align === 'left';
+        const x = it.align === 'right' ? p.x + 6 : it.align === 'left' ? p.x - w - 6 : p.x - w / 2, y = side ? p.y - h / 2 : p.y - h - 4;
         e.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
         return e;
       }).filter(Boolean);
@@ -141,6 +147,7 @@ export function mountStack(el: HTMLElement, opts: StackOptions = {}): StackHandl
     const pieceCards = cards(d, GF, TN, MARK_URLS, now);
     const route = (tab) => { try { onRoute(tab); } catch (e) { console.error(e); } };
     const hover = hoverController(space, { theme, host, cards: pieceCards, project, size, onRoute: route, glyphColor: GLYPH_COLOR[theme] });
+    hover.prepare();
     const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
     const pickAt = (x, y) => {
       ndc.set((x / size.W) * 2 - 1, -(y / size.H) * 2 + 1); ray.setFromCamera(ndc, stage.camera);

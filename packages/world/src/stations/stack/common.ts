@@ -3,7 +3,7 @@
 // labels and where they sit, the zone titles' row, the "after the seal" ticks and the key card's rows.
 import { THREE, fitCamera } from './kit';
 import { boundsPoints, POS, ZONES, PAL } from './space';
-import { labels, POD_IDS } from './pieces';
+import { labels, POD_IDS, LOGO_OF } from './pieces';
 
 export const ISO = (Math.atan(1 / Math.SQRT2) * 180) / Math.PI;   // 35.26 degrees: the true isometric down-angle
 export const NIGHT = {
@@ -30,10 +30,12 @@ export function fitRest(stage, W, H, rect = { x0: 0.045, x1: 0.85, y0: 0.10, y1:
 /** Where each label sits beside its piece. */
 export const ALIGN = {
   terminal: 'above', brain: 'right', greenfield: 'right', ercot: 'left', cournot: 'left', gate: 'above', studio: 'right', verifier: 'left', aws: 'below', cloudflare: 'above',
+  openfour: 'right', electronx: 'right', flap: 'right', atlas: 'right',
   forecaster: 'inside', state: 'inside', market: 'inside', hedger: 'inside', risk: 'inside', planner: 'inside',
 };
 
-/** The labels' items at the current camera: { id, x, y, plain, name, align, cls }. skip: ids left out. */
+/** The labels' items at the current camera: { id, x, y, plain, name, logo, caption, align, cls }; a sponsor piece's
+ *  name line is its owner's logo chip (LOGO_OF). skip: ids left out. */
 export function labelItems(space, d, project, skip = new Set()) {
   const L = labels(d), out = [];
   const ghost = (id) => space.states[id] === 'designed';
@@ -42,7 +44,9 @@ export function labelItems(space, d, project, skip = new Set()) {
     const at = space.pieces[id]?.at; if (!at) continue;
     const p = project(at); if (!p) continue;
     const pod = POD_IDS.includes(id);
-    out.push({ id, x: p.x, y: p.y, plain: lab.plain, name: lab.name, align: ALIGN[id] ?? 'below', cls: [pod ? 'stk-pod' : '', ghost(id) ? 'stk-ghost' : ''].filter(Boolean).join(' ') });
+    const lg = LOGO_OF[id];
+    out.push({ id, x: p.x, y: p.y, plain: lab.plain, name: lab.name, logo: lg?.logo, caption: lg?.caption, lead: lg?.lead, align: ALIGN[id] ?? 'below',
+      cls: [pod ? 'stk-pod' : '', ghost(id) ? 'stk-ghost' : ''].filter(Boolean).join(' ') });
   }
   return out;
 }
@@ -57,7 +61,8 @@ export function afterItems(space) {
   const out = [];
   const E = space.edges;
   if (E.E3?.after) out.push({ at: E.E3.at(E.E3.len * 0.16).p.toArray(), text: 'read after the seal', align: 'above' });
-  if (E.E5u?.after) out.push({ at: [POS.brain.x + POS.brain.r * 0.78, POS.brain.y - POS.brain.r * 0.62, POS.brain.z], text: 'read after the seal', align: 'right' });
+  // left of the sphere: on its right, Living Brain's label and logo chip stand
+  if (E.E5u?.after) out.push({ at: [POS.brain.x - POS.brain.r * 0.74, POS.brain.y - POS.brain.r * 0.6, POS.brain.z], text: 'read after the seal', align: 'left' });
   if (E.E17?.after) out.push({ at: [POS.pods.state[0] + 6, POS.pod.y + POS.pod.h + 3.2, (POS.pods.planner[1] + POS.pods.forecaster[1]) / 2], text: 'paid job, after the seal', align: 'above' });
   return out;
 }

@@ -173,6 +173,13 @@
   color: var(--w-muted);
   font-weight: 600;
 }
+/* the source's logo chip (kit/logos), its words after it */
+.px-src__who:has(.lg-chip) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--t-space-2);
+}
 .px-src__price {
   font-size: var(--t-fs-stat);
   font-weight: 600;

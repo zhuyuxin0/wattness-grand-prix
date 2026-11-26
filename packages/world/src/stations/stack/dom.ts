@@ -1,11 +1,11 @@
 // @ts-nocheck
-// The stack's words, in DOM over the canvas (never painted into the 3D): the pieces' labels (plain meaning first, the
-// name second and smaller), chapter 05's key card with its drawn samples (engine.ts legendEl), its logo chips
-// (OVERLAY_CSS: a mark on paper in a glass bezel, a caps caption) and tags, the zone titles, the "after the seal" ticks,
-// a piece's card (the storyboard's key-card skin) with the Terminal's popout and chevron glyphs (ui/glyph.css) and the
-// button to the site's tab, and the end card's lockup. Sizes are the storyboard's 1920 cut; the card scales by
-// --stk-k (1 in the stills).
+// The stack's words, in DOM over the canvas (never painted into the 3D): the pieces' labels (plain meaning first, then
+// the name, smaller, or for a sponsor piece its owner's logo chip from the registry, kit/logos), chapter 05's key card
+// with its drawn samples (engine.ts legendEl), the zone titles, the "after the seal" ticks, a piece's card (the
+// storyboard's key-card skin) with the Terminal's popout and chevron glyphs (ui/glyph.css) and the button to the site's
+// tab, and the end card's lockup. Sizes are the storyboard's 1920 cut; the card scales by --stk-k (1 in the stills).
 import { glyphSvg } from './glyphs';
+import { logoChip } from '../../kit/logos';
 
 const CSS = `
 .stk-key { position: absolute; display: grid; gap: 6px; padding: 13px 16px 14px; border-radius: 7px; font: 400 14.5px/18px var(--w-font-sans, system-ui, sans-serif); z-index: 40; }
@@ -21,17 +21,30 @@ const CSS = `
 .stk-labels { position: absolute; inset: 0; pointer-events: none; z-index: 21; }
 .stk-lab { position: absolute; left: 0; top: 0; white-space: nowrap; display: flex; flex-direction: column; gap: 1px; font: 500 14px/17px var(--w-font-sans, system-ui, sans-serif);
   color: #dfe3e7; text-shadow: 0 0 2px #101315, 0 0 4px #101315, 0 0 7px #101315; transition: opacity 0.2s ease; }
-.stk-lab span { font-weight: 400; font-size: 12px; line-height: 14px; color: #98a1aa; }
+/* the name line's words (and the words before a chip): never the chip's own spans, which keep its ink */
+.stk-lab > span, .stk-lab .stk-lead > span { font-weight: 400; font-size: 12px; line-height: 14px; color: #98a1aa; }
 .stk-lab[data-align="right"], .stk-lab[data-align="inside"] { align-items: flex-start; }
 .stk-lab[data-align="left"] { align-items: flex-end; text-align: right; }
 .stk-lab[data-align="below"], .stk-lab[data-align="above"] { align-items: center; text-align: center; }
 .stk-lab.stk-pod { font-size: 14.5px; color: #e6e9ec; }
 .stk-lab.stk-ghost { color: #8a929a; }
-.stk-lab.stk-ghost span { color: #6f777f; }
+.stk-lab.stk-ghost > span { color: #6f777f; }
+/* a sponsor piece's name line is its owner's logo chip (kit/logos/chip.css): a link to the owner in a new tab, so it
+   takes the pointer the labels' layer lets through; the label's glow is for words on the stage, not on the white glass */
+.stk-lab .lg-chip { --lg-h: 13px; margin-top: 4px; text-shadow: none; transition: opacity 0.2s ease, translate 0.12s ease-out, box-shadow 0.12s ease-out; }
+.stk-lab.stk-dim .lg-chip { opacity: 0.6; }
+.stk-lab .stk-lead { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.stk-lab .stk-lead .lg-chip { margin-top: 0; }
+/* on a phone's stage the labels would sit on each other: the owners' chips go in one row of their own, wrapped */
+.stk-strip { position: absolute; left: 16px; right: 16px; top: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; z-index: 21; pointer-events: none; }
+.stk-strip .lg-chip { --lg-h: 11px; }
+/* the plan view's chips, one over each sponsor piece, the logo alone */
+.stk-plan { position: absolute; inset: 0; pointer-events: none; z-index: 22; }
+.stk-plan .lg-chip { position: absolute; left: 0; top: 0; --lg-h: 14px; }
 /* while another piece is open its neighbours step back in color, not opacity, so they still read at 4.5:1 or more on
    the stage (#8f979f on #101315 is about 6:1; #7d858d about 4.9:1) */
 .stk-lab.stk-dim { color: #8f979f; }
-.stk-lab.stk-dim span { color: #7d858d; }
+.stk-lab.stk-dim > span, .stk-lab.stk-dim .stk-lead > span { color: #7d858d; }
 /* a narrow stage (a phone): at that scale the labels would sit on each other, so a tap's card names each piece */
 .stk-root.is-narrow .stk-lab, .stk-root.is-narrow .intro-tick.stk-after { display: none; }
 .stk-root.is-narrow .stk-card .stk-mono { white-space: normal; overflow-wrap: anywhere; }
@@ -40,16 +53,7 @@ const CSS = `
 .intro-plate.stk-sealed { box-shadow: inset 3px 0 0 #F0B90B, 0 0 0 1px rgba(255, 255, 255, 0.12), 0 6px 16px -10px rgba(0, 0, 0, 0.3); padding-left: 12px; }
 .intro-plate.stk-refused { box-shadow: inset 3px 0 0 #e5534b, 0 0 0 1px rgba(255, 255, 255, 0.12), 0 6px 16px -10px rgba(0, 0, 0, 0.3); padding-left: 12px; }
 .intro-plate .stk-mono, .stk-card .stk-mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-variant-numeric: tabular-nums; font-size: 0.88em; line-height: 1.5; white-space: nowrap; }
-/* chips and tags: they come with the card, with chapter 05's entry (a 6 px rise in 160 ms) */
-.stk-chip { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 5px; white-space: nowrap; z-index: 38; pointer-events: none; }
-.stk-chip .glass { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 5px 5px 6px; border-radius: 12px; }
-.stk-paper { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; padding: 7px 12px; border-radius: 8px; background: #ffffff; box-shadow: 0 0 0 1px rgba(16, 19, 21, 0.08); }
-.stk-paper.dark { background: #101315; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1); }
-.stk-paper img { display: block; height: 22px; width: auto; }
-.stk-cap { position: relative; z-index: 1; padding: 0 6px; font: 500 11px/13px var(--w-font-sans, system-ui, sans-serif); letter-spacing: 0.11em; text-transform: uppercase; color: #b9c0c7; }
-.stk-tag { display: flex; flex-direction: column; align-items: center; padding: 5px 11px 6px; border-radius: 8px; font: 400 12px/15px var(--w-font-sans, system-ui, sans-serif);
-  color: #9ea6ae; background: rgba(22, 26, 30, 0.92); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.11), 0 8px 22px -10px rgba(0, 0, 0, 0.7); }
-.stk-tag b { font-weight: 600; color: #eef2f6; font-size: 13px; }
+/* a piece's card comes in with chapter 05's entry (a 6 px rise in 160 ms) */
 /* a piece's card; an open card sits over the live mount's key card, which it can overlap near the stage's bottom right */
 .stk-card { --k: var(--stk-k, 1); position: absolute; left: 0; top: 0; width: calc(470px * var(--k)); max-width: calc(100% - 32px); box-sizing: border-box; padding: calc(16px * var(--k)) calc(18px * var(--k)) calc(17px * var(--k));
   border-radius: 9px; z-index: 41; color: #e6e8ea; background: rgba(13, 17, 23, 0.97); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 18px 40px -18px rgba(0, 0, 0, 0.8);
@@ -85,9 +89,9 @@ const CSS = `
 .stk-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 /* the light cut */
 [data-stk-theme="light"] .stk-lab { color: #1f2429; text-shadow: 0 0 2px #fff, 0 0 4px #fff, 0 0 7px #fff; }
-[data-stk-theme="light"] .stk-lab span { color: #59606a; }
+[data-stk-theme="light"] .stk-lab > span, [data-stk-theme="light"] .stk-lab .stk-lead > span { color: #59606a; }
 [data-stk-theme="light"] .stk-lab.stk-dim { color: #59606a; }
-[data-stk-theme="light"] .stk-lab.stk-dim span { color: #5f666f; }
+[data-stk-theme="light"] .stk-lab.stk-dim > span { color: #5f666f; }
 [data-stk-theme="light"] .stk-lab.stk-pod { color: #1a1a1a; }
 [data-stk-theme="light"] .stk-lab.stk-ghost { color: #8b939c; }
 [data-stk-theme="light"] .intro-tick.stk-after { color: #4a515a; background: rgba(255, 255, 255, 0.92); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.16); }
@@ -100,9 +104,6 @@ const CSS = `
 [data-stk-theme="light"] .stk-card dt { color: #636a75; }
 [data-stk-theme="light"] .stk-card-foot a.out { color: #0b7f68; }
 [data-stk-theme="light"] .stk-go { color: #ffffff; background: #0b7f68; }
-[data-stk-theme="light"] .stk-cap { color: #4a515a; }
-[data-stk-theme="light"] .stk-tag { color: #636a75; background: rgba(255, 255, 255, 0.94); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12), 0 6px 18px -10px rgba(0, 0, 0, 0.3); }
-[data-stk-theme="light"] .stk-tag b { color: #1a1a1a; }
 .stk-lockup { color: #f6f7f8; }
 .stk-lockup[data-theme="light"] { color: #1a1a1a; }
 .stk-lockup[data-theme="light"] .rule { background: rgba(0, 0, 0, 0.3); }
@@ -125,7 +126,8 @@ const NS = 'http://www.w3.org/2000/svg';
 const sv = (n, a) => { const e = document.createElementNS(NS, n); for (const [k, v] of Object.entries(a)) e.setAttribute(k, String(v)); return e; };
 let gradN = 0;
 
-/** The pieces' labels: items { id, x, y, plain, name?, align, cls? }; returns { els: Map(id -> el), place(id, x, y) }. */
+/** The pieces' labels: items { id, x, y, plain, name?, logo?, caption?, align, cls? }; a logo (the registry's id, or
+ *  ids for one glass) stands in the name line's place as the owner's chip. Returns { root, els: Map(id -> el), set, clear }. */
 export function labelLayer(host) {
   const box = document.createElement('div'); box.className = 'stk-labels'; host.appendChild(box);
   const els = new Map();
@@ -150,7 +152,13 @@ export function labelLayer(host) {
         if (!el) {
           el = document.createElement('div'); el.className = `stk-lab${it.cls ? ` ${it.cls}` : ''}`; el.dataset.piece = it.id; el.dataset.align = it.align ?? 'below';
           const b = document.createElement('b'); b.style.fontWeight = 'inherit'; b.textContent = it.plain; el.appendChild(b);
-          if (it.name) { const s = document.createElement('span'); s.textContent = it.name; el.appendChild(s); }
+          if (it.logo && it.lead) {
+            // words, then the chip, on one line (the AgentCore piece: "which runs them on" its owner's chip)
+            const row = document.createElement('div'); row.className = 'stk-lead';
+            const w = document.createElement('span'); w.textContent = it.lead;
+            row.append(w, logoChip(it.logo, { caption: it.caption })); el.classList.add('has-logo'); el.appendChild(row);
+          } else if (it.logo) { el.classList.add('has-logo'); el.appendChild(logoChip(it.logo, { caption: it.caption })); }
+          else if (it.name) { const s = document.createElement('span'); s.textContent = it.name; el.appendChild(s); }
           box.appendChild(el); els.set(it.id, el);
         }
         rects.set(it.id, place(el, it.x, it.y, it.align ?? 'below', W));
@@ -209,26 +217,14 @@ export function zoneTitles(host, items, theme) {
   });
 }
 
-/** A logo chip (the owner's lockup on paper in the Terminal's glass bezel, a caps caption under it) or a tag (two
- *  words, for the pieces with no mark of their own). Returns { el, ready, place(x, y) } with the chip's foot at (x, y). */
-export function chip(host, spec) {
-  const c = document.createElement('div'); c.className = 'stk-chip stk-pop';
-  let ready = Promise.resolve();
-  if (spec.tag) {
-    const t = document.createElement('div'); t.className = 'stk-tag';
-    t.append(document.createTextNode(spec.tag)); const b = document.createElement('b'); b.textContent = spec.caption; t.appendChild(b);
-    c.appendChild(t);
-  } else {
-    const g = document.createElement('div'); g.className = 'glass';
-    const paper = document.createElement('div'); paper.className = `stk-paper${spec.dark ? ' dark' : ''}`;
-    const img = document.createElement('img'); img.src = spec.src; img.alt = ''; img.style.height = `${spec.height ?? 22}px`; paper.appendChild(img);
-    g.appendChild(paper);
-    if (spec.caption) { const cap = document.createElement('div'); cap.className = 'stk-cap'; cap.textContent = spec.caption; g.appendChild(cap); }
-    c.appendChild(g);
-    ready = img.decode ? img.decode().catch(() => {}) : Promise.resolve();
-  }
-  host.appendChild(c);
-  return { el: c, ready, place(x, y) { c.style.setProperty('--x', `${(x - c.offsetWidth / 2).toFixed(1)}px`); c.style.setProperty('--y', `${(y - c.offsetHeight).toFixed(1)}px`); } };
+/** The owners' logo chips in one wrapped row (a phone's stage, where labels would collide): logos, each the registry's
+ *  id or ids for one glass, in the order given; its top at y. Returns the row. */
+export function logoStrip(host, logos, y) {
+  const row = document.createElement('div'); row.className = 'stk-strip';
+  for (const l of logos) row.appendChild(logoChip(l.logo, { caption: l.caption }));
+  row.style.top = `${Math.round(y)}px`;
+  host.appendChild(row);
+  return row;
 }
 
 /** Keeps a code's letters and number together across a line end (SHA-256, ERC-8004): a non-breaking hyphen. */
