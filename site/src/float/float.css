@@ -1,0 +1,280 @@
+/*
+ * The float layer: rc-dock's float box in the site's tokens, after wattness.tech's Terminal (wattness-site apps/terminal
+ * src/shell/dock.css, and apps/mms skins/wattness.css "floating panes"). rc-dock's light sheet is the layout base and
+ * every color it sets is overridden here, so one code path serves both themes; its grey glow and the resize grip baked
+ * into a data: URI are redrawn: the raised plane, a hairline, the Terminal's lift, a grip in the text's own color.
+ *
+ * Stacking: the panes sit over the page and under the masthead's menus. The masthead is 20, a battery picker's list 30,
+ * the market day's popover and sheet 50, the tab drawer 60; the introduction is a modal dialog in the top layer. The
+ * layer is 25, so Ask Ness's panel (anything from 26) is above the panes and the popovers are above both.
+ */
+
+.gp-float-root {
+  --gp-z-panes: 25;
+}
+
+.gp-float {
+  position: fixed;
+  z-index: var(--gp-z-panes);
+  top: var(--gp-masthead-h);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* The layer is glass the pointer passes through; only a pane takes it. */
+  pointer-events: none;
+}
+.gp-float .dock-layout {
+  pointer-events: none;
+}
+/* The dock itself is empty: the panes only float. */
+.gp-float .dock-layout > .dock-box:not(.dock-fbox) {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- a floating pane */
+
+.gp-float .dock-fbox > .dock-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--t-pane);
+  color: var(--w-fg);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-paper);
+  box-shadow: var(--t-shadow-2);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs);
+  line-height: var(--t-lh);
+}
+:root[data-theme="dark"] .gp-float .dock-fbox > .dock-panel {
+  /* Dark has no soft lift of its own on a near-black page: a hair of light at the edge carries the plane. */
+  box-shadow: var(--t-shadow-2), 0 0 0 1px color-mix(in srgb, var(--w-fg) 8%, transparent);
+}
+.gp-float .dock-fbox > .dock-panel.dragging {
+  opacity: 0.92;
+}
+
+/* The header: the pane's tab, its group above its name, and the two actions. The whole bar carries the pane. */
+.gp-float .dock-bar {
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  background: var(--t-chrome);
+  border-bottom: 1px solid var(--w-border);
+  font-size: var(--t-fs);
+  cursor: move;
+}
+.gp-float .dock-nav,
+.gp-float .dock-nav-wrap,
+.gp-float .dock-nav-list {
+  height: 100%;
+}
+.gp-float .dock-nav-wrap {
+  min-width: 0;
+}
+.gp-float .dock-tab {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 var(--t-space-4);
+  background: transparent;
+  border: 0;
+  color: var(--w-fg);
+  font-weight: 400;
+  cursor: move;
+}
+.gp-float .dock-tab:hover,
+.gp-float .dock-tab-active,
+.gp-float .dock-tab-active:hover {
+  color: var(--w-fg);
+  background: transparent;
+}
+.gp-float .dock-tab > div {
+  padding: 0;
+  outline-color: var(--t-focus);
+}
+.gp-float .dock-ink-bar {
+  display: none;
+}
+.gp-float .dock-nav-more,
+.gp-float .dock-nav-operations {
+  display: none;
+}
+.gp-float .dock-extra-content {
+  height: 100%;
+  align-items: center;
+  padding-right: var(--t-space-3);
+}
+
+.gp-pane__title {
+  display: flex;
+  align-items: center;
+  gap: var(--t-space-3);
+  min-width: 0;
+  white-space: nowrap;
+}
+.gp-pane__group {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.gp-pane__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.gp-pane__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* The tab's icon, as the side panel draws it beside the open tab. */
+.gp-pane__icon {
+  color: var(--w-fg);
+}
+
+.gp-pane__actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--t-space-2);
+}
+/* The Terminal's 28px control, on the raised plane: hovers change color only. */
+.gp-pane__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--t-ctl-h);
+  padding: 0 10px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--m-dur-s) ease-out;
+}
+.gp-pane__btn:hover {
+  background: color-mix(in srgb, var(--w-fg) 6%, var(--t-raised));
+}
+.gp-pane__btn--icon {
+  width: var(--t-ctl-h);
+  padding: 0;
+  justify-content: center;
+}
+
+/* The page, scrolling inside its pane. */
+.gp-float .dock-content-holder {
+  min-height: 0;
+}
+.gp-float .dock-tabpane {
+  background: var(--t-pane);
+}
+.gp-pane__scroll {
+  /* A page's bars that stick under the masthead stick to the pane's top here: the pane scrolls, not the window. */
+  --gp-masthead-h: 0px;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--t-pane);
+}
+.gp-pane__scroll:focus {
+  outline: none;
+}
+.gp-pane__page {
+  padding: var(--t-space-5) var(--t-space-5) var(--gp-space-8);
+}
+
+/* The edges resize; the corner carries the grip, two strokes in the muted ink (rc-dock's is a fixed grey picture). */
+.gp-float .dock-panel-drag-size {
+  z-index: 3;
+}
+.gp-float .dock-panel-drag-size-b-r {
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  height: 18px;
+  background-image: none;
+}
+.gp-float .dock-panel-drag-size-b-r::before {
+  content: "";
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 9px;
+  height: 9px;
+  background:
+    linear-gradient(135deg, transparent 0 calc(50% - 0.75px), var(--w-muted) calc(50% - 0.75px) calc(50% + 0.75px), transparent calc(50% + 0.75px)) no-repeat,
+    linear-gradient(135deg, transparent 0 calc(50% - 0.75px), var(--w-muted) calc(50% - 0.75px) calc(50% + 0.75px), transparent calc(50% + 0.75px)) no-repeat;
+  background-size: 9px 9px, 5px 5px;
+  background-position: right bottom, right bottom;
+  opacity: 0.8;
+}
+.gp-float .dock-panel-drag-size-b-r:hover::before {
+  opacity: 1;
+}
+
+/* ---------------------------------------------------------------- the phone's sheet */
+
+.gp-sheet {
+  position: fixed;
+  z-index: var(--gp-z-panes);
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--t-pane);
+  color: var(--w-fg);
+  animation: gp-sheet-in var(--m-dur-m) var(--m-ease-out);
+}
+.gp-sheet[hidden] {
+  display: none;
+}
+.gp-sheet__bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--t-space-4);
+  min-height: 48px;
+  padding: env(safe-area-inset-top, 0px) var(--gp-gutter) 0;
+  background: var(--t-chrome);
+  border-bottom: 1px solid var(--w-border);
+}
+.gp-sheet .gp-pane__title {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+.gp-sheet .gp-pane__btn {
+  height: 32px;
+}
+.gp-sheet .gp-pane__btn--icon {
+  width: 32px;
+}
+.gp-sheet .gp-pane__scroll {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+.gp-sheet .gp-pane__page {
+  padding: var(--t-space-5) var(--gp-gutter) calc(var(--gp-space-8) + env(safe-area-inset-bottom, 0px));
+}
+@keyframes gp-sheet-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
