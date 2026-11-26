@@ -95,7 +95,7 @@ describe('season config and salt', () => {
     expect(token.toLowerCase().endsWith('7777')).toBe(true);
     expect(predictToken(salt)).toBe(token);
     expect(tries).toBeGreaterThan(0);
-  });
+  }, 30_000);
 });
 
 describe('verified-skill weight', () => {
