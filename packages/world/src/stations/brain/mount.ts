@@ -237,7 +237,14 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     const sc = root.querySelector<HTMLElement>('.lb-scope');
     if (sc) root.style.setProperty('--lbm-scope-h', `${Math.ceil(sc.offsetHeight)}px`);
     compose();
+    // where no tag stands: the HUD, the chips, the scope line, the pages button (their boxes, 4 px round)
+    const o = root.getBoundingClientRect();
+    keepOut = [root.querySelector('.lb-hud'), chipsBox, sc, pagesBtn].flatMap((e) => {
+      const r = e?.getBoundingClientRect();
+      return r && r.width > 0 && r.height > 0 ? [[r.left - o.left - 4, r.top - o.top - 4, r.right - o.left + 4, r.bottom - o.top + 4] as [number, number, number, number]] : [];
+    });
   };
+  let keepOut: [number, number, number, number][] = [];
   /** The farthest the visitor zooms out: Living Brain's 7, or more where the stage's framing needs it. */
   const dMax = () => Math.max(7, frame(VIEW.all).dist * 1.2);
   const fillDrawer = () => {
@@ -305,6 +312,9 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     return Math.min(1, Math.max(0.7, (half * 0.92 - 0.3) / ORBIT.radius));
   };
   S.orbitK = orbitScale();
+  /** The camera's distance as Living Brain's framing would have it: on a stage narrower than it is tall, the brain view
+   *  frames from farther off (frame()), so the zoom's fades and the tags' are measured against that framing. */
+  const zoomDist = () => (S.cam.dist * REST.dist) / frame(VIEW.brain).dist;
   const animateCam = (to: { dist: number; el: number; az?: number }, dur = DUR) => {
     S.camA = { ...S.cam }; S.camB = { az: S.cam.az, ...to }; S.ct0 = now(); S.camDur = reduced ? 0.2 : dur; S.zoomTo = null;
     if (to.az != null) S.pauseUntil = now() + S.camDur + 4;
@@ -403,7 +413,9 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     const k = reduced ? (t - S.ft0 >= 0.2 ? 1 : (t - S.ft0) / 0.2) : calm((t - S.ft0) / DUR);
     const wOf = (x: BrainFocus) => (S.focus === x ? k : 0) + (S.from === x ? 1 - k : 0);
     const fs = t - S.form0, formK = clamp01(fs / 3.2);
-    const zoom = smooth((S.cam.dist - 2.15) / (3.1 - 2.15));
+    // the members, their tags, the filaments and the links across brains fade with the zoom (Living Brain's 2.15 to
+    // 3.1), measured against the stage's own framing: a tall stage frames a brain from farther off, as if from 2.08
+    const zoom = smooth((zoomDist() - 2.15) / (3.1 - 2.15));
     // a selected page keeps its connections lit while another is hovered (the hover shows only its small card)
     const target = S.sel ?? S.hover;
     const key = target ? `${target.brain}/${target.slug}` : '';
@@ -541,13 +553,14 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     project = projectorNow(world, size, stage.camera);
     const specs = tagSpecs(P);
     // the member brains' tags take part in the overlap rule, the farther member's giving way
+    const d = zoomDist();
     const mt = BRAIN_IDS.map((b) => {
-      const w = P._w.wOf(b), vis = (1 - w) * (P.cam.dist > 2.6 ? 1 : P._w.zoom) * smooth((P._w.fs - 2.9) / 0.7);
+      const w = P._w.wOf(b), vis = (1 - w) * (d > 2.6 ? 1 : P._w.zoom) * smooth((P._w.fs - 2.9) / 0.7);
       return { b, ms: memberScreen(world, b, stage.camera, size), k: { name: vis, detail: vis } };
     });
-    const kept = chrome.keptAt(specs, project, mt);
-    chrome.tags(specs, project, (id) => (kept.has(id) ? 1 : 0), P.cam.dist);
-    for (const m of mt) chrome.member(m.b, { name: m.ms.name, detail: m.ms.detail }, { name: kept.has(`mn:${m.b}`) ? m.k.name : 0, detail: kept.has(`md:${m.b}`) ? m.k.detail : 0 }, S.hoverBrain === m.b);
+    const kept = chrome.keptAt(specs, project, mt, keepOut);
+    chrome.tags(specs, project, (id) => (kept.has(id) ? 1 : 0), d);
+    for (const m of mt) chrome.member(m.b, { name: m.ms.name, detail: m.ms.detail, center: m.ms.center }, { name: kept.has(`mn:${m.b}`) ? m.k.name : 0, detail: kept.has(`md:${m.b}`) ? m.k.detail : 0 }, S.hoverBrain === m.b);
     if (hoverEl && S.hover) {
       const s = screenOf(S.hover.brain, S.hover.slug);
       if (s) {

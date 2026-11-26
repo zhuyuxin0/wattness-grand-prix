@@ -196,8 +196,10 @@ export class Chrome {
 
   /** Which tags overlapping heavier ones are hidden, at one moment (Living Brain's rule): the ids kept. The member
    *  brains' tags take part: their names after the beat's own page tags (hot, selected, the conflict) and before the
-   *  rest, their page counts last, the farther member's giving way to the nearer's (ids mn:<brain> and md:<brain>). */
-  keptAt(tags: TagSpec[], project: Projector, members: MemberTags[] = []): Set<string> {
+   *  rest, their page counts last, the farther member's giving way to the nearer's (ids mn:<brain> and md:<brain>).
+   *  keepOut: the host's own chrome over the layer (its HUD, buttons, scope line), where no tag stands; with it, a page
+   *  tag the layer's edge would cut is hidden too. */
+  keptAt(tags: TagSpec[], project: Projector, members: MemberTags[] = [], keepOut: [number, number, number, number][] | null = null): Set<string> {
     type Item = { id: string; order: number; rect: () => [number, number, number, number] | null };
     const items: Item[] = tags.filter((t) => t.k > 0.02).map((t) => ({ id: t.id, order: t.order, rect: () => {
       const s = project(t.cloud, t.index);
@@ -206,14 +208,20 @@ export class Chrome {
       return [s.x - w / 2, s.y - h / 2, s.x + w / 2, s.y + h / 2];
     } }));
     [...members].sort((a, b) => a.ms.depth - b.ms.depth).forEach((m, rank) => {
+      // a member off the layer draws no tags (member()); the others' rects are where member() puts them
+      if (this.offLayer(m.ms.center)) return;
       const { name, detail } = this.memberTagEls(m.b);
-      if (m.k.name > 0.02 && !m.ms.name.behind) items.push({ id: `mn:${m.b}`, order: -0.5 + rank * 0.01, rect: () => [m.ms.name.x - name.w / 2, m.ms.name.y - name.h / 2, m.ms.name.x + name.w / 2, m.ms.name.y + name.h / 2] });
-      if (m.k.detail > 0.02 && !m.ms.detail.behind) items.push({ id: `md:${m.b}`, order: 1e4 + rank, rect: () => [m.ms.detail.x, m.ms.detail.y - detail.h / 2, m.ms.detail.x + detail.w, m.ms.detail.y + detail.h / 2] });
+      const rect = (x: TagEl, p: { x: number; y: number }, align: 'center' | 'left') => (): [number, number, number, number] => { const q = this.placeOf(x, p, align); return [q.left, q.top, q.left + x.w, q.top + x.h]; };
+      if (m.k.name > 0.02 && !m.ms.name.behind) items.push({ id: `mn:${m.b}`, order: -0.5 + rank * 0.01, rect: rect(name, m.ms.name, 'center') });
+      if (m.k.detail > 0.02 && !m.ms.detail.behind) items.push({ id: `md:${m.b}`, order: 1e4 + rank, rect: rect(detail, m.ms.detail, 'left') });
     });
-    const kept = new Set<string>(), rects: [number, number, number, number][] = [];
+    const kept = new Set<string>(), rects: [number, number, number, number][] = [...(keepOut ?? [])];
+    const W = this.el.clientWidth, H = this.el.clientHeight;
     for (const it of items.sort((a, b) => a.order - b.order)) {
       const r = it.rect();
       if (!r || rects.some((q) => r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1])) continue;
+      const memberTag = it.id.startsWith('mn:') || it.id.startsWith('md:');
+      if (keepOut && W && H && !memberTag && (r[0] < 0 || r[1] < 0 || r[2] > W || r[3] > H)) continue;
       rects.push(r); kept.add(it.id);
     }
     return kept;
@@ -255,16 +263,31 @@ export class Chrome {
     return { name: get(`${b}:name`, 'lb-member', PLAIN[b]), detail: get(`${b}:detail`, 'lb-detail', `${brain.pages} ${brain.pages === 1 ? 'page' : 'pages'}`) };
   }
 
-  /** A member's name above it and its page count beside it ("123 pages"; Living Brain's other detail tag, its owner's
-   *  name, is never drawn), kept inside the layer. */
-  member(b: BrainId, at: { name: { x: number; y: number; behind: boolean }; detail: { x: number; y: number; behind: boolean } }, k: { name: number; detail: number }, hot = false) {
-    const { name, detail } = this.memberTagEls(b);
+  /** Where a member's tag stands: centered over its point (the name) or starting at it (the page count), kept 6 px
+   *  inside the layer. keptAt and member() both place it so. */
+  private placeOf(x: TagEl, p: { x: number; y: number }, align: 'center' | 'left') {
     const W = this.el.clientWidth || Infinity;
+    return { left: Math.max(6, Math.min(W - x.w - 6, p.x + (align === 'center' ? -x.w / 2 : 0))), top: p.y - x.h / 2 };
+  }
+
+  /** A member whose center is off the layer (or behind the camera) draws no tags: held at the edge they would stand
+   *  over other tags, far from the brain they name. */
+  private offLayer(c?: { x: number; y: number; behind?: boolean }) {
+    const W = this.el.clientWidth, H = this.el.clientHeight;
+    if (!c || !W || !H) return false;
+    return !!c.behind || c.x < 0 || c.x > W || c.y < 0 || c.y > H;
+  }
+
+  /** A member's name above it and its page count beside it ("123 pages"; Living Brain's other detail tag, its owner's
+   *  name, is never drawn), kept inside the layer; none while the member's center is off it. */
+  member(b: BrainId, at: { name: { x: number; y: number; behind: boolean }; detail: { x: number; y: number; behind: boolean }; center?: { x: number; y: number; behind: boolean } }, k: { name: number; detail: number }, hot = false) {
+    const { name, detail } = this.memberTagEls(b);
+    const off = this.offLayer(at.center);
     const place = (x: TagEl, p: { x: number; y: number; behind: boolean }, o: number, align: 'center' | 'left') => {
-      const op = p.behind ? 0 : o;
+      const op = p.behind || off ? 0 : o;
       x.el.style.opacity = op.toFixed(3); x.el.style.visibility = op > 0.003 ? 'visible' : 'hidden';
-      const left = Math.max(6, Math.min(W - x.w - 6, p.x + (align === 'center' ? -x.w / 2 : 0)));
-      x.el.style.transform = `translate3d(${left.toFixed(1)}px, ${(p.y - x.h / 2).toFixed(1)}px, 0)`;
+      const q = this.placeOf(x, p, align);
+      x.el.style.transform = `translate3d(${q.left.toFixed(1)}px, ${q.top.toFixed(1)}px, 0)`;
     };
     place(name, at.name, k.name * 0.92, 'center');
     place(detail, at.detail, k.detail * 0.76, 'left');

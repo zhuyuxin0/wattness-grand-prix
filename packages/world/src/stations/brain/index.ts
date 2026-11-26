@@ -86,7 +86,7 @@ async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string
     for (const b of BRAIN_IDS) {
       const cam = useStage ? st.camera : restCam;
       const ms = memberScreen(world, b, cam, size);
-      chrome.member(b, { name: ms.name, detail: ms.detail }, { name: w.members[b].name * shown(`mn:${b}`), detail: w.members[b].detail * shown(`md:${b}`) });
+      chrome.member(b, { name: ms.name, detail: ms.detail, center: ms.center }, { name: w.members[b].name * shown(`mn:${b}`), detail: w.members[b].detail * shown(`md:${b}`) });
     }
     chrome.hud(w.hud);
     chrome.scope(scopeLine(inFilm(ctx.overlay)));
