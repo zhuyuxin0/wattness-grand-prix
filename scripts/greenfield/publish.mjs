@@ -362,7 +362,7 @@ async function check() {
   const total = out.reduce((s, r) => s + r.bytes, 0);
   const doc = {
     schema: "gate-record.greenfield-publication.v1",
-    operating_day: "2026-11-26",
+    operating_day: `${DAY.slice(3, 7)}-${DAY.slice(7, 9)}-${DAY.slice(9, 11)}`,
     network: { greenfield: GF_CHAIN_NAME, bsc: 97 },
     bucket: { name: BUCKET, owner: bucket.owner, visibility: "public-read", id: String(bucket.id), primary_sp: sp.endpoint },
     explorer: `https://testnet.dcellar.io/buckets/${BUCKET}`,
