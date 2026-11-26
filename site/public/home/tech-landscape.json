@@ -1,0 +1,219 @@
+{
+ "schema": "grand-prix.loop.v1",
+ "frame_key": "stack.rest",
+ "loop": {
+  "id": "stack.rest",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 1,
+  "theme": "dark",
+  "seconds": 12,
+  "fps": 30,
+  "frames": 360,
+  "camera": {
+   "zoom": 1.1,
+   "dx": 0.0578,
+   "dy": -0.0908,
+   "daz": 2.5,
+   "del": 0.5
+  },
+  "clock": {
+   "t0": 7,
+   "rock": 0.9
+  },
+  "comets": [
+   {
+    "spacings": 5,
+    "speedRatio": 0.9491
+   },
+   {
+    "spacings": 5,
+    "speedRatio": 0.9491
+   },
+   {
+    "spacings": 5,
+    "speedRatio": 0.9491
+   },
+   {
+    "spacings": 5,
+    "speedRatio": 0.9491
+   },
+   {
+    "spacings": 5,
+    "speedRatio": 0.9491
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 30,
+    "speedRatio": 1.0163
+   },
+   {
+    "spacings": 28,
+    "speedRatio": 1
+   },
+   {
+    "spacings": 8,
+    "speedRatio": 1
+   },
+   {
+    "spacings": 28,
+    "speedRatio": 1
+   },
+   {
+    "spacings": 8,
+    "speedRatio": 1
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 6,
+    "speedRatio": 0.9815
+   },
+   {
+    "spacings": 8,
+    "speedRatio": 1
+   },
+   {
+    "spacings": 8,
+    "speedRatio": 1
+   },
+   {
+    "spacings": 0,
+    "speedRatio": 1
+   }
+  ],
+  "settle": 3,
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "setupMs": 1528
+ },
+ "code": {
+  "commit": "ab0e8ffb73fe760cc1c382a56f522d495d945859",
+  "base": "main ab0e8ff",
+  "note": "packages/world at main ab0e8ff (the stack with Living Brain's brain in its sphere), plus the loop lab committed with these files (loop.html, src/loop.ts, scripts/render-loop.mjs); rendered from this branch, whose packages/world differs from main's only by those three files",
+  "dirty": false
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render-loop.mjs --port <port> --frame stack.rest --frames <frames> --out <out> --name tech-landscape --seconds 12 --fps 30 --zoom 1.1 --dx 0.0578 --dy -0.0908 --daz 2.5 --del 0.5 --rock 0.9 --t0 7",
+  "url": "loop.html?frame=stack.rest&w=1920&h=1080&seconds=12&fps=30&zoom=1.1&dx=0.0578&dy=-0.0908&daz=2.5&del=0.5&rock=0.9&t0=7",
+  "scale": 1,
+  "frames": 360,
+  "seconds": 12,
+  "fps": 30,
+  "closes": true,
+  "wall_ms": 49131,
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "gpu_load": {
+   "before": 74,
+   "after": 78
+  },
+  "warnings": [],
+  "rendered": {
+   "bangkok": "2026-11-27 01:27",
+   "ct": "2026-11-26 12:27"
+  },
+  "deterministic": "frames 0, 30, ... 330 drawn again in a fresh page (the same command at --fps 1) are byte-identical to these; frame 360 is frame 0 byte for byte"
+ },
+ "encode": {
+  "mp4": "ffmpeg -framerate 30 -i <frames>/%04d.png -c:v libx264 -preset veryslow -crf 30 -maxrate 1.6M -bufsize 3.2M -pix_fmt yuv420p -profile:v high -g 120 -movflags +faststart -an",
+  "webm": "ffmpeg -framerate 30 -i <frames>/%04d.png -c:v libvpx-vp9 -b:v 0 -crf 42 -deadline good -cpu-used 1 -row-mt 1 -pix_fmt yuv420p -g 120 -an",
+  "poster": "cwebp -q 78 -m 6 -sharp_yuv -quiet <frames>/0000.png",
+  "tools": {
+   "ffmpeg": "ffmpeg version 8.1",
+   "cwebp": "1.6.0"
+  }
+ },
+ "files": {
+  "tech-landscape.mp4": {
+   "bytes": 1023334,
+   "sha256": "b1100fc8eddb603be95ebef2ad337ca531f645c1edf6dd9b5564421b33295956",
+   "codec": "h264",
+   "width": 1920,
+   "height": 1080,
+   "pix_fmt": "yuv420p",
+   "fps": "30/1",
+   "frames": 360,
+   "seconds": 12,
+   "audio": false
+  },
+  "tech-landscape.webm": {
+   "bytes": 1763828,
+   "sha256": "1b26505741f4fcb2848bc2d90b9d06275871eb4a614b0b93ffe9ce3a5fd3c4e3",
+   "codec": "vp9",
+   "width": 1920,
+   "height": 1080,
+   "pix_fmt": "yuv420p",
+   "fps": "30/1",
+   "frames": 360,
+   "seconds": 12,
+   "audio": false
+  },
+  "tech-landscape-poster.webp": {
+   "bytes": 59646,
+   "sha256": "acc88c4c5eb5f8224ffe7ba86325e7f188d06bccf11866d63deca316e6b9407d",
+   "width": 1920,
+   "height": 1080,
+   "of": "frame 0"
+  }
+ },
+ "total_bytes": 2846808,
+ "rerender_when": "the stack changes: packages/world/src/stations/stack/**, the brain inset (stations/brain/inset.ts and its data), their kit parts, or the frame data"
+}

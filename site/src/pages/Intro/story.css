@@ -212,3 +212,18 @@
     white-space: nowrap;
   }
 }
+
+/* The story's last stop: the way into the Terminal, beside the story's bar (StoryOverlay measures where). */
+.story-dialog__end {
+  position: absolute;
+  z-index: 64;
+  left: 0;
+  top: 0;
+}
+.story-dialog__enter {
+  height: 30px;
+  padding: 0 14px;
+  font-size: var(--t-fs);
+  border-radius: var(--t-radius-paper);
+  box-shadow: 0 10px 28px -10px rgb(0 0 0 / 0.7);
+}

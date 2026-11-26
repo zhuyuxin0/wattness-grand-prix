@@ -58,6 +58,29 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
   const [phase, setPhase] = useState<Phase>("loading");
   const [drawn, setDrawn] = useState(false);
   const [noWebgl, setNoWebgl] = useState(false);
+  // At the story's last stop the dialog offers the way into the Terminal (the Overview's control room), beside the
+  // story's bar, or under it where the bar leaves no room; measured from the stage, so it never covers the bar.
+  const [atEnd, setAtEnd] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
+  const [endAt, setEndAt] = useState<{ left: number; top: number } | null>(null);
+  useLayoutEffect(() => {
+    if (!atEnd) return setEndAt(null);
+    const place = () => {
+      const offer = endRef.current;
+      const stage = offer?.parentElement;
+      const bar = host.current?.querySelector<HTMLElement>(".gp-bar");
+      if (!offer || !stage || !bar) return;
+      const s = stage.getBoundingClientRect();
+      const b = bar.getBoundingClientRect();
+      const w = offer.offsetWidth;
+      const h = offer.offsetHeight;
+      const beside = b.right - s.left + 10 + w <= s.width - 12;
+      setEndAt(beside ? { left: b.right - s.left + 10, top: b.top - s.top + (b.height - h) / 2 } : { left: (s.width - w) / 2, top: b.bottom - s.top + 8 });
+    };
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [atEnd]);
   // The story records the site's theme on its root; the 3D holds dark in either.
   const siteTheme = useTheme();
   const theme = useRef(siteTheme);
@@ -165,6 +188,9 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
           markStory(STORY_MARK.firstBeat);
           setDrawn(true);
         }),
+        story.on("beat", (b) => {
+          if (!gone) setAtEnd((b as { index?: number } | undefined)?.index === story.beats.length - 1);
+        }),
       );
       story.ready.then(() => {
         if (gone) return;
@@ -223,7 +249,7 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
             <p className="story-dialog__failed-line">Every step of it is in the tabs.</p>
             <div className="story-dialog__failed-actions">
               <button type="button" className="btn" onClick={() => live.current.onRoute("/overview")}>
-                Open the Overview
+                Enter the Terminal
                 <Glyph name="next" />
               </button>
               <button type="button" className="btn" onClick={() => live.current.onRoute("/about")}>
@@ -231,6 +257,14 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
                 <Glyph name="next" />
               </button>
             </div>
+          </div>
+        )}
+        {atEnd && shown && !failed && (
+          <div ref={endRef} className="story-dialog__end" style={endAt ? { left: endAt.left, top: endAt.top } : { visibility: "hidden" }}>
+            <button type="button" className="btn btn--primary story-dialog__enter" onClick={() => live.current.onRoute("/overview")}>
+              Enter the Terminal
+              <Glyph name="next" />
+            </button>
           </div>
         )}
       </div>

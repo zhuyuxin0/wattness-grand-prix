@@ -142,7 +142,7 @@ export function Closing({ armed, paused = false, caption, onPlay, onPlayIntent }
             Verify a plan
           </Link>
           <Link to="/overview" className="intro-close__link">
-            Open the Overview
+            Enter the Terminal
             <Glyph name="next" />
           </Link>
           <Link to="/about" className="intro-close__link">

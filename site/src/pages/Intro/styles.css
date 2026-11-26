@@ -1,6 +1,7 @@
 /* Intro: chapter 01's still across the main column, dark, with the hero line
-   and the ways in; then the page in the visitor's theme, the plain steps beside
-   the racing words; then the dark closing band, the starting grid's close. */
+   and the ways in, and under it "Start where you are"; then the page in the
+   visitor's theme, the plain steps beside the racing words; then the dark
+   closing band, the starting grid's close. */
 
 .app__page:has(.page--intro) {
   max-width: none;
@@ -23,6 +24,13 @@
   border-bottom: 1px solid var(--w-border);
   background: #101315;
   overflow: hidden;
+}
+/* The picture and what sits over it: the card, the lockup and the scope line
+   take their places from here. */
+.intro-hero__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
 }
 .intro-hero__frame {
   position: relative;
@@ -147,9 +155,10 @@
 }
 
 @media (min-width: 1024px) {
+  /* the first view holds the picture and the list under it (Hero.tsx measures the list into --intro-start-h) */
   .intro-hero__frame {
     min-height: 560px;
-    max-height: calc(100svh - var(--gp-masthead-h));
+    max-height: calc(100svh - var(--gp-masthead-h) - var(--intro-start-h, 0px));
   }
   /* Shade under the words and the lockup, so they read on the night ground and over the line to the grid. */
   .intro-hero__frame::after {
@@ -237,6 +246,18 @@
   }
   .intro-hero__facts {
     font-size: var(--t-fs);
+  }
+}
+
+/* "Start where you are" (StartHere.tsx), on the same night ground under the
+   picture: from 1024px its edges line up with the card's and the lockup's. */
+.intro-hero__start {
+  padding: var(--t-space-5) var(--gp-gutter) var(--t-space-6);
+  border-top: 1px solid var(--t-rule);
+}
+@media (min-width: 1024px) {
+  .intro-hero__start {
+    padding: 14px clamp(24px, 3.5%, 56px) 16px clamp(24px, 4%, 64px);
   }
 }
 

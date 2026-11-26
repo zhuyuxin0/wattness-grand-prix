@@ -1,0 +1,469 @@
+/* The control room: the Overview's first view. Blocks: ov-room*, ov-pane*, ov-seal*, ov-find*, ov-board*, ov-ness*,
+   ov-morph. Dark in either theme (data-atmosphere="dark"), full bleed under the masthead, about one view tall. The
+   Tech Stack's 3D loops behind, dimmed; the panes are the Terminal's glass (a raised ground over the blurred scene,
+   a hair of a border, a lit top edge, a soft lift), placed round the landscape: the page's head, the seal and Verify
+   down its left, the morph and the Fleet board down its right, Ask Ness under its middle (in a build that has it),
+   the visitors' ways in along its foot, the middle above Ask Ness left open. Under 1000px of room the picture sits on top and the panes follow it in one column (two from
+   640px). Hovers change color only. */
+
+/* The band spans the page's whole width; what follows it keeps the page's measure. */
+.app__page:has(> .page--overview) {
+  max-width: none;
+  padding-top: 0;
+  padding-inline: 0;
+}
+.page--overview > :not(.ov-room),
+.app__page:has(> .page--overview) > :not(.page--overview) {
+  margin-inline: var(--gp-gutter);
+  max-width: var(--gp-max);
+}
+
+.ov-room {
+  container: ov-room / inline-size;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--t-chrome);
+}
+
+/* ---------------------------------------------------------------- the landscape */
+
+.ov-room__media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--t-chrome);
+}
+.ov-room__loop,
+.ov-room__still {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* The dim the panes read over, and a fade into the ground below. */
+.ov-room__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 65% at 50% 42%, transparent 35%, rgb(16 19 21 / 0.42) 100%),
+    linear-gradient(to bottom, rgb(16 19 21 / 0.18), rgb(16 19 21 / 0.08) 45%, rgb(16 19 21 / 0.9) 100%);
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- the panes' places */
+
+.ov-room__panes {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--t-space-4);
+  padding: var(--t-space-5) var(--gp-gutter) var(--gp-space-7);
+}
+.ov-room__side {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--t-space-4);
+}
+
+@container ov-room (min-width: 640px) and (max-width: 999.98px) {
+  .ov-room__panes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ov-room__start {
+    grid-column: 1 / -1;
+  }
+}
+
+/* With room, the picture fills the band and the panes stand round it. */
+@container ov-room (min-width: 1000px) {
+  .ov-room__media {
+    position: absolute;
+    inset: 0;
+    aspect-ratio: auto;
+    z-index: -1;
+  }
+  .ov-room__media::after {
+    background:
+      radial-gradient(ellipse 62% 58% at 50% 44%, rgb(16 19 21 / 0.06) 30%, rgb(16 19 21 / 0.52) 100%),
+      linear-gradient(to bottom, rgb(16 19 21 / 0.34), rgb(16 19 21 / 0.06) 32%, rgb(16 19 21 / 0.12) 62%, rgb(16 19 21 / 0.78) 100%);
+  }
+  .ov-room__panes {
+    min-height: max(640px, calc(100svh - var(--gp-masthead-h)));
+    grid-template-columns: minmax(300px, 340px) minmax(0, 1fr) minmax(300px, 344px);
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "left ness right"
+      "start start start";
+    gap: var(--t-space-4) var(--gp-space-7);
+    padding: var(--t-space-5) var(--gp-space-7) var(--t-space-5);
+  }
+  .ov-room__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--t-space-4);
+  }
+  .ov-room__side--left {
+    grid-area: left;
+  }
+  .ov-room__side--right {
+    grid-area: right;
+    padding-top: var(--t-space-3);
+  }
+  /* the last pane of each side stands down by the visitors' row, the middle of the landscape open above it */
+  .ov-room__side > .ov-pane:last-child {
+    margin-top: auto;
+  }
+  .ov-room__start {
+    grid-area: start;
+  }
+  /* Ask Ness's launcher floats at the window's bottom right: the visitors' row ends above it */
+  .ov-room:has(.ov-pane--ness) .ov-room__panes {
+    padding-bottom: 64px;
+  }
+  /* Ask Ness stands under the landscape's middle, its questions in a row, the middle above it left open */
+  .ov-pane--ness {
+    grid-area: ness;
+    align-self: end;
+    justify-self: center;
+    width: min(100%, 470px);
+  }
+  .ov-pane--ness .ov-ness {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .ov-pane--ness .ov-ness__q {
+    width: auto;
+  }
+}
+
+/* ---------------------------------------------------------------- the head */
+
+.ov-room__head.page-header {
+  padding-bottom: 0;
+  border-bottom: 0;
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.55);
+}
+.ov-room__head .page-header__title {
+  font-size: 30px;
+}
+.ov-room__head .page-header__lede {
+  max-width: 38ch;
+  color: var(--w-fg);
+}
+
+/* ---------------------------------------------------------------- a pane */
+
+.ov-pane {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--t-space-3);
+  min-width: 0;
+  padding: 12px 16px;
+  border: 1px solid color-mix(in srgb, var(--w-fg) 12%, transparent);
+  border-radius: var(--t-radius-paper);
+  background: color-mix(in srgb, var(--t-raised) 92%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, #ffffff 10%, transparent),
+    0 1px 2px rgb(0 0 0 / 0.2),
+    0 18px 40px -20px rgb(0 0 0 / 0.75);
+}
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .ov-pane {
+    background: color-mix(in srgb, var(--t-raised) 70%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(150%);
+    backdrop-filter: blur(14px) saturate(150%);
+  }
+}
+.ov-pane__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px var(--t-space-4);
+}
+.ov-pane__title {
+  font-family: var(--t-font-display);
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--w-fg);
+}
+.ov-pane__meta,
+.ov-pane__note {
+  font-size: var(--t-fs-xs);
+  line-height: 1.4;
+  color: var(--w-muted);
+}
+.ov-pane__line {
+  font-size: var(--t-fs-sm);
+  line-height: 1.45;
+  color: var(--w-muted);
+}
+.ov-pane__open {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--t-fs);
+  font-weight: 600;
+  color: var(--t-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+.ov-pane__open:hover,
+.ov-pane__inline:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--t-accent-mark);
+  text-underline-offset: 3px;
+}
+.ov-pane__inline {
+  color: var(--w-fg);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--w-fg) 35%, transparent);
+  text-underline-offset: 3px;
+}
+.ov-pane :focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+}
+.ov-room__yours {
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- the seal */
+
+.ov-seal__lead {
+  display: grid;
+  gap: 2px;
+}
+.ov-seal__margin {
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--seal-text);
+}
+.ov-seal__before,
+.ov-seal__gate {
+  font-size: var(--t-fs-sm);
+  color: var(--w-fg);
+}
+.ov-seal__facts {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  font-size: var(--t-fs-sm);
+}
+.ov-seal__facts > div {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--t-space-3);
+}
+.ov-seal__facts dt {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.ov-seal__facts dd {
+  margin: 0;
+  min-width: 0;
+  color: var(--w-fg);
+}
+.ov-seal__tx {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--t-link);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ov-seal__tx:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- Verify's search */
+
+.ov-find {
+  position: relative;
+  display: grid;
+  gap: 4px;
+}
+.ov-find__input {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid color-mix(in srgb, var(--w-fg) 16%, transparent);
+  border-radius: var(--t-radius);
+  background: color-mix(in srgb, var(--t-chrome) 70%, transparent);
+  color: var(--w-fg);
+  font: inherit;
+  font-size: var(--t-fs);
+}
+.ov-find__input::placeholder {
+  color: var(--w-muted);
+}
+.ov-find__input:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 1px;
+}
+/* The matches drop over what follows, so the panes never move as the reader types; the pane stands above its
+   neighbors while they show. */
+.ov-pane--verify {
+  position: relative;
+  z-index: 3;
+}
+.ov-find__pop {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 5;
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--w-fg) 14%, transparent);
+  border-radius: var(--t-radius);
+  background: var(--t-chrome);
+  box-shadow: var(--t-shadow-2);
+}
+.ov-find__list {
+  display: grid;
+  padding: 2px 0;
+  list-style: none;
+}
+.ov-find__none {
+  padding: 8px 10px;
+}
+.ov-find__list li {
+  display: grid;
+  gap: 1px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.ov-find__list li.is-cursor {
+  background: var(--t-hover);
+  box-shadow: var(--t-mark-edge);
+}
+.ov-find__name {
+  font-size: var(--t-fs);
+  color: var(--w-fg);
+}
+.ov-find__meta,
+.ov-find__none {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- the Fleet board */
+
+.ov-board {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--t-rule);
+}
+.ov-board li {
+  border-bottom: 1px solid var(--t-rule);
+}
+.ov-board__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 84px;
+  align-items: center;
+  gap: var(--t-space-4);
+  min-height: 34px;
+  padding: 4px 2px;
+  color: var(--w-fg);
+  text-decoration: none;
+}
+.ov-board__row:hover {
+  background: var(--t-hover);
+}
+.ov-board__name {
+  display: grid;
+  min-width: 0;
+  font-size: var(--t-fs);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.ov-board__hub,
+.ov-board__mw {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.ov-board__mw {
+  text-align: right;
+  white-space: nowrap;
+}
+.ov-board .fl-strip__axis {
+  stroke: var(--ch-axis);
+  stroke-width: 1;
+}
+.ov-board .fl-strip__bar {
+  fill: var(--ch-ours);
+}
+
+/* ---------------------------------------------------------------- Ask Ness */
+
+.ov-ness {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ov-ness__q {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid color-mix(in srgb, var(--w-fg) 10%, transparent);
+  border-radius: var(--t-radius);
+  background: color-mix(in srgb, var(--t-chrome) 55%, transparent);
+  color: var(--w-fg);
+  font: inherit;
+  font-size: var(--t-fs-sm);
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--m-dur-s) var(--m-ease-out), background-color var(--m-dur-s) var(--m-ease-out);
+}
+.ov-ness__q:hover {
+  border-color: color-mix(in srgb, var(--t-accent-mark) 60%, transparent);
+  background: color-mix(in srgb, var(--t-chrome) 80%, transparent);
+}
+
+/* ---------------------------------------------------------------- the morph */
+
+.ov-morph {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  margin-inline: -8px;
+  border-radius: var(--t-radius);
+  overflow: hidden;
+  background: var(--t-chrome);
+}
+.ov-morph > * {
+  width: 100%;
+  height: 100%;
+}
+/* The pane says the scene's line in its own words under it, and at this size the scene's tags (the showcase's place,
+   the root) would stand at its edges, cut: the marks and the names carry it. */
+.ov-morph .sg-lockup__line,
+.ov-morph .scene-tag {
+  display: none;
+}
+
+/* ---------------------------------------------------------------- the visitors' ways in */
+
+.ov-room__start .start-here__head {
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.6);
+}

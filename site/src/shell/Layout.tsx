@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { PRODUCT_NAME } from "../config";
 import { useFloatHost } from "../float";
 import { isCapture } from "../lib/capture";
+import { followHash, hashId } from "../lib/follow-hash";
 import { Loading } from "../ui/States";
 import { Footer } from "./Footer";
 import { Masthead } from "./Masthead";
@@ -12,7 +13,7 @@ import { tabAt } from "./tabs";
 
 /** The app: wattness.tech's masthead over a side panel of grouped tabs and the page. */
 export function Layout() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const tab = tabAt(pathname);
   const [drawer, setDrawer] = useState(false);
   const menu = useRef<HTMLButtonElement>(null);
@@ -23,9 +24,11 @@ export function Layout() {
     document.title = tab && tab.path !== "/" ? `${tab.label} · ${PRODUCT_NAME}` : PRODUCT_NAME;
   }, [tab]);
 
-  // A new tab starts at its top; a change inside one (another battery) keeps the place.
+  // A new tab starts at its top, then goes to the place its address names (#id) once the page has drawn it; a change
+  // inside one (another battery) keeps the place.
   useEffect(() => {
     window.scrollTo(0, 0);
+    if (hashId(hash)) return followHash(hash);
   }, [tab?.id]);
 
   useEffect(() => {
