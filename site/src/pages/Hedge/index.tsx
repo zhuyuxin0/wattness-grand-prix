@@ -38,6 +38,7 @@ import {
   type HubsDoc,
 } from "../Battery/kit";
 import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
+import { HedgeObject } from "./HedgeObject";
 import "./styles.css";
 
 // Hedge: the contracts each plan holds by hour, the entry price the comparison
@@ -127,6 +128,7 @@ export default function HedgePage() {
             </>
           }
         />
+        <HedgeObject />
         <BatteryBar choice={choice} />
         <Ready state={all} label="Loading the hedge">
           {([desk, common, hubs]) => {
