@@ -63,7 +63,8 @@ export async function verdictFor(day: Day, network: NetworkName, battery: string
   const position = leaves.findIndex((l) => l.resource === battery);
   if (position < 0) {
     // A battery is found by the names beside the leaf hashes, which no hash fixes, so a 404 says what the
-    // index lists, not what the record holds; and it is said only under the copy whose root GateRecord holds.
+    // index lists, not what the record holds; and it is said only under a copy that passes every index check
+    // against the chain. An isolate that has verified another copy of the day's index answers 502 instead.
     const sealed = await sealedIndex(day, network);
     const copy = fileSha256(indexObject.bytes);
     if (sealed.sha256 !== copy) throw new EdgeError(502, `the index of ${day.day} is not served: Greenfield's copy (SHA-256 ${copy}) is not the one verified on ${network} (SHA-256 ${sealed.sha256})`);

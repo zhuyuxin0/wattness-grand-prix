@@ -72,10 +72,10 @@ lines and V3 are the verifier's; V1's first line reads `GateRecord holds <root>`
 A verdict is given only under an index that passes the checks `/day` applies to the index's own bytes (its
 rendering and its shape, paths included), and only for a leaf whose bytes `/day` would serve in that form (the
 document's own rendering); otherwise the answer is the same 502 `/day` gives. A leaf in that form that fails a
-check, such as the one with a changed digit, gets a failing verdict. It finds the battery by its name
-in the index, which no hash fixes: the leaf check fails unless the leaf's own `battery.resource` is that name, and
-when the index lists no leaf under the name the answer is a 404 that says so, given only when Greenfield's copy
-of the index is the one whose root GateRecord holds.
+check, such as the one with a changed digit, gets a failing verdict. It finds the battery by its name in the
+index, which no hash fixes: the leaf check fails unless the leaf's own `battery.resource` is that name, and when
+the index lists no leaf under the name the answer is a 404 that says so, given under a copy that passes every
+index check against the chain; an isolate that has verified another copy of that day's index answers 502 instead.
 
 ## Headers
 
@@ -88,7 +88,10 @@ On a served file: `x-gate-verified`, `x-gate-network`, `x-gate-root`, `x-gate-re
 
 A verified response on a record at least 15 blocks deep is put in the edge cache (the Cache API) and marked
 `public, max-age=300, s-maxage=86400`. GateRecord is write-once, so a file verified against a day's root stays
-verified. Nothing is cached before it is verified: refusals, 404s and responses on a fresher record carry
+verified. More than one copy of a file can verify, though: an index with other names beside the leaf hashes or its
+keys in another order, a leaf or a scenario set with its keys in another order or in RFC 8785 form. The edge keeps
+the first copy it served, so an index cached at the edge keeps the names it was verified with for up to a day
+(`s-maxage=86400`), whatever the bucket holds later. Nothing is cached before it is verified: refusals, 404s and responses on a fresher record carry
 `no-store`. The cache key includes the Worker's version (the version metadata binding), so a new deploy never
 serves an earlier version's verdicts or headers. Each isolate also keeps the indexes and leaves it has verified,
 so a burst of requests for one day reads the chain once. A remembered leaf is keyed by its day, its name and its
