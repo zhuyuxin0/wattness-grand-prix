@@ -181,6 +181,34 @@ function chapter(setup: (ctx: FrameContext) => Promise<FrameHandle>, { local = n
   };
 }
 
+/** A chapter at its rest with the lens narrowed onto one object in its picture: rect is that object's part of the frame
+ *  (x0, y0, x1, y1, fractions from the top left) as the chapter's own camera frames it. The camera stays where the
+ *  chapter puts it; only the lens narrows and shifts (stack.cube-check's crop), so the object is drawn at the shot's
+ *  full resolution. The chapters' updates set their camera each time, so the crop is applied once after each. */
+function chapterCrop(setup: (ctx: FrameContext) => Promise<FrameHandle>, { local = null as number | null, rect, margin = 0.04, note = '' }: { local?: number | null; rect: [number, number, number, number]; margin?: number; note?: string }) {
+  return async (ctx: FrameContext): Promise<FrameHandle> => {
+    const h = await setup(ctx);
+    const { stage } = ctx;
+    const [fx0, fy0, fx1, fy1] = rect;
+    const x0 = 2 * fx0 - 1, x1 = 2 * fx1 - 1, y0 = 1 - 2 * fy1, y1 = 1 - 2 * fy0;
+    const k = (1 - 2 * margin) / Math.max((x1 - x0) / 2, (y1 - y0) / 2);
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    const crop = () => {
+      const cam = stage.camera, s0 = cam.userData.shift ?? [0, 0];
+      cam.fov = (2 * Math.atan(Math.tan((cam.fov * Math.PI) / 360) / k) * 180) / Math.PI;
+      cam.userData.shift = [(-k * (cx - 2 * s0[0])) / 2, (-k * (cy - 2 * s0[1])) / 2];
+      stage.applyProjection();
+      cam.updateMatrixWorld();
+    };
+    return {
+      ...h,
+      time: local ?? h.time ?? 0,
+      note: `${note} The chapter's own camera, its lens narrowed ${k.toFixed(1)} times onto that part of its picture. ${h.note}`.trim(),
+      update(t, dt) { h.update?.(t, dt); crop(); },
+    };
+  };
+}
+
 const at0 = { x: 0, z: 0 };
 const SOURCE = "frame-data.json (the sealed Nov 26 record: Desert Willow's showcase, plan C)";
 
@@ -203,6 +231,9 @@ export const frames: StationModule['frames'] = {
   '_objects.chapter-check': chapter(grid['grid.R03-pass'], { note: "Chapter 17 at its rest (beats.ts KEYS check): the sealed copy, every check passing." }),
   '_objects.chapter-starting-grid': chapter(grid['grid.R01'], { note: "Chapter 04 at its rest (beats.ts KEYS starting-grid): every battery planned for tomorrow." }),
   '_objects.chapter-odds': chapter(world['world.W02-radar'], { note: "Chapter 14 at its rest (beats.ts KEYS odds): the weather odds, read after the seal." }),
+  '_objects.seal-stamp': chapterCrop(grid['grid.R02'], { local: 4.0, rect: [0.5, 0.11, 0.85, 0.69], note: "The seal's stamp: chapter 13's gate at 09:15:17 CT on Nov 25, its clock, and the sealing ring lit gold as the Nov 26 root lands on BNB Chain." }),
+  '_objects.record-coin': chapterCrop(grid['grid.R03-pass'], { rect: [0.33, 0.02, 0.45, 0.19], margin: 0.08, note: "The record coin: chapter 17's gold coin with BNB Chain's symbol, the day's root on BNB Chain, at the top of the proof." }),
+  '_objects.radar': chapterCrop(world['world.W02-radar'], { rect: [0.45, 0.22, 0.76, 0.82], note: "The weather radar's screen: chapter 14's sweep over Texas, the weather odds read for Nov 26." }),
   '_objects.chapter-operating-day': chapter(world['world.W03-race-day'], { note: "Chapter 16 at its rest (beats.ts KEYS operating-day): the operating day runs." }),
   '_objects.tower-season': chapter(towers['towers.T02-season'], { screens: false, note: "The season's tower (towers.T02-season) without its display: its words are the Season tab's, read live." }),
   '_objects.tower-launch': chapter(towers['towers.T04-launch-graduate'], { screens: false, note: "The launch tower (towers.T04-launch-graduate) without its display: its words are the Launchpad tab's, read live." }),
