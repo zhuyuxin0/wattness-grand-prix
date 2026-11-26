@@ -131,6 +131,18 @@ describe("a changed byte is refused", () => {
     expect(await doubled.text()).toContain("byte form");
   });
 
+  it("serves a leaf with its keys in another order, which no hash fixes, as the README says", async () => {
+    // RFC 8785 sorts keys, so the reordered document hashes the same, and its pretty-printed bytes are
+    // its own rendering. These bytes differ from the published file's.
+    const u = upstreams();
+    const reordered = `${JSON.stringify(Object.fromEntries(Object.entries(JSON.parse(text.dswl) as object).reverse()), null, 2)}\n`;
+    expect(reordered).not.toBe(text.dswl);
+    u.objects.set(`${DAY}/leaves/DSWL_ESS_ESR1.json`, reordered);
+    const res = await call(freshOrigin(), LEAF);
+    expect(res.status).toBe(200);
+    expect(await res.text()).toBe(reordered);
+  });
+
   it("refuses a scenario set with one changed number", async () => {
     const u = upstreams();
     // The last digit of the first price in the matrix, plus one.

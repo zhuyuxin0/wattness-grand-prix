@@ -132,6 +132,7 @@ export function parseJson(object: StoredObject, what: string): Parsed {
  * Hashes cover a document, not its whitespace. Requiring the bytes to be the document's own rendering, the
  * publisher's JSON.stringify(doc, null, 2) and a newline or the RFC 8785 form itself, means no byte rides
  * along unchecked: no padding, no duplicate key a different parser would read the other way, no escapes.
+ * The order of an object's keys is the exception: RFC 8785 sorts them, so no hash fixes it.
  */
 export function renderingOf(text: string, doc: unknown): "pretty-printed" | "RFC 8785" | null {
   if (text === `${JSON.stringify(doc, null, 2)}\n`) return "pretty-printed";
