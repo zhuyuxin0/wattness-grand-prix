@@ -144,6 +144,10 @@
   font-size: var(--t-fs-sm);
   color: var(--w-muted);
 }
+/* a sponsor piece's owner, its logo chip (kit/logos) under its name */
+.stack-row__logo {
+  margin-top: var(--t-space-2);
+}
 .stack-row__role {
   line-height: var(--t-lh-prose);
   color: var(--w-fg);

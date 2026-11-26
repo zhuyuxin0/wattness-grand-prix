@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import type { LogoId, LogoSpec } from "@world/kit/logos";
 import type { Part, Row } from "@world/stations/stack/pieces";
 import { SOURCE_LINE } from "../../config";
 import { dualTime } from "../../lib/time";
@@ -7,6 +8,7 @@ import { useSelectedBattery } from "../../shell/battery";
 import { TABS, worldTab } from "../../shell/tabs";
 import { worldPath } from "../../shell/world";
 import { Glyph, PageHeader, Ready, Section } from "../../ui";
+import { LogoChip } from "../../ui/LogoChip";
 import { useStackList, type PieceItem, type StackList, type Zone } from "./list";
 import { StackStage } from "./Stage";
 import "./styles.css";
@@ -32,9 +34,28 @@ function useRoomy(query = "(min-width: 600px)"): boolean {
   return roomy;
 }
 
+type Logos = Record<LogoId, LogoSpec>;
+/** The owners' logos (the world package's registry, by dynamic import, which also brings the chip's stylesheet); null
+ *  until then, and on a failure the list keeps its words. */
+function useLogos(): Logos | null {
+  const [logos, setLogos] = useState<Logos | null>(null);
+  useEffect(() => {
+    let live = true;
+    import("@world/kit/logos").then(
+      (m) => live && setLogos(m.LOGOS),
+      (error: unknown) => console.warn("The logos could not be loaded:", error),
+    );
+    return () => {
+      live = false;
+    };
+  }, []);
+  return logos;
+}
+
 export default function TechStackPage() {
   const state = useStackList();
   const roomy = useRoomy();
+  const logos = useLogos();
   // Battery tabs open on the carried battery, so their links follow a new pick.
   useSelectedBattery();
 
@@ -46,7 +67,7 @@ export default function TechStackPage() {
         {(list) => (
           <>
             {list.zones.map((zone) => (
-              <ZoneSection key={zone.id} zone={zone} full={list.full} roomy={roomy} />
+              <ZoneSection key={zone.id} zone={zone} full={list.full} roomy={roomy} logos={logos} />
             ))}
             <Source list={list} />
           </>
@@ -56,7 +77,7 @@ export default function TechStackPage() {
   );
 }
 
-function ZoneSection({ zone, full, roomy }: { zone: Zone; full: boolean; roomy: boolean }) {
+function ZoneSection({ zone, full, roomy, logos }: { zone: Zone; full: boolean; roomy: boolean; logos: Logos | null }) {
   const prices = zone.pieces.some((p) => p.id === "atlas" || p.id === "cmc");
   return (
     <Section id={`stack-${zone.id}`} title={zone.title} lede={zone.lede || undefined}>
@@ -68,7 +89,7 @@ function ZoneSection({ zone, full, roomy }: { zone: Zone; full: boolean; roomy: 
           <span>See it in</span>
         </li>
         {zone.pieces.map((p) => (
-          <PieceRow key={p.id} piece={p} full={full} roomy={roomy} />
+          <PieceRow key={p.id} piece={p} full={full} roomy={roomy} logos={logos} />
         ))}
       </ol>
       {prices && full && <p className="stack-note">A token's price says nothing about an agent's plans.</p>}
@@ -76,14 +97,17 @@ function ZoneSection({ zone, full, roomy }: { zone: Zone; full: boolean; roomy: 
   );
 }
 
-function PieceRow({ piece: p, full, roomy }: { piece: PieceItem; full: boolean; roomy: boolean }) {
+function PieceRow({ piece: p, full, roomy, logos }: { piece: PieceItem; full: boolean; roomy: boolean; logos: Logos | null }) {
   const t = worldTab(p.route);
   const to = worldPath(p.route);
+  // a sponsor piece's owner, as the 3D's label shows it: its logo chip, a link to the owner in a new tab
+  const chip = logos && p.logo ? p.logo.map((id) => logos[id as LogoId]).filter((s): s is LogoSpec => !!s) : [];
   return (
     <li className="stack-row" id={`piece-${p.id}`}>
       <div className="stack-row__piece">
         <h3 className="stack-row__plain">{p.plain}</h3>
         {p.name && <p className="stack-row__name">{p.name}</p>}
+        {chip.length > 0 && <LogoChip logo={chip.length === 1 ? chip[0]! : chip} caption={p.caption} size={12} className="stack-row__logo" />}
       </div>
       {full && <p className="stack-row__role">{p.role}</p>}
       {full &&

@@ -22,6 +22,9 @@ export interface PieceItem {
   link?: { text: string; href: string };
   /** The package's tab id (ROUTES); the site's path is worldPath(route). */
   route: string;
+  /** A sponsor piece's owner: the logo registry's ids, and the words its chip carries. */
+  logo?: string[];
+  caption?: string;
 }
 
 export interface Zone {
@@ -75,7 +78,7 @@ async function build(): Promise<StackList> {
     import("@world/stations/stack/greenfield-record.json"),
     load ? load().catch(() => null) : Promise.resolve(null),
   ]);
-  const { PIECE_IDS, ROUTES, cards, labels, ctUnix } = pieces;
+  const { PIECE_IDS, ROUTES, cards, labels, ctUnix, LOGO_OF } = pieces;
 
   let L: ReturnType<typeof labels> | null = null;
   let C: Record<string, Card> | null = null;
@@ -100,7 +103,10 @@ async function build(): Promise<StackList> {
   const item = (id: string): PieceItem => {
     const card = C?.[id];
     const label = names[id];
+    const lg = LOGO_OF[id];
     return {
+      logo: lg ? (Array.isArray(lg.logo) ? lg.logo : [lg.logo]) : undefined,
+      caption: lg?.caption,
       id,
       plain: label?.plain ?? card?.name ?? id,
       name: label?.name,
