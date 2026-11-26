@@ -3,6 +3,7 @@ import { CONTRACT_ADDRESS, REPO_URL, SHADOW_NOTE, TERMINAL_URL } from "../../con
 import { useDay, type DayIndex } from "../../data";
 import { formatInt } from "../../lib/format";
 import { Glyph, Hash, PageHeader, Section, Table, type Column } from "../../ui";
+import { ObjectStill } from "../../ui/ObjectStill";
 import { Architecture } from "./Architecture";
 import "./styles.css";
 
@@ -39,9 +40,16 @@ export default function HowItWorksPage() {
         aside={<Facts day={day} />}
       />
 
-      <Section title="What It Is" lede="Three steps, in the order the tabs follow.">
+      <Section title="What It Is" lede="Three steps, in the order the tabs follow, each as the introduction shows it.">
         <ol className="hw-steps">
           <li>
+            <ObjectStill
+              className="hw-still"
+              name="chapter-starting-grid"
+              alt="The starting grid in 3D: one column for each battery planned for Nov 26, in a row across a map of Texas"
+              caption="Chapter 04: the Nov 26 plans, a column each"
+              sizes="(max-width: 899px) calc(100vw - 32px), 30vw"
+            />
             <h3>Plan</h3>
             <p>
               The planner reads the Wattness Terminal's public ERCOT release, every input named by its SHA-256, and solves each battery's next day hour by hour
@@ -54,6 +62,13 @@ export default function HowItWorksPage() {
             <Go links={[["/fleet", "Fleet"], ["/battery", "Battery"], ["/agents/forecast", "Agents"]]} />
           </li>
           <li>
+            <ObjectStill
+              className="hw-still"
+              name="chapter-sealed"
+              alt="Parc fermé in 3D: the gate's clock at 09:15:17 CT and the sealing ring lit gold as the Nov 26 root goes onto BNB Chain"
+              caption="Chapter 13: sealed 09:15:17 CT, Nov 25"
+              sizes="(max-width: 899px) calc(100vw - 32px), 30vw"
+            />
             <h3>Seal</h3>
             <p>
               Each plan becomes an RFC 8785 canonical JSON document and one leaf of an RFC 6962 Merkle root. GateRecord stores the root on BNB Smart Chain with the
@@ -63,6 +78,13 @@ export default function HowItWorksPage() {
             <Go links={[["/seal", "Seal"], ["/files", "Files"]]} />
           </li>
           <li>
+            <ObjectStill
+              className="hw-still"
+              name="chapter-check"
+              alt="The proof tower in 3D: Desert Willow's sealed Nov 26 plan at its foot, a rung for each hash up to the gold root, beside a board with five checks passing"
+              caption="Chapter 17: 5 of 5 checks, Nov 26"
+              sizes="(max-width: 899px) calc(100vw - 32px), 30vw"
+            />
             <h3>Verify</h3>
             <p>
               One command, the Verify tab or a standard-library Python script checks a battery's plan: the leaf and its proof, the record on chain, the seal
