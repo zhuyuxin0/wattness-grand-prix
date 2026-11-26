@@ -1,0 +1,344 @@
+{
+  "kind": "openfour-submit-pack",
+  "version": "1",
+  "createdAt": "2026-11-26T17:52:17Z",
+  "gitRev": "06d70b5f2d10c1cecac02252b1c5da30ca3efc36",
+  "repository": "https://github.com/zhuyuxin0/wattness-grand-prix",
+  "preset": {
+    "id": "evidence-gated-bonding-v1",
+    "name": "Evidence-gated Bonding V1",
+    "description": "Bonding V1 token, vault, curve and trade; graduation needs the agent's sealed GateRecord record",
+    "path": "modules/openfour/deployments/bsc-testnet.json",
+    "modules": {
+      "token": {
+        "reuse": "TOKEN_STANDARD",
+        "moduleId": "0x48f90f4115ab8ef5e9e882e46964405e86bb62323d676b602350fc8baef2637e"
+      },
+      "vault": {
+        "reuse": "VAULT_BASIC",
+        "moduleId": "0x3e7c54e066dccd796d82c61050797d9b41fc573ce6b95b1968fb6e21c9df315b"
+      },
+      "curve": {
+        "reuse": "CURVE_BONDING",
+        "moduleId": "0x0e4ee145a2864ef2ac97032a3c00ed121816998110d1cf364770093ce952cb47"
+      },
+      "trade": {
+        "reuse": "TRADE_SIMPLE",
+        "moduleId": "0x379c13a7faced71bfa110d4297fd89666ac21c3407816ab9ef26027c15dce10d"
+      },
+      "migrate": {
+        "contract": "EvidenceGatedMigrateModule",
+        "keySource": "module.migrate.evidence_gated",
+        "moduleKey": "0xda5f2c8f283f8842faa41ec65c6c1a7987d39cb0bccb02f4d5b8048a152e65df",
+        "kind": 4,
+        "version": "1.0.0",
+        "implementation": "0xfc2E00dCfC39C71F97Ce0e6ba9C52717Ed8fbA8e",
+        "beacon": "0xd57B39899b3bb33d85ACAAe705d571a1559F30C6",
+        "constructor": {
+          "gateRecord": "0x2922c68cE15EB3e83B7f43b136e981dDc4262876",
+          "pairFactory": "0x6725F303b657a9451d8BA641348b6761A6CC7a17"
+        }
+      },
+      "customData": null
+    },
+    "validator": {
+      "reuse": "Bonding V1",
+      "address": "0xD8590b6914d4D60FcCfe08A2087B9A3d3F2d6A70"
+    },
+    "tokenImpl": {
+      "reuse": "fork",
+      "tokenImplId": "0x2b5b4abf986db939c949935971f5f7455d608538c86cb2537b616ef1755b7d47"
+    }
+  },
+  "sources": [
+    "modules/openfour/contracts/EvidenceGatedMigrateModule.sol",
+    "modules/openfour/contracts/interfaces/OpenFour.sol",
+    "modules/openfour/contracts/interfaces/IGateRecord.sol"
+  ],
+  "tests": [
+    "modules/openfour/test/migrate.test.ts",
+    "modules/openfour/test/schema.test.ts"
+  ],
+  "compiler": {
+    "solc": "0.8.28",
+    "evmVersion": "cancun",
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "viaIR": true
+  },
+  "descriptor": {
+    "tag": "module.migrate.evidence_gated",
+    "tagId": "0xda5f2c8f283f8842",
+    "version": "1.0.0",
+    "schema": {
+      "kind": "migrate",
+      "version": 1,
+      "params": [
+        {
+          "name": "agent",
+          "abiType": "address",
+          "hint": "The wallet that seals the agent's plans in GateRecord"
+        },
+        {
+          "name": "scope",
+          "abiType": "bytes32",
+          "hint": "keccak256 of the scope label; default gate-record/ercot-da-energy"
+        },
+        {
+          "name": "minOd",
+          "abiType": "uint32",
+          "hint": "Earliest qualifying operating day, YYYYMMDD"
+        },
+        {
+          "name": "minLeafCount",
+          "abiType": "uint32",
+          "hint": "Batteries the record must cover"
+        },
+        {
+          "name": "codeHash",
+          "abiType": "bytes32",
+          "hint": "Required record code hash; zero accepts any"
+        },
+        {
+          "name": "outcomeStage",
+          "abiType": "uint8",
+          "hint": "0: the sealed record; 1 to 3: that settlement stage must also be linked"
+        },
+        {
+          "name": "liquidityPredicate",
+          "abiType": "uint8",
+          "hint": "0: sold out; 1: raised at least minQuoteRaised"
+        },
+        {
+          "name": "minQuoteRaised",
+          "abiType": "uint256",
+          "hint": "Quote floor for predicate 1; 0 with predicate 0"
+        }
+      ]
+    }
+  },
+  "registration": {
+    "path": "modules/openfour/deployments/bsc-testnet.json",
+    "registry": "0x4458EdB563886b1568701A13aDFb0D3e17254e99",
+    "core": "0x90feAb906d1eE89611576DD6F042Bca840A94aF7",
+    "presetId": "1795634196178",
+    "tokenImplId": "0x2b5b4abf986db939c949935971f5f7455d608538c86cb2537b616ef1755b7d47",
+    "moduleKeys": [
+      "0xda5f2c8f283f8842faa41ec65c6c1a7987d39cb0bccb02f4d5b8048a152e65df"
+    ],
+    "transactions": [
+      {
+        "label": "deploy EvidenceGatedMigrateModule",
+        "txHash": "0x1cd5fca52f8af590effedca8e6d3682e1b3424626f2bcd03a2312a8e7be74e45",
+        "blockNumber": "144842374"
+      },
+      {
+        "label": "registry.upsertModule module.migrate.evidence_gated",
+        "txHash": "0xb9ad795d5b2d9236aed496105c2e66194b104a1dc5ae6a2636755f7e8f34ce11",
+        "blockNumber": "144842379"
+      },
+      {
+        "label": "registry.upsertPreset evidence-gated Bonding V1",
+        "txHash": "0x23aa595add67656eb2965908309467b1d4d2f35ade1a50f0dbbf39095e32a7f2",
+        "blockNumber": "144842385"
+      }
+    ]
+  },
+  "forkRegistry": "0x4458EdB563886b1568701A13aDFb0D3e17254e99",
+  "forkedWith": "openfour-docs 079a45e9c3358c9f357c84f336c7d915c9f0e9fc, developer/fork-deploy",
+  "tokens": [
+    {
+      "tokenAddress": "0x027C1A8D15ceb3048F5EC787D5e1E64B1043cE47",
+      "name": "Grand Prix Planner 27 Nov",
+      "symbol": "PLNR27",
+      "presetId": "1795634196178",
+      "presetName": "Evidence-gated Bonding V1",
+      "creator": "0x749A444AC6220539D8b5E9D8E21232ff70C4C79D",
+      "txHash": "0x26ab9fbc2def498e98436ee1754700eaddcd5c6d3a3ea54a83a7e9562d546323",
+      "chainId": 97,
+      "quoteAsset": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      "createdAt": "2026-11-26T17:39:46Z",
+      "phase": "Migrated",
+      "pair": "0x28Fb374c51B89c7D58c5849a478339BFda640879",
+      "evidence": {
+        "key": "0x24f59168bacf7252e2fc846a70c3a3b464eb3d15dd1a329a352d505c920bcf99",
+        "od": 20261127,
+        "root": "0x3cd800432f3596e13c9f169348630c0fb69192501cf448a4859dd3104e9e59be"
+      },
+      "records": [
+        {
+          "action": "create",
+          "result": "created",
+          "txHash": "0x26ab9fbc2def498e98436ee1754700eaddcd5c6d3a3ea54a83a7e9562d546323",
+          "blockNumber": "145021087",
+          "ct": "2026-11-26 11:39:46 CT",
+          "bangkok": "2026-11-27 00:39:46 Bangkok"
+        },
+        {
+          "action": "buy",
+          "result": "bought",
+          "txHash": "0x65bd6eba352db36dd2054f307330352fca71ce4468e8fc8778f9d21b3f2268b5",
+          "blockNumber": "145021141",
+          "ct": "2026-11-26 11:40:11 CT",
+          "bangkok": "2026-11-27 00:40:11 Bangkok"
+        },
+        {
+          "action": "approve",
+          "result": "ok",
+          "txHash": "0x0dbda5e90174546b578d065b830bdb690ffc37b89eff2b93a23bbc6c2f682abd",
+          "blockNumber": "145021174",
+          "ct": "2026-11-26 11:40:26 CT",
+          "bangkok": "2026-11-27 00:40:26 Bangkok"
+        },
+        {
+          "action": "sell",
+          "result": "sold",
+          "txHash": "0x1e420c74807f518ea5a7ce5831add11c13b51a0d4cd06b20c6cc3eeb62f6fd56",
+          "blockNumber": "145021178",
+          "ct": "2026-11-26 11:40:27 CT",
+          "bangkok": "2026-11-27 00:40:27 Bangkok"
+        },
+        {
+          "action": "wrap",
+          "result": "ok",
+          "txHash": "0x0f15116a544404d6cd503522eab44920806fe5624b7ae711d10e7d07e8e1cb5b",
+          "blockNumber": "145021207",
+          "ct": "2026-11-26 11:40:40 CT",
+          "bangkok": "2026-11-27 00:40:40 Bangkok"
+        },
+        {
+          "action": "approve",
+          "result": "ok",
+          "txHash": "0xefe8853055d68f774bffe01e674f6467fb45d6608f37d804a5ad238518636252",
+          "blockNumber": "145021211",
+          "ct": "2026-11-26 11:40:42 CT",
+          "bangkok": "2026-11-27 00:40:42 Bangkok"
+        },
+        {
+          "action": "buy",
+          "result": "bought",
+          "txHash": "0xdd809ed51df954bd0e3f4aa931650ac6a187f20072cfeb22ee05ecd8224d9467",
+          "blockNumber": "145021216",
+          "ct": "2026-11-26 11:40:44 CT",
+          "bangkok": "2026-11-27 00:40:44 Bangkok"
+        },
+        {
+          "action": "migrate",
+          "result": "refused",
+          "txHash": "0xce84183e3eba32a691dd66dad351c1eba0541df7d64c46a7471cfe222891eeaf",
+          "blockNumber": "145021247",
+          "ct": "2026-11-26 11:40:58 CT",
+          "bangkok": "2026-11-27 00:40:58 Bangkok"
+        },
+        {
+          "action": "bind",
+          "result": "bound",
+          "txHash": "0xd7be1172ffe756dc26175c9b6520fcdfe41d85a7b190cd571bffa851ed10d515",
+          "blockNumber": "145021288",
+          "ct": "2026-11-26 11:41:17 CT",
+          "bangkok": "2026-11-27 00:41:17 Bangkok"
+        },
+        {
+          "action": "migrate",
+          "result": "migrated",
+          "txHash": "0x9d2b5112d35700f4fe274fcc70dc537ddfb9755d4f891d4e4e26d7ee133b6720",
+          "blockNumber": "145021313",
+          "ct": "2026-11-26 11:41:28 CT",
+          "bangkok": "2026-11-27 00:41:28 Bangkok"
+        }
+      ]
+    },
+    {
+      "tokenAddress": "0xB1e792b2C6Bf7Ae7A1D972af313442039422ef14",
+      "name": "Grand Prix Planner",
+      "symbol": "PLNR",
+      "presetId": "1795634196178",
+      "presetName": "Evidence-gated Bonding V1",
+      "creator": "0x749A444AC6220539D8b5E9D8E21232ff70C4C79D",
+      "txHash": "0x875372271c9dde0ecdb3703dec11a7fd88108d68ce80bde84241ab4411ecac6f",
+      "chainId": 97,
+      "quoteAsset": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+      "createdAt": "2026-11-25T19:16:51Z",
+      "phase": "Migrated",
+      "pair": "0xe54cDdE2d4A28b0131C5Dc6b9E5Afb20701680Ee",
+      "evidence": {
+        "key": "0xafee502d7b63d89f48434a1e9c1b73c949ca08f7189f68be54e30f2d81fdedf9",
+        "od": 20261126,
+        "root": "0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7"
+      },
+      "records": [
+        {
+          "action": "create",
+          "result": "created",
+          "txHash": "0x875372271c9dde0ecdb3703dec11a7fd88108d68ce80bde84241ab4411ecac6f",
+          "blockNumber": "144842416",
+          "ct": "2026-11-25 13:16:51 CT",
+          "bangkok": "2026-11-26 02:16:51 Bangkok"
+        },
+        {
+          "action": "wrap",
+          "result": "ok",
+          "txHash": "0x03058afbded0dd16544dfc9e50141bdde73867dad454b6e5b9c156041d74418e",
+          "blockNumber": "144842446",
+          "ct": "2026-11-25 13:17:05 CT",
+          "bangkok": "2026-11-26 02:17:05 Bangkok"
+        },
+        {
+          "action": "approve",
+          "result": "ok",
+          "txHash": "0x0f8d4103585f9e51447e851589a1196c1b837cddc466c1d001545d41cfac2788",
+          "blockNumber": "144842450",
+          "ct": "2026-11-25 13:17:07 CT",
+          "bangkok": "2026-11-26 02:17:07 Bangkok"
+        },
+        {
+          "action": "buy",
+          "result": "bought",
+          "txHash": "0x17d7940454fc2e05e39803520582b3faadbdda7fd6aab920b2880ec29df73a56",
+          "blockNumber": "144842456",
+          "ct": "2026-11-25 13:17:09 CT",
+          "bangkok": "2026-11-26 02:17:09 Bangkok"
+        },
+        {
+          "action": "migrate",
+          "result": "refused",
+          "txHash": "0x219f25a2b86a8a73595911f40dd81f072655bd6711fdd4eb6b8108b6a733686e",
+          "blockNumber": "144842485",
+          "ct": "2026-11-25 13:17:22 CT",
+          "bangkok": "2026-11-26 02:17:22 Bangkok"
+        },
+        {
+          "action": "bind",
+          "result": "bound",
+          "txHash": "0xd100cfa2402baaeec7de4545deedec2f72d238bbb53ec3fc34753d93718a1128",
+          "blockNumber": "144842524",
+          "ct": "2026-11-25 13:17:40 CT",
+          "bangkok": "2026-11-26 02:17:40 Bangkok"
+        },
+        {
+          "action": "migrate",
+          "result": "migrated",
+          "txHash": "0xc549f6e5a6598ba308e6ecb837cf0da2a6fa23c1d72a6e40065df4c585af5330",
+          "blockNumber": "144842547",
+          "ct": "2026-11-25 13:17:51 CT",
+          "bangkok": "2026-11-26 02:17:51 Bangkok"
+        }
+      ]
+    }
+  ],
+  "tokensFile": "modules/openfour/submission/tokens.json",
+  "audit": "docs/sponsors/openfour-ai-audit.md",
+  "gameplay": "docs/sponsors/openfour-gameplay.md",
+  "frontend": {
+    "demo": "https://gp.wattness.tech/markets/launchpad",
+    "source": "site/src/pages/Launchpad/",
+    "note": "The Launchpad tab reads a launch with view calls (modules/openfour/src/launch-tower.ts); the standard create, buy, sell and migrate screens are unchanged."
+  },
+  "notes": [
+    "Registered only on the developer-owned Registry above; production Registries are OpenFour's to write after review.",
+    "Testnet only (chain 97); the tokens are testnet tokens.",
+    "Fixes the audit lists (H-1, M-1 to M-4, L-3) are not deployed; they would be re-reviewed before an official registration."
+  ]
+}

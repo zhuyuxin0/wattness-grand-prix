@@ -1,12 +1,14 @@
-// Runs one step of the evidence-gated PLNR launch on a developer-owned OpenFour
+// Runs one step of an evidence-gated launch on a developer-owned OpenFour
 // deployment, on BSC testnet (97) or a local fork of it (31337), and writes
 // what it sent and observed to the evidence directory.
 //
 //   node scripts/launch.ts <step> --fork <fork-deployment.json> --evidence <dir> [--rpc <url>]
 //
-// Steps, in order: deploy, create, buy, graduate [--expect-revert], bind --od --root,
-// graduate, status, verify. The fork file is the fork toolkit's output; the
-// evidence directory also keeps the launch state between steps.
+// Steps, in order: deploy (or create --preset <id> to reuse the deployed preset),
+// create, buy [--tokens <n>], sell [--percent <n>], buy, graduate [--expect-revert],
+// bind --od --root, graduate, status, verify. The fork file is the fork toolkit's
+// output; the evidence directory also keeps the launch state between steps, one
+// launch per directory.
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -39,9 +41,11 @@ import { privateKeyToAccount } from "viem/accounts";
 import { encodeModuleParams, type ModuleEncodeSchema } from "../src/schema.ts";
 import { EVIDENCE_GATED_TAG, evidenceGatedMigrateAbi, explainRevert, readLaunchTower } from "../src/launch-tower.ts";
 
-// Placeholders, one constant each.
+// The first launch's name and symbol; create --name and --symbol name another.
 const TOKEN_NAME = "Grand Prix Planner";
 const TOKEN_SYMBOL = "PLNR";
+// Core.sell option bit 0: keep the quote as WBNB instead of unwrapping it.
+const SELL_OPTION_RECEIVE_WBNB = 1n;
 
 const TESTNET_RPC = "https://bsc-testnet.publicnode.com";
 const SECOND_RPC = "https://bsc-testnet-dataseed.bnbchain.org";
@@ -76,7 +80,9 @@ const registryAbi = parseAbi([
 ]);
 const coreAbi = parseAbi([
   "function createToken(bytes createArgs, bytes signature) payable returns (address)",
+  "function buy(address token,uint256 amount,uint256 maxQuotePayAmount,uint256 options,bytes proof) payable",
   "function buyByBudget(address token,uint256 maxPayAmount,uint256 minAmountOut,uint256 options,bytes proof) payable",
+  "function sell(address token,uint256 amount,uint256 minQuoteRecvAmount,uint256 options,bytes proof)",
   "function signer() view returns (address)",
   "function registry() view returns (address)",
   "function tokens(address) view returns (uint32 version,address creator,uint256 presetId,address token,string name,string symbol,uint256 maxSupply,uint256 saleAmount,uint256 raiseAmount,address quoteAsset,address vault,address curveModule,address tradeModule,address migrateModule,address tokenModule,address customData,uint256 createBlock,bool exists,bool paused,bool antiSniperEnabled)",
@@ -89,9 +95,11 @@ const coreAbi = parseAbi([
 const toolsAbi: Abi = parseAbi([
   `function getPresetEncodeSchemas(uint256 presetId) view returns (${SCHEMA_T},${SCHEMA_T},${SCHEMA_T},${SCHEMA_T},${SCHEMA_T},${SCHEMA_T})`,
 ] as string[]);
-// Not a view in the ABI (it may quote through external routers); run it with eth_call only.
+// Not views in the ABI (they may quote through external routers); run them with eth_call only.
 const estimateAbi = parseAbi([
   `function estimateBuyByBudget(address token,address trader,uint256 maxQuotePayAmount,uint256 options,bytes proof) returns (${ESTIMATE_T})`,
+  `function estimateBuy(address token,address trader,uint256 amount,uint256 options,bytes proof) returns (${ESTIMATE_T})`,
+  `function estimateSell(address token,address trader,uint256 amount,uint256 options,bytes proof) returns (${ESTIMATE_T})`,
 ]);
 const vaultAbi = parseAbi([
   "function phase() view returns (uint8)",
@@ -121,6 +129,7 @@ const gateRecordAbi = parseAbi([
 
 const here = dirname(fileURLToPath(import.meta.url));
 const ARTIFACT = join(here, "../artifacts/contracts/EvidenceGatedMigrateModule.sol/EvidenceGatedMigrateModule.json");
+const DEPLOYMENTS = join(here, "../deployments/bsc-testnet.json");
 
 const { positionals, values: args } = parseArgs({
   allowPositionals: true,
@@ -136,11 +145,16 @@ const { positionals, values: args } = parseArgs({
     od: { type: "string" },
     root: { type: "string" },
     "expect-revert": { type: "boolean", default: false },
+    preset: { type: "string" },
+    name: { type: "string", default: TOKEN_NAME },
+    symbol: { type: "string", default: TOKEN_SYMBOL },
+    tokens: { type: "string" },
+    percent: { type: "string", default: "90" },
   },
 });
 const step = positionals[0];
 if (!step || !args.fork || !args.evidence) {
-  throw new Error("usage: node scripts/launch.ts <deploy|create|buy|graduate|bind|status|verify> --fork <file> --evidence <dir>");
+  throw new Error("usage: node scripts/launch.ts <deploy|create|buy|sell|graduate|bind|status|verify> --fork <file> --evidence <dir>");
 }
 
 // ---- evidence ----
@@ -214,7 +228,7 @@ const readSchemas = async (presetId: bigint) =>
 async function record(label: string, hash: Hash, expect: "success" | "reverted" = "success"): Promise<TransactionReceipt> {
   const receipt = await reader.waitForTransactionReceipt({ hash, timeout: 180_000 });
   const block = await reader.getBlock({ blockNumber: receipt.blockNumber });
-  transactions.push({
+  const tx = {
     label,
     hash,
     status: receipt.status,
@@ -226,10 +240,27 @@ async function record(label: string, hash: Hash, expect: "success" | "reverted" 
     contractAddress: receipt.contractAddress ?? null,
     gasUsed: receipt.gasUsed,
     effectiveGasPrice: receipt.effectiveGasPrice,
-  });
+  };
+  transactions.push(tx);
+  // Every transaction of the launch, in order, for verify and tokens.json.
+  state.txs = [...(state.txs ?? []), { step, label, hash, status: tx.status, blockNumber: tx.blockNumber.toString(), blockHash: tx.blockHash, gasUsed: tx.gasUsed.toString() }];
+  writeFileSync(statePath, `${json({ ...state, chainId })}\n`);
   if (receipt.status !== expect) throw new Error(`${label} ${hash}: ${receipt.status}, expected ${expect}`);
   return receipt;
 }
+
+// Wraps and approves only what the next trade can spend.
+async function ensureQuote(amount: bigint) {
+  const balance = await reader.readContract({ address: A.wbnb, abi: erc20Abi, functionName: "balanceOf", args: [account.address] });
+  if (balance < amount) await sendTx("wbnb.deposit", { address: A.wbnb, abi: erc20Abi, functionName: "deposit", value: amount - balance });
+  const allowance = await reader.readContract({ address: A.wbnb, abi: erc20Abi, functionName: "allowance", args: [account.address, A.core] });
+  if (allowance < amount) await sendTx("wbnb.approve core", { address: A.wbnb, abi: erc20Abi, functionName: "approve", args: [A.core, amount] });
+}
+
+const balances = async (token: Address) => ({
+  token: await reader.readContract({ address: token, abi: erc20Abi, functionName: "balanceOf", args: [account.address] }),
+  wbnb: await reader.readContract({ address: A.wbnb, abi: erc20Abi, functionName: "balanceOf", args: [account.address] }),
+});
 
 function revertData(err: unknown): Hex | undefined {
   if (!(err instanceof BaseError)) return undefined;
@@ -336,7 +367,27 @@ if (step === "deploy") {
 }
 
 if (step === "create") {
-  if (!state.presetId || !args.agent || !args["min-od"]) throw new Error("create needs a deployed preset, --agent and --min-od");
+  if (state.token) throw new Error(`this evidence directory already holds launch ${state.token.address}; use a new directory`);
+  if (!state.presetId && args.preset) {
+    // Reuse the module and preset already registered on the fork, after checking the Registry still resolves them.
+    const dep = JSON.parse(readFileSync(DEPLOYMENTS, "utf8"));
+    if (String(dep.preset.id) !== args.preset) throw new Error(`preset ${args.preset} is not the one in deployments/bsc-testnet.json`);
+    const presetId = BigInt(args.preset);
+    const [preset, implementation, beacon] = await Promise.all([
+      reader.readContract({ address: A.registry, abi: registryAbi, functionName: "getPreset", args: [presetId] }),
+      reader.readContract({ address: A.registry, abi: registryAbi, functionName: "getModuleImplementation", args: [dep.module.key] }),
+      reader.readContract({ address: A.registry, abi: registryAbi, functionName: "getModuleBeacon", args: [dep.module.key] }),
+    ]);
+    if (preset.migrateModuleId.toLowerCase() !== String(dep.module.key).toLowerCase() || !preset.active || !preset.createEnabled) {
+      throw new Error(`preset ${presetId} does not bind ${EVIDENCE_GATED_TAG} or is not open for creation`);
+    }
+    if (getAddress(implementation) !== getAddress(dep.module.implementation) || getAddress(beacon) !== getAddress(dep.module.beacon)) {
+      throw new Error(`Registry resolves ${EVIDENCE_GATED_TAG} to ${implementation} (beacon ${beacon}), not the recorded deployment`);
+    }
+    state.module = { implementation: getAddress(implementation), key: dep.module.key, beacon: getAddress(beacon), tag: EVIDENCE_GATED_TAG };
+    state.presetId = presetId.toString();
+  }
+  if (!state.presetId || !args.agent || !args["min-od"]) throw new Error("create needs a deployed preset (deploy, or --preset), --agent and --min-od");
   const coreSigner = await reader.readContract({ address: A.core, abi: coreAbi, functionName: "signer" });
   if (getAddress(coreSigner) !== getAddress(account.address)) throw new Error(`Core signer is ${coreSigner}, not this key`);
   const presetId = BigInt(state.presetId);
@@ -358,8 +409,8 @@ if (step === "create") {
       antiSniperEnabled: false,
       partner: "0x0000000000000000000000000000000000000000",
       initParams: {
-        name: TOKEN_NAME,
-        symbol: TOKEN_SYMBOL,
+        name: args.name!,
+        symbol: args.symbol!,
         tokenUri: "",
         maxSupply: LAUNCH.maxSupply,
         saleAmount: LAUNCH.saleAmount,
@@ -379,23 +430,84 @@ if (step === "create") {
   const digest = keccak256(encodePacked(["string", "uint256", "address", "bytes32"], ["createOpenFourToken", BigInt(chainId), account.address, keccak256(createArgs)]));
   const signature = await account.signMessage({ message: { raw: digest } });
   await reader.simulateContract({ account, address: A.core, abi: coreAbi, functionName: "createToken", args: [createArgs, signature] });
-  const receipt = await sendTx("core.createToken PLNR", { address: A.core, abi: coreAbi, functionName: "createToken", args: [createArgs, signature] });
+  const receipt = await sendTx(`core.createToken ${args.symbol}`, { address: A.core, abi: coreAbi, functionName: "createToken", args: [createArgs, signature] });
   const [created] = parseEventLogs({ abi: coreAbi, logs: receipt.logs, eventName: "TokenCreated" });
   if (!created) throw new Error("no TokenCreated");
   const { token, vault, migrateModule } = created.args;
   const params = await reader.readContract({ address: migrateModule, abi: evidenceGatedMigrateAbi, functionName: "params" });
   const descriptor = await reader.readContract({ address: migrateModule, abi: evidenceGatedMigrateAbi, functionName: "descriptor" });
-  state.token = { address: token, vault, migrateModule, requestId: requestId.toString(), agent, scope, minOd: Number(args["min-od"]) };
+  state.token = {
+    address: token,
+    vault,
+    migrateModule,
+    requestId: requestId.toString(),
+    name: args.name,
+    symbol: args.symbol,
+    agent,
+    scope,
+    minOd: Number(args["min-od"]),
+    minLeafCount: Number(args["min-leaves"]),
+    codeHash: (args["code-hash"] as Hex | undefined) ?? ZERO32,
+  };
   save(
     { requestId, presetId, token, vault, migrateModule, tokenCreated: created.args, migrateParams, decodedParams: params, descriptor, vault0: await vaultState(vault) },
     {
-      before: "No PLNR launch on the developer-owned Core.",
-      after: `PLNR ${token} launched; it graduates only when the vault sells out and agent ${agent}'s sealed record for scope ${scope}, day ${args["min-od"]} or later, is bound.`,
+      before: `No ${args.symbol} launch in this evidence directory.`,
+      after: `${args.symbol} ${token} launched; it graduates only when the vault sells out and agent ${agent}'s sealed record for scope ${scope}, day ${args["min-od"]} or later, is bound.`,
     },
   );
 }
 
-if (step === "buy") {
+if (step === "buy" && args.tokens) {
+  // A partial buy of an exact token amount, leaving the sale open for a sell on the curve.
+  const { address: token, vault } = state.token as { address: Address; vault: Address };
+  const amount = parseEther(args.tokens);
+  const before = { vault: await vaultState(vault), wallet: await balances(token) };
+  const { result: estimate } = await reader.simulateContract({ account, address: A.tools, abi: estimateAbi, functionName: "estimateBuy", args: [token, account.address, amount, 0n, "0x"] });
+  if (estimate.tokenAmount !== amount) throw new Error(`estimateBuy fills ${estimate.tokenAmount}, not ${amount}`);
+  const maxPay = (estimate.userPays * 10_500n) / 10_000n; // the toolkit's 5% slippage bound
+  await ensureQuote(maxPay);
+  await reader.simulateContract({ account, address: A.core, abi: coreAbi, functionName: "buy", args: [token, amount, maxPay, 0n, "0x"] });
+  const receipt = await sendTx("core.buy partial", { address: A.core, abi: coreAbi, functionName: "buy", args: [token, amount, maxPay, 0n, "0x"] });
+  const trade = parseEventLogs({ abi: coreAbi, logs: receipt.logs, eventName: "TradeExecuted" })[0]?.args;
+  if (!trade?.isBuy) throw new Error("no buy TradeExecuted");
+  const after = { vault: await vaultState(vault), wallet: await balances(token) };
+  save(
+    { amount, estimate, maxPay, trade, before, after },
+    {
+      before: `Sale open: phase ${before.vault.phase}, ${before.vault.remainingForSale} token wei unsold, ${before.vault.totalRaised} quote wei raised.`,
+      after: `Bought ${trade.tokenAmount} token wei for ${trade.traderQuoteAmount} quote wei (estimate ${estimate.userPays}); phase ${after.vault.phase}, ${after.vault.remainingForSale} unsold.`,
+    },
+  );
+}
+
+if (step === "sell") {
+  // Sells part of the wallet's tokens back to the curve while the sale is open.
+  const { address: token, vault } = state.token as { address: Address; vault: Address };
+  const percent = BigInt(args.percent!);
+  if (percent <= 0n || percent > 100n) throw new Error("--percent must be 1..100");
+  const before = { vault: await vaultState(vault), wallet: await balances(token) };
+  const amount = (before.wallet.token * percent) / 100n;
+  if (amount === 0n) throw new Error("no tokens to sell");
+  const allowance = await reader.readContract({ address: token, abi: erc20Abi, functionName: "allowance", args: [account.address, A.core] });
+  if (allowance < amount) await sendTx("token.approve core", { address: token, abi: erc20Abi, functionName: "approve", args: [A.core, amount] });
+  const { result: estimate } = await reader.simulateContract({ account, address: A.tools, abi: estimateAbi, functionName: "estimateSell", args: [token, account.address, amount, SELL_OPTION_RECEIVE_WBNB, "0x"] });
+  const minOut = (estimate.userReceives * 9_500n) / 10_000n; // the toolkit's 5% slippage bound
+  await reader.simulateContract({ account, address: A.core, abi: coreAbi, functionName: "sell", args: [token, amount, minOut, SELL_OPTION_RECEIVE_WBNB, "0x"] });
+  const receipt = await sendTx("core.sell", { address: A.core, abi: coreAbi, functionName: "sell", args: [token, amount, minOut, SELL_OPTION_RECEIVE_WBNB, "0x"] });
+  const trade = parseEventLogs({ abi: coreAbi, logs: receipt.logs, eventName: "TradeExecuted" })[0]?.args;
+  if (!trade || trade.isBuy) throw new Error("no sell TradeExecuted");
+  const after = { vault: await vaultState(vault), wallet: await balances(token) };
+  save(
+    { amount, percent, estimate, minOut, options: SELL_OPTION_RECEIVE_WBNB, trade, before, after },
+    {
+      before: `Holding ${before.wallet.token} token wei; phase ${before.vault.phase}, ${before.vault.totalRaised} quote wei raised.`,
+      after: `Sold ${trade.tokenAmount} token wei back to the curve for ${trade.traderQuoteAmount} quote wei (estimate ${estimate.userReceives}); phase ${after.vault.phase}, ${after.vault.remainingForSale} unsold, ${after.vault.totalRaised} raised.`,
+    },
+  );
+}
+
+if (step === "buy" && !args.tokens) {
   const { address: token, vault } = state.token as { address: Address; vault: Address };
   const before = await vaultState(vault);
   const wbnbBalance = await reader.readContract({ address: A.wbnb, abi: erc20Abi, functionName: "balanceOf", args: [account.address] });
@@ -514,17 +626,36 @@ if (step === "status" || step === "verify") {
   const reads = step === "verify" ? createPublicClient({ chain: { ...chain, rpcUrls: { default: { http: [SECOND_RPC] } } }, transport: http(SECOND_RPC, { fetchFn: loggedFetch }) }) : reader;
   if (step === "verify" && chainId !== 97) throw new Error("verify re-reads BSC testnet from a second RPC");
   const tower = await readLaunchTower(reads, { core: A.core, token: state.token.address });
+  // Every transaction this launch sent (state.txs), or the three graduation ones for a launch
+  // recorded before state.txs existed; each compared with what the sending RPC reported.
+  const sent: { label: string; hash: Hash; status?: string; blockNumber?: string; blockHash?: Hex; gasUsed?: string }[] =
+    state.txs ??
+    [
+      ["module.graduate (evidence missing)", state.graduateRevert?.hash],
+      ["module.bindEvidence", state.evidence?.hash],
+      ["module.graduate", state.graduation?.hash],
+    ]
+      .filter(([, hash]) => hash)
+      .map(([label, hash]) => ({ label, hash }));
   const receipts =
     step === "verify"
       ? await Promise.all(
-          [state.graduateRevert?.hash, state.evidence?.hash, state.graduation?.hash].filter(Boolean).map(async (hash: Hash) => {
-            const r = await reads.getTransactionReceipt({ hash });
-            return { hash, status: r.status, blockNumber: r.blockNumber, gasUsed: r.gasUsed };
+          sent.map(async (t) => {
+            const r = await reads.getTransactionReceipt({ hash: t.hash });
+            const agrees =
+              t.status === undefined ||
+              (t.status === r.status && t.blockNumber === r.blockNumber.toString() && t.blockHash === r.blockHash && t.gasUsed === r.gasUsed.toString());
+            return { label: t.label, hash: t.hash, status: r.status, blockNumber: r.blockNumber, blockHash: r.blockHash, gasUsed: r.gasUsed, logs: r.logs.length, agreesWithSendingRpc: agrees };
           }),
         )
       : [];
+  const disagree = receipts.filter((r) => !r.agreesWithSendingRpc);
   save(
     { endpoint: step === "verify" ? SECOND_RPC : rpc, tower, receipts },
-    { before: "Read only.", after: `Phase ${tower.vault.phase}; graduated ${tower.graduated}; blockers ${tower.blockers.join(", ") || "none"}.` },
+    {
+      before: "Read only.",
+      after: `Phase ${tower.vault.phase}; graduated ${tower.graduated}; blockers ${tower.blockers.join(", ") || "none"}; ${receipts.length - disagree.length} of ${receipts.length} receipts agree with the sending RPC.`,
+    },
   );
+  if (disagree.length > 0) throw new Error(`the second RPC disagrees: ${json(disagree)}`);
 }
