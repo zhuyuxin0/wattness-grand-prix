@@ -19,8 +19,11 @@ import "./ness.css";
 
 const TABBABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/** What Tab can reach inside the panel: shown, and outside the header's live stage, which is a picture (inert). */
 function tabbables(root: HTMLElement): HTMLElement[] {
-  return [...root.querySelectorAll<HTMLElement>(TABBABLE)].filter((el) => !el.hidden && el.getClientRects().length > 0);
+  return [...root.querySelectorAll<HTMLElement>(TABBABLE)].filter(
+    (el) => !el.hidden && el.getClientRects().length > 0 && !el.closest("[inert]") && getComputedStyle(el).visibility !== "hidden",
+  );
 }
 
 /** What the search reads of an answer: its question, its prose, its sponsor and the words it is known by. */
@@ -302,6 +305,8 @@ export default function NessPanel({ open, id, onShow, onList, onClose, onLeave }
   const live = useRef({ onClose });
   live.current = { onClose };
 
+  // The Memory tab draws the brains itself: there the header keeps its still, so one stage runs at a time.
+  const onMemory = useLocation().pathname.startsWith("/agents/memory");
   const answer = id ? (ANSWERS.find((a) => a.id === id) ?? null) : null;
   const missing = id !== null && answer === null;
   const caption = brainCaption(answer?.brainPage ?? null);
@@ -401,7 +406,7 @@ export default function NessPanel({ open, id, onShow, onList, onClose, onLeave }
     >
       <div className="ness__panel" data-wide={wide || undefined}>
         <header className="ness__head" data-atmosphere="dark">
-          <BrainHeader lit={answer?.brainPage ?? null} />
+          <BrainHeader lit={answer?.brainPage ?? null} live={open && !onMemory} />
           <div className="ness__bar">
             <NessMark size={24} />
             <h2 className="ness__title" id="ness-title" tabIndex={-1} ref={title}>

@@ -101,3 +101,14 @@ export function splitPageKey(key: string): { brain: string; slug: string } | nul
   if (at <= 0 || at === key.length - 1) return null;
   return { brain: key.slice(0, at), slug: key.slice(at + 1) };
 }
+
+/** The brains the live stage can bring to its center (packages/world's BrainFocus, less "all"). */
+export const LIVE_BRAINS = ["grand-prix", "terminal", "battery-review"] as const;
+export type LiveFocus = { brain: "all" | (typeof LIVE_BRAINS)[number]; page: string | null };
+
+/** Where the live stage looks for an answer: the page's brain at the center with the page pinned, or all three brains. */
+export function liveFocus(lit: string | null): LiveFocus {
+  const p = lit ? splitPageKey(lit) : null;
+  const brain = p ? LIVE_BRAINS.find((b) => b === p.brain) : undefined;
+  return brain && p ? { brain, page: p.slug } : { brain: "all", page: null };
+}

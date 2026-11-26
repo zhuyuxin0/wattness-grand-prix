@@ -95,6 +95,37 @@ html[data-ness-open] {
   object-fit: cover;
   user-select: none;
 }
+/* The live stage: a picture, not a control (the Memory tab is where it is explored), so only its canvas shows. It is
+   taller than the header, as the stage's least height, and centered in it. */
+.ness-brains__live {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 320px;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity var(--m-dur-l) var(--m-ease-out);
+}
+.ness-brains__live .lbm-root > :not(.lbm-canvas):not(.lbm-cardbox) {
+  display: none !important;
+}
+/* A pinned page's card stays measurable, just past the stage's corner, so the stage composes as if no card stood
+   beside it: the selected brain stays in the middle of the header. */
+.ness-brains__live .lbm-cardbox {
+  left: 100% !important;
+  top: 100% !important;
+  right: auto !important;
+  bottom: auto !important;
+  visibility: hidden !important;
+}
+.ness-brains[data-live] .ness-brains__live {
+  opacity: 1;
+}
+.ness-brains[data-live] .ness-brains__frame {
+  opacity: 0;
+  transition: opacity var(--m-dur-l) var(--m-ease-out);
+}
 .ness-brains__lit {
   position: absolute;
   aspect-ratio: 1;

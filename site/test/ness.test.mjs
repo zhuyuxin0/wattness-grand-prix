@@ -10,7 +10,7 @@ import { dirname, join, resolve } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { ANSWERS, BRAIN_PAGES, BRAINS, GROUPS, SPONSORS, START_HERE } from "../src/ness/answers.ts";
-import { countWords, filterByQuery, fold, hostOf, isExternal, matchesQuery, queryTerms, readAsk, splitPageKey, splitTimes, writeAsk } from "../src/ness/logic.ts";
+import { countWords, filterByQuery, fold, hostOf, isExternal, liveFocus, matchesQuery, queryTerms, readAsk, splitPageKey, splitTimes, writeAsk } from "../src/ness/logic.ts";
 import { tabAt } from "../src/shell/tabs.ts";
 
 const site = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -82,6 +82,14 @@ test("a Living Brain page key splits into its brain and slug", () => {
   assert.equal(splitPageKey("gaterecord"), null);
   assert.equal(splitPageKey(":x"), null);
   assert.equal(splitPageKey("grand-prix:"), null);
+});
+
+test("the live stage centers an answer's brain and pins its page, or shows all three", () => {
+  assert.deepEqual(liveFocus("grand-prix:gaterecord"), { brain: "grand-prix", page: "gaterecord" });
+  assert.deepEqual(liveFocus("battery-review:dswl-ess-esr1"), { brain: "battery-review", page: "dswl-ess-esr1" });
+  assert.deepEqual(liveFocus(null), { brain: "all", page: null });
+  assert.deepEqual(liveFocus("combined:anything"), { brain: "all", page: null });
+  for (const key of Object.keys(BRAIN_PAGES)) assert.notEqual(liveFocus(key).brain, "all", key);
 });
 
 test("links say where they go", () => {
