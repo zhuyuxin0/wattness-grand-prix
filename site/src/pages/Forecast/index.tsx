@@ -173,6 +173,7 @@ export default function ForecastPage() {
               <>
                 <Section
                   className="fc-lead"
+                  id="node-scenarios"
                   title={`Price Scenarios at the Node (${desk.settlementPoint})`}
                   lede={`The day-ahead forecast this battery's plans used for ${day0}, and the ${count(common.scenarios.count)} ${weighted} scenarios around it, in $/MWh.`}
                   source={`${SOURCE_LINE} Operating day ${day0}, hours in CT. Forecast: the hub forecast plus the node's average day-ahead basis to the hub over the basis days.${
@@ -205,6 +206,7 @@ export default function ForecastPage() {
 
                 <div className="pk-two">
                   <Section
+                    id="at-the-hub"
                     title={`At the Hub (${desk.hub})`}
                     lede={`What a hedge contract settles on: the hour's real-time hub price, held to the contract's $0 to $100 range. One path per history day; ${hub ? `${hub.batteries} batteries share them` : "no hub file"}.`}
                     source={`${SOURCE_LINE} Hub forecast: the reference days' day-ahead hub prices, weighted. Settlement: the mean of the hour's four 15-minute real-time hub prices in each history day's scenario.`}

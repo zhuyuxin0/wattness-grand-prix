@@ -124,6 +124,7 @@ const hash = await wallet.writeContract({
               </Section>
 
               <Section
+                id="sealing-agent"
                 title={`The Agent That Sealed the ${formatOperatingDay(g.operatingDay).replace(/^\w+, /, "").replace(/, \d{4}$/, "")} Plans`}
                 lede="The reference entry: the wallet that committed the published day, and what it signs."
                 check={{
