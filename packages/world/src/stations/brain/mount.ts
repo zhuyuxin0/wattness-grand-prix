@@ -106,6 +106,9 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     zoomTo: null as null | number, litK: 0, ptr: { x: NaN, y: NaN }, still: null as null | { x: number; y: number },
     // the orbit's scale on a stage narrower than it is tall (frame())
     orbitK: 1,
+    // the lens shift (stage fractions, the kit's setCamera shift) that composes the scene left of a pinned card, or
+    // above the bottom sheet, eased toward shiftTo; and the selection the camera last eased out for (showAcross)
+    shift: { x: 0, y: 0 }, shiftTo: { x: 0, y: 0 }, acrossFor: '',
   };
   visited = true;
   const t0 = performance.now();
@@ -233,6 +236,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     root.classList.toggle('is-narrow', n);
     const sc = root.querySelector<HTMLElement>('.lb-scope');
     if (sc) root.style.setProperty('--lbm-scope-h', `${Math.ceil(sc.offsetHeight)}px`);
+    compose();
   };
   /** The farthest the visitor zooms out: Living Brain's 7, or more where the stage's framing needs it. */
   const dMax = () => Math.max(7, frame(VIEW.all).dist * 1.2);
@@ -247,17 +251,23 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   const renderCard = () => {
     cardbox.replaceChildren();
     root.classList.remove('has-card');
-    const s = S.sel;
-    if (!s) return;
-    const p = page(s.brain, s.slug);
-    if (!p) return;
-    root.classList.add('has-card');
-    cardbox.appendChild(pageCard(p, {
-      // a row in the card pins its page: the new card takes the focus the row had
-      select: (b, slug) => { const inCard = cardbox.contains(document.activeElement); keepFocus(() => select(b, slug, 'user')); if (inCard) focusCard(); },
-      route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => closeCard(), tabs, fix,
-    }));
+    const s = S.sel, p = s ? page(s.brain, s.slug) : null;
+    if (p) {
+      root.classList.add('has-card');
+      cardbox.appendChild(pageCard(p, {
+        // a row in the card pins its page: the new card takes the focus the row had
+        select: (b, slug) => { const inCard = cardbox.contains(document.activeElement); keepFocus(() => select(b, slug, 'user')); if (inCard) focusCard(); },
+        route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => closeCard(), tabs, fix,
+      }));
+    }
+    compose();
   };
+  // the card's list of links across brains, looked at: the pointer over it, a row in it focused, a Why in it opened
+  const acrossSec = (t) => !!t?.closest?.('.lbm-sec[data-sec="across"]');
+  cardbox.addEventListener('pointerover', (e) => { if (e.pointerType !== 'touch' && acrossSec(e.target)) showAcross(); });
+  cardbox.addEventListener('focusin', (e) => { if (acrossSec(e.target) && e.target.matches?.(':focus-visible')) showAcross(); });
+  // a Why opened (toggle does not bubble): in the across list it shows them; in the narrow layout the sheet's height moves
+  cardbox.addEventListener('toggle', (e) => { if (e.target.open && acrossSec(e.target)) showAcross(); compose(); }, true);
   /** The card closed (its close, or Escape): focus goes back to the list row its page was picked from, else the stage. */
   const closeCard = () => {
     const back = returnTo; returnTo = null;
@@ -302,18 +312,67 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   /** The pointer, still, as the view moves under it: hover waits for it to really move (a tag sliding under a still
    *  pointer never takes the hover from the selection). */
   const holdHover = () => { S.still = Number.isFinite(S.ptr.x) ? { ...S.ptr } : null; };
+  /** The stage's free area beside a pinned card (CSS px from the root's top left): left of the card, or above the bottom
+   *  sheet in the narrow layout. */
+  const freeArea = () => {
+    const card = S.sel ? cardbox.querySelector('.lbm-card') : null;
+    const W = size.width, H = size.height;
+    if (!card) return { x0: 16, x1: W - 16, y0: 16, y1: H - 16 };
+    const r = card.getBoundingClientRect(), o = root.getBoundingClientRect();
+    return root.classList.contains('is-narrow') ? { x0: 16, x1: W - 16, y0: 52, y1: r.top - o.top - 16 } : { x0: 16, x1: r.left - o.left - 16, y0: 16, y1: H - 16 };
+  };
+  /** The composition beside a pinned card: the scene shifted left by half the width the card takes (and its margin),
+   *  so the brain stands in the middle of the stage left of it; in the narrow layout up by half the bottom sheet's
+   *  height, so the selection and its lit connections sit above the sheet. Eased in draw(); none without a card. */
+  const compose = () => {
+    const card = S.sel ? cardbox.querySelector('.lbm-card') : null;
+    S.shiftTo = { x: 0, y: 0 };
+    if (!card) return;
+    const r = card.getBoundingClientRect(), o = root.getBoundingClientRect();
+    if (root.classList.contains('is-narrow')) S.shiftTo.y = Math.max(0, o.bottom - r.top) / 2 / size.height;
+    else S.shiftTo.x = -Math.max(0, o.right - r.left) / 2 / size.width;
+  };
   /** The azimuth, near the camera's, that puts the brains a selected page links to off to the sides of the one at the
-   *  center (where they would sit behind or in front of it, the links across brains would hide in it). */
-  const sideAz = (brains: string[], t: number) => {
-    const at = brains.map((b) => BrainWorld.orbitAt(BRAIN_IDS.indexOf(b), PHASE + (2 * Math.PI * BRAIN_IDS.indexOf(b)) / 3 + (reduced ? 0 : (2 * Math.PI * t) / ORBIT.period)));
-    let best = S.cam.az, bestScore = -1;
+   *  center (where they would sit behind or in front of it, the links across brains would hide in it), among those that
+   *  keep them in the stage's free area at that distance (left of the card, or above the sheet); the camera's own
+   *  azimuth when none does. */
+  const sideAz = (brains: string[], t: number, dist: number) => {
+    const at = brains.map((b) => BrainWorld.orbitAt(BRAIN_IDS.indexOf(b), PHASE + (2 * Math.PI * BRAIN_IDS.indexOf(b)) / 3 + (reduced ? FREEZE : t) * (2 * Math.PI) / ORBIT.period).multiplyScalar(S.orbitK));
+    const cam = new THREE.PerspectiveCamera(VFOV, size.width / size.height, 0.05, 200);
+    cam.updateProjectionMatrix();
+    cam.projectionMatrix.elements[8] = -2 * S.shiftTo.x; cam.projectionMatrix.elements[9] = -2 * S.shiftTo.y;
+    const free = freeArea(), m = 40, e = (S.cam.el * Math.PI) / 180, v = new THREE.Vector3();
+    const inside = (p) => {
+      v.copy(p).applyMatrix4(cam.matrixWorldInverse);
+      if (v.z >= 0) return false;
+      v.copy(p).project(cam);
+      const x = ((v.x + 1) / 2) * size.width, y = ((1 - v.y) / 2) * size.height;
+      return x > free.x0 + m && x < free.x1 - m && y > free.y0 + m && y < free.y1 - m;
+    };
+    let best = S.cam.az, bestScore = -Infinity;
     for (let d = 0; d <= 150; d += 5) for (const sgn of d ? [1, -1] : [1]) {
       const a = ((S.cam.az + sgn * d) * Math.PI) / 180;
+      cam.position.set(Math.sin(a) * Math.cos(e) * dist, Math.sin(e) * dist, -Math.cos(a) * Math.cos(e) * dist);
+      cam.up.set(0, 1, 0); cam.lookAt(0, 0, 0); cam.updateMatrixWorld();
+      if (!at.every(inside)) continue;
       // the camera's right is (-cos a, 0, -sin a) and its line of sight toward the target (-sin a, 0, cos a), level
       const score = Math.min(...at.map((p) => Math.abs(-p.x * Math.cos(a) - p.z * Math.sin(a)) - 0.25 * Math.max(0, -p.x * Math.sin(a) + p.z * Math.cos(a))));
       if (score > bestScore + 0.02) { bestScore = score; best = S.cam.az + sgn * d; }
     }
     return best;
+  };
+  /** The visitor looks at a pinned card's links across brains (the pointer over that list, a row in it focused, or a Why
+   *  in it opened): once for this selection, the camera eases out until the brains they reach are in the picture (LB6's
+   *  pull back), turning only as far as keeps them in the stage's free area. A click never moves the camera (Living
+   *  Brain's rule: a selection only lights things). */
+  const showAcross = () => {
+    const s = S.sel;
+    if (!s || S.focus !== s.brain) return;
+    const key = keyOf(s.brain, s.slug), xs = acrossOf(s.brain, s.slug);
+    if (S.acrossFor === key || !xs.length) return;
+    S.acrossFor = key;
+    const dist = Math.max((3.4 * frame(VIEW.brain).dist) / REST.dist, S.cam.dist);
+    animateCam({ dist, el: S.cam.el, az: sideAz([...new Set(xs.map((x) => x.other.brain))], now() + 1.2, dist) }, 1.2);
   };
   const focusBrain = (b: BrainFocus, who: 'user' | 'host') => {
     if (b === S.focus) return;
@@ -330,11 +389,11 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     // one the URL and the page view share (a history entry for the brain, then the page replacing it)
     if (b && slug && b !== S.focus) focusBrain(b, who);
     S.sel = b && slug ? { brain: b, slug } : null;
+    if (!S.sel) S.acrossFor = '';
     setHover(null); holdHover();
+    // the camera stays where the visitor left it: the selection only lights things, and the scene is composed beside
+    // the card (compose); the links across brains come into the picture when the visitor looks at them (showAcross)
     setBridges(); renderCard();
-    // links across brains: the camera eases back so the brains they reach are in the picture (LB6's pull back)
-    const xs = S.sel && S.focus !== 'all' ? acrossOf(S.sel.brain, S.sel.slug) : [];
-    if (xs.length) animateCam({ dist: Math.max(3.4, S.cam.dist), el: S.cam.el, az: sideAz([...new Set(xs.map((x) => x.other.brain))], now() + 1.2) }, 1.2);
     if (who === 'user') { const s = state(); emit('state', s); opts.onState?.(s, { history: 'replace' }); }
   };
 
@@ -456,7 +515,10 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     S.litK += ((S.sel || S.hover ? 1 : 0) - S.litK) * (reduced ? 1 : 1 - Math.exp(-dt / 0.2));
     const P = pose(t);
     lastP = P;
-    stage.setCamera(restPose());
+    // the composition beside a pinned card (compose), eased over about 250 ms
+    const sk = reduced ? 1 : 1 - Math.exp(-dt / 0.25);
+    S.shift.x += (S.shiftTo.x - S.shift.x) * sk; S.shift.y += (S.shiftTo.y - S.shift.y) * sk;
+    stage.setCamera({ ...restPose(), shift: [S.shift.x, S.shift.y] });
     stage.camera.updateMatrixWorld();
     world.apply(P, { height: size.height, dpr }, stage.camera);
     if (bridges) {
@@ -684,11 +746,9 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   cleanups.push(() => { io.disconnect(); ro.disconnect(); document.removeEventListener('visibilitychange', onVis); });
 
   Object.assign(S.cam, frame(S.focus === 'all' ? VIEW.all : VIEW.brain));
-  if (S.sel && S.focus !== 'all') {
-    const xs = acrossOf(S.sel.brain, S.sel.slug);
-    if (xs.length) { S.cam.dist = Math.max(3.4, S.cam.dist); S.cam.az = sideAz([...new Set(xs.map((x) => x.other.brain))], 0); S.pauseUntil = 4; }
-  }
+  // a page opened cold: the brain's own framing (the camera moves for no selection), the scene composed beside its card
   renderChrome(); renderCard(); setBridges();
+  S.shift = { ...S.shiftTo };
   const ready = (async () => {
     draw();
     await stage.preparePrograms([() => draw()], () => !disposed);

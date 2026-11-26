@@ -116,6 +116,8 @@ export function pageCard(p: Page, host: CardHost): HTMLElement {
   const list = (title: string, rows: { other: Page; strength: Strength; similarity: number; reasoning: string | null; correction?: string }[], acrossRows: boolean) => {
     if (!rows.length) return;
     const sec = el('div', 'lbm-sec');
+    // the stage eases out to show the links across brains when the visitor looks at that list (mount.ts showAcross)
+    if (acrossRows) sec.dataset.sec = 'across';
     sec.append(el('p', 'lbm-label', `${title} · ${rows.length}`));
     const ul = el('ul', 'lbm-rows');
     for (const r of rows) {
