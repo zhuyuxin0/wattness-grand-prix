@@ -16,6 +16,7 @@ public objects on BNB Greenfield testnet so anyone can fetch the leaves the root
 | `od-20261126/root.hex`, `salt.txt` | the committed root (`root.txt` locally) and the salt, which is also inside every leaf |
 | `od-20261126/record.bsc-mainnet.json` | the GateRecord commit on BSC mainnet (`out/od-20261126/record.json`) |
 | `od-20261126/record.bsc-testnet.json` | the same root on BSC testnet (`out/od-20261126-bsc-testnet/record.json`) |
+| `<day>/cournot/probability.json` | the Cournot response the plan read before the gate, when it read one; V7 hashes it beside the record |
 
 The primary SP's edge firewall answers 405 to any path ending in `root.txt`, so the root is stored as `root.hex`; the same
 root is in `manifest.json` and both receipts.
@@ -39,6 +40,9 @@ node publish.mjs check              # download every object, compare SHA-256, wr
 
 Without `--send`, `fund` and `publish` simulate and send nothing. `publish` resumes: objects already on chain are
 checked against the local checksums and only the missing payloads are uploaded. `--no-sync` leaves out `sync/`.
+
+`GATE_DAY=od-YYYYMMDD` publishes another sealed day from `out/<day>/` and `out/<day>-bsc-testnet/` (default
+`od-20261126`); its list goes to `published-<day>.json`.
 
 The key is `GATE_PRIVATE_KEY` in `~/Documents/wattness-secrets/bnb-bangkok.env`, read by name and never printed; the
 script stops unless it derives the agent wallet's address.
