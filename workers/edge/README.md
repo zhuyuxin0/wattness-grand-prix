@@ -38,16 +38,18 @@ the code that produced it. Everything else hangs from that root.
 | `leaves/<R>.scenarios.json` | SHA-256 of its RFC 8785 form is the digest R's verified leaf names |
 | `record.<network>.json` | every field is what GateRecord holds on that network, there are no other fields, and the transaction it names succeeded in the record's block and logged one matching `Committed` event |
 | `root.hex` | it is the root GateRecord holds |
-| `salt.txt` | it is the salt inside the showcase battery's verified leaf |
-| a file a leaf names | SHA-256 of its bytes is the digest the showcase battery's verified leaf records, as for an outside input's saved response (`cournot/probability.json`; none on 26 Nov) |
+| `salt.txt` | it is the salt inside the showcase battery's verified leaf (the first leaf's when the index names no showcase) |
+| a file a leaf names | SHA-256 of its bytes is the digest the showcase battery's verified leaf records (the first leaf's when the index names no showcase), as for an outside input's saved response (`cournot/probability.json`; none on 26 Nov) |
 
-Every JSON file must also be its document's own rendering, pretty-printed with a final newline or in RFC 8785
-form. A hash covers a document, not its whitespace; this rule means no byte is served that the document does not
-determine, other than the order of an object's keys, which no hash fixes: RFC 8785 sorts them, so a copy with its
-keys in another order hashes the same and is served. The rule refuses a duplicate key that one parser would read
-one way and another the other. A JSON file the Worker parses must also nest at most 64 levels of arrays and
-objects (26 Nov's nest at most 4, the 27 Nov dry run's at most 5); a deeper one is refused with 502 before any
-check walks it.
+Every JSON file checked as a document (the index, a leaf, a scenario set, a receipt) must also be its document's
+own rendering, pretty-printed with a final newline or in RFC 8785 form. A hash covers a document, not its
+whitespace; this rule means no byte is served that the document does not determine, other than the order of an
+object's keys, which no hash fixes: RFC 8785 sorts them, so a copy with its keys in another order hashes the same
+and is served. The rule refuses a duplicate key that one parser would read one way and another the other. Each of
+these must also nest at most 64 levels of arrays and objects (26 Nov's nest at most 4, the 27 Nov dry run's at
+most 5); a deeper one is refused with 502 before any check walks it. A file a leaf names is checked by the SHA-256
+of its bytes, which fixes every byte, and is served as it is; its envelope gives the document as null when it is
+not JSON or nests deeper than 64 levels.
 
 GateRecord accepts records from any wallet. The Worker serves those of the agent wallet named in
 `wrangler.jsonc` (`COMMITTER`), under the scope `gate-record/ercot-da-energy`.
@@ -71,11 +73,14 @@ lines and V3 are the verifier's; V1's first line reads `GateRecord holds <root>`
 
 A verdict is given only under an index that passes the checks `/day` applies to the index's own bytes (its
 rendering and its shape, paths included), and only for a leaf whose bytes `/day` would serve in that form (the
-document's own rendering); otherwise the answer is the same 502 `/day` gives. A leaf in that form that fails a
-check, such as the one with a changed digit, gets a failing verdict. It finds the battery by its name in the
-index, which no hash fixes: the leaf check fails unless the leaf's own `battery.resource` is that name, and when
-the index lists no leaf under the name the answer is a 404 that says so, given under a copy that passes every
-index check against the chain; an isolate that has verified another copy of that day's index answers 502 instead.
+document's own rendering). Otherwise the answer is a 502: for an index that fails those checks, the one `/day`
+gives for that copy; for a leaf that is not its document's own rendering, one with `/day`'s reason for the byte
+form, which is `/day`'s whole reason when the byte form is the only check the leaf fails (`/day` names each check
+that fails). A leaf in that form that fails a check, such as the one with a changed digit, gets a failing verdict.
+It finds the battery by its name in the index, which no hash fixes: the leaf check fails unless the leaf's own
+`battery.resource` is that name, and when the index lists no leaf under the name the answer is a 404 that says so,
+given under a copy that passes every index check against the chain; an isolate that has verified another copy of
+that day's index answers 502 instead.
 
 ## Headers
 
