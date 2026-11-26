@@ -31,6 +31,7 @@ import {
   useNarrow,
   type SocLimits,
 } from "../Battery/kit";
+import { BatteryObject } from "./BatteryObject";
 import "./styles.css";
 
 // State of charge: how full the battery is at the end of every hour under each
@@ -121,6 +122,7 @@ export default function StateOfChargePage() {
             </>
           }
         />
+        <BatteryObject />
         <BatteryBar choice={choice} />
         <Ready state={all} label="Loading the plan">
           {([desk, common]) => {
