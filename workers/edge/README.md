@@ -112,8 +112,9 @@ wrangler's output. wrangler's debug log records its API requests, and so the acc
 a temporary folder of its own (`edge-deploy-*` under the system's temporary folder) and removes that folder when
 wrangler exits, instead of letting it collect in the `logs/` folder under wrangler's global config. `--check`
 prints each name as present or missing, never a value, and starts no wrangler. The token needs one permission,
-Account › Workers Scripts › Edit, for that account, and the account needs a workers.dev subdomain. `scripts/smoke.ts` calls every endpoint for 26 Nov and checks each file
-against the SHA-256 the publisher recorded (`scripts/greenfield/published.json`).
+Account › Workers Scripts › Edit, for that account, and the account needs a workers.dev subdomain.
+`scripts/smoke.ts` calls every endpoint for 26 Nov and checks each file against the SHA-256 the publisher
+recorded (`scripts/greenfield/published.json`).
 
 ## Limits
 
