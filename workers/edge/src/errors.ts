@@ -17,3 +17,6 @@ export class EdgeError extends Error {
  * A refusal prints at most 200 characters of a value and 2,000 of its reason, so it never carries the file.
  */
 export const cut = (s: string, max: number): string => (s.length > max ? `${s.slice(0, max)}... (${s.length} characters)` : s);
+
+/** A request value or a path as a reason quotes it: as JSON, at most 200 characters of it, and a cut one's length after the closing quote. */
+export const quoted = (s: string): string => (s.length > 200 ? `${JSON.stringify(s.slice(0, 200))}... (${s.length} characters)` : JSON.stringify(s));

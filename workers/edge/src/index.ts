@@ -1,6 +1,6 @@
 import { assertOd, isoFromOd } from "../../../packages/core/src/gate.ts";
 import { configFrom, NETWORKS, isNetwork, type Config, type Env, type NetworkName } from "./config.ts";
-import { EdgeError, cut } from "./errors.ts";
+import { EdgeError, quoted } from "./errors.ts";
 import { isPlainPath } from "./greenfield.ts";
 import { homePage } from "./page.ts";
 import {
@@ -21,9 +21,6 @@ import { CORS, VERIFIED_CACHE, errorResponse, servedResponse, textResponse, verd
 import { cacheableVerdict, verdictFor } from "./verdict.ts";
 
 export type { Env } from "./config.ts";
-
-/** A request value as a reason quotes it: as JSON, and at most 200 characters of it. */
-const quoted = (v: string): string => JSON.stringify(cut(v, 200));
 
 /** YYYY-MM-DD or YYYYMMDD to the uint32 the contract takes. */
 export function parseDay(raw: string): number {

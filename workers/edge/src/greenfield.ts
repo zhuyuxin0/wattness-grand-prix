@@ -1,7 +1,7 @@
 // Reads a sealed day's objects from the public-read Greenfield bucket. Nothing here is trusted: every
 // byte goes through a check before the Worker serves or caches it.
 import type { Config } from "./config.ts";
-import { EdgeError, cut } from "./errors.ts";
+import { EdgeError, quoted } from "./errors.ts";
 
 /** The day's files are a few hundred KB each; anything far larger is not one of them. */
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -22,7 +22,7 @@ export interface StoredObject {
 
 /** The object's bytes, or null when the bucket has no such object. */
 export async function fetchObject(cfg: Config, od: number, path: string): Promise<StoredObject | null> {
-  if (!isPlainPath(path)) throw new EdgeError(400, `${JSON.stringify(cut(path, 200))} is not a plain relative path`);
+  if (!isPlainPath(path)) throw new EdgeError(400, `${quoted(path)} is not a plain relative path`);
   const url = objectUrl(cfg, od, path);
   let res: Response;
   try {

@@ -7,6 +7,7 @@ import { PLAN_SCOPE_LABEL, configFrom } from "../src/config.ts";
 import { merkleRoot } from "../src/merkle.ts";
 import { forgetVerified } from "../src/record.ts";
 import { EdgeError } from "../src/errors.ts";
+import { fetchObject } from "../src/greenfield.ts";
 import { VERIFIED_CACHE, errorResponse } from "../src/respond.ts";
 import { BASE, DAY, bytesOf, call, freshOrigin, sealedObjects, text, upstreams, utf8 } from "./fake.ts";
 import chain from "./fixtures/chain.json";
@@ -744,6 +745,18 @@ describe("requests", () => {
       expect.soft([400, 404], what).toContain(res.status);
       expect.soft((await bytesOf(res)).length, what).toBeLessThan(2100);
     }
+  });
+
+  it("puts the note on a cut request value after its closing quote, where a refusal's values have it", async () => {
+    upstreams();
+    const day = await call(freshOrigin(), `/day/${"9".repeat(20_000)}/index.json`);
+    expect.soft(await day.text()).toBe(`400: "${"9".repeat(200)}"... (20000 characters) is not a day; use YYYY-MM-DD\n`);
+    const verify = (await (await call(freshOrigin(), `/verify/${"A".repeat(20_000)}?od=2026-11-26`)).json()) as { error: string };
+    expect.soft(verify.error).toBe(`"${"A".repeat(200)}"... (20000 characters) is not an ERCOT resource name`);
+    const network = await call(freshOrigin(), `/day/2026-11-26/index.json?network=${"x".repeat(20_000)}`);
+    expect.soft(await network.text()).toBe(`400: network "${"x".repeat(200)}"... (20000 characters): use bsc-mainnet, bsc-testnet or both, comma-separated\n`);
+    // The same for a path the Worker would fetch, though every route checks a path before it gets there.
+    await expect.soft(fetchObject(configFrom(env), 20261126, "a ".repeat(150))).rejects.toThrow(`"${"a ".repeat(100)}"... (300 characters) is not a plain relative path`);
   });
 
   it("cuts any reason at 2,000 characters where a response is made", async () => {
