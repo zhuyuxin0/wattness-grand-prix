@@ -8,6 +8,13 @@
 //                          the Forecaster's chart wall, the State keeper's battery column, the Market reader's file wall,
 //                          the Hedger's strip, the Risk officer's coin board, the Planner's three boards, the
 //                          evaluator's bench of ten check lamps
+//   _objects.stack-<piece>  one piece of the stack (stations/stack/space.ts) in its place: the stack's rest camera, its
+//                          lens narrowed onto the piece (as stack.cube-check crops the cube), the rest of the stack as
+//                          it stands round it
+//   _objects.battery-cells  Desert Willow's enclosure kind (kit/enclosure.ts, the intro's), opened: the roof lifted, the
+//                          front wall slid out, one module pulled onto its cart with its lid up over the cells
+//   _objects.chapter-<key>  a chapter of the introduction at its rest, as the story's beat holds it (story/beats.ts):
+//                          the station's own frame and camera, at the beat's local time
 import * as THREE from 'three';
 import { createMaterials } from '../../kit/materials';
 import { ensureBase } from '../../kit/geo';
@@ -16,6 +23,14 @@ import { GrabPass } from '../../kit/hedge/fields';
 import { assignLayers } from '../../lib/stage';
 import { forecastWall, socColumn, fileWall, setupStrip, coinBoard, strategyBoards } from '../garage/bays';
 import { buildWorkshop, faceCamera } from '../garage/workshop';
+import { buildEnclosure } from '../../kit/enclosure';
+import { GrabBlurPass, markTexture } from '../stack/kit';
+import { buildSpace } from '../stack/space';
+import { injectCss } from '../stack/dom';
+import { stageLook, fitRest } from '../stack/common';
+import { frames as grid } from '../grid/index';
+import { frames as world } from '../world/index';
+import { frames as towers } from '../towers/index';
 import type { FrameContext, FrameHandle, StationModule } from '../types';
 
 /** The cards' ground: the garage's night (garage/index.ts lit), the floor a shade under the backdrop's horizon. */
@@ -91,10 +106,99 @@ function objectFrame(note: string, shot: Shot, build: (ctx: FrameContext, kit: {
   };
 }
 
+/** A piece of the stack in its place: the stack's rest (S01's camera, as stack.rest builds it, without its words), the
+ *  lens narrowed and shifted so the piece's own box fills the frame less a margin (stack.cube-check's crop). */
+function stackPiece(id: string, note: string, { margin = 0.12, nudge = [0, 0] as [number, number] } = {}) {
+  return async (ctx: FrameContext): Promise<FrameHandle> => {
+    const { stage, theme, width: W, height: H, dpr } = ctx;
+    ctx.needData();
+    injectCss();
+    stageLook(stage, theme, { seal: false });
+    const fit = fitRest(stage, W, H);
+    stage.camera.updateMatrixWorld();
+    const grab = new GrabBlurPass(W * dpr, H * dpr, { passes: 2, radius: 1.0 });
+    stage.insertBeforeOverlay(grab);
+    const mark = await markTexture();
+    const blankC = document.createElement('canvas'); blankC.width = blankC.height = 4;
+    const blank = { texture: new THREE.CanvasTexture(blankC), aspect: 1 };
+    const space = await buildSpace(ctx, { theme, mpp: fit.mpp, camera: stage.camera, blur: grab.texture, res: new THREE.Vector2(W * dpr, H * dpr), mark, blank, footprints: false });
+    assignLayers(space.root);
+    stage.scene.add(space.root);
+    setLineResolution(space.root, W, H, dpr);
+    space.root.updateMatrixWorld(true);
+    const camR = new THREE.Vector3().setFromMatrixColumn(stage.camera.matrixWorld, 0);
+    const camU = new THREE.Vector3().setFromMatrixColumn(stage.camera.matrixWorld, 1);
+    const camD = new THREE.Vector3().setFromMatrixColumn(stage.camera.matrixWorld, 2).negate();
+    space.aimCube(camR, camU, camD, true);
+    stage.setShadowAuto(true);
+    // the piece's box on screen at the rest camera, in normalized device coordinates
+    const p = space.pieces[id];
+    if (!p?.picks?.length) throw new Error(`the stack has no piece "${id}" with a box`);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    const v = new THREE.Vector3(), box = new THREE.Box3();
+    for (const mesh of p.picks) {
+      mesh.geometry.computeBoundingBox(); box.copy(mesh.geometry.boundingBox).applyMatrix4(mesh.matrixWorld);
+      for (let i = 0; i < 8; i++) {
+        v.set(i & 1 ? box.max.x : box.min.x, i & 2 ? box.max.y : box.min.y, i & 4 ? box.max.z : box.min.z).project(stage.camera);
+        x0 = Math.min(x0, v.x); x1 = Math.max(x1, v.x); y0 = Math.min(y0, v.y); y1 = Math.max(y1, v.y);
+      }
+    }
+    // a narrower lens from the same place: k times the picture, centered on the box (the lens shift is in half-frames)
+    const half = Math.max((x1 - x0) / 2, (y1 - y0) / 2), k = (1 - 2 * margin) / half;
+    const fov = (2 * Math.atan(Math.tan((fit.pose.vfov * Math.PI) / 360) / k) * 180) / Math.PI;
+    const s0 = fit.pose.shift ?? [0, 0];
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    const pose = { ...fit.pose, vfov: fov, shift: [(-k * (cx - 2 * s0[0])) / 2 + nudge[0], (-k * (cy - 2 * s0[1])) / 2 + nudge[1]] };
+    return {
+      time: 6.0,
+      steps: 30,
+      note: `${note} A crop of the stack's rest (S01's camera, ${k.toFixed(1)} times), built by stations/stack/space.ts from frame-data.json and the stack's records; nothing drawn differently.`,
+      update(t) {
+        stage.setCamera(pose);
+        stage.camera.updateMatrixWorld();
+        space.pose(t, stage.camera.position);
+      },
+    };
+  };
+}
+
+/** A chapter of the introduction at its rest: the station's own frame, posed at the beat's local time. With --plates 0
+ *  its words stay out; a frame's own screens drawn as DOM over the canvas (the towers' displays) are left out too. */
+function chapter(setup: (ctx: FrameContext) => Promise<FrameHandle>, { local = null as number | null, screens = true, note = '' } = {}) {
+  return async (ctx: FrameContext): Promise<FrameHandle> => {
+    const h = await setup(ctx);
+    if (!screens) ctx.overlay.style.display = 'none';
+    return { ...h, time: local ?? h.time ?? 0, note: `${note} ${h.note}`.trim() };
+  };
+}
+
 const at0 = { x: 0, z: 0 };
 const SOURCE = "frame-data.json (the sealed Nov 26 record: Desert Willow's showcase, plan C)";
 
 export const frames: StationModule['frames'] = {
+  // ── the tabs' objects ──────────────────────────────────────────────────────────────────────────────────────────
+  '_objects.stack-electronx': stackPiece('electronx', "ElectronX's piece in the stack: its published hourly contract terms, the hedge's instrument.", { margin: 0.1 }),
+  '_objects.stack-greenfield': stackPiece('greenfield', "BNB Greenfield's piece in the stack: the sealed day's files in a public bucket, as trays under the record.", { margin: 0.2 }),
+  '_objects.stack-gate': stackPiece('gate', "GateRecord's piece in the stack: BNB Chain's cube, where the day's root is committed before the gate.", { margin: 0.1 }),
+  '_objects.battery-cells': objectFrame(
+    "Desert Willow's enclosure kind as the landing intro builds it (kit/enclosure.ts, about 5 MWh of racks in a 20-ft-class steel enclosure; chemistry not modelled), opened as the intro opens it (explode at 1): the roof lifted, the front wall slid out, one module pulled onto its service cart with its lid up over the cells.",
+    { az: 208, el: 20, vfov: 30, margin: -0.03, key: { az: 150, el: 48, intensity: 1.3 }, light: { key: 1.6, fill: 1.15, env: 0.5, shadow: 0.42 } },
+    (ctx, { M }) => {
+      const enc = buildEnclosure(THREE, { lod: 'hero', theme: ctx.theme, materials: M });
+      enc.explode(1);
+      enc.group.updateMatrixWorld(true);
+      return { group: enc.group, box: new THREE.Box3().setFromObject(enc.group) };
+    },
+  ),
+  '_objects.chapter-sealed': chapter(grid['grid.R02'], { local: 4.0, note: "Chapter 13 at its rest, as the site's story holds it (beats.ts KEYS sealed, local 4.0): Parc fermé at 09:15:17 CT on Nov 25, the root sealed on BNB Chain." }),
+  '_objects.chapter-check': chapter(grid['grid.R03-pass'], { note: "Chapter 17 at its rest (beats.ts KEYS check): the sealed copy, every check passing." }),
+  '_objects.chapter-starting-grid': chapter(grid['grid.R01'], { note: "Chapter 04 at its rest (beats.ts KEYS starting-grid): every battery planned for tomorrow." }),
+  '_objects.chapter-odds': chapter(world['world.W02-radar'], { note: "Chapter 14 at its rest (beats.ts KEYS odds): the weather odds, read after the seal." }),
+  '_objects.chapter-operating-day': chapter(world['world.W03-race-day'], { note: "Chapter 16 at its rest (beats.ts KEYS operating-day): the operating day runs." }),
+  '_objects.tower-season': chapter(towers['towers.T02-season'], { screens: false, note: "The season's tower (towers.T02-season) without its display: its words are the Season tab's, read live." }),
+  '_objects.tower-launch': chapter(towers['towers.T04-launch-graduate'], { screens: false, note: "The launch tower (towers.T04-launch-graduate) without its display: its words are the Launchpad tab's, read live." }),
+
+  // ── the agents' instruments ────────────────────────────────────────────────────────────────────────────────────
   '_objects.agent-forecaster': objectFrame(
     `The Forecaster's instrument as the garage stands it (garage/bays.ts forecastWall): the hub's and the node's day-ahead forecast as hourly steps over the 301 scenarios' node-price fan (p05 to p95, p25 to p75), plan C's power below. From ${SOURCE}.`,
     { az: 218, el: 9, vfov: 24, margin: 0.04, key: { az: 160, el: 46 } },
