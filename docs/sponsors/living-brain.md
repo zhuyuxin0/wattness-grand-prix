@@ -1,6 +1,9 @@
 # Living Brain: agents that remember their reviews, as of the decision
 
-<!-- MEDIA: video-living-brain -->
+<p align="center"><img src="../media/living-brain-memory.gif" alt="The Memory tab: three brains in Living Brain, the Grand Prix build's, the Wattness Terminal's and Desert Willow's review, 142 pages with 55 links across brains" width="100%"></p>
+
+<!-- VIDEO-TODO(living-brain): replace the link below with the film's YouTube URL. -->
+<a href="https://youtu.be/VIDEO-TODO-living-brain"><img src="../media/video-living-brain.jpg" alt="Watch the Living Brain film: memory that remembers, retrieves and connects" width="440"></a>
 
 Living Brain is the agents' persistent memory, used through its REST API. Desert Willow (DSWL_ESS_ESR1), the showcase battery, has a brain of its own for the reviews of its plans; the build and the Wattness Terminal each have one too. Code: [`packages/adapters/living-brain`](../../packages/adapters/living-brain). Interface: the [Memory tab](https://gp.wattness.tech/agents/memory).
 
