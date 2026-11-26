@@ -91,6 +91,15 @@ function objectFrame(note: string, shot: Shot, build: (ctx: FrameContext, kit: {
     stage.setFade({ center: [0.5, 0.55], screen: [0.6, 1.1], world: [r * 1.2, r * 3.2], worldCenter: [c.x, c.z], glow: null });
     stage.setAO({ radius: Math.max(0.6, r / 30), scale: 1.0, thickness: Math.max(1, r / 18), samples: 16, distanceFallOff: 1 });
     stage.setShadowAuto(true);
+    // for scripts/spin.mjs, in the lab only: the same picture with the camera swung round the object by swing degrees
+    // and back, u in [0, 1) the loop's phase; it resolves once the pose is drawn
+    (window as any).__objectSpin = async (u: number, swing = 10) => {
+      stage.setCamera({ ...pose, az: pose.az + swing * Math.sin(2 * Math.PI * u) });
+      stage.camera.updateMatrixWorld();
+      if (b.billboards) faceCamera(root, stage.camera);
+      for (let i = 0; i < 3; i++) { stage.requestShadow(); stage.render(); await new Promise((r) => requestAnimationFrame(r)); }
+      stage.renderer.getContext().finish();
+    };
     return {
       time: 0,
       steps: 2,
