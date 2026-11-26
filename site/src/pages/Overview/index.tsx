@@ -3,7 +3,8 @@ import { SOURCE_LINE } from "../../config";
 import { combine, useDay, useLateSeal, useReceipts } from "../../data";
 import { minSec } from "../../lib/clock";
 import { formatInt } from "../../lib/format";
-import { dualTime, formatCountdown, formatOperatingDay, nextGate } from "../../lib/time";
+import { dualTime, formatOperatingDay, nextGate } from "../../lib/time";
+import { countdown } from "../../shell/market-day";
 import { batteryPath, useSelectedBattery } from "../../shell/battery";
 import { useSecondClock } from "../../shell/MarketClock";
 import { panelSections, type PanelGroup } from "../../shell/tabs";
@@ -110,7 +111,8 @@ export default function OverviewPage() {
   );
 }
 
-/** The lead: ERCOT's next day-ahead gate, counted down in market time with the reader's own beside it. */
+/** The lead: ERCOT's next day-ahead gate, counted down as the masthead counts it (market-day.ts countdown), in market
+ *  time with the reader's own beside it. */
 function NextGate({ nowMs }: { nowMs: number }) {
   const gate = nextGate(nowMs);
   const left = Math.max(0, gate.unix - Math.floor(nowMs / 1000));
@@ -119,17 +121,17 @@ function NextGate({ nowMs }: { nowMs: number }) {
   return (
     <section className="ov-gate" aria-labelledby="ov-gate-title">
       <h2 id="ov-gate-title" className="ov-gate__label">
-        Next gate
+        DAM deadline
       </h2>
-      <p className={`ov-gate__digits num${closing ? " ov-gate__digits--closing" : ""}`} role="timer" aria-live="off" aria-label={`${formatCountdown(left)} to the gate`}>
-        {formatCountdown(left)}
+      <p className={`ov-gate__digits num${closing ? " ov-gate__digits--closing" : ""}`} role="timer" aria-live="off" aria-label={`${countdown(left * 1000)} to the DAM deadline`}>
+        {countdown(left * 1000)}
       </p>
       <p className="ov-gate__meta">
         <span className="ov-gate__at">
           <b className="num">{at.ct}</b>
           {at.yours && <span className="muted num"> · {at.yours}</span>}
         </span>
-        <span className="ov-gate__what">ERCOT's day-ahead market closes for bids on {formatOperatingDay(gate.operatingDay)}.</span>
+        <span className="ov-gate__what">Bids and offers for Operating Day {formatOperatingDay(gate.operatingDay)} close at this gate.</span>
       </p>
     </section>
   );
