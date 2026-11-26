@@ -3,7 +3,7 @@
 <p align="center"><img src="../media/coinmarketcap-atlas-prices.gif" alt="The Prices tab: Atlas's BNB/USD and USDT/USD read live from BSC testnet beside CoinMarketCap's recorded Pro quotes, then the tokenized stocks of Vistra, Fluence, GE Vernova and IREN read live from BNB Smart Chain" width="100%"></p>
 
 <!-- VIDEO-TODO(coinmarketcap-atlas): replace the link below with the film's YouTube URL. -->
-<a href="https://youtu.be/VIDEO-TODO-coinmarketcap-atlas"><img src="../media/video-coinmarketcap-atlas.jpg" alt="Watch the CoinMarketCap and Atlas film" width="440"></a>
+<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-coinmarketcap-atlas"><img src="../media/video-coinmarketcap-atlas.jpg" alt="Watch the CoinMarketCap and Atlas film" width="440"></a> -->
 
 CoinMarketCap's Pro API and Atlas's signed reports and on-chain feeds decide how many paid checks of Wattness Grand Prix's sealed plans a budget pays for, and stop the count when the prices are stale or disagree. The Grand Prix seals the next day's plan for every ERCOT battery with complete public data (316 on Nov 26) on BNB Chain before the market's 10:00 CT gate. Repository: [github.com/zhuyuxin0/wattness-grand-prix](https://github.com/zhuyuxin0/wattness-grand-prix), MIT; setup in [Run it](../../README.md#run-it). Code: [`packages/adapters/atlas-cmc`](../../packages/adapters/atlas-cmc), server-side, with offline tests and setup in [its README](../../packages/adapters/atlas-cmc/README.md). Interface: the [Prices tab](https://gp.wattness.tech/markets/prices) and the Seal tab.
 

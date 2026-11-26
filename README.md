@@ -19,7 +19,7 @@
 **Judges' path**
 
 <!-- VIDEO-TODO(developer): replace the link below with the demo film's YouTube URL; then add item 1, "Watch the demo (under 3 minutes)", linking the same URL. -->
-<p align="center"><a href="https://youtu.be/VIDEO-TODO-developer"><img src="docs/media/video-developer.jpg" alt="Watch the demo film of Wattness Grand Prix" width="88%"></a></p>
+<!-- FILM-LINK-PENDING <p align="center"><a href="https://youtu.be/VIDEO-TODO-developer"><img src="docs/media/video-developer.jpg" alt="Watch the demo film of Wattness Grand Prix" width="88%"></a></p> -->
 
 1. **Open the site:** [gp.wattness.tech](https://gp.wattness.tech). It opens on a 3D introduction to one operating day; the [Overview](https://gp.wattness.tech/overview) and the tabs beside it hold every battery's plan, the agents, the seal and the checks.
 2. **See the Nov 27 seal on BSC mainnet:** [transaction 0xd6ce6ebd…f853dbef](https://bscscan.com/tx/0xd6ce6ebdd4f70dfe3aafae5fb76f014152f10a9f3a6c83d52362954cf853dbef). 316 plans under one root, committed 1 h 49 min before the gate, each plan carrying Cournot's weather probability.
@@ -150,7 +150,7 @@ Flap's Pool Launch Portal launches tokens through Launcher Factories. Ours launc
 - **Code.** [`modules/flap`](modules/flap) holds the Launcher, the Vault and their factories, tested against a stand-in Portal and the real GateRecord; [`packages/adapters/flap`](packages/adapters/flap) holds the read clients.
 
 <!-- VIDEO-TODO(flap): replace the link below with the film's YouTube URL. -->
-<a href="https://youtu.be/VIDEO-TODO-flap"><img src="docs/media/video-flap.jpg" alt="Watch the Flap film: the Season Token" width="440"></a>
+<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-flap"><img src="docs/media/video-flap.jpg" alt="Watch the Flap film: the Season Token" width="440"></a> -->
 
 ### OpenFour (Four.meme)
 
@@ -164,7 +164,7 @@ OpenFour, Four.meme's open launch framework, builds each launch from swappable m
 - **Interface and code.** The [Launchpad tab](https://gp.wattness.tech/markets/launchpad) reads the launch with view calls. [`modules/openfour`](modules/openfour) holds the module, its tests on Hardhat against the real GateRecord, the launch runner and the read client.
 
 <!-- VIDEO-TODO(openfour): replace the link below with the film's YouTube URL. -->
-<a href="https://youtu.be/VIDEO-TODO-openfour"><img src="docs/media/video-openfour.jpg" alt="Watch the OpenFour film: the evidence-gated launch" width="440"></a>
+<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-openfour"><img src="docs/media/video-openfour.jpg" alt="Watch the OpenFour film: the evidence-gated launch" width="440"></a> -->
 
 ### CoinMarketCap × Atlas
 
@@ -184,7 +184,7 @@ The plans themselves are valued only at ERCOT's prices; these prices decide what
 <p align="center"><sub>The Seal tab prices the Nov 27 seal's gas in dollars with Atlas's BNB/USD feed, read live from BNB Smart Chain</sub></p>
 
 <!-- VIDEO-TODO(coinmarketcap-atlas): replace the link below with the film's YouTube URL. -->
-<a href="https://youtu.be/VIDEO-TODO-coinmarketcap-atlas"><img src="docs/media/video-coinmarketcap-atlas.jpg" alt="Watch the CoinMarketCap and Atlas film" width="440"></a>
+<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-coinmarketcap-atlas"><img src="docs/media/video-coinmarketcap-atlas.jpg" alt="Watch the CoinMarketCap and Atlas film" width="440"></a> -->
 
 ### Living Brain (ChatAndBuild)
 
@@ -199,7 +199,7 @@ Living Brain is the agents' persistent memory, reached through its API: a review
 - **The run** (Nov 25, 10:58 CT / 23:58 Bangkok). Two captures for Desert Willow; a fresh client retrieved page `dswl-ess-esr1`, version 2, and cited it. Its review of the plan's hedge moved from "needs-supported-review" to "assumed-entry-scenario": the second interaction knew the reviewed rule, that the hedge's entry is assumed at the model's fair value, so the result is a scenario comparison and not a trade. Code: [`packages/adapters/living-brain`](packages/adapters/living-brain).
 
 <!-- VIDEO-TODO(living-brain): replace the link below with the film's YouTube URL. -->
-<a href="https://youtu.be/VIDEO-TODO-living-brain"><img src="docs/media/video-living-brain.jpg" alt="Watch the Living Brain film: memory that remembers, retrieves and connects" width="440"></a>
+<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-living-brain"><img src="docs/media/video-living-brain.jpg" alt="Watch the Living Brain film: memory that remembers, retrieves and connects" width="440"></a> -->
 
 ### Cournot
 
@@ -209,7 +209,7 @@ Living Brain is the agents' persistent memory, reached through its API: a review
 Cournot's Intelligence Oracle gives the risk officer one probability before the gate: the odds, from Kalshi's market, that the Dallas–Fort Worth low falls below 29°F. Wattness's declared rule turns it into the weight on each battery's stress scenarios and the hourly hedge cap, and the response's SHA-256 is sealed in every Nov 27 plan on BSC mainnet. The five items the track asks for are in [Cournot Integration](#cournot-integration).
 
 <!-- VIDEO-TODO(cournot): replace the link below with the film's YouTube URL. -->
-<a href="https://youtu.be/VIDEO-TODO-cournot"><img src="docs/media/video-cournot.jpg" alt="Watch the Cournot film: weather odds sealed in every plan" width="440"></a>
+<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-cournot"><img src="docs/media/video-cournot.jpg" alt="Watch the Cournot film: weather odds sealed in every plan" width="440"></a> -->
 
 ## Cournot Integration
 

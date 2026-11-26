@@ -3,7 +3,7 @@
 <p align="center"><img src="../media/flap-season-token.gif" alt="The Season Token tab: the Wattness Season Mini App on BSC testnet replays round 3, from the round opening and the Nov 27 plan sealed to the launch of PRIX (testnet) on Flap" width="100%"></p>
 
 <!-- VIDEO-TODO(flap): replace the link below with the film's YouTube URL. -->
-<a href="https://youtu.be/VIDEO-TODO-flap"><img src="../media/video-flap.jpg" alt="Watch the Flap film: the Season Token" width="440"></a>
+<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-flap"><img src="../media/video-flap.jpg" alt="Watch the Flap film: the Season Token" width="440"></a> -->
 
 Built on Flap's Pool Launch Portal through our own Launcher Factory, on BSC testnet. A season round launches its token only once GateRecord holds a named agent's plan for a named day, sealed before that day's gate; a round that has not launched by its deadline only refunds. Round 3 [launched](https://testnet.bscscan.com/tx/0x4881264736e39903dd28eadd23602d8d710c558055be4f2f74db9d5eeb872429) on BSC testnet at 08:12:32 CT on Nov 26 (21:12:32 Bangkok), 2 min 16 s after the Nov 27 record it waited for. The season token, PRIX, is a testnet placeholder.
 

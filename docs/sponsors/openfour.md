@@ -3,7 +3,7 @@
 <p align="center"><img src="../media/openfour-launchpad.gif" alt="The Launchpad tab replays PLNR27's real BSC testnet transactions: sold out, graduation refused, the sealed record bound, then graduated into a PancakeSwap V2 pair" width="100%"></p>
 
 <!-- VIDEO-TODO(openfour): replace the link below with the film's YouTube URL. -->
-<a href="https://youtu.be/VIDEO-TODO-openfour"><img src="../media/video-openfour.jpg" alt="Watch the OpenFour film: the evidence-gated launch" width="440"></a>
+<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-openfour"><img src="../media/video-openfour.jpg" alt="Watch the OpenFour film: the evidence-gated launch" width="440"></a> -->
 
 Route: **OpenFour Hub**, a new launch mechanism. Preset: **Evidence-gated Bonding V1** (preset `1795634196178`).
 
