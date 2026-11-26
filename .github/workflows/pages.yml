@@ -5,7 +5,8 @@ on:
     branches: [main]
     paths:
       - "site/**"
-      - "packages/core/src/**"
+      - "packages/core/src/jcs.ts"
+      - "packages/core/src/hash.ts"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -16,7 +17,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -33,6 +34,9 @@ jobs:
       - name: Build
         working-directory: site
         run: pnpm run build:app
+      - name: Test
+        working-directory: site
+        run: pnpm test
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
