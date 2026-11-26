@@ -42,6 +42,8 @@ uniform float uTime;
 uniform float uDrawDur;
 uniform float uOverlay;
 uniform float uWide;
+uniform vec3 uTint;
+uniform float uTintK;
 varying vec3 vColor;
 varying float vB;
 void main() {
@@ -69,6 +71,8 @@ void main() {
     vColor = mix(aColor, vec3(0.45, 0.9, 1.0), clamp((glow - 1.0) * 0.4, 0.0, 0.7));
     vB = (0.16 + aSim * 0.26) * glow * aGain * drawn;
   }
+  // a member brain's own lines take its tint, as its particles do (Living Brain tints a member 72 % toward its color)
+  vColor = mix(vColor, uTint, uTintK);
 }`;
 
 const FRAG = /* glsl */`
@@ -154,6 +158,7 @@ export function makeRibbons(lines: RibbonLine[], opts: { overlay?: boolean; wide
   const uniforms: Record<string, THREE.IUniform> = {
     uRes: { value: new THREE.Vector2(1920, 1080) }, uPixelRatio: { value: 1 }, uSel: { value: -1 }, uSelT: { value: 0 },
     uTime: { value: 0 }, uDrawDur: { value: 0.5 }, uOverlay: { value: 0 }, uWide: { value: opts.wide ?? 1.4 }, uFade: { value: 1 },
+    uTint: { value: new THREE.Color(1, 1, 1) }, uTintK: { value: 0 },
   };
   const mat = (overlay: number) => new THREE.ShaderMaterial({
     vertexShader: VERT, fragmentShader: FRAG, uniforms: { ...uniforms, uOverlay: { value: overlay } },

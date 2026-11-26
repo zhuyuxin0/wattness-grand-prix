@@ -476,10 +476,11 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
       members[b] = {
         pos: orb.lerp(new THREE.Vector3(), cw), scale: lerp(0.42 * SC[m], 1, cw), yaw: YAW[m] * (1 - cw),
         st: { time: reduced ? 3.1 : t, form: formK, coreForm: 1, breath: reduced ? 0 : 0.06 * w, tint: new THREE.Color(brainOf(b).color), tintK: lerp(0.72, 0, cw),
-          bright: vis * (w < 0.5 ? 1.25 : 1), coreK: w, pageFade: vis * smooth((fs - 1.8) / 1.1), sel: idx, selT },
+          bright: vis * (w < 0.5 ? 1.1 : 1), coreK: w, pageFade: vis * smooth((fs - 1.8) / 1.1), sel: idx, selT },
       };
-      // a member on its orbit draws 24,000 of its particles (12,000 on phones) at 1.25 times the brightness (SPEC 6.5)
-      const draw = w < 0.5 ? (lite ? 12000 : 24000) : Infinity;
+      // a member on its orbit draws 32,000 of its particles (16,000 on phones) at 1.1 times the brightness: with its lower
+      // half lit and its lines tinted (cloud.ts), as near Living Brain's measured member colors as one setting comes
+      const draw = w < 0.5 ? (lite ? 16000 : 32000) : Infinity;
       world.members[b].body.geometry.setDrawRange(0, draw);
     });
     const wAll = wOf('all');

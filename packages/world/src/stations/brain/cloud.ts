@@ -15,7 +15,7 @@ export const DOT = '#4c8fff';
  *  1.05; ours run through the kit's Neutral curve at 1, which keeps the darks brighter and the blues more saturated. These
  *  bring our rendered bands back onto the measured table: the body's colors mixed toward their own luminance, its
  *  brightness, the core's light whitening the particles round it, and the connections dimmer. */
-export const LOOK = { desat: 0.5, gain: 1.31, white: 0.2, whiteMax: 0.6, hi: 0.25, low: 0.04, edge: 0.8, dot: 1.0, core: 0.8 };
+export const LOOK = { desat: 0.5, gain: 1.31, white: 0.2, whiteMax: 0.6, hi: 0.25, low: 0.04, edge: 0.8, dot: 1.0, core: 0.8, tintDesat: 0.5 };
 
 /** The sprites' sizes are drawn for the brain station's 37 degree lens (world.ts VFOV). Under another lens a host
  *  scales sizeK by this, so the particles stay as fine against the brain's shape as the station draws them (the
@@ -88,6 +88,7 @@ uniform float uWhite;
 uniform float uWhiteMax;
 uniform float uHi;
 uniform float uLow;
+uniform float uTintDesat;
 varying float vB;
 varying float vMix;
 varying float vCore;
@@ -96,12 +97,17 @@ void main() {
   float d = length(uv) * 2.0;
   float a = pow(smoothstep(1.0, 0.0, d), 1.6);
   vec3 c = mix(mix(uTop, uBottom, vMix), uTint, uTintK);
+  // a member's tint toward its own luminance: ACES whitens a saturated color as it brightens, which the Neutral curve
+  // does not, so the members land on Living Brain's measured (paler) member colors
+  c = mix(c, vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))), uTintDesat * uTintK);
   // ACES lifts the blue top toward lavender and keeps the violet bottom; it whitens the brightest
   c = mix(c, vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))), uDesat * pow(1.0 - vMix, 3.0));
   c = mix(c, vec3(1.0), clamp(vCore * uWhite + (vB - 0.9) * uHi, 0.0, uWhiteMax));
-  c *= mix(1.0, uLow, smoothstep(0.5, 1.0, vMix));
+  // the lower half darkened, and its red cut below, by the untinted share only: a member tinted toward its color keeps
+  // its lower half lit, as Living Brain's do
+  c *= mix(1.0, uLow, smoothstep(0.5, 1.0, vMix) * (1.0 - uTintK));
   // and a deeper violet there: ACES takes some red out of #9B4DFF that the Neutral curve keeps
-  c.r *= mix(1.0, 0.84, smoothstep(0.55, 1.0, vMix));
+  c.r *= mix(1.0, 0.84, smoothstep(0.55, 1.0, vMix) * (1.0 - uTintK));
   gl_FragColor = vec4(c * vB, a * vB);
 }`;
 
@@ -226,11 +232,13 @@ attribute float aGlow;
 uniform float uPixelRatio;
 uniform float uHeight;
 uniform float uSizeK;
+uniform vec3 uTint;
+uniform float uTintK;
 varying vec3 vColor;
 varying float vGlow;
 void main() {
   vec4 mv = modelViewMatrix * vec4(position, 1.0);
-  vColor = aColor; vGlow = aGlow;
+  vColor = mix(aColor, uTint, uTintK); vGlow = aGlow;
   gl_Position = projectionMatrix * mv;
   gl_PointSize = 0.026 * uSizeK * uPixelRatio * (uHeight * 0.5 / -mv.z) * mix(1.0, 1.3, clamp(aGlow - 1.0, 0.0, 1.0));
 }`;
@@ -359,6 +367,7 @@ export class Cloud {
       uBright: { value: 1 }, uSizeK: { value: 1 }, uTwinkle: { value: 1 }, uViewDir: { value: new THREE.Vector3(0, 0, 1) }, uPush: { value: new THREE.Vector4(1e4, 1e4, 1e4, 0) },
       uTop: { value: lin(BODY_TOP) }, uBottom: { value: lin(BODY_BOTTOM) }, uTint: { value: new THREE.Color(1, 1, 1) }, uTintK: { value: 0 },
       uDesat: { value: LOOK.desat }, uWhite: { value: LOOK.white }, uWhiteMax: { value: LOOK.whiteMax }, uHi: { value: LOOK.hi }, uLow: { value: LOOK.low },
+      uTintDesat: { value: LOOK.tintDesat },
     };
     this.body = new THREE.Points(g, new THREE.ShaderMaterial({
       vertexShader: BODY_VERT, fragmentShader: BODY_FRAG, uniforms: this.bodyU,
@@ -429,7 +438,7 @@ export class Cloud {
         pc.set([c.r, c.g, c.b, c.r, c.g, c.b], i * 6);
       });
       pg.setAttribute('position', this.pulsePos); pg.setAttribute('aColor', new THREE.BufferAttribute(pc, 3)); pg.setAttribute('aGlow', this.pulseGlow);
-      this.pulseU = { uPixelRatio: { value: 1 }, uHeight: { value: 1080 }, uSizeK: { value: 1 }, uFade: { value: 1 } };
+      this.pulseU = { uPixelRatio: { value: 1 }, uHeight: { value: 1080 }, uSizeK: { value: 1 }, uFade: { value: 1 }, uTint: { value: new THREE.Color(1, 1, 1) }, uTintK: { value: 0 } };
       this.pulses = new THREE.Points(pg, new THREE.ShaderMaterial({
         vertexShader: PULSE_VERT, fragmentShader: PULSE_FRAG, uniforms: this.pulseU,
         transparent: true, depthWrite: false, depthTest: true, blending: THREE.AdditiveBlending,
@@ -460,6 +469,7 @@ export class Cloud {
     B.uTime!.value = s.time; B.uForm!.value = s.form; B.uBreath!.value = s.breath; B.uCoreK!.value = s.coreK * (this.core ? 1 : 0);
     B.uPixelRatio!.value = s.pixelRatio; B.uHeight!.value = s.height; B.uBright!.value = s.bright * LOOK.gain;
     B.uDesat!.value = LOOK.desat; B.uWhite!.value = LOOK.white; B.uWhiteMax!.value = LOOK.whiteMax; B.uHi!.value = LOOK.hi; B.uLow!.value = LOOK.low; B.uSizeK!.value = s.sizeK ?? 1;
+    B.uTintDesat!.value = LOOK.tintDesat;
     (B.uViewDir!.value as THREE.Vector3).copy(eyeLocal).normalize();
     (B.uTint!.value as THREE.Color).copy(s.tint); B.uTintK!.value = s.tintK;
     (B.uPush!.value as THREE.Vector4).copy(s.push ?? new THREE.Vector4(1e4, 1e4, 1e4, 0));
@@ -486,6 +496,8 @@ export class Cloud {
     if (this.edges) {
       const U = this.edges.uniforms;
       U.uSel!.value = s.sel; U.uSelT!.value = s.selT; U.uFade!.value = s.pageFade * LOOK.edge; U.uTime!.value = s.time; U.uPixelRatio!.value = s.pixelRatio;
+      // a member's own connections take its tint with its particles
+      (U.uTint!.value as THREE.Color).copy(s.tint); U.uTintK!.value = s.tintK;
       (U.uRes!.value as THREE.Vector2).set((s.height * s.pixelRatio * this.aspect), s.height * s.pixelRatio);
       this.edges.mesh.visible = s.pageFade > 0.001;
       this.edges.over.visible = s.pageFade > 0.001 && s.sel >= 0;
@@ -499,6 +511,7 @@ export class Cloud {
     if (this.pulses && this.pulsePos && this.pulseU && this.pulseGlow) {
       const U = this.pulseU;
       U.uPixelRatio!.value = s.pixelRatio; U.uHeight!.value = s.height; U.uSizeK!.value = s.sizeK ?? 1; U.uFade!.value = s.pageFade;
+      (U.uTint!.value as THREE.Color).copy(s.tint); U.uTintK!.value = s.tintK;
       const v = this.tmp;
       this.curves.forEach((c, i) => {
         for (let k = 0; k < 2; k++) {
