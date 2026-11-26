@@ -1,4 +1,6 @@
-# Tonight: operating day 2026-11-26 on BSC testnet
+# Runbook: sealing operating day 2026-11-26 (25 Nov)
+
+The record was committed on BSC mainnet and testnet; see `fixtures/od-20261126`.
 
 The record for operating day 2026-11-26 must be on chain before ERCOT's day-ahead gate: 10:00 CT on 25 Nov, which is
 23:00 Bangkok (unix 1795622400). Every time below is Bangkok; CT is Bangkok minus 13 hours tonight.
