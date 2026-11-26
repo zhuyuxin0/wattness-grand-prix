@@ -146,8 +146,11 @@ scenario set with its leaf and index, and 8.5 to 11 ms for a verdict once the pr
 data, which costs about 12 ms more the first time; warm, 0.8 to 6.5 ms. A verdict now also runs the index's
 rendering and shape checks. In alternating runs of the code before and after that change, at load averages of 7.3
 to 7.8, a cold verdict went from 9.4 to 10.8 ms to 11.7 to 12.9 ms with ICU loaded, and a warm one to 5.9 to 7.2
-ms; the index, leaf and scenario set did not change beyond the spread. Node only stands in for workerd here.
-Bundled, the Worker is 82 KiB (23 KiB gzipped).
+ms; the index, leaf and scenario set did not change beyond the spread. Each parsed document is now also walked once
+for its nesting. In alternating runs of the code before and after the walk (and the changes made beside it), at
+load averages of 5.2 to 5.9, a cold leaf went from 8.2 to 8.4 ms to 8.6 to 9.3 ms, a scenario set from 9.9 to 10.9
+ms to 11.0 to 12.0 ms and a verdict with ICU loaded from 10.4 to 11.0 ms to 10.8 to 11.6 ms; the index did not
+change beyond the spread. Node only stands in for workerd here. Bundled, the Worker is 83 KiB (23 KiB gzipped).
 
 Cloudflare's edge answers some default client signatures (Python's `urllib`, for one) with error 1010 before the
 Worker runs; setting a `User-Agent` header avoids it.
