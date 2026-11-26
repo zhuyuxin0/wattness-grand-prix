@@ -102,7 +102,8 @@ export default function memory({ repo, readJson, writeJson, copyVerbatim }) {
       return { ...x, correction: SITE_CORRECTIONS.pages[key] };
     };
     if (doc.pages) doc.pages = doc.pages.map(bring);
-    if (replaced) writeJson(OUT, doc, "Living Brain build brain (kept; site corrections brought up to date)");
+    // One label either way, so a rebuild from the updated copy lists the same files.json.
+    if (replaced) writeJson(OUT, doc, "Living Brain build brain (kept)");
     else copyVerbatim(OUT, kept, "Living Brain build brain (kept)");
     return;
   }
