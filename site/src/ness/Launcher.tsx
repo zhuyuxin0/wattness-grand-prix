@@ -81,7 +81,7 @@ export function NessButton() {
       onClick={() => (open ? close() : go(null))}
       onPointerEnter={warm}
       onFocus={warm}
-      title={open ? "Close Ask Ness" : "Ask Ness: prepared answers from the record"}
+      title={open ? "Close Ask Ness" : "Ask Ness: prepared answers from the record, or ask your own"}
     >
       <NessMark size={18} />
       <span className="ness-btn__label">Ness</span>
