@@ -9,15 +9,15 @@
    "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
   },
   "world_tree": "6ac4c591c479b580e84134393b6d3cac9307ca72",
-  "note": "packages/world as on main (base), plus the rig named here: the stations' own frames from the frame data, with the chapter's own camera, its lens narrowed onto the object where the frame is a crop"
+  "note": "packages/world as on main (base), plus the rig named here (src/stations/_objects): the stations' own builders and frames from the frame data, with the rig's camera, or the chapter's own with its lens narrowed onto the object where the frame is a crop"
  },
  "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
  "render": {
   "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.seal-stamp --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
   "lab": "lab.html?frame=_objects.seal-stamp&w=1280&h=720&theme=dark&plates=0",
   "rendered": {
-   "bangkok": "2026-11-27 02:12",
-   "ct": "2026-11-26 13:12"
+   "bangkok": "2026-11-27 02:14",
+   "ct": "2026-11-26 13:14"
   },
   "gpu": "ANGLE Metal Renderer: Apple M1 Max",
   "deterministic": "2 draws in fresh pages, byte-identical",

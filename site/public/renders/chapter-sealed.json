@@ -3,21 +3,21 @@
  "what": "Chapter 13 of the introduction at its rest: Parc fermé at 09:15:17 CT on Nov 25, the Nov 26 root sealed on BNB Chain before the 10:00 CT gate.",
  "frame": "_objects.chapter-sealed",
  "code": {
-  "base": "ab0e8ffb73fe760cc1c382a56f522d495d945859",
+  "base": "7ff01507be78bd70ca423445854a4171fa393666",
   "rig": {
    "path": "packages/world/src/stations/_objects/index.ts",
-   "git_blob": "c6fd405140bae0bc25799af53da2c2ab35fbb89b"
+   "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
   },
-  "world_tree": "6a2b350bb4f0f959cc1063391b496af5990276d4",
-  "note": "packages/world as on main (base), plus the rig named here: the stations' own builders and frames from the frame data, with the rig's camera or the chapter's own"
+  "world_tree": "6ac4c591c479b580e84134393b6d3cac9307ca72",
+  "note": "packages/world as on main (base), plus the rig named here (src/stations/_objects): the stations' own builders and frames from the frame data, with the rig's camera, or the chapter's own with its lens narrowed onto the object where the frame is a crop"
  },
  "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
  "render": {
   "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.chapter-sealed --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
   "lab": "lab.html?frame=_objects.chapter-sealed&w=1280&h=720&theme=dark&plates=0",
   "rendered": {
-   "bangkok": "2026-11-27 01:36",
-   "ct": "2026-11-26 12:36"
+   "bangkok": "2026-11-27 02:13",
+   "ct": "2026-11-26 13:13"
   },
   "gpu": "ANGLE Metal Renderer: Apple M1 Max",
   "deterministic": "2 draws in fresh pages, byte-identical",
