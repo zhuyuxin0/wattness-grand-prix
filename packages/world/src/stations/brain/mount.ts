@@ -7,8 +7,9 @@
 // its brain and across brains, Living Brain's summary and the correction beside it, and "Open <tab>" where the page is a tab's
 // own. Drag and pinch orbit and zoom as Living Brain's controls do; the wheel zooms with Ctrl or ⌘ held (a trackpad's
 // pinch arrives so) or once the visitor has pressed on the stage, and otherwise scrolls the page past it, and a vertical
-// swipe on a phone scrolls the page too. Every page is also a button in a visually
-// hidden list (the keyboard's path); without WebGL the list is the view, and under 720 px it opens as a drawer. The
+// swipe on a phone scrolls the page too. The keyboard's path: the stage, the brains' chips, the pinned card (a page
+// picked from the list takes focus into it, and its close gives it back), then the focused brain's pages, each a
+// button in a visually hidden list; without WebGL the list is the view, and under 720 px it opens as a drawer. The
 // mount never writes the URL: it calls onState and the host does. The 3D holds dark in either site theme.
 import './brain.css';
 import './mount.css';
@@ -19,7 +20,7 @@ import { BrainWorld, restPose, REST, ORBIT, VFOV } from './world';
 import { BrainBloomPass } from './bloom';
 import { makeRibbons } from './ribbons';
 import { Chrome, memberScreen, projectorNow } from './tags';
-import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, keyOf, fmt, PLAIN, THE, scopeLine } from './data';
+import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, keyOf, fmt, PLAIN, scopeLine } from './data';
 import { pageCard, hoverCard, pageRows, brainChips, setChips, fixOf } from './card';
 import { T_SHARED } from './moments';
 
@@ -167,21 +168,19 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   };
 
   const chrome = new Chrome(root, false);
-  // the chips and the keyboard's brain buttons are made once and updated in place, so a clicked one keeps its focus
+  // the chips are made once and updated in place, so a clicked one keeps its focus (they are the keyboard's brains too)
   const chipsBox = brainChips(S.focus, (b) => keepFocus(() => focusBrain(b, 'user')), (b) => { S.hoverBrain = b; });
   root.appendChild(chipsBox);
   const hint = document.createElement('p'); hint.className = 'lb-hint'; root.appendChild(hint);
   const cardbox = document.createElement('div'); cardbox.className = 'lbm-cardbox'; root.appendChild(cardbox);
   let hoverEl: HTMLElement | null = null;
-  const nav = document.createElement('nav'); nav.className = 'lbm-sr'; nav.setAttribute('aria-label', 'Brains and pages'); root.appendChild(nav);
-  const navBtns = new Map<BrainFocus, HTMLButtonElement>();
+  // the focused brain's pages, for the keyboard (visually hidden: a page focused shows its hover card on the stage)
+  const nav = document.createElement('nav'); nav.className = 'lbm-sr'; nav.setAttribute('aria-label', 'Pages'); root.appendChild(nav);
   let navRows: HTMLElement | null = null, navRowsFor = '';
-  for (const id of ['all', ...BRAIN_IDS] as BrainFocus[]) {
-    const bt = document.createElement('button'); bt.type = 'button'; bt.textContent = id === 'all' ? 'All brains' : `Focus ${THE[id]}`;
-    // the keyboard's path goes on into the brain's pages
-    bt.addEventListener('click', () => keepFocus(() => { focusBrain(id, 'user'); navRows?.querySelector<HTMLElement>('button')?.focus({ preventScroll: true }); }));
-    nav.appendChild(bt); navBtns.set(id, bt);
-  }
+  /** The list row a page was picked from: focus goes back to it when the page's card closes. */
+  let returnTo: HTMLElement | null = null;
+  /** Focus into the pinned card, on its close (its title has no control of its own). */
+  const focusCard = () => cardbox.querySelector<HTMLElement>('.lbm-close')?.focus({ preventScroll: true });
   /** Runs a change that may remove or hide the focused control: focus then returns to the stage, so its keys (Escape)
    *  still act. */
   const keepFocus = (fn: () => void) => {
@@ -206,11 +205,14 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     chrome.hud(b
       ? [[{ n: fmt(b.pages), label: b.pages === 1 ? 'page' : 'pages' }, { n: fmt(b.connections), label: 'connections' }, ...(b.connections ? [{ n: fmt(b.strong), label: 'strong', tone: 'em' as const }] : [])]]
       : [[{ n: fmt(SCENE.combined.pages), label: 'pages' }, { n: fmt(SCENE.combined.across), label: 'across brains' }, { n: String(SCENE.conflicts.length), label: SCENE.conflicts.length === 1 ? 'conflict' : 'conflicts', tone: 'rose' as const }]]);
-    // the keyboard's path: the other brains, then the focused brain's pages in number order
-    for (const [id, bt] of navBtns) bt.hidden = id === S.focus;
+    // the keyboard's path into the focused brain's pages, in number order; Enter pins a page and focus goes into its card
     if (navRowsFor !== S.focus) {
       navRows?.remove();
-      navRows = S.focus !== 'all' ? pageRows(S.focus, (p) => keepFocus(() => select(p.brain, p.slug, 'user')), (p) => setHover(p ? { brain: p.brain, slug: p.slug } : null)) : null;
+      navRows = S.focus !== 'all' ? pageRows(S.focus, (p) => {
+        const row = document.activeElement instanceof HTMLElement && navRows?.contains(document.activeElement) ? document.activeElement : null;
+        keepFocus(() => select(p.brain, p.slug, 'user'));
+        if (S.sel && S.sel.brain === p.brain && S.sel.slug === p.slug) { returnTo = row; focusCard(); }
+      }, (p) => setHover(p ? { brain: p.brain, slug: p.slug } : null)) : null;
       if (navRows) nav.appendChild(navRows);
       navRowsFor = S.focus;
     }
@@ -250,7 +252,17 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     const p = page(s.brain, s.slug);
     if (!p) return;
     root.classList.add('has-card');
-    cardbox.appendChild(pageCard(p, { select: (b, slug) => keepFocus(() => select(b, slug, 'user')), route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => keepFocus(() => select(null, null, 'user')), tabs, fix }));
+    cardbox.appendChild(pageCard(p, {
+      // a row in the card pins its page: the new card takes the focus the row had
+      select: (b, slug) => { const inCard = cardbox.contains(document.activeElement); keepFocus(() => select(b, slug, 'user')); if (inCard) focusCard(); },
+      route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => closeCard(), tabs, fix,
+    }));
+  };
+  /** The card closed (its close, or Escape): focus goes back to the list row its page was picked from, else the stage. */
+  const closeCard = () => {
+    const back = returnTo; returnTo = null;
+    keepFocus(() => select(null, null, 'user'));
+    if (back && back.isConnected && root.contains(back) && !back.closest('[hidden]') && root.contains(document.activeElement)) back.focus({ preventScroll: true });
   };
   const setHover = (h: null | { brain: string; slug: string }) => {
     if ((h?.brain ?? '') + (h?.slug ?? '') === (S.hover?.brain ?? '') + (S.hover?.slug ?? '')) return;
@@ -642,7 +654,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   const onKey = (e) => {
     if (e.key === 'Escape') {
       // the control that had focus may go with the card or the brain's page list: focus comes back to the stage
-      if (S.sel) keepFocus(() => select(null, null, 'user')); else if (S.focus !== 'all') keepFocus(() => focusBrain('all', 'user'));
+      if (S.sel) closeCard(); else if (S.focus !== 'all') keepFocus(() => focusBrain('all', 'user'));
       e.preventDefault(); return;
     }
     if (e.target !== root) return;

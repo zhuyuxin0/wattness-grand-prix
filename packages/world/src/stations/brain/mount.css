@@ -18,7 +18,11 @@
 .lbm-chips { position: absolute; right: 12px; top: 12px; z-index: 5; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 200px); }
 .lbm-chipbtn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; cursor: pointer;
   font: 500 12px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: #e6e8ea; background: rgba(8, 11, 25, 0.72); border: 1px solid rgba(255, 255, 255, 0.14); }
-.lbm-chipbtn:hover, .lbm-chipbtn:focus-visible { border-color: rgba(255, 255, 255, 0.4); outline: none; }
+.lbm-chipbtn:hover { border-color: rgba(255, 255, 255, 0.4); }
+/* the keyboard's ring, on every control of the stage */
+.lbm-chipbtn:focus-visible, .lbm-close:focus-visible, .lbm-open:focus-visible, .lbm-rowbtn:focus-visible, .lbm-link:focus-visible, .lbm-pagesbtn:focus-visible,
+.lbm-why summary:focus-visible { outline: 2px solid rgba(103, 232, 249, 0.8); outline-offset: 2px; }
+.lbm-listbtn:focus-visible { outline: 2px solid rgba(103, 232, 249, 0.8); outline-offset: -2px; }
 .lbm-chipbtn[aria-pressed="true"] { border-color: rgba(103, 232, 249, 0.6); }
 .lbm-chipbtn.is-all { color: #a5f3fc; }
 .lbm-chipbtn[hidden] { display: none; }
@@ -40,12 +44,12 @@
 .lbm-title { flex: 1; display: flex; align-items: center; gap: 8px; margin: 0; font: 600 18px/1.3 var(--t-font-display, "Libre Franklin Brand", system-ui, sans-serif); color: #fff; overflow-wrap: anywhere; }
 .lbm-title .lb-n, .lbm-htitle .lb-n { width: 18px; height: 18px; font-size: 9px; }
 .lbm-close { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; border: 0; background: transparent; color: rgba(255, 255, 255, 0.6); cursor: pointer; }
-.lbm-close:hover, .lbm-close:focus-visible { color: #fff; background: rgba(255, 255, 255, 0.08); outline: none; }
+.lbm-close:hover, .lbm-close:focus-visible { color: #fff; background: rgba(255, 255, 255, 0.08); }
 .lbm-meta { margin: 6px 0 0; font: 500 11px/1.5 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); letter-spacing: 0.12em; text-transform: uppercase; color: rgb(50, 185, 205); font-variant-numeric: tabular-nums; }
 .lbm-actions { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .lbm-open { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 14px; border-radius: 12px; border: 0; cursor: pointer; font: 600 12px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: #04121a; background: rgba(34, 211, 238, 0.9); }
 .lbm-glyph { flex: none; display: block; }
-.lbm-open:hover, .lbm-open:focus-visible { background: rgb(103, 232, 249); outline: none; }
+.lbm-open:hover, .lbm-open:focus-visible { background: rgb(103, 232, 249); }
 .lbm-part { margin: 0; font: 400 12px/1.5 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: rgb(166, 170, 186); }
 .lbm-link { padding: 0; border: 0; background: none; cursor: pointer; font: inherit; color: #a5f3fc; text-decoration: underline; text-underline-offset: 2px; }
 .lbm-label { margin: 14px 0 0; font: 500 10px/1.4 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); }
@@ -59,7 +63,7 @@
 .lbm-rows { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; }
 .lbm-rowbtn { width: 100%; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 8px; padding: 6px 6px; border-radius: 8px; border: 0;
   background: transparent; color: #fff; cursor: pointer; text-align: left; font: 400 12.5px/1.35 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); }
-.lbm-rowbtn:hover, .lbm-rowbtn:focus-visible { background: rgba(255, 255, 255, 0.06); outline: none; }
+.lbm-rowbtn:hover, .lbm-rowbtn:focus-visible { background: rgba(255, 255, 255, 0.06); }
 .lbm-rowname { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
 .lbm-rowname .lb-n { width: 14px; height: 14px; font-size: 7.5px; }
 .lbm-chip { font: 500 10px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); padding: 3px 6px; border-radius: 999px; }
@@ -87,7 +91,7 @@
 .lbm-list { list-style: none; margin: 0; padding: 0; }
 .lbm-listbtn { width: 100%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   background: transparent; color: inherit; cursor: pointer; text-align: left; font: 400 14px/1.35 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); }
-.lbm-listbtn:hover, .lbm-listbtn:focus-visible { background: rgba(255, 255, 255, 0.06); outline: none; }
+.lbm-listbtn:hover, .lbm-listbtn:focus-visible { background: rgba(255, 255, 255, 0.06); }
 .lbm-listbtn .lb-n { width: 18px; height: 18px; font-size: 9px; }
 .lbm-listmeta { font-size: 12px; color: rgba(255, 255, 255, 0.5); font-variant-numeric: tabular-nums; }
 
