@@ -20,8 +20,7 @@ const launchedCt = (() => {
   return m ? `${['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][Number(m[2]) - 1]} ${Number(m[3])}, ${m[4]} CT` : '';
 })();
 
-/** The season token's ticker, one constant. Until the organizers say testnet tickers are fine, the frames print the
- *  plain name ("the season's test token") instead of it. */
+/** The season token, one constant until the organizers answer on testnet tickers. */
 export const SEASON_TOKEN = 'PRIX';
 
 const M = { x: 0, z: 177, w: 26, h: 30, d: 10, base: 0.8 }; // z: the front face
@@ -233,7 +232,7 @@ export function buildMachine(ctx: FrameContext, mats: Mats, o: { far?: boolean; 
 function seasonScreen(f: any) {
   const blk = int(f.block);
   return el('div.tw-screen.tw-tower.tw-season',
-    el('div.hd', el('b', 'Season 1 · test token'), el('i.lamp')),
+    el('div.hd', el('b', `Season 1 · ${SEASON_TOKEN}`), el('i.lamp')),
     el('div.how', 'how the season pays'),
     el('div.tw-formula',
       el('div.k', 'the reserve'), el('div.v', 'pro rata to deposits'),
@@ -307,7 +306,7 @@ export async function seasonFrame(ctx: FrameContext): Promise<FrameHandle> {
 
   return {
     time,
-    note: `Season purse: a design. Nothing has launched: no Wattness factory, Launcher, Vault, season token or deposit exists, so the presale tube and the vault are empty and the allocation screen shows the rules, not counts. Real: the Flap Portal's live configuration on BSC testnet (frame-data.json sponsors.flap: Portal ${f.portal_version}, block ${int(f.block)} at ${f.block_time.ct.slice(11)}, creation ${f.creation_paused ? 'paused' : 'open'}, salt-lock fee ${f.salt_lock_fee_tbnb} tBNB) and its floors at half the supply in the pool, ${usd(fl0.creation_floor_usd, 0)} to create and ${usd(fl0.graduation_floor_usd, 0)} to graduate; the tube's brass marks stand at those floors on a linear scale whose graduation floor is 90% of the tube (the ratio is the Portal's, the scale the design's). ${SEASON_TOKEN} is a placeholder held in one constant (season.ts SEASON_TOKEN): the organizers have not said whether 'no token tickers' covers testnet tokens. The visitor is the kit's figure for scale; the bulbs chase at 0.8 Hz. The License to launch tower stands east of the frame, so it is not in this view.`,
+    note: `Season purse: a design. Nothing has launched: no Wattness factory, Launcher, Vault, ${SEASON_TOKEN} token or deposit exists, so the presale tube and the vault are empty and the allocation screen shows the rules, not counts. Real: the Flap Portal's live configuration on BSC testnet (frame-data.json sponsors.flap: Portal ${f.portal_version}, block ${int(f.block)} at ${f.block_time.ct.slice(11)}, creation ${f.creation_paused ? 'paused' : 'open'}, salt-lock fee ${f.salt_lock_fee_tbnb} tBNB) and its floors at half the supply in the pool, ${usd(fl0.creation_floor_usd, 0)} to create and ${usd(fl0.graduation_floor_usd, 0)} to graduate; the tube's brass marks stand at those floors on a linear scale whose graduation floor is 90% of the tube (the ratio is the Portal's, the scale the design's). ${SEASON_TOKEN} is a placeholder held in one constant (season.ts SEASON_TOKEN): the organizers have not said whether 'no token tickers' covers testnet tokens. The visitor is the kit's figure for scale; the bulbs chase at 0.8 Hz. The License to launch tower stands east of the frame, so it is not in this view.`,
     update(tt) {
       stage.setCamera(cam);
       gk.lightDirs();
@@ -321,7 +320,7 @@ export async function seasonFrame(ctx: FrameContext): Promise<FrameHandle> {
         .map((p) => ctx.plates.project([p.x, p.y, p.z])).filter((p): p is { x: number; y: number } => !!p);
       const scr = { x: Math.min(...ps.map((p) => p.x)) - 10, y: Math.min(...ps.map((p) => p.y)) - 10, w: 0, h: 0 };
       scr.w = Math.max(...ps.map((p) => p.x)) - scr.x + 20; scr.h = Math.max(...ps.map((p) => p.y)) - scr.y + 20;
-      const cap = caption(ctx, { head: 'Season rewards', flavor: 'season purse', line: `The season's test token: contributors get the reserve pro rata; a 20% share and the vault's trading tax pay by days sealed before the gate.` });
+      const cap = caption(ctx, { head: 'Season rewards', flavor: 'season purse', line: `${SEASON_TOKEN}, the season token: contributors get the reserve pro rata; a 20% share and the vault's trading tax pay by days sealed before the gate.` });
       const fl = f.floors.at_half_supply_in_pool;
       ctx.plates.leaders([
         { id: 'tube', text: `Creation floor ${int(fl.creation_floor_usd)} USD · Graduation floor ${int(fl.graduation_floor_usd)} USD (half the supply in the pool)`, at: machine.at.tubeMark, priority: 0 },
