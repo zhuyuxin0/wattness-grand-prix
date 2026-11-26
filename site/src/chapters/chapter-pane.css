@@ -184,3 +184,9 @@
     overflow: hidden;
   }
 }
+
+/* A tab previewed in a floating pane (src/float) shows its page without the chapter's loop: the page under the
+   preview has its own. Hidden, the pane is never near the view, so its files are never asked for. */
+.gp-pane__page .chapter-pane {
+  display: none;
+}
