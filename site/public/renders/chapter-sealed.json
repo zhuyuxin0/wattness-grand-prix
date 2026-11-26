@@ -1,0 +1,53 @@
+{
+ "schema": "grand-prix.render-still.v1",
+ "what": "Chapter 13 of the introduction at its rest: Parc fermé at 09:15:17 CT on Nov 25, the Nov 26 root sealed on BNB Chain before the 10:00 CT gate.",
+ "frame": "_objects.chapter-sealed",
+ "code": {
+  "base": "ab0e8ffb73fe760cc1c382a56f522d495d945859",
+  "rig": {
+   "path": "packages/world/src/stations/_objects/index.ts",
+   "git_blob": "c6fd405140bae0bc25799af53da2c2ab35fbb89b"
+  },
+  "world_tree": "6a2b350bb4f0f959cc1063391b496af5990276d4",
+  "note": "packages/world as on main (base), plus the rig named here: the stations' own builders and frames from the frame data, with the rig's camera or the chapter's own"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.chapter-sealed --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
+  "lab": "lab.html?frame=_objects.chapter-sealed&w=1280&h=720&theme=dark&plates=0",
+  "rendered": {
+   "bangkok": "2026-11-27 01:36",
+   "ct": "2026-11-26 12:36"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max",
+  "deterministic": "2 draws in fresh pages, byte-identical",
+  "master": {
+   "size": "2560 x 1440",
+   "sha256": "9f29ccfd53957eb965941a95d25bf98bd752b7f23d48444507315954008c5bc8"
+  },
+  "png_1280": {
+   "size": "1280 x 720, render.mjs's Lanczos from the master",
+   "sha256": "abff2747f98c897d0761149613d0af6a491ef786981007d62d6046451583dcca"
+  },
+  "png_640": {
+   "size": "640 x 360, ffmpeg's Lanczos from the master",
+   "sha256": "675e6dffe66dce4f9675c843a7882d89dc13d81c860992416518f9462eec74ac"
+  },
+  "webp": "cwebp 1.6.0 -q 86 -m 6 -sharp_yuv -metadata none"
+ },
+ "files": {
+  "chapter-sealed-640.webp": {
+   "width": 640,
+   "height": 360,
+   "bytes": 12480,
+   "sha256": "608116b3242d55ed43b80d84bd38786830e5ca9541b7a16d14bd2e69ef2b361a"
+  },
+  "chapter-sealed-1280.webp": {
+   "width": 1280,
+   "height": 720,
+   "bytes": 34236,
+   "sha256": "07cb97d958171bdb4dec13bbfe5d6d692703881a4a768689d3a7f9a86399477e"
+  }
+ },
+ "rerender_when": "Parc fermé (stations/grid/r02.ts), the story's beat (story/beats.ts sealed), the rig, or the frame data changes"
+}

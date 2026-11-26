@@ -7,6 +7,7 @@ import { dualTime, formatOperatingDay } from "../../lib/time";
 import { Glyph, Hash, PageHeader, Ready, Section, type CheckItem } from "../../ui";
 import { sponsors, useLogoRegistry, type LogoRegistry } from "../TechStack/sponsors";
 import { RecordTable, recordItems } from "./RecordTable";
+import { SealObject } from "./SealObject";
 import { SealClock } from "./SealClock";
 import "./styles.css";
 
@@ -27,6 +28,7 @@ export default function SealPage() {
         title="Seal"
         lede="The record on BNB Chain: one root over every plan for the operating day, committed to GateRecord before ERCOT's 10:00 CT day-ahead gate."
       />
+      <SealObject />
       <Ready state={all}>{([day, r, late]) => <Record day={day} receipts={r} late={late} registry={registry} />}</Ready>
       <SealCost builtWith={sponsors(registry, "atlas")} />
     </div>
