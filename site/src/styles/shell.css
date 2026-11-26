@@ -465,9 +465,13 @@
   justify-items: end;
   text-align: right;
 }
-.pager__step:hover {
+/* Only a real step lights up: the first and last tabs keep an empty, inert cell on their open side. */
+a.pager__step:hover {
   background: var(--t-hover);
   color: var(--w-fg);
+}
+.pager__step--none {
+  pointer-events: none;
 }
 .pager__step:focus-visible {
   outline-offset: 0;
