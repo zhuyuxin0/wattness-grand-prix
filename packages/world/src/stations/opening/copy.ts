@@ -47,6 +47,6 @@ export function columnCopy(s: Showcase, f: { discharge: number; cycles: number; 
     keyEnds: ['0', String(Math.round(f.max))],
     keyMark: one(f.discharge),
     scope: `Its selected plan (arm ${f.arm}), sealed on BNB Chain on ${dayUS(f.sealedCT.slice(0, 10))} at ${clock24(f.sealedCT)}` +
-      `${f.sealedYours ? ` (${f.sealedYours})` : ''}. A shadow plan computed from public data, never used to operate the battery.`,
+      `${f.sealedYours ? ` (${f.sealedYours})` : ''}. A shadow plan computed from public data.`,
   };
 }

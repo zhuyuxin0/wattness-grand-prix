@@ -824,7 +824,7 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
   const br = el(
     "div",
     "scene-hud scene-hud--br",
-    `<div class="scene-source"><span class="scene-source__scope">${slots.length} shadow plans, computed from public data, never used to operate the batteries.<br/></span>${SOURCE_LINE}</div>`,
+    `<div class="scene-source"><span class="scene-source__scope">${slots.length} shadow plans, computed from public data.<br/></span>${SOURCE_LINE}</div>`,
   );
   if (opts.hud) hud.append(tl, tr, bl, br);
 

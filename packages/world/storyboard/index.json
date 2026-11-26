@@ -544,7 +544,7 @@
    ],
    "kind": "story",
    "films": "master, 90 s",
-   "caption": "On the map it stands as one column. Its height is tomorrow's planned discharge: 304.2 MWh on Nov 26, about 0.9 of a full cycle. Its selected plan (arm C), sealed on BNB Chain on Nov 25 at 9:15 am CT (10:15 pm Bangkok). A shadow plan computed from public data, never used to operate the battery.",
+   "caption": "On the map it stands as one column. Its height is tomorrow's planned discharge: 304.2 MWh on Nov 26, about 0.9 of a full cycle. Its selected plan (arm C), sealed on BNB Chain on Nov 25 at 9:15 am CT (10:15 pm Bangkok). A shadow plan computed from public data.",
    "real_vs_mechanism": "O02. Real: the column's height and color are the sealed leaf's planned discharge, 304.176 MWh for 2026-11-26 (showcase.arms.C.discharge_mwh; arms A, B and C all discharge 304.176 MWh), on W01's rules: height 0.3 + 9.7 x d / 564.13 (SOLC_SLR_ESR1, the fleet's largest), color the discharge ramp at sqrt(d / 564.13) = 0.734; W01's own column object (stations/world/common.ts) at 52.22 x W01's size: 47.0 m across, 288.8 m tall. Sealed 2026-11-25 09:15:17 CT (block 135677078). Illustrative: the gather (the enclosures do not move); the packing is the intro's (radius 22 m for 65).",
    "links": {
     "prev": "opening.gather",

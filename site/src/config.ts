@@ -3,7 +3,7 @@ export const PRODUCT_SHORT = "Grand Prix";
 
 /** Every figure on the site carries this line. */
 export const SOURCE_LINE = "Data: ERCOT. Calculation and display: Wattness.";
-export const SHADOW_NOTE = "Shadow plans, computed from public data. They are never used to operate the batteries.";
+export const SHADOW_NOTE = "Shadow plans, computed from public data.";
 
 export const REPO_URL = "https://github.com/zhuyuxin0/wattness-grand-prix";
 export const TERMINAL_URL = "https://wattness.tech";
