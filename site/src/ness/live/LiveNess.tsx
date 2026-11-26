@@ -104,7 +104,9 @@ export function LiveThread({ live, mode, onLeave }: { live: LiveNess; mode: stri
     const el = document.getElementById(`ness-live-t-${lastId}`);
     if (!el || el.getClientRects().length === 0) return;
     const still = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
-    el.scrollIntoView({ block: "nearest", behavior: still ? "auto" : "smooth" });
+    // A new question glides in; its answer, the line in its place or a new mode comes at once, so a reply that lands
+    // mid-glide (a refusal can) still ends in view.
+    el.scrollIntoView({ block: "nearest", behavior: still || lastState !== "waiting" ? "auto" : "smooth" });
   }, [lastId, lastState, mode]);
   if (live.thread.length === 0) return null;
   return (
