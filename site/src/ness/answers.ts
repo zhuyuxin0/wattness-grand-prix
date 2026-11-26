@@ -671,12 +671,12 @@ export const ANSWERS: Answer[] = [
     question: "What is real, and what is a shadow plan?",
     body: [
       "Real: the batteries and ERCOT's public data, the seals on BSC mainnet for the Nov 26 and Nov 27 plans, the files on BNB Greenfield, and the agents' identities, paid jobs and launches on BSC testnet.",
-      "Shadow: the plans. Each is computed for a real ERCOT battery from public data, and the batteries are not operated from here. The hedge uses ElectronX's published contract terms at an entry price the model assumes, so it is a scenario, not a trade.",
+      "Shadow: the plans. Each is computed for a real ERCOT battery from public data. The hedge uses ElectronX's published contract terms at an entry price the model assumes, so it is a scenario, not a trade.",
       "After the gate, each plan is valued at the prices ERCOT publishes.",
     ],
     sources: [S.fleet, S.hedge, S.seal],
     brainPage: "grand-prix:agent-plans",
-    keywords: ["shadow", "real", "paper", "operated", "electronx", "hedge"],
+    keywords: ["shadow", "real", "paper", "electronx", "hedge"],
   },
   {
     id: "why-a-chain",
