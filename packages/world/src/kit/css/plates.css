@@ -1,0 +1,143 @@
+/* Label plates on teal leaders, ticks, the key card and the caption glass, carried as written from the Terminal:
+   apps/mms/src/ui/intro/intro.css lines 132-165 (the intro's plates), then apps/mms/src/tabs/hedge/walkthrough/
+   walkthrough.css lines 7-26, 33-46 and 64-125 (the walkthrough's skin of them, its caption, key card, scope line
+   and X cut), both at c5c182dc. The world root carries the classes these rules read (world, intro, hwalk, is-x) and
+   the variables (src/lib/tokens.css). No backticks in here. */
+
+/* labels: dark plates on thin teal leaders from a teal dot */
+.intro-labels { position: absolute; inset: 0; pointer-events: none; }
+.intro-labels svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.intro-leader { fill: none; stroke: var(--intro-teal); stroke-width: 1; stroke-opacity: 0.9; }
+.intro-halo { fill: rgba(13, 17, 23, 0.55); }
+.intro-dot { fill: var(--intro-teal); }
+.intro-plate { position: absolute; left: 0; top: 0; white-space: nowrap; font: 500 12.5px/16px var(--w-font-sans); color: var(--intro-plate-ink);
+  background: var(--intro-plate); padding: 4px 8px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14); will-change: transform; }
+.intro-plate.intro-hover { font-size: 12px; box-shadow: 0 0 0 1px rgba(46, 199, 166, 0.55); }
+
+/* a scene's own marks: chart ticks, strip titles, the key plate */
+.intro-ticks { position: absolute; inset: 0; pointer-events: none; }
+.intro-tick { position: absolute; left: 0; top: 0; white-space: nowrap; font: 500 11px/13px var(--w-font-sans); color: #d7dbe0;
+  background: rgba(13, 17, 23, 0.62); padding: 1px 5px; border-radius: 3px; font-variant-numeric: tabular-nums; }
+.intro-tick.intro-tick-title { font-size: 11.5px; line-height: 14px; padding: 2px 6px; color: #eef2f6; background: rgba(13, 17, 23, 0.8);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12); }
+.intro-key { position: absolute; left: 0; top: 0; font: 500 12px/16px var(--w-font-sans); color: #eef2f6; background: rgba(13, 17, 23, 0.86);
+  padding: 6px 9px 7px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14); }
+.intro[data-theme="light"] .intro-key { color: #1a1a1a; background: rgba(255, 255, 255, 0.94); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.18); }
+.intro[data-theme="light"] .intro-key-row { color: #2c3138; }
+.intro[data-theme="light"] .intro-key-label { color: #636a75; }
+.intro-key-title { margin-bottom: 4px; }
+.intro-key-row { display: flex; gap: 12px; flex-wrap: wrap; color: #c9ced3; }
+.intro-key-row + .intro-key-row { margin-top: 3px; }
+.intro-key-label { color: #8f979f; font-size: 11px; min-width: 44px; }
+.intro-key-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.intro-key-item i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.intro-key-item i.intro-sw-line, .intro-key-item i.intro-sw-thick { width: 16px; height: 10px; border-radius: 0;
+  background: linear-gradient(var(--c), var(--c)) 0 6px / 8px 1.25px no-repeat, linear-gradient(var(--c), var(--c)) 7px 2px / 1.25px 5px no-repeat,
+    linear-gradient(var(--c), var(--c)) 7px 2px / 9px 1.25px no-repeat; }
+.intro-key-item i.intro-sw-thick { background: linear-gradient(var(--c), var(--c)) 0 6px / 8px 2.4px no-repeat, linear-gradient(var(--c), var(--c)) 7px 2px / 2.4px 6px no-repeat,
+    linear-gradient(var(--c), var(--c)) 7px 2px / 9px 2.4px no-repeat; }
+.intro-key-item i.intro-sw-outline { background: transparent; border: 1.5px solid; box-sizing: border-box; border-radius: 1px; }
+.intro-key-item i.intro-sw-dash { background: transparent; border: 2px dashed; box-sizing: border-box; border-radius: 3px; width: 14px; }
+
+.hwalk { position: relative; overflow: hidden; isolation: isolate; color: var(--w-fg); font-family: var(--w-font-sans);
+  -webkit-font-smoothing: antialiased; background: var(--t-chrome); --u: 0.6;
+  --intro-plate: color-mix(in srgb, var(--t-raised, #fff) 92%, transparent); --intro-plate-ink: var(--w-fg); --intro-teal: var(--t-accent-mark, #2ec7a6); }
+.hwalk[data-theme="dark"] { --intro-plate: rgba(13, 17, 23, 0.86); --intro-plate-ink: #eef2f6; --intro-teal: #2ec7a6; }
+.hwalk.is-closing { opacity: 0; transition: opacity 0.45s ease; pointer-events: none; }
+.hwalk-stage, .hwalk-stage .intro-host { position: absolute; inset: 0; }
+.hwalk-stage canvas { display: block; width: 100%; height: 100%; }
+.hwalk-labels-host { position: absolute; inset: 0; pointer-events: none; z-index: 22; }
+.hwalk .intro-plate { font-size: calc(15px * max(var(--u), 0.82)); line-height: 1.3; padding: 5px 9px 6px; border-radius: 7px;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--w-fg) 12%, transparent), 0 6px 16px -10px rgba(0, 0, 0, 0.3); }
+.hwalk .intro-plate .hwalk-plate-sub { display: block; font-weight: 400; font-size: 0.88em; color: var(--w-muted); }
+.hwalk[data-theme="dark"] .intro-plate .hwalk-plate-sub { color: #a9b1ba; }
+.hwalk[data-theme="light"] .intro-halo { fill: rgba(255, 255, 255, 0.7); }
+.hwalk .intro-tick.hwalk-tick { background: none; box-shadow: none; padding: 0; font: 500 calc(14px * max(var(--u), 0.82)) / 1.2 var(--w-font-sans); color: var(--w-muted); }
+/* in dark a halo of the chrome under a tick: at the plan's view the back months sit over the pale panes' tops, where
+   muted gray on light blue barely read (beat 7's reviews, Nov 21); the light theme's ticks read as approved */
+.hwalk[data-theme="dark"] .intro-tick.hwalk-tick { text-shadow: 0 0 2px var(--t-chrome, #101315), 0 0 4px var(--t-chrome, #101315), 0 0 6px var(--t-chrome, #101315); }
+.hwalk .intro-tick.hwalk-tick-side { background: var(--intro-plate); padding: 3px 8px 4px; border-radius: 6px; color: var(--w-fg);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--w-fg) 12%, transparent); }
+.hwalk .intro-ticks { z-index: 21; transition: none; }
+
+/* the caption: the X series' system on the Terminal's glass. In the pane and the stepper its bottom clears the scope
+   line under it: the fixed offset, or the scope's measured height where the scope runs longer (--hw-scope-h, set by the
+   scroller and the stepper: at a narrow stage a four-line scope ran under the caption, the flow review of Nov 22) */
+.hwalk-cap { position: absolute; left: max(16px, calc(96px * var(--u))); bottom: calc(max(8px, calc(14px * var(--u))) + max(3.4em, var(--hw-scope-h, 0px)) + 10px); z-index: 40;
+  max-width: min(calc(100% - 2 * max(16px, calc(96px * var(--u)))), calc(1180px * var(--u))); box-sizing: border-box;
+  padding: calc(22px * var(--u)) calc(28px * var(--u)) calc(24px * var(--u)); border-radius: calc(16px * max(var(--u), 0.6));
+  background: var(--glass-surface, color-mix(in srgb, var(--t-raised, #fff) 74%, transparent));
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--glass-graze, rgba(0, 0, 0, 0.1)), var(--glass-rim, none), var(--glass-depth, 0 14px 32px -16px rgba(0, 0, 0, 0.28));
+  pointer-events: none; }
+.hwalk-cap h3 { margin: 0; font: 600 max(17px, calc(40px * var(--u))) / 1.18 var(--t-font-display, "Libre Franklin Brand", system-ui, sans-serif);
+  letter-spacing: -0.014em; color: var(--w-fg); text-wrap: balance; }
+.hwalk-cap p { margin: calc(10px * var(--u)) 0 0; font: 400 max(13px, calc(26px * var(--u))) / 1.32 var(--t-font-display, "Libre Franklin Brand", system-ui, sans-serif);
+  color: var(--w-fg); opacity: 0.86; text-wrap: pretty; }
+
+/* the key: top right. Its box (the scroller's wrapper, whose opacity the engine's copy fade writes) is a layer of its
+   own at the key's level: a plain wrapper at any opacity under 1 became a stacking context at level 0, under the
+   stage, and the card vanished whole at 0.99 and came back at 1 (measured Nov 21, beat 6's fix round 2): the key never
+   faded with the caption, it popped at the stop. The box takes no pointer (the key takes none either). */
+.hwalk-keybox { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
+.hwalk-key { position: absolute; right: max(14px, calc(96px * var(--u))); top: max(12px, calc(60px * var(--u))); z-index: 40; display: grid;
+  gap: calc(9px * var(--u)); justify-items: end; font: 400 max(11px, calc(15px * var(--u))) / 1.3 var(--w-font-sans); color: var(--w-muted);
+  pointer-events: none; text-align: right; max-width: 60%;
+  /* its card (Jo, Nov 18: the cold snap's columns rose behind it): the caption's glass, lighter, with no shadow, so the
+     key reads over any picture at any rest (probe check 7 measures its text at 4.5:1 or more) */
+  box-sizing: border-box; padding: max(8px, calc(12px * var(--u))) max(10px, calc(16px * var(--u)));
+  border-radius: calc(12px * max(var(--u), 0.6)); border: 1px solid color-mix(in srgb, var(--w-fg) 9%, transparent);
+  background: color-mix(in srgb, var(--t-raised, #fff) 92%, transparent);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2); backdrop-filter: blur(10px) saturate(1.2); }
+.hwalk[data-theme="dark"] .hwalk-key { background: rgba(13, 17, 23, 0.88); border-color: rgba(255, 255, 255, 0.08); }
+.hwalk-key .ramp { display: flex; align-items: center; gap: 10px; }
+.hwalk-key .ramp i { display: block; width: max(90px, calc(220px * var(--u))); height: max(7px, calc(10px * var(--u))); border-radius: 2px;
+  background: linear-gradient(90deg, var(--ch-heat-0), var(--ch-heat-1), var(--ch-heat-2), var(--ch-heat-3), var(--ch-heat-4), var(--ch-heat-5),
+    var(--ch-heat-6), var(--ch-heat-7), var(--ch-heat-8)); }
+.hwalk-key .sw { display: inline-block; width: max(18px, calc(26px * var(--u))); height: max(9px, calc(12px * var(--u))); border-radius: 3px; vertical-align: -1px; margin-right: 8px; }
+.hwalk-key .sw-glass { background: color-mix(in srgb, var(--t-raised, #fff) 70%, transparent); box-shadow: 0 0 0 1px color-mix(in srgb, var(--w-fg) 30%, transparent), inset 0 1px 1px #fff; }
+.hwalk-key .sw-light { background: var(--hw-light); opacity: 0.9; }
+.hwalk-key .sw-red { background: var(--ch-heat-1); }
+/* THE C16 MARK (Jo, Nov 13: "hedged, not earned"): the light in the gap between the glass and a battery that did not
+   deliver, pale gold in light and a paler, cooler gold in dark (the stills' fix round, Nov 20). A light, not a chart
+   line, so it sits outside the chart tokens' 3:1 rule for lines (ui/chart/chart-tokens.css); fields.ts THEMES draws it
+   with the same values (walkthrough.check.ts holds the two together). The arms' colors (the physical arm's teal, the
+   financial arm's orange, the intro's two-arms palette), the hatch and the stage are fields.ts THEMES' as well. */
+.hwalk { --hw-light: #ffcf5c; --hw-teal: #1fae8f; --hw-orange: #e35f2a; --hw-hatch: #b4b9c0; --hw-floor: #dfdedb; --hw-stage: #f3f4f6; }
+.hwalk[data-theme="dark"] { --hw-light: #ffe3ad; --hw-teal: #2ec7a6; --hw-orange: #eb6834; --hw-hatch: #2a3038; --hw-floor: #414344; --hw-stage: #101315; }
+/* the ramp names its zero under the gray; a line swatch for the path, a dashed one for the contract's hours, the hatch
+   (hours with no metered data) and the pale state (the year's other days: the ramp eased toward the stage) */
+.hwalk-key .ramp { margin-bottom: 9px; }
+.hwalk-key .ramp .bar { position: relative; display: block; }
+.hwalk-key .ramp .bar::after { content: ''; position: absolute; left: 50%; top: 100%; width: 1px; height: 4px; background: var(--w-muted); }
+.hwalk-key .ramp .bar b { position: absolute; left: 50%; top: calc(100% + 5px); transform: translateX(-50%); font: 500 11px/1 var(--w-font-sans); color: var(--w-muted); }
+.hwalk-key .sw-teal { background: var(--hw-teal); height: 3px; border-radius: 2px; vertical-align: 3px; }
+.hwalk-key .sw-orange { background: transparent; border: 2px dashed var(--hw-orange); box-sizing: border-box; }
+.hwalk-key .sw-hatch { background: repeating-linear-gradient(135deg, var(--hw-hatch) 0 2px, var(--hw-floor) 2px 4px); box-shadow: 0 0 0 1px color-mix(in srgb, var(--w-fg) 14%, transparent); }
+.hwalk-key .sw-pale { background: linear-gradient(90deg, color-mix(in srgb, var(--ch-heat-2) 40%, var(--hw-stage)), color-mix(in srgb, var(--ch-heat-6) 40%, var(--hw-stage)));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--w-fg) 16%, transparent); }
+
+/* the scope line, the data's provenance: in the pane a full-width line under the caption (a pane is narrower than the
+   stills' 1,920 px, where the two sat side by side); in the X cut bottom right, clear of the series' caption plate */
+.hwalk-scope { position: absolute; left: max(16px, calc(96px * var(--u))); right: max(14px, calc(96px * var(--u))); bottom: max(8px, calc(14px * var(--u)));
+  z-index: 40; margin: 0; text-align: left; font: 400 max(10.5px, calc(15px * var(--u))) / 1.4 var(--w-font-sans);
+  color: var(--w-muted); pointer-events: none; }
+/* the X skin (the stills' composition, Nov 20): the scope line on the ticks' plate at 14 px, wide enough for two lines,
+   bottom right; the caption above it; the key narrower so the light's row wraps and the card never covers the picture's
+   far end; the plates at 16 px and the ticks at 15 px at 1,920 px */
+.hwalk.is-x .hwalk-scope { left: auto; bottom: 22px; max-width: min(78%, 1500px); font-size: 14px; line-height: 1.4; text-align: right;
+  background: var(--intro-plate); padding: 6px 10px; border-radius: 6px; box-shadow: 0 0 0 1px color-mix(in srgb, var(--w-fg) 10%, transparent); }
+/* the caption clears the scope line however many lines it runs to (the prototype's rule, the approved stills': 72 px
+   over a one-line scope, its height + 36 px over a longer one); --hw-scope-h is the scope's measured height
+   (WalkthroughScroller) */
+.hwalk.is-x .hwalk-cap { bottom: max(72px, calc(var(--hw-scope-h, 36px) + 36px)); }
+/* the key's cap in the X cut: wide enough for the drift's arms row on one line at 1920 (574 px of content with the
+   storyboard's "week by week", beat 4 of Nov 20; the row is "Teal: its selling hour" since the claims review of Nov 22,
+   the follow's row, so it sits well inside); every other beat's rows are under 480 px, so their cards keep their width */
+.hwalk.is-x .hwalk-key { max-width: 620px; }
+/* never under 11 px: on a phone the stage's scale (--u, 0.2 at 390) would set them at 3 px beside 13 px captions */
+.hwalk.is-x .intro-plate { font-size: max(11px, calc(16px * var(--u))); line-height: 1.3; }
+.hwalk.is-x .intro-tick.hwalk-tick { font-size: max(11px, calc(15px * var(--u))); }
+/* on a phone the key cards would sit under the beat's title bar and run their figures together: the caption carries
+   what they say */
+@media (max-width: 599px) { .hwalk .hwalk-key { display: none; } }

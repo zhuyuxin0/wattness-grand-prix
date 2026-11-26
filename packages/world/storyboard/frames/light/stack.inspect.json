@@ -1,0 +1,75 @@
+{
+ "id": "stack.inspect",
+ "url": "http://127.0.0.1:15197/lab.html?frame=stack.inspect&w=1920&h=1080&theme=light",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "light",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/light/stack.inspect.png",
+ "sha256": "b764d8bc25dd021cbf3ac29512f2d98c2e75f7da65966cf33b9a62bedd16ae2b",
+ "deterministic": null,
+ "renderMs": 574,
+ "wallMs": 637,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 99,
+  "after": 98
+ },
+ "underLoad": true,
+ "note": "S03, GateRecord hovered: the live mount's hover state at its end (its halo, its own strands at full, the other strands at 0.25 and objects at 0.55; the chip and card beside it). Every line of the card is on file in frame-data.json sealed_day; the refusal is the simulated call. The pointer is drawn for the still.",
+ "frame": {
+  "id": "stack.inspect",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "light",
+  "time": 7.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "S03, GateRecord hovered: the live mount's hover state at its end (its halo, its own strands at full, the other strands at 0.25 and objects at 0.55; the chip and card beside it). Every line of the card is on file in frame-data.json sealed_day; the refusal is the simulated call. The pointer is drawn for the still.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 574,
+  "programs": {
+   "state": "ready",
+   "programs": 28
+  },
+  "frameInfo": {
+   "calls": 400,
+   "triangles": 119604,
+   "passes": {
+    "shadow": 23,
+    "ShadowOncePass": 0,
+    "opaque": 60,
+    "aoNormalAndBlend": 38,
+    "copyBack": 1,
+    "overlay": 295,
+    "OutputPass": 1,
+    "opaqueColour": 37
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "b764d8bc25dd021cbf3ac29512f2d98c2e75f7da65966cf33b9a62bedd16ae2b",
+   "wallMs": 637,
+   "renderMs": 574,
+   "gpuLoad": {
+    "before": 99,
+    "after": 98
+   }
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "id": "stack.hover.verifier",
+ "url": "http://127.0.0.1:15197/lab.html?frame=stack.hover.verifier&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/stack.hover.verifier.png",
+ "sha256": "00af3dd1a88041f606dec027c3db5e1a0cd507a22e241326888b089c8eb66793",
+ "deterministic": null,
+ "renderMs": 549,
+ "wallMs": 644,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 99,
+  "after": 98
+ },
+ "underLoad": true,
+ "note": "Hover still: verifier, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Verify tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+ "frame": {
+  "id": "stack.hover.verifier",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 7.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Hover still: verifier, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Verify tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 549,
+  "programs": {
+   "state": "ready",
+   "programs": 28
+  },
+  "frameInfo": {
+   "calls": 400,
+   "triangles": 119604,
+   "passes": {
+    "shadow": 23,
+    "ShadowOncePass": 0,
+    "opaque": 60,
+    "aoNormalAndBlend": 38,
+    "copyBack": 1,
+    "overlay": 295,
+    "OutputPass": 1,
+    "opaqueColour": 37
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "00af3dd1a88041f606dec027c3db5e1a0cd507a22e241326888b089c8eb66793",
+   "wallMs": 644,
+   "renderMs": 549,
+   "gpuLoad": {
+    "before": 99,
+    "after": 98
+   }
+  }
+ ]
+}

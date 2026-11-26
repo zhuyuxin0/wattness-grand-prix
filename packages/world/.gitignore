@@ -1,0 +1,12 @@
+# Frame data is built outside the repository and copied in by scripts/sync-data.sh. The layout is committed: the
+# sync only compares it with the storyboard's (scripts/sync-data.sh --layout takes that one).
+src/data/*.json
+!src/data/layout.json
+.data-src
+# Dev server pid and log files (scripts/serve.sh).
+.serve/
+# Rendered frames.
+out/
+# Build output: vite build writes dist/ (also ignored at the root); scene and film builds write .build/.
+dist/
+.build/

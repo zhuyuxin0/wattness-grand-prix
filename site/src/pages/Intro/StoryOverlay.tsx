@@ -1,0 +1,231 @@
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import type { StoryHandle } from "@world/story/mount";
+import { Glyph, useTheme } from "../../ui";
+import { FIRST_BEAT_STILL, STORY_MARK, markStory, storyPath } from "./story";
+import "./story.css";
+
+// The story: packages/world's mountStory in site mode, over the whole viewport
+// in a modal dialog, dark in either site theme. The world's code (the player,
+// its stations and the frame data) is fetched when the dialog opens, never
+// with the Intro; three.js itself is the one copy the starting grid already
+// uses. Until the story draws its first beat, the dialog shows that beat's
+// own still.
+
+const NAV_KEYS = new Set(["ArrowDown", "ArrowRight", "ArrowUp", "ArrowLeft", "PageDown", "PageUp", "Home", "End"]);
+const TABBABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function tabbables(root: HTMLElement): HTMLElement[] {
+  return [...root.querySelectorAll<HTMLElement>(TABBABLE)].filter((el) => !el.hidden && el.getClientRects().length > 0);
+}
+
+/** Whether this browser can make a WebGL context at all (the context is let go at once). */
+function webglAvailable(): boolean {
+  try {
+    const c = document.createElement("canvas");
+    const g = c.getContext("webgl2") ?? c.getContext("webgl");
+    g?.getExtension("WEBGL_lose_context")?.loseContext();
+    return !!g;
+  } catch {
+    return false;
+  }
+}
+
+function prefersReducedMotion(): boolean {
+  try {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return false;
+  }
+}
+
+type Phase = "loading" | "live" | "failed";
+
+interface Props {
+  /** Esc or the close button: the dialog goes, and the page puts focus back on the button that opened it. */
+  onClose: () => void;
+  /** A beat's "Open <tab>", or a way on from the failed state: the dialog goes and the site opens that path. */
+  onRoute: (to: string) => void;
+}
+
+export default function StoryOverlay({ onClose, onRoute }: Props) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const host = useRef<HTMLDivElement>(null);
+  const [phase, setPhase] = useState<Phase>("loading");
+  const [drawn, setDrawn] = useState(false);
+  const [noWebgl, setNoWebgl] = useState(false);
+  // The story records the site's theme on its root; the 3D holds dark in either.
+  const siteTheme = useTheme();
+  const theme = useRef(siteTheme);
+  const live = useRef({ onClose, onRoute });
+  live.current = { onClose, onRoute };
+
+  // A modal dialog: the top layer over the masthead and the panel, the page
+  // behind it inert, and the page's own scroll held while it is open.
+  useLayoutEffect(() => {
+    const d = dialog.current;
+    if (!d) return;
+    const html = document.documentElement;
+    const prior = html.style.overflow;
+    html.style.overflow = "hidden";
+    if (!d.open) d.showModal();
+    return () => {
+      if (d.open) d.close();
+      html.style.overflow = prior;
+    };
+  }, []);
+
+  // Esc leaves; Tab stays inside; the story's keys and the wheel work from
+  // anywhere in the dialog, and never reach the page behind it.
+  useEffect(() => {
+    const d = dialog.current;
+    if (!d) return;
+    const storyRoot = () => host.current?.querySelector<HTMLElement>(".gp-story") ?? null;
+    const onCancel = (e: Event) => {
+      e.preventDefault();
+      live.current.onClose();
+    };
+    const onWheel = (e: WheelEvent) => {
+      // ctrl with the wheel is the browser's zoom (a trackpad's pinch): left to it
+      if (e.ctrlKey) return;
+      const root = storyRoot();
+      if (root?.contains(e.target as Node)) return;
+      e.preventDefault();
+      root?.dispatchEvent(new WheelEvent("wheel", { deltaX: e.deltaX, deltaY: e.deltaY, deltaZ: e.deltaZ, deltaMode: e.deltaMode, cancelable: true }));
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Tab") {
+        const items = tabbables(d);
+        const first = items[0];
+        const last = items[items.length - 1];
+        const at = document.activeElement;
+        if (!first || !last) {
+          e.preventDefault();
+        } else if (e.shiftKey && (at === first || !d.contains(at))) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (at === last || !d.contains(at))) {
+          e.preventDefault();
+          first.focus();
+        }
+        return;
+      }
+      // The story takes its keys while it has focus: from the dialog's own
+      // controls, focus moves into it and the same key steps it.
+      const root = storyRoot();
+      if (root && NAV_KEYS.has(e.key) && !e.altKey && !e.ctrlKey && !e.metaKey && !root.contains(document.activeElement)) {
+        root.focus({ preventScroll: true });
+      }
+    };
+    d.addEventListener("cancel", onCancel);
+    d.addEventListener("keydown", onKey);
+    d.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      d.removeEventListener("cancel", onCancel);
+      d.removeEventListener("keydown", onKey);
+      d.removeEventListener("wheel", onWheel);
+    };
+  }, []);
+
+  // The story itself: loaded and mounted once the dialog is open, disposed with it.
+  useEffect(() => {
+    let gone = false;
+    let handle: StoryHandle | null = null;
+    const offs: (() => void)[] = [];
+    const fail = () => {
+      if (gone) return;
+      setNoWebgl(!webglAvailable());
+      setPhase("failed");
+    };
+    import("@world/story/mount").then(({ mountStory }) => {
+      const el = host.current;
+      if (gone || !el) return;
+      markStory(STORY_MARK.code);
+      const story = mountStory(el, {
+        mode: "site",
+        theme: theme.current,
+        reducedMotion: prefersReducedMotion(),
+        onRoute: (id) => {
+          const to = storyPath(id);
+          if (to) live.current.onRoute(to);
+        },
+      });
+      handle = story;
+      let first = true;
+      offs.push(
+        story.on("beat", () => {
+          if (!first || gone) return;
+          first = false;
+          markStory(STORY_MARK.firstBeat);
+          setDrawn(true);
+        }),
+      );
+      story.ready.then(() => {
+        if (gone) return;
+        markStory(STORY_MARK.ready);
+        setPhase("live");
+        // Focus moves into the story so its keys work at once, unless the
+        // visitor has already moved it within the dialog.
+        const at = document.activeElement;
+        const root = el.querySelector<HTMLElement>(".gp-story");
+        if (root && (at === dialog.current || at === document.body || (at instanceof HTMLElement && at.dataset.storyStart !== undefined))) {
+          root.focus({ preventScroll: true });
+        }
+      }, fail);
+    }, fail);
+    return () => {
+      gone = true;
+      for (const off of offs) off();
+      handle?.dispose();
+    };
+  }, []);
+
+  const failed = phase === "failed";
+  const shown = phase === "live" && drawn;
+
+  return createPortal(
+    <dialog ref={dialog} className="story-dialog" data-atmosphere="dark" aria-labelledby="story-dialog-title" aria-describedby="story-dialog-length">
+      <div className="story-dialog__bar">
+        <p className="story-dialog__title">
+          <b id="story-dialog-title">The story</b>
+          <span id="story-dialog-length">3 min, from one battery</span>
+        </p>
+        {/* The first control, so the dialog opens with focus here; it moves into the story once that is ready. */}
+        <button type="button" className="btn story-dialog__close" onClick={() => live.current.onClose()} title="Close the story (Esc)" data-story-start="">
+          <Glyph name="close" />
+          <span className="story-dialog__close-label">Close</span>
+        </button>
+      </div>
+      <div className="story-dialog__stage" aria-busy={!shown && !failed ? true : undefined}>
+        <div ref={host} className="story-dialog__host" />
+        <figure className="story-dialog__still" data-gone={shown || undefined} aria-hidden="true">
+          <img src={FIRST_BEAT_STILL} alt="" decoding="async" />
+        </figure>
+        {!shown && !failed && (
+          <p className="story-dialog__status" role="status">
+            Loading the story
+          </p>
+        )}
+        {failed && (
+          <div className="story-dialog__failed" role="alert">
+            <p className="story-dialog__failed-head">
+              {noWebgl ? "The story is drawn in 3D with WebGL, which this browser has turned off." : "The story could not start in this browser."}
+            </p>
+            <p className="story-dialog__failed-line">Every step of it is in the tabs.</p>
+            <div className="story-dialog__failed-actions">
+              <button type="button" className="btn" onClick={() => live.current.onRoute("/overview")}>
+                Open the Overview
+                <Glyph name="next" />
+              </button>
+              <button type="button" className="btn" onClick={() => live.current.onRoute("/about")}>
+                How It Works
+                <Glyph name="next" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </dialog>,
+    document.body,
+  );
+}

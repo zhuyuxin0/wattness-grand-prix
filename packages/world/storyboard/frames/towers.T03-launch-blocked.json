@@ -1,0 +1,75 @@
+{
+ "id": "towers.T03-launch-blocked",
+ "url": "http://127.0.0.1:15196/lab.html?frame=towers.T03-launch-blocked&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/towers.T03-launch-blocked.png",
+ "sha256": "d10fc1ce999165388bf7e921bc4faf8cf3671ce922323f55ebe5f47a184f1eb4",
+ "deterministic": null,
+ "renderMs": 1910,
+ "wallMs": 1991,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 76
+ },
+ "underLoad": false,
+ "note": "The state today. Real: the right lamp reads the 26 Nov record, sealed 2,683 s before the gate (frame-data.json sealed_day.receipts[0]); the agent's wallet 0xfa22\u202694b8 and its evaluation, 8 checks pass and 2 skipped (sponsors.agent_studio.evaluation); OpenFour's Bonding V1 preset and its 5 modules, found by the testnet discovery probe (block 144,816,767, 10:04:06 CT). The OpenFour testnet run is in progress; at this data no custom module is deployed, no token created and no migration run, so the liquidity lamp has nothing to read and stays dark and hatched, and the spiral has one lit turn for the one sealed day. PLNR is a working name held in one constant. Illustrative: the tower and its signal head (on the crown, turned toward A9), the spiral's rise per day, the card's angle toward the lane, and the pool. Whether a developer-owned registry qualifies for OpenFour's Hub is an open question to OpenFour.",
+ "frame": {
+  "id": "towers.T03-launch-blocked",
+  "station": "towers",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 1.6,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "The state today. Real: the right lamp reads the 26 Nov record, sealed 2,683 s before the gate (frame-data.json sealed_day.receipts[0]); the agent's wallet 0xfa22\u202694b8 and its evaluation, 8 checks pass and 2 skipped (sponsors.agent_studio.evaluation); OpenFour's Bonding V1 preset and its 5 modules, found by the testnet discovery probe (block 144,816,767, 10:04:06 CT). The OpenFour testnet run is in progress; at this data no custom module is deployed, no token created and no migration run, so the liquidity lamp has nothing to read and stays dark and hatched, and the spiral has one lit turn for the one sealed day. PLNR is a working name held in one constant. Illustrative: the tower and its signal head (on the crown, turned toward A9), the spiral's rise per day, the card's angle toward the lane, and the pool. Whether a developer-owned registry qualifies for OpenFour's Hub is an open question to OpenFour.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1910,
+  "programs": {
+   "state": "ready",
+   "programs": 39
+  },
+  "frameInfo": {
+   "calls": 145,
+   "triangles": 65430,
+   "passes": {
+    "shadow": 32,
+    "ShadowOncePass": 0,
+    "opaque": 76,
+    "aoNormalAndBlend": 43,
+    "copyBack": 1,
+    "overlay": 18,
+    "OutputPass": 1,
+    "opaqueColour": 44
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "d10fc1ce999165388bf7e921bc4faf8cf3671ce922323f55ebe5f47a184f1eb4",
+   "wallMs": 1991,
+   "renderMs": 1910,
+   "gpuLoad": {
+    "before": 0,
+    "after": 76
+   }
+  }
+ ]
+}

@@ -10,6 +10,12 @@ import "./styles.css";
 // the Grand Prix's words to plain ones (and to the tab that shows each), and
 // what is new here against what it calls.
 
+/** "Nov 26" for a YYYY-MM-DD operating day. */
+function shortDay(day: string): string {
+  const [y, m, d] = day.split("-").map(Number) as [number, number, number];
+  return new Intl.DateTimeFormat("en-US", { timeZone: "UTC", month: "short", day: "numeric" }).format(new Date(Date.UTC(y, m - 1, d)));
+}
+
 export default function HowItWorksPage() {
   const state = useDay();
   const day = state.status === "ready" ? state.data : null;
@@ -20,8 +26,14 @@ export default function HowItWorksPage() {
         title="How It Works"
         lede={
           <>
-            Agents plan tomorrow for every real ERCOT battery and seal each plan on BNB Chain before the day-ahead gate. {SHADOW_NOTE} What the record proves is
-            that no plan changed after the gate.
+            Agents plan tomorrow for every Texas battery with complete public data
+            {day && (
+              <>
+                {" "}
+                (<span className="num">{formatInt(day.leafCount)}</span> on {shortDay(day.operatingDay)})
+              </>
+            )}{" "}
+            and seal each plan on BNB Chain before the day-ahead gate. {SHADOW_NOTE} What the record proves is that no plan changed after the gate.
           </>
         }
         aside={<Facts day={day} />}
@@ -33,7 +45,7 @@ export default function HowItWorksPage() {
             <h3>Plan</h3>
             <p>
               The planner reads the Wattness Terminal's public ERCOT release, every input named by its SHA-256, and solves each battery's next day hour by hour
-              within its power and energy limits: a linear program, solved with HiGHS.
+              within its power and energy limits: a mixed-integer program, solved with HiGHS.
             </p>
             <p>
               For Desert Willow (DSWL_ESS_ESR1) it compares three plans under the same inputs: no hedge; a hedge added on top of a fixed schedule; schedule and
@@ -103,7 +115,7 @@ export default function HowItWorksPage() {
               </div>
               <div>
                 <dt>The fleet planner</dt>
-                <dd>The forecast, the price scenarios and the dispatch and hedge program, run for every battery at each gate.</dd>
+                <dd>The forecast, the price scenarios and the dispatch and hedge program, run for every battery with complete public data at each gate.</dd>
               </div>
               <div>
                 <dt>The verifier</dt>
@@ -137,7 +149,7 @@ export default function HowItWorksPage() {
               </div>
               <div>
                 <dt>HiGHS</dt>
-                <dd>The open-source linear programming solver.</dd>
+                <dd>The open-source solver for linear and mixed-integer programs.</dd>
               </div>
               <div>
                 <dt>Living Brain</dt>
@@ -185,7 +197,7 @@ function Facts({ day }: { day: DayIndex | null }) {
       </div>
       <div>
         <dt>Batteries</dt>
-        <dd>{day ? <><span className="num">{formatInt(day.leafCount)}</span> with a sealed plan</> : "Every battery"}</dd>
+        <dd>{day ? <><span className="num">{formatInt(day.leafCount)}</span> with a sealed plan</> : "Every one with complete public data"}</dd>
       </div>
       <div>
         <dt>Chain</dt>
@@ -219,7 +231,7 @@ function terms(day: DayIndex | null): Term[] {
     { term: "Standings", means: "Every sealed plan of the day in one table, with fleet totals.", to: "/fleet", tab: "Fleet" },
     { term: "Pit wall", means: "One battery's plan in full: its limits, schedule, state of charge and the three plans compared.", to: "/battery", tab: "Battery" },
     { term: "Team data", means: "The agents' memory, kept in Living Brain.", to: "/agents/memory", tab: "Memory" },
-    { term: "Parc ferme", means: "The seal: the day's root on BNB Chain before the 10:00 CT gate. No plan changes after it; a late commit reverts.", to: "/seal", tab: "Seal" },
+    { term: "Parc fermé", means: "The seal: the day's root on BNB Chain before the 10:00 CT gate. No plan changes after it; a late commit reverts.", to: "/seal", tab: "Seal" },
     { term: "Race day", means: "The operating day the plans are for, 00:00 to 24:00 CT.", to: "/overview", tab: "Overview" },
     { term: "Stewards", means: "The check anyone can run on any plan, in the browser.", to: "/verify", tab: "Verify" },
     { term: "Paddock", means: "How the parts fit: this page.", to: "/about", tab: "How It Works" },

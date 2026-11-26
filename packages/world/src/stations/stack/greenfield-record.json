@@ -1,0 +1,36 @@
+{
+ "what": "BNB Greenfield publication of the 26 Nov sealed day, summarized from gatelock-world scripts/greenfield/published.json (commit 41c0ef7)",
+ "source": {
+  "path": "scripts/greenfield/published.json",
+  "sha256": "fe7cc08e13e8ac46365e83c73179e64c96244b0ebc629868a9c83373613e82b2"
+ },
+ "operating_day": "2026-11-26",
+ "network": {
+  "greenfield": "greenfield_5600-1",
+  "bsc": 97
+ },
+ "bucket": {
+  "name": "wattness-grand-prix-records",
+  "visibility": "public-read"
+ },
+ "objects": 953,
+ "total_bytes": 156346613,
+ "all_verified": true,
+ "verified_at": "2026-11-25T18:01:56.688Z",
+ "kinds": {
+  "leaf": 316,
+  "scenarios": 316,
+  "index": 1,
+  "receipt": 2,
+  "root": 1,
+  "salt": 1,
+  "sync": 316
+ },
+ "others": [
+  "manifest.json",
+  "record.bsc-mainnet.json",
+  "record.bsc-testnet.json",
+  "root.hex",
+  "salt.txt"
+ ]
+}

@@ -1,0 +1,206 @@
+{
+ "cut": "master",
+ "mp4": "master.mp4",
+ "bytes": 149867985,
+ "sha256": "20906e3ffbda72c01405bf225a6fb6f54432d74fcd109cb25804bd8c404e05e3",
+ "stream": {
+  "codec_name": "h264",
+  "width": 1920,
+  "height": 1080,
+  "pix_fmt": "yuv420p",
+  "r_frame_rate": "60/1",
+  "duration": "180.000000",
+  "nb_frames": "10800"
+ },
+ "encode": "libx264, preset slow, crf 14, yuv420p, +faststart, from 1920 x 1080 PNGs at scale 1",
+ "source": {
+  "page": "src/story/story.html?mode=capture&captions=film",
+  "player_commit": "f3d35ce",
+  "how": "scripts/capture-story.mjs per range (--no-encode), ranges split inside holds and run in parallel, one headless Chrome each; frames numbered from the film's start, so the ranges meet frame for frame"
+ },
+ "rendered": "Nov 26 2026, 13:00 to 13:15 Bangkok (Nov 26, 00:00 to 00:15 CT), on this Mac (Apple M1 Max, Chrome's ANGLE on Metal, headless), 6 to 14 ranges at once and other renders on the GPU (70 to 90% busy). Two ranges were stopped early and split to finish sooner (29.5 to 53 s, which rendered 29.5 to 36.0 s; 53 to 80 s, which rendered 53.0 to 57.0 s); their frames up to the split points are kept (no receipt), and the ranges that replaced them start before those points and overwrote the rest. Errors: venue.hub:decorate (the map's own layout throws when tried at a leg's pose, where a corner it measures is off screen; the map has no screens and its plates are out through a leg, so nothing it drew shows). The rendered code is commit f3d35ce's, but for one comment line in player.ts.",
+ "chunks": [
+  {
+   "from": 0,
+   "to": 29.5,
+   "frames": 1770,
+   "perFrameMs": {
+    "mean": 283,
+    "p95": 591,
+    "max": 1501
+   },
+   "wallMs": 502771,
+   "gpuLoad": {
+    "before": 0,
+    "after": 95
+   },
+   "errors": {
+    "venue.hub:decorate": "TypeError: Cannot read properties of null (reading 'x')"
+   },
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 35.9,
+   "to": 39.5,
+   "frames": 216,
+   "perFrameMs": {
+    "mean": 936,
+    "p95": 1309,
+    "max": 2852
+   },
+   "wallMs": 207603,
+   "gpuLoad": {
+    "before": 93,
+    "after": 92
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 39.5,
+   "to": 45,
+   "frames": 330,
+   "perFrameMs": {
+    "mean": 682,
+    "p95": 1106,
+    "max": 12844
+   },
+   "wallMs": 235584,
+   "gpuLoad": {
+    "before": 100,
+    "after": 68
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 45,
+   "to": 53,
+   "frames": 480,
+   "perFrameMs": {
+    "mean": 645,
+    "p95": 980,
+    "max": 12421
+   },
+   "wallMs": 319958,
+   "gpuLoad": {
+    "before": 90,
+    "after": 92
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 53.5,
+   "to": 61,
+   "frames": 450,
+   "perFrameMs": {
+    "mean": 739,
+    "p95": 1055,
+    "max": 8415
+   },
+   "wallMs": 339611,
+   "gpuLoad": {
+    "before": 100,
+    "after": 94
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 61,
+   "to": 68,
+   "frames": 420,
+   "perFrameMs": {
+    "mean": 736,
+    "p95": 1023,
+    "max": 3588
+   },
+   "wallMs": 312017,
+   "gpuLoad": {
+    "before": 100,
+    "after": 85
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 68,
+   "to": 80,
+   "frames": 720,
+   "perFrameMs": {
+    "mean": 561,
+    "p95": 944,
+    "max": 7715
+   },
+   "wallMs": 410714,
+   "gpuLoad": {
+    "before": 94,
+    "after": 91
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 80,
+   "to": 112,
+   "frames": 1920,
+   "perFrameMs": {
+    "mean": 300,
+    "p95": 542,
+    "max": 4423
+   },
+   "wallMs": 576564,
+   "gpuLoad": {
+    "before": 0,
+    "after": 94
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 112,
+   "to": 140,
+   "frames": 1680,
+   "perFrameMs": {
+    "mean": 285,
+    "p95": 512,
+    "max": 3496
+   },
+   "wallMs": 480415,
+   "gpuLoad": {
+    "before": 0,
+    "after": 77
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 140,
+   "to": 180,
+   "frames": 2400,
+   "perFrameMs": {
+    "mean": 242,
+    "p95": 482,
+    "max": 2881
+   },
+   "wallMs": 582074,
+   "gpuLoad": {
+    "before": 0,
+    "after": 88
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  }
+ ]
+}

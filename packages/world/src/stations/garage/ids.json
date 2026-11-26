@@ -1,0 +1,80 @@
+{
+ "what": "On-chain identities (ERC-8004, BSC testnet, chain 97) of the six planning roles and of the Agent Studio evaluator, copied from their records. Registered on 25 Nov after the 26 Nov plan was sealed; the sealed leaf's own agent field (erc8004_id) is null.",
+ "roles_source": {
+  "repo": "gatelock",
+  "branch": "core/agents",
+  "commit": "d69fe6e775e68e10ab2b8f5953a67990f48f279f",
+  "path": "contracts/deployments/agents.bsc-testnet.json",
+  "sha256": "4bf12b4c1c66da94f8bb96fcd6e634d257513203393c1033a1c0c5163035e4e6",
+  "schema": "grand-prix.agents.v1",
+  "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+  "chainId": 97
+ },
+ "evaluator_source": {
+  "repo": "gatelock",
+  "branch": "integrate/studio",
+  "path": "packages/adapters/agent-studio/WattnessEvaluator/app/agent/studio.toml",
+  "section": "[identity]",
+  "sha256": "43b79a77c51174a926f79df39657cf87b99e2c7a9026cfc9c11ba247a2869967",
+  "state": "working-tree change on integrate/studio (HEAD 73c5ffe), not committed when read"
+ },
+ "roles": {
+  "market-reader": {
+   "agentId": 2923,
+   "owner": "0xEd3Cc8b9A53F2BFb58e2B4d41082BF675632DA43",
+   "register_tx": "0x434035c983445f8c0b6f5ca147a8423ae4c1a3f2178ada163ed314862e152991",
+   "register_block": 144850634,
+   "register_unix": 1795637914
+  },
+  "state-keeper": {
+   "agentId": 2924,
+   "owner": "0xC014b341280ba89a5f1000740152e9cBf067b5cF",
+   "register_tx": "0x5d0fbe388c0dac8d087b801bb5cb903af2149ba8d7f9d62ff3cb186ce5e4080a",
+   "register_block": 144850652,
+   "register_unix": 1795637922
+  },
+  "forecaster": {
+   "agentId": 2925,
+   "owner": "0x0cBB05162596b58686AB50C76d86CAeFd9b7EF76",
+   "register_tx": "0x31bcbff9a9bf651cea75a830ead316292fbf4a472126c890a71e3629bdd4c435",
+   "register_block": 144850704,
+   "register_unix": 1795637945
+  },
+  "hedger": {
+   "agentId": 2926,
+   "owner": "0x78576079312F5c1dB833ae84B91dae0dE34A48ca",
+   "register_tx": "0x8bc7da13a80e4ace83dff59565bb30d42c4cffdd62f5fdbe7fcdbcb098323abf",
+   "register_block": 144850720,
+   "register_unix": 1795637952
+  },
+  "risk-officer": {
+   "agentId": 2927,
+   "owner": "0x8FaD9a8D368E4b4E2B7322C95c3bEfDf6A264b6b",
+   "register_tx": "0xd9cb3c2a3e4b76679639d0faf99966b95fcf890f2c543edeb1a3e90c362600c0",
+   "register_block": 144850727,
+   "register_unix": 1795637956
+  },
+  "planner": {
+   "agentId": 2928,
+   "owner": "0x648608Ab27e7C1a024c45082E3094721FF11E67a",
+   "register_tx": "0xf0b0e75801c1081bcecc77e8f985bb2bb07dc834861112e9833354e046768528",
+   "register_block": 144850777,
+   "register_unix": 1795637978
+  }
+ },
+ "evaluator": {
+  "agentId": 2922,
+  "registered_at_utc": "2026-11-25T20:39:31.264Z",
+  "register_tx": "0x1715b7ee8824a2fc79b304da0573d25a47e7acfec8b93f58bebcf5148d110561",
+  "platform_backend": "aws"
+ },
+ "job": {
+  "jobId": 1872,
+  "task": "price-scenarios",
+  "client": "planner",
+  "provider": "forecaster",
+  "deliverable": "0xdb892cae095c9bbee80fce8431307db49691786e9bcac101a69fa78fc3c022f2",
+  "status": "Completed",
+  "timing": "sealed"
+ }
+}

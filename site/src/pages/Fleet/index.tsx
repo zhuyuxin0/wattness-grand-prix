@@ -130,7 +130,7 @@ function Fleet({ day }: { day: DayIndex }) {
     <>
       <PageHeader
         title="Fleet"
-        lede={`All ${formatInt(day.leafCount)} sealed plans for ${opDay}: every ERCOT battery's plan, made under the same rules from the same public data and sealed before the gate. Open a row for one plan's schedule.`}
+        lede={`All ${formatInt(day.leafCount)} sealed plans for ${opDay}, one for every Texas battery with complete public data: made under the same rules from the same data and sealed before the gate. Open a row for one plan's schedule.`}
         aside={
           <div className="fl-aside">
             <ParcFerme state="sealed" label="Sealed in one root" />

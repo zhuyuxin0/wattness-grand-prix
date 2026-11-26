@@ -1,0 +1,9 @@
+/* The display face (apps/mms/src/skins/wattness.css, lines 23-29 at c5c182dc). Libre Franklin is under the SIL
+   Open Font License 1.1 (../fonts/OFL.txt). */
+@font-face {
+  font-family: "Libre Franklin Brand";
+  src: url("../fonts/librefranklin-100-900-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}

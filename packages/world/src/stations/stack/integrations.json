@@ -1,0 +1,197 @@
+{
+ "what": "Addresses and transactions behind the stack's live pieces that frame-data.json does not carry yet: the sponsor flows on BSC testnet (chain 97) on Nov 25 and 26, 2026 CT, Living Brain's API base and the edge Worker's address. Taken from the lanes' records (addresses, hashes, blocks and times only).",
+ "chain_id": 97,
+ "explorer": "https://testnet.bscscan.com",
+ "read_back": {
+  "rpc": "https://bsc-testnet-rpc.publicnode.com",
+  "also": "https://bsc-testnet-dataseed.bnbchain.org",
+  "at_ct": "2026-11-26 05:25 CT",
+  "receipts": 20,
+  "status_1": 19,
+  "status_0": [
+   "openfour.refused"
+  ],
+  "note": "every transaction named here was read back with eth_getTransactionReceipt on both nodes: status and block as recorded; the refused graduation reverted (status 0), as recorded. Job 1897's settle moved 0.1 U from the commerce contract to 0x0cBB05162596b58686AB50C76d86CAeFd9b7EF76, and its submit came from that wallet"
+ },
+ "flap": {
+  "portal": "0x000042108465206185A077Edc3F3fd2b49060000",
+  "launcher": "0x627A6C606d87d31121e5201bFf999695D3C70D59",
+  "token": "0xcCdA7b7B6cF49208a3E751e56c98cb34202e7777",
+  "pool": "0x510D53EFdAdEec8299D7328867Ddc6f815cbEA6B",
+  "vault": "0x44c5AFF0812bCe6b53c17910a3427ceB0955f70a",
+  "launch": {
+   "tx": "0x34439fa4200a28a54678b1493900f4fee0ee294540ff2e27b40cebbeaea3c084",
+   "block": 144840106,
+   "ct": "2026-11-25 12:59:28 CT"
+  },
+  "vault_claim": {
+   "tx": "0x41a1ed514a49dd993fd946b69d97ad310a007269c1d9afdce21aa3b518c4ec3d",
+   "block": 144840240,
+   "ct": "2026-11-25 13:00:29 CT"
+  },
+  "transactions": 26
+ },
+ "openfour": {
+  "core": "0x90feAb906d1eE89611576DD6F042Bca840A94aF7",
+  "migrate_module": "0xfc2E00dCfC39C71F97Ce0e6ba9C52717Ed8fbA8e",
+  "token": "0xB1e792b2C6Bf7Ae7A1D972af313442039422ef14",
+  "refused": {
+   "tx": "0x219f25a2b86a8a73595911f40dd81f072655bd6711fdd4eb6b8108b6a733686e",
+   "block": 144842485,
+   "error": "EvidenceMissing"
+  },
+  "evidence": {
+   "tx": "0xd100cfa2402baaeec7de4545deedec2f72d238bbb53ec3fc34753d93718a1128",
+   "record_key": "0xafee502d7b63d89f48434a1e9c1b73c949ca08f7189f68be54e30f2d81fdedf9",
+   "operating_day": 20261126,
+   "block": 144842524
+  },
+  "graduated": {
+   "tx": "0xc549f6e5a6598ba308e6ecb837cf0da2a6fa23c1d72a6e40065df4c585af5330",
+   "block": 144842547,
+   "pair": "0xe54cDdE2d4A28b0131C5Dc6b9E5Afb20701680Ee"
+  }
+ },
+ "agent_studio": {
+  "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+  "agent_id": 2922,
+  "registered": {
+   "tx": "0x018e3939e1a11427801d552db0e31a91e64312211d9dc72dd6ca23dc44b77e1c",
+   "block": 144840710,
+   "ct": "2026-11-25 13:04:00 CT"
+  },
+  "hosted": {
+   "agent_card": "https://bnbagent-api.bnbchain.world/v1/rt/01M8A6SP0DFR9E3KR8AYM3FDK9/.well-known/agent-card.json",
+   "backend": "AgentCore Runtime, zip artifact, Node 22",
+   "since_ct": "2026-11-25 14:37:22 CT",
+   "until_ct": "2026-11-27 14:37:19 CT",
+   "uri_tx": "0x1715b7ee8824a2fc79b304da0573d25a47e7acfec8b93f58bebcf5148d110561",
+   "uri_block": 144853424,
+   "backend_reported_by": "the hosting platform at deploy (aws)"
+  },
+  "commerce": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de",
+  "jobs": [
+   {
+    "id": 1871,
+    "status": "COMPLETED",
+    "submit_tx": "0x4fb4fa287dcd08c6abdccc2d5ed5dd2d628b7961971ae0a0f9437c0986db3cf2",
+    "settle_tx": "0xc98c6bcaaa887339c0bd91fc6d3ab3226613aa50ce9b9ac3c639573ed4240c22",
+    "settle_block": 144844254,
+    "settle_ct": "2026-11-25 13:30:40 CT",
+    "hosted": false
+   },
+   {
+    "id": 1873,
+    "status": "COMPLETED",
+    "submit_tx": "0x1abfbbfd619a5c9852dc41453f10cfacde6b0dbf8c6f58d76c5ab0ce4f0c6767",
+    "settle_tx": "0x31b15cbe6d5a65e8b2c011c750ba5f1055b769d047ff23728bb38c9e0dc03aab",
+    "settle_block": 144856336,
+    "settle_ct": "2026-11-25 15:01:24 CT",
+    "hosted": true
+   }
+  ],
+  "hosted_forecaster": {
+   "agent_id": 2925,
+   "slug": "wattnessforecaster",
+   "wallet": "0x0cBB05162596b58686AB50C76d86CAeFd9b7EF76",
+   "agent_card": "https://bnbagent-api.bnbchain.world/v1/rt/01M8BE5637A0BP9F1JVANPMKMX/.well-known/agent-card.json",
+   "backend": "AgentCore Runtime, zip artifact, Node 22",
+   "since_ct": "2026-11-26 02:05:13 CT",
+   "until_ct": "2026-11-27 14:37:19 CT",
+   "backend_reported_by": "the hosting platform at deploy (aws), the same managed trial as the evaluator",
+   "identity": "agent 2925's registry entry still names its role card; the wallet that owns agent 2925 signs every quote and submit from the hosted runtime"
+  }
+ },
+ "agents": {
+  "registry": "0x8004A818BFB912233c491871b3d84c89A494BD9e",
+  "ids": {
+   "market": 2923,
+   "state": 2924,
+   "forecaster": 2925,
+   "hedger": 2926,
+   "risk": 2927,
+   "planner": 2928
+  },
+  "registered": {
+   "market": {
+    "tx": "0x434035c983445f8c0b6f5ca147a8423ae4c1a3f2178ada163ed314862e152991",
+    "block": 144850634
+   },
+   "state": {
+    "tx": "0x5d0fbe388c0dac8d087b801bb5cb903af2149ba8d7f9d62ff3cb186ce5e4080a",
+    "block": 144850652
+   },
+   "forecaster": {
+    "tx": "0x31bcbff9a9bf651cea75a830ead316292fbf4a472126c890a71e3629bdd4c435",
+    "block": 144850704
+   },
+   "hedger": {
+    "tx": "0x8bc7da13a80e4ace83dff59565bb30d42c4cffdd62f5fdbe7fcdbcb098323abf",
+    "block": 144850720
+   },
+   "risk": {
+    "tx": "0xd9cb3c2a3e4b76679639d0faf99966b95fcf890f2c543edeb1a3e90c362600c0",
+    "block": 144850727
+   },
+   "planner": {
+    "tx": "0xf0b0e75801c1081bcecc77e8f985bb2bb07dc834861112e9833354e046768528",
+    "block": 144850777
+   }
+  },
+  "job_1872": {
+   "id": 1872,
+   "client": "planner",
+   "provider": "forecaster",
+   "status": "COMPLETED",
+   "settle_tx": "0x9673dc120d0a4337374dd27feb37d8b7342c7446c86dbb27ca742c3e5753cd2f",
+   "settle_block": 144854078,
+   "settle_ct": "2026-11-25 14:44:26 CT"
+  },
+  "job_1897": {
+   "id": 1897,
+   "client": "planner",
+   "provider": "forecaster",
+   "status": "COMPLETED",
+   "hosted": true,
+   "budget": "0.1 U",
+   "task": {
+    "operating_day": "2026-11-26",
+    "resource": "DSWL_ESS_ESR1"
+   },
+   "submit_tx": "0x4737a6845d52c8cd86157e3901c4dcfd8d3044faff2bb4d605b0324c75144c58",
+   "submit_block": 144945159,
+   "settle_tx": "0xb9d457e23529dc105b79b6df718aa51b412080c433e7b92e5cd3f4b5f83ba9be",
+   "settle_block": 144947242,
+   "settle_ct": "2026-11-26 02:24:43 CT",
+   "content_sha256": "db892cae095c9bbee80fce8431307db49691786e9bcac101a69fa78fc3c022f2",
+   "sealed_digest": "db892cae095c9bbee80fce8431307db49691786e9bcac101a69fa78fc3c022f2",
+   "manifest_sha256": "cce4789958c73c05bdb75567b5e6337b91e62f1ca23ff8e770bc3cb409b5a426",
+   "manifest_copy": "https://gnfd-testnet-sp3.nodereal.io/view/wattness-grand-prix-records/deliverables/sha256/cce4789958c73c05bdb75567b5e6337b91e62f1ca23ff8e770bc3cb409b5a426.json"
+  }
+ },
+ "living_brain": {
+  "api": "https://api.livingbrain.com/v1"
+ },
+ "cloudflare": {
+  "worker": "https://grand-prix-edge.wattness.workers.dev",
+  "verify": "https://grand-prix-edge.wattness.workers.dev/verify/DSWL_ESS_ESR1?od=2026-11-26&network=bsc-mainnet",
+  "read_ct": "2026-11-26 05:19 CT",
+  "answered": {
+   "root": "a plain-text page: each sealed day's files from BNB Greenfield, each served only after it is checked against GateRecord on BSC; a file that fails a check answers 502 with the reason",
+   "verify": "HTTP 200, schema gate-record.edge-verdict.v1, verdict pass on bsc-mainnet: leaf hash, Merkle proof, record key, on-chain record and gate, each pass with the values compared"
+  },
+  "checks": [
+   "leaf hash",
+   "Merkle proof",
+   "record key",
+   "on-chain record",
+   "gate"
+  ],
+  "source": "the Worker's / names https://github.com/zhuyuxin0/wattness-grand-prix",
+  "turnstile": {
+   "guards": "Ness, Wattness's assistant on wattness.tech",
+   "how": "a question without a session opens Cloudflare Turnstile's check; Ness's server opens a session only for a token Cloudflare confirms for its own host and the action ness",
+   "code": "Wattness's site code for Ness: the client opens Cloudflare Turnstile's check when a question has no session; the server checks the token with Cloudflare's siteverify for its own host and the action ness"
+  }
+ }
+}

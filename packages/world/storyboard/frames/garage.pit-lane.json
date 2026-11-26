@@ -1,0 +1,75 @@
+{
+ "id": "garage.pit-lane",
+ "url": "http://127.0.0.1:15195/lab.html?frame=garage.pit-lane&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/garage.pit-lane.png",
+ "sha256": "74572c61dcdd452b52d869211c887dbd957176368ac60a1c4c1b4e2c7e2962d7",
+ "deterministic": null,
+ "renderMs": 1310,
+ "wallMs": 1358,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 97
+ },
+ "underLoad": false,
+ "note": "Real, from frame-data.json: each board is one of the three plans the planner solved for Desert Willow's 2026-11-26 (showcase.arms.{A,B,C}: expected_usd as the mean, minus cvar_usd as the worst tenth's average day, objective_usd as the score, the same objective the arcade cabinet ONE PLAN scores), with its 301 scenario totals (game.results.*.total_uusd) in $250 bins on one shared axis on the heat ramp, and scenarios_below_zero. C is the selected arm (selection_rule: the highest objective) and carries the seal's time (sealed_day.receipts[0], 2026-11-25 09:15:17 CT). The planner's badge is ERC-8004 agent 2928 on BSC testnet (ids.json, from agents.bsc-testnet.json on core/agents d69fe6e; registered after the seal). Design: the boards' size, stands and turn toward the lane, the lights. Camera at the pit lane's end, [44, 9.5, -181] looking at [150, 7.4, -153] on a 33 degree lens, from the storyboard's [-207, 9, -175], where the boards stood 340 m off.",
+ "frame": {
+  "id": "garage.pit-lane",
+  "station": "garage",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 4.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real, from frame-data.json: each board is one of the three plans the planner solved for Desert Willow's 2026-11-26 (showcase.arms.{A,B,C}: expected_usd as the mean, minus cvar_usd as the worst tenth's average day, objective_usd as the score, the same objective the arcade cabinet ONE PLAN scores), with its 301 scenario totals (game.results.*.total_uusd) in $250 bins on one shared axis on the heat ramp, and scenarios_below_zero. C is the selected arm (selection_rule: the highest objective) and carries the seal's time (sealed_day.receipts[0], 2026-11-25 09:15:17 CT). The planner's badge is ERC-8004 agent 2928 on BSC testnet (ids.json, from agents.bsc-testnet.json on core/agents d69fe6e; registered after the seal). Design: the boards' size, stands and turn toward the lane, the lights. Camera at the pit lane's end, [44, 9.5, -181] looking at [150, 7.4, -153] on a 33 degree lens, from the storyboard's [-207, 9, -175], where the boards stood 340 m off.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1310,
+  "programs": {
+   "state": "ready",
+   "programs": 45
+  },
+  "frameInfo": {
+   "calls": 327,
+   "triangles": 91406,
+   "passes": {
+    "shadow": 17,
+    "ShadowOncePass": 0,
+    "opaque": 245,
+    "aoNormalAndBlend": 32,
+    "copyBack": 1,
+    "overlay": 42,
+    "OutputPass": 1,
+    "opaqueColour": 228
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "74572c61dcdd452b52d869211c887dbd957176368ac60a1c4c1b4e2c7e2962d7",
+   "wallMs": 1358,
+   "renderMs": 1310,
+   "gpuLoad": {
+    "before": 0,
+    "after": 97
+   }
+  }
+ ]
+}

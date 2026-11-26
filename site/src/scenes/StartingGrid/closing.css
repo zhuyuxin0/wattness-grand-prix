@@ -28,6 +28,10 @@
 }
 
 .sg-lockup__line {
+  /* Scene labels keep to one line; on a narrow stage this one wraps, balanced, inside it. */
+  max-width: 88cqw;
+  white-space: normal;
+  text-wrap: balance;
   font-family: var(--w-font-sans);
   font-size: clamp(11px, 1.5cqh, 16px);
   line-height: 1.4;

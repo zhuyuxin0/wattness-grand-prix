@@ -1,0 +1,24 @@
+{
+  "what": "Desert Willow's substation name, which frame-data.json does not carry: the Wattness Terminal's public fleet reference for DSWL_ESS_ESR1, read through the Terminal's find on Thu 26 Nov 2026 at 02:47 Bangkok (Wed 25 Nov, 13:47 CT). O01's plate 'Substation (DSWL_ESS)' prints it.",
+  "battery": "DSWL_ESS_ESR1",
+  "substation": "DSWL_ESS",
+  "settlement_point": "DSWL_BES1",
+  "owner": "DESERT WILLOW ENERGY STORAGE LLC",
+  "qse": "QPHIL3",
+  "qse_as_of": "2026-08-30",
+  "county": "Ellis",
+  "energy_mwh_on_file": 349.5,
+  "energy_note": "The census row's energy. The frames print the plan's 338.307 MWh (frame-data.json showcase.energy_mwh), the size the plan was made with.",
+  "release": {
+    "id": "terminal-daily-20261124-1120",
+    "generated_at": "2026-11-24T11:20:07-06:00",
+    "manifest_sha256": "9ae88df778012b79133b4a6dea53ab57e7bf733c89ef8cf0477ab7d497bba074",
+    "manifest_url": "https://wattness.tech/data/terminal-display/v1/releases/terminal-daily-20261124-1120/manifest.json"
+  },
+  "files": [
+    { "route": "/api/fleet-reference/v2/index", "sha256": "fb337d3a47c2b698fd5aeba9bc6dca6c37b4c87239af34f6b6a0eb77a2833c0b", "bytes": 3054007 },
+    { "route": "/api/fleet", "sha256": "f45b57beebb8bbf8fda5ffc8347e5b40423e344a451e2fe71890829991155d74", "bytes": 97867 },
+    { "route": "/api/fleet-geo/v2/native", "sha256": "fb3d4e53f32236d1f19f2721a0846d061f68db88b1b2869bf6b2600f9541b621", "bytes": 812937 }
+  ],
+  "attribution": "Data: ERCOT. Calculation and display: Wattness."
+}

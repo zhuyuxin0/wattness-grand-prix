@@ -40,7 +40,7 @@ export const PANEL: PanelEntry[] = [
     id: "intro",
     label: "Intro",
     path: "/",
-    summary: "The Grand Prix: every battery's plan for tomorrow, sealed on BNB Chain before the market closes.",
+    summary: "The Grand Prix: tomorrow's plan for every Texas battery with complete public data, sealed on BNB Chain before the market closes.",
     term: "the starting grid",
     page: page(() => import("../pages/Intro")),
   },
@@ -79,6 +79,14 @@ export const PANEL: PanelEntry[] = [
   },
 
   { kind: "group", id: "agents", label: "Agents" },
+  {
+    kind: "tab",
+    id: "agent-ids",
+    label: "Agent IDs",
+    path: "/agents/ids",
+    summary: "The agents' ERC-8004 identities on BSC testnet, the evaluator hosted on Amazon Bedrock AgentCore through BNB Agent Studio, and their paid ERC-8183 jobs.",
+    page: page(() => import("../pages/AgentIds")),
+  },
   {
     kind: "tab",
     id: "forecast",
@@ -120,7 +128,7 @@ export const PANEL: PanelEntry[] = [
     id: "memory",
     label: "Memory",
     path: "/agents/memory",
-    summary: "What the agents remember: Living Brain pages, their connections and the reasoning behind each.",
+    summary: "What Living Brain keeps on the build and on the Wattness Terminal: its pages, their connections and the reasoning behind each.",
     term: "team data",
     page: page(() => import("../pages/Memory")),
   },
@@ -132,7 +140,7 @@ export const PANEL: PanelEntry[] = [
     label: "Seal",
     path: "/seal",
     summary: "The record on BNB Chain: the root, both receipts, and the gate the contract computes.",
-    term: "parc ferme",
+    term: "parc fermé",
     page: page(() => import("../pages/Seal")),
   },
   {
@@ -154,6 +162,44 @@ export const PANEL: PanelEntry[] = [
     page: page(() => import("../pages/Files")),
   },
 
+  { kind: "group", id: "markets", label: "Markets" },
+  {
+    kind: "tab",
+    id: "season",
+    label: "Season",
+    path: "/markets/season",
+    summary: "The Flap season: its token launches only on a plan sealed before the gate, and its vault pays contributors for the days their agent sealed in time.",
+    term: "the season purse",
+    page: page(() => import("../pages/Season")),
+  },
+  {
+    kind: "tab",
+    id: "launchpad",
+    label: "Launchpad",
+    path: "/markets/launchpad",
+    summary: "Agent launches on OpenFour that graduate into a PancakeSwap V2 pool only with a sealed record bound to them, and are refused without one.",
+    term: "license to launch",
+    page: page(() => import("../pages/Launchpad")),
+  },
+  {
+    kind: "tab",
+    id: "prices",
+    label: "Prices",
+    path: "/markets/prices",
+    summary: "BNB and USDT in US dollars from Atlas's signed reports and from CoinMarketCap, side by side, and the evaluation budget they price.",
+    term: "the timing screens",
+    page: page(() => import("../pages/Prices")),
+  },
+  {
+    kind: "tab",
+    id: "one-plan",
+    label: "ONE PLAN",
+    path: "/markets/one-plan",
+    summary: "Plan Desert Willow's sealed day yourself and score it over the same 301 price scenarios with the planner's objective.",
+    term: "the arcade",
+    page: page(() => import("../pages/OnePlan")),
+  },
+
   { kind: "group", id: "about", label: "About" },
   {
     kind: "tab",
@@ -163,6 +209,14 @@ export const PANEL: PanelEntry[] = [
     summary: "What the Grand Prix is, how its parts fit, and the glossary.",
     term: "the paddock",
     page: page(() => import("../pages/HowItWorks")),
+  },
+  {
+    kind: "tab",
+    id: "stack",
+    label: "Tech Stack",
+    path: "/about/stack",
+    summary: "Every piece the Grand Prix is built from on one map, each with its role and its real integration, contracts and transactions linked.",
+    page: page(() => import("../pages/TechStack")),
   },
   {
     kind: "tab",
@@ -213,4 +267,41 @@ export function groupOf(tab: PanelTab): PanelGroup | null {
     else if (e === tab) return group;
   }
   return null;
+}
+
+/**
+ * The tab ids the 3D world names when a visitor asks to open a tab
+ * (packages/world: the story's onRoute, src/story/beats.ts TabId, and the
+ * stack's, src/stations/stack/pieces.ts ROUTES), and the tab each one opens
+ * here. They are this list's own ids, except the stack's "agents", which is
+ * Agent IDs. test/world-tabs.test.mjs reads both of the package's lists and
+ * holds this map to them.
+ */
+export const WORLD_TABS = {
+  intro: "intro",
+  overview: "overview",
+  fleet: "fleet",
+  battery: "battery",
+  agents: "agent-ids",
+  forecast: "forecast",
+  state: "state",
+  hedge: "hedge",
+  risk: "risk",
+  memory: "memory",
+  seal: "seal",
+  verify: "verify",
+  files: "files",
+  season: "season",
+  launchpad: "launchpad",
+  prices: "prices",
+  "one-plan": "one-plan",
+  about: "about",
+  "add-agent": "add-agent",
+} as const;
+
+/** The tab a 3D route opens; undefined for an id this map does not know. */
+export function worldTab(id: string): PanelTab | undefined {
+  if (!Object.hasOwn(WORLD_TABS, id)) return undefined;
+  const tabId = WORLD_TABS[id as keyof typeof WORLD_TABS];
+  return TABS.find((t) => t.id === tabId);
 }

@@ -1,0 +1,232 @@
+/* Launchpad. Blocks: launch-*. One surface, hairline rules; yellow only on the
+   bound sealed record, the ok and bad colors only on a transaction's status. */
+
+.launch-stack {
+  display: grid;
+  gap: var(--t-space-6);
+  min-width: 0;
+}
+.launch-sub {
+  margin-bottom: var(--t-space-3);
+  font-size: var(--t-fs);
+  font-weight: 600;
+}
+.launch-when {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 var(--t-space-2);
+}
+.launch-when .muted::before {
+  content: "· ";
+}
+/* No node answered: one muted line and the stamp's compact Read again. */
+.launch-pending {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  margin: 0;
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- definition lists */
+
+.launch-dl {
+  margin: 0;
+  display: grid;
+  min-width: 0;
+}
+.launch-dl > div {
+  display: grid;
+  grid-template-columns: 9em minmax(0, 1fr);
+  gap: var(--t-space-4);
+  align-items: baseline;
+  padding: 6px 0;
+  border-top: 1px solid var(--t-rule);
+}
+.launch-dl dt {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.launch-dl dd {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh);
+}
+.launch-dl a {
+  color: inherit;
+}
+.launch-dl__note {
+  margin-top: 3px;
+  color: var(--w-muted);
+  line-height: var(--t-lh-prose);
+}
+.launch-dl--contracts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gp-space-7);
+}
+.launch-dl--contracts > div {
+  grid-template-columns: 12em minmax(0, 1fr);
+}
+.launch-agent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-1) var(--t-space-3);
+}
+@media (max-width: 899px) {
+  .launch-dl--contracts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 599px) {
+  .launch-dl > div,
+  .launch-dl--contracts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------- the two conditions */
+
+.launch-conditions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--t-space-5);
+}
+@media (max-width: 899px) {
+  .launch-conditions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.launch-card {
+  display: grid;
+  gap: var(--t-space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--t-space-4) var(--t-space-5);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+.launch-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--t-space-3);
+}
+.launch-card__title {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.launch-held,
+.launch-ok,
+.launch-bad {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.launch-held,
+.launch-ok {
+  color: var(--s-ok);
+}
+.launch-bad {
+  color: var(--s-bad);
+}
+
+/* ---------------------------------------------------------------- the steps */
+
+.launch-steps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.launch-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: var(--t-space-4);
+  padding: var(--t-space-4) 0;
+  border-top: 1px solid var(--t-rule);
+}
+.launch-step:last-child {
+  border-bottom: 1px solid var(--t-rule);
+}
+.launch-step__n {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--w-border);
+  border-radius: 50%;
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.launch-step--refused .launch-step__n {
+  border-color: color-mix(in srgb, var(--s-bad) 55%, transparent);
+  color: var(--s-bad);
+}
+.launch-step__main {
+  display: grid;
+  gap: var(--t-space-2);
+  min-width: 0;
+}
+.launch-step__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-4);
+  min-height: 22px;
+}
+.launch-step__title {
+  font-size: var(--t-fs);
+  font-weight: 600;
+}
+.launch-step__body {
+  max-width: 92ch;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+.launch-step__tx {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-5);
+  font-size: var(--t-fs-xs);
+}
+.launch-step__tx a {
+  color: inherit;
+}
+
+/* ---------------------------------------------------------------- today */
+
+.launch-today {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--t-space-6) var(--gp-space-7);
+}
+.launch-today .launch-dl > div {
+  grid-template-columns: 7em minmax(0, 1fr);
+}
+@media (max-width: 1099px) {
+  .launch-today {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 599px) {
+  .launch-today .launch-dl > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

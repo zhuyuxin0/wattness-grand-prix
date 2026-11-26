@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en" data-skin="wattness" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ONE PLAN</title>
+    <script>
+      // Seeded before any module runs, as the frame lab does: the stage's ambient occlusion draws its noise from
+      // Math.random, and a still must give the same pixels on every load.
+      (function () {
+        var s = 0x2f6b3a1d >>> 0;
+        Math.random = function () { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; };
+      })();
+    </script>
+    <script type="module" src="./play.ts"></script>
+  </head>
+  <body>
+    <main id="game"></main>
+  </body>
+</html>

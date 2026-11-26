@@ -1,0 +1,75 @@
+{
+ "id": "towers.T04-launch-graduate",
+ "url": "http://127.0.0.1:15196/lab.html?frame=towers.T04-launch-graduate&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/towers.T04-launch-graduate.png",
+ "sha256": "948e912ecc4780c5ac646c385b3628152bf37cccaa27e8bb2d2f4199ed1e5e50",
+ "deterministic": null,
+ "renderMs": 1383,
+ "wallMs": 1443,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 76
+ },
+ "underLoad": false,
+ "note": "Entirely a design: no evidence-gated module is deployed, no PLNR token exists, no liquidity, no migration. The OpenFour testnet run is in progress; this frame claims no result from it. The plates describe how graduation works; the fill is the module's threshold mark, not a market figure. Real, as in T03: the agent's wallet, its one sealed day (26 Nov, 2,683 s before the gate on BSC mainnet) and its checks (8 pass, 2 skipped), from frame-data.json sealed_day and sponsors.agent_studio. PLNR is a working name held in one constant. Jo decides whether a design frame belongs in the public cut.",
+ "frame": {
+  "id": "towers.T04-launch-graduate",
+  "station": "towers",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 1.6,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Entirely a design: no evidence-gated module is deployed, no PLNR token exists, no liquidity, no migration. The OpenFour testnet run is in progress; this frame claims no result from it. The plates describe how graduation works; the fill is the module's threshold mark, not a market figure. Real, as in T03: the agent's wallet, its one sealed day (26 Nov, 2,683 s before the gate on BSC mainnet) and its checks (8 pass, 2 skipped), from frame-data.json sealed_day and sponsors.agent_studio. PLNR is a working name held in one constant. Jo decides whether a design frame belongs in the public cut.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1383,
+  "programs": {
+   "state": "ready",
+   "programs": 41
+  },
+  "frameInfo": {
+   "calls": 154,
+   "triangles": 88562,
+   "passes": {
+    "shadow": 34,
+    "ShadowOncePass": 0,
+    "opaque": 82,
+    "aoNormalAndBlend": 45,
+    "copyBack": 1,
+    "overlay": 19,
+    "OutputPass": 1,
+    "opaqueColour": 48
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "948e912ecc4780c5ac646c385b3628152bf37cccaa27e8bb2d2f4199ed1e5e50",
+   "wallMs": 1443,
+   "renderMs": 1383,
+   "gpuLoad": {
+    "before": 0,
+    "after": 76
+   }
+  }
+ ]
+}

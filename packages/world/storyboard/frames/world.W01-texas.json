@@ -1,0 +1,75 @@
+{
+ "id": "world.W01-texas",
+ "url": "http://127.0.0.1:15196/lab.html?frame=world.W01-texas&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/world.W01-texas.png",
+ "sha256": "975c6873037f301ba21b8c9e170df0ecfeb3912c8fc624e2b72f11e198ceb2c3",
+ "deterministic": null,
+ "renderMs": 412,
+ "wallMs": 482,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 75
+ },
+ "underLoad": false,
+ "note": "Real: every column stands at its battery's point in the fleet geo file every leaf cites (fleet_geo /api/fleet-geo/v2/native, sha256 fb3d4e53..., release terminal-daily-20261124-1120), projected with layout.texas (1:10,300). 232 exact sites stand solid; 38 points placed by county (19), substation (15), sibling (2) or co-located plant (2) stand hollow; county points are county interior points. The 46 batteries with no coordinates on file lie in four trays by load zone (Houston 20, South 15, North 8, West 3); no coordinate is invented for them. Height is 0.3 + 9.7 x planned discharge / 564.13 MWh (the fleet's largest) and color the site's discharge ramp at its square root, from fleet.batteries[].planned_discharge_mwh (the selected arm's sealed schedule). Desert Willow's size is the sealed 338.307 MWh. The map is the intro's HIFLD ERCOT polygon (iso-regions.geojson, copied into ercot-ring.ts). Illustrative: the plinths, trays and the faint comets on the start straight (a drawing of the lap's direction, carrying no figure).",
+ "frame": {
+  "id": "world.W01-texas",
+  "station": "world",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 3,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real: every column stands at its battery's point in the fleet geo file every leaf cites (fleet_geo /api/fleet-geo/v2/native, sha256 fb3d4e53..., release terminal-daily-20261124-1120), projected with layout.texas (1:10,300). 232 exact sites stand solid; 38 points placed by county (19), substation (15), sibling (2) or co-located plant (2) stand hollow; county points are county interior points. The 46 batteries with no coordinates on file lie in four trays by load zone (Houston 20, South 15, North 8, West 3); no coordinate is invented for them. Height is 0.3 + 9.7 x planned discharge / 564.13 MWh (the fleet's largest) and color the site's discharge ramp at its square root, from fleet.batteries[].planned_discharge_mwh (the selected arm's sealed schedule). Desert Willow's size is the sealed 338.307 MWh. The map is the intro's HIFLD ERCOT polygon (iso-regions.geojson, copied into ercot-ring.ts). Illustrative: the plinths, trays and the faint comets on the start straight (a drawing of the lap's direction, carrying no figure).",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 412,
+  "programs": {
+   "state": "ready",
+   "programs": 23
+  },
+  "frameInfo": {
+   "calls": 57,
+   "triangles": 106792,
+   "passes": {
+    "shadow": 5,
+    "ShadowOncePass": 0,
+    "opaque": 27,
+    "aoNormalAndBlend": 15,
+    "copyBack": 1,
+    "overlay": 13,
+    "OutputPass": 1,
+    "opaqueColour": 22
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "975c6873037f301ba21b8c9e170df0ecfeb3912c8fc624e2b72f11e198ceb2c3",
+   "wallMs": 482,
+   "renderMs": 412,
+   "gpuLoad": {
+    "before": 0,
+    "after": 75
+   }
+  }
+ ]
+}

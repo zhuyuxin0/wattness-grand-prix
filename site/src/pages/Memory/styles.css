@@ -262,3 +262,259 @@
     display: none;
   }
 }
+
+/* ---------------------------------------------------------------- the build's brain */
+
+.mem-lead--terminal {
+  margin-top: 0;
+}
+.mem-part {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+  padding-bottom: var(--t-space-3);
+  border-bottom: 1px solid var(--t-rule);
+}
+.mem-anchor {
+  scroll-margin-top: calc(var(--gp-masthead-h) + var(--t-space-4));
+}
+
+/* Living Brain's text, and the correction beside it. */
+.mem-said {
+  display: grid;
+  gap: var(--t-space-2) var(--t-space-5);
+  min-width: 0;
+}
+@media (min-width: 1000px) {
+  .mem-said--fixed {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+.mem-said__text {
+  max-width: 80ch;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.mem-said__fix {
+  max-width: 80ch;
+  padding-left: var(--t-space-3);
+  border-left: 2px solid var(--w-border);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+  color: var(--w-fg);
+}
+.mem-said__label {
+  display: block;
+  margin-bottom: 1px;
+  font-size: var(--t-fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.mem-said--lead .mem-said__text,
+.mem-said--lead .mem-said__fix {
+  font-size: var(--t-fs);
+}
+.mem-said--lead .mem-said__text {
+  color: var(--w-fg);
+}
+
+/* Every tab's page. */
+.mem-tabs {
+  display: grid;
+  gap: var(--t-space-5);
+}
+.mem-tabs__name {
+  margin-bottom: var(--t-space-1);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.mem-tabs__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mem-tab {
+  display: grid;
+  grid-template-columns: 9.5em minmax(11em, 0.7fr) minmax(0, 3fr);
+  gap: var(--t-space-2) var(--t-space-5);
+  align-items: start;
+  padding: var(--t-space-3) var(--t-space-2);
+  border-top: 1px solid var(--t-rule);
+}
+.mem-tab.is-on {
+  background: var(--t-selected);
+  box-shadow: var(--t-mark-edge);
+}
+.mem-tab__tab {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  min-width: 0;
+}
+.mem-tab__link {
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+}
+.mem-here {
+  padding: 0 6px;
+  border: 1px solid var(--t-accent-text);
+  border-radius: var(--t-radius-pill);
+  font-size: var(--t-fs-2xs);
+  color: var(--t-accent-text);
+  white-space: nowrap;
+}
+.mem-tab__page {
+  display: grid;
+  justify-items: start;
+  gap: 2px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--t-link);
+  font: inherit;
+  font-size: var(--t-fs-sm);
+  text-align: left;
+  cursor: pointer;
+}
+.mem-tab__page .mem-title {
+  text-decoration: underline;
+  text-decoration-color: var(--t-accent-mark);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+.mem-tab__page:hover .mem-title {
+  color: var(--w-fg);
+}
+@media (max-width: 767px) {
+  .mem-tab {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: var(--t-space-3) var(--t-space-1);
+  }
+  /* On a phone a row is one line: the tab's name as its heading, the page's
+     connection count muted beside it (the control that opens the page), and the
+     summary folded until the row is open. */
+  .mem-tab__tab {
+    grid-column: 1;
+    grid-auto-flow: column;
+    justify-content: start;
+    align-items: center;
+  }
+  .mem-tab__page {
+    grid-column: 2;
+    align-self: center;
+    color: var(--w-muted);
+  }
+  .mem-tab__page .mem-title {
+    display: none;
+  }
+  .mem-tab__said {
+    grid-column: 1 / -1;
+  }
+  .mem-tab:not(.is-on) .mem-tab__said {
+    display: none;
+  }
+}
+
+/* One page and its connections. */
+.mem-also {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2);
+}
+.mem-also__label {
+  margin-right: var(--t-space-1);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.mem-chip {
+  padding: 2px 8px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-pill);
+  background: none;
+  color: var(--w-fg);
+  font: inherit;
+  font-size: var(--t-fs-xs);
+  cursor: pointer;
+}
+.mem-chip:hover {
+  background: var(--t-hover);
+}
+.mem-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.mem-link {
+  display: grid;
+  gap: var(--t-space-2);
+  padding: var(--t-space-3) 0;
+  border-top: 1px solid var(--t-rule);
+}
+.mem-link__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--t-space-1) var(--t-space-3);
+}
+.mem-link__other {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--t-link);
+  font: inherit;
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--t-accent-mark);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.mem-brain {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.mem-link__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--t-space-3);
+  margin-left: auto;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.mem-conflict {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.mem-links .mem-empty {
+  padding: var(--t-space-5) 0;
+  text-align: left;
+}
+.mem-find input {
+  width: 320px;
+  max-width: 100%;
+  height: var(--t-ctl-h);
+  padding: 0 var(--t-space-3);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-raised);
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+}
+.mem-find input::placeholder {
+  color: var(--w-muted);
+}
+.mem-find input:focus {
+  outline: none;
+  border-color: var(--t-accent-text);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--t-accent-text) 22%, transparent);
+}

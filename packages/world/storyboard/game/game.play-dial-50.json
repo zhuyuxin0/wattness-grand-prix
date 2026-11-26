@@ -1,0 +1,19 @@
+{
+ "id": "game.play-dial-50",
+ "note": "Dial at 0.50: the schedule halfway from A to C, no glass.",
+ "url": "http://127.0.0.1:15192/src/game/play.html?mode=story&dial=10&glass=&still=1&w=1920&h=1080&dpr=2",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "score": {
+  "step": 10,
+  "mean": 3654879852,
+  "cvar": 1805358394,
+  "objective": 2752200655,
+  "losing": 55,
+  "lit": false,
+  "limits": []
+ },
+ "warnings": [],
+ "refused": []
+}

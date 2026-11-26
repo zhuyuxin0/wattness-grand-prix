@@ -7,6 +7,9 @@ on:
       - "site/**"
       - "packages/core/src/jcs.ts"
       - "packages/core/src/hash.ts"
+      - "packages/core/src/weather.ts"
+      - "packages/core/src/int.ts"
+      - "packages/world/src/**"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 
@@ -31,6 +34,14 @@ jobs:
       - name: Install
         working-directory: site
         run: pnpm install --frozen-lockfile
+      # The story, ONE PLAN and the stack's cards draw from packages/world/src/data/frame-data.json, which the world
+      # package keeps out of git. The site's copy, reviewed for publication, is committed in site/world-data: it must
+      # match its pinned SHA-256, and the build stops unless the sync puts the same bytes in place.
+      - name: Frame data
+        run: |
+          echo "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf  site/world-data/frame-data.json" | sha256sum -c -
+          sh packages/world/scripts/sync-data.sh site/world-data
+          echo "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf  packages/world/src/data/frame-data.json" | sha256sum -c -
       - name: Build
         working-directory: site
         run: pnpm run build:app

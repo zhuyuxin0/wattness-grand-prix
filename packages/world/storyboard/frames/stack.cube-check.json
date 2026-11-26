@@ -1,0 +1,75 @@
+{
+ "id": "stack.cube-check",
+ "url": "http://127.0.0.1:15194/lab.html?frame=stack.cube-check&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/stack.cube-check.png",
+ "sha256": "433626051a60ee8afa168c804834aa87004784238293daa0feb11f304b3f29e8",
+ "deterministic": null,
+ "renderMs": 419,
+ "wallMs": 493,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 92
+ },
+ "underLoad": false,
+ "note": "Check, not a storyboard frame: the cube alone at S01's camera (a crop of the same projection), BNB Chain's symbol drawn over it in red as published (marks/bnbchain.svg). The cube shows the mark wherever the two agree.",
+ "frame": {
+  "id": "stack.cube-check",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 6,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Check, not a storyboard frame: the cube alone at S01's camera (a crop of the same projection), BNB Chain's symbol drawn over it in red as published (marks/bnbchain.svg). The cube shows the mark wherever the two agree.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 419,
+  "programs": {
+   "state": "ready",
+   "programs": 27
+  },
+  "frameInfo": {
+   "calls": 17,
+   "triangles": 209,
+   "passes": {
+    "shadow": 1,
+    "ShadowOncePass": 0,
+    "opaque": 5,
+    "aoNormalAndBlend": 5,
+    "copyBack": 1,
+    "overlay": 0,
+    "OutputPass": 1,
+    "opaqueColour": 4
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "433626051a60ee8afa168c804834aa87004784238293daa0feb11f304b3f29e8",
+   "wallMs": 493,
+   "renderMs": 419,
+   "gpuLoad": {
+    "before": 0,
+    "after": 92
+   }
+  }
+ ]
+}

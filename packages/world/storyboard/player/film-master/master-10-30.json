@@ -1,0 +1,27 @@
+{
+ "cut": "master",
+ "url": "http://127.0.0.1:15191/src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=film",
+ "from": 10,
+ "to": 30,
+ "fps": 60,
+ "scale": 1,
+ "crf": 14,
+ "frames": 1200,
+ "mp4": "storyboard/player/film-master/master-10-30.mp4",
+ "framesDir": "a temporary folder outside the repository",
+ "encodeOnly": false,
+ "perFrameMs": {
+  "mean": 160,
+  "p95": 241,
+  "max": 524
+ },
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuLoad": {
+  "before": 18,
+  "after": 90
+ },
+ "wallMs": 207948,
+ "errors": {},
+ "warnings": [],
+ "refused": []
+}

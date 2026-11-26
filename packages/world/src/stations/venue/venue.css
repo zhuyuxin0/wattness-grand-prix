@@ -1,0 +1,69 @@
+/* The venue frames' words: the hub's zone titles, station names and the diagram's pills, the sealed chip, the hint,
+   the closing's end card and the drive's lower third. Each sits on the kit's plates (kit/css/plates.css) and keeps its
+   type: Libre Franklin Brand for display, the system UI for plate text, ui-monospace for figures. */
+
+.world .intro-tick.v-zone { background: none; box-shadow: none; padding: 0; font: 600 13px/1 var(--t-font-display); letter-spacing: 0.14em;
+  color: #aab1b8; text-shadow: 0 0 3px #101315, 0 0 6px #101315, 0 0 10px #101315; }
+.world .intro-tick.v-station { font: 500 13px/1.25 var(--w-font-sans); color: #e6e8ea; padding: 3px 8px 4px; border-radius: 5px;
+  background: rgba(13, 17, 23, 0.78); box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.09); }
+.world .intro-tick.v-station.is-live { box-shadow: 0 0 0 1px rgba(46, 199, 166, 0.34); }
+.world .intro-tick.v-station.is-gold { box-shadow: 0 0 0 1px rgba(240, 185, 11, 0.5); }
+.world .intro-tick.v-tag { font: 600 10.5px/1 var(--t-font-code); letter-spacing: 0.05em; color: #101315; background: #e6e8ea; padding: 4px 9px 4px;
+  border-radius: 999px; box-shadow: 0 1px 6px rgba(0, 0, 0, 0.45); }
+
+/* the hub's caption sits in the diagram's open ground at the left, between the real world and the arena */
+.world.v-hub .hwalk-cap { left: var(--v-cap-x, 96px); top: var(--v-cap-y, 520px); bottom: auto; max-width: var(--v-cap-w, 520px);
+  padding: 18px 24px 20px; }
+.world.v-hub .hwalk-cap h3 { font-size: 32px; }
+.world.v-hub .hwalk-cap p { font-size: 17.5px; line-height: 1.38; margin-top: 7px; }
+.world.v-hub .hwalk-cap .v-chip { font-size: 12.5px; gap: 8px; padding: 7px 12px 7px 11px; }
+.world.v-hub .hwalk-cap .v-chip b { font-size: 12.5px; }
+.v-caprow { display: flex; align-items: center; gap: 16px; margin-top: 14px; }
+.v-chip { position: relative; display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px 8px 12px; border-radius: 6px;
+  font: 500 14px/1.2 var(--w-font-sans); color: #e6e8ea; background: rgba(13, 17, 23, 0.86); box-shadow: inset 3px 0 0 #f0b90b, 0 0 0 1px rgba(255, 255, 255, 0.08);
+  font-variant-numeric: tabular-nums; white-space: nowrap; }
+.v-chip b { font: 600 14px/1.2 var(--t-font-code); color: #f6f7f8; font-variant-numeric: tabular-nums; }
+.v-chip .v-dot { color: #6b7178; }
+.v-chip.is-stack { display: inline-grid; gap: 6px; padding: 8px 14px 9px 13px; }
+.v-chip .v-line { display: flex; align-items: center; gap: 8px; }
+.v-hint { position: absolute; z-index: 41; display: inline-flex; align-items: center; gap: 8px; font: 500 13px/1 var(--w-font-sans); color: #969ca3;
+  white-space: nowrap; }
+.v-hint i { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #2ec7a6; box-shadow: 0 0 0 3px rgba(46, 199, 166, 0.22); }
+.v-note { position: absolute; z-index: 41; font: 400 12.5px/1.35 var(--w-font-sans); color: #8b9299; white-space: nowrap; }
+
+/* the closing's end card: glass, lower left */
+.v-end { position: absolute; z-index: 41; left: 96px; top: 88px; width: 720px; box-sizing: border-box; padding: 30px 34px 28px; border-radius: 16px;
+  background: var(--glass-surface, rgba(31, 36, 41, 0.78)); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--glass-graze, rgba(0, 0, 0, 0.55)), var(--glass-rim, none), 0 18px 40px -18px rgba(0, 0, 0, 0.65); color: #e6e8ea; }
+.v-end h2 { margin: 0; font: 600 52px/1.08 var(--t-font-display); letter-spacing: -0.016em; color: #f6f7f8; }
+.v-end p { margin: 14px 0 0; font: 400 22px/1.38 var(--t-font-display); color: #d7d9d4; text-wrap: pretty; }
+.v-end .v-gate { margin-top: 22px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; background: rgba(13, 17, 23, 0.6);
+  box-shadow: inset 3px 0 0 #f0b90b; font: 500 16px/1.25 var(--w-font-sans); color: #e6e8ea; font-variant-numeric: tabular-nums; }
+.v-end .v-gate b { font: 600 16px/1.25 var(--t-font-code); color: #f6f7f8; }
+.v-end .v-foot { margin-top: 18px; display: flex; justify-content: space-between; align-items: baseline; gap: 20px; }
+.v-end .v-url { font: 600 18px/1 var(--t-font-code); color: #2ec7a6; letter-spacing: 0.01em; }
+.v-end .v-attr { font: 400 13px/1.3 var(--w-font-sans); color: #969ca3; }
+
+/* the drive's lower third and its lane plate: the plain words first, the Grand Prix's below them, small (Jo, Nov 26) */
+.v-third { position: absolute; z-index: 41; left: 96px; bottom: 92px; display: grid; gap: 10px; }
+.v-third .v-third-head { display: inline-flex; align-items: center; gap: 14px; padding: 14px 22px 15px 20px; border-radius: 12px;
+  background: var(--glass-surface, rgba(31, 36, 41, 0.78)); -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--glass-graze, rgba(0, 0, 0, 0.55)), var(--glass-rim, none), 0 14px 32px -14px rgba(0, 0, 0, 0.6);
+  font: 600 42px/1.1 var(--t-font-display); letter-spacing: -0.012em; color: #f6f7f8; }
+.v-third .v-third-words { display: grid; gap: 9px; }
+.v-third .v-third-line { display: inline-flex; align-items: center; gap: 14px; }
+.v-third .w-flavor { font: 600 15px/1.2 var(--t-font-display); letter-spacing: 0.16em; text-transform: uppercase; color: #8f979f; }
+.v-third .v-third-head i { font-style: normal; color: #2ec7a6; font-weight: 500; }
+.v-third .v-third-sub { justify-self: start; padding: 6px 12px; border-radius: 6px; background: rgba(13, 17, 23, 0.82); box-shadow: inset 3px 0 0 #2ec7a6;
+  font: 500 18px/1.25 var(--w-font-sans); color: #e6e8ea; }
+
+/* the side-by-side's half title */
+.v-half { position: absolute; z-index: 41; left: 32px; top: 70px; padding: 7px 12px 8px; border-radius: 6px; background: rgba(13, 17, 23, 0.86);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1); font: 600 15px/1.2 var(--w-font-sans); color: #f6f7f8; letter-spacing: 0.01em; }
+.v-half span { color: #969ca3; font-weight: 500; }
+
+/* the lamps' numbers under the lamps, in the page's strip type (Barlow Condensed 600) and colors */
+.world .intro-tick.v-lampno { background: rgba(13, 17, 23, 0.82); box-shadow: none; padding: 3px 9px 2px; border-radius: 4px;
+  font: 600 17px/1 "Barlow Condensed", var(--w-font-sans); letter-spacing: 0.06em; }
+.world .intro-tick.v-lampno.is-fail { color: #e5534b; box-shadow: inset 0 -2px 0 #e5534b; }
+.world .intro-tick.v-lampno.is-pass { color: #2ec7a6; box-shadow: inset 0 -2px 0 #2ec7a6; }

@@ -1,0 +1,73 @@
+/* The Terminal's liquid glass (apps/mms/src/ui/glass.css, lines 1-71 at c5c182dc), carried as written: one tinted,
+ diffused material for floating surfaces. Its tokens read --t-raised, --page and --w-accent (src/lib/tokens.css). */
+/* One tinted, diffused material across floating surfaces. Docked readers stay opaque. */
+:root {
+  --glass-fill: color-mix(in srgb, var(--t-raised, var(--page)) 68%, transparent);
+  --glass-matte: color-mix(in srgb, var(--t-raised, var(--page)) 90%, transparent);
+  --glass-blur: blur(6px) saturate(1.4);
+  --glass-hairline: color-mix(in srgb, white 40%, transparent);
+  --glass-graze: color-mix(in srgb, black 30%, transparent);
+  --glass-rim: inset 0 1.5px 1px -.5px rgb(255 255 255 / .96),
+    inset 0 -1.5px 1px -.5px rgb(0 0 0 / .34),
+    inset 0 0 4px -2px rgb(255 255 255 / .35), inset 0 0 0 1px rgb(255 255 255 / .16);
+  --glass-lift: 0 3px 10px -7px rgb(0 0 0 / .40);
+  --glass-depth: 0 12px 30px -14px rgb(0 0 0 / .38);
+  --glass-sheen: .16;
+  --glass-frost: color-mix(in srgb, var(--t-raised, var(--page)) 80%, transparent);
+  --glass-icon: color-mix(in srgb, var(--t-raised, var(--page)) 40%, transparent);
+  --glass-surface: linear-gradient(145deg, color-mix(in srgb, white 12%, transparent), transparent 48%, color-mix(in srgb, var(--w-accent) 3%, transparent)), var(--glass-fill);
+  --glass-surface-backdrop: var(--glass-blur);
+  --glass-direct-surface: var(--glass-surface);
+  --glass-band: var(--glass-matte);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="wattness"]:not([data-theme="light"]) {
+    --glass-fill: color-mix(in srgb, var(--t-raised, var(--page)) 78%, transparent);
+    --glass-matte: color-mix(in srgb, var(--t-raised, var(--page)) 94%, transparent);
+    --glass-hairline: color-mix(in srgb, white 22%, transparent);
+    --glass-graze: rgb(0 0 0 / .55);
+    --glass-rim: inset 0 1.5px 1px -.5px rgb(255 255 255 / .34),
+      inset 0 -1.5px 1px -.5px rgb(0 0 0 / .50),
+      inset 0 0 4px -2px rgb(255 255 255 / .14), inset 0 0 0 1px rgb(255 255 255 / .08);
+    --glass-lift: 0 3px 10px -7px rgb(0 0 0 / .60);
+    --glass-depth: 0 14px 32px -12px rgb(0 0 0 / .60);
+    --glass-sheen: .08;
+    --glass-frost: color-mix(in srgb, var(--t-raised, var(--page)) 88%, transparent);
+    --glass-icon: color-mix(in srgb, var(--t-raised, var(--page)) 61%, transparent);
+  }
+}
+:root[data-skin="wattness"][data-theme="dark"] {
+  --glass-fill: color-mix(in srgb, var(--t-raised, var(--page)) 78%, transparent);
+  --glass-matte: color-mix(in srgb, var(--t-raised, var(--page)) 94%, transparent);
+  --glass-hairline: color-mix(in srgb, white 22%, transparent);
+  --glass-graze: rgb(0 0 0 / .55);
+  --glass-rim: inset 0 1.5px 1px -.5px rgb(255 255 255 / .34),
+    inset 0 -1.5px 1px -.5px rgb(0 0 0 / .50),
+    inset 0 0 4px -2px rgb(255 255 255 / .14), inset 0 0 0 1px rgb(255 255 255 / .08);
+  --glass-lift: 0 3px 10px -7px rgb(0 0 0 / .60);
+  --glass-depth: 0 14px 32px -12px rgb(0 0 0 / .60);
+  --glass-sheen: .08;
+  --glass-frost: color-mix(in srgb, var(--t-raised, var(--page)) 88%, transparent);
+  --glass-icon: color-mix(in srgb, var(--t-raised, var(--page)) 61%, transparent);
+}
+.glass { position: relative; border-radius: var(--t-radius-glass, 14px); padding: 8px; background: transparent; isolation: isolate; }
+.glass::before, .glass-bezel {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: var(--glass-surface); border: 1px solid var(--glass-hairline);
+  -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+  box-shadow: 0 0 0 1px var(--glass-graze), var(--glass-rim), var(--glass-lift), var(--glass-depth);
+}
+.glass::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: linear-gradient(122deg, rgb(255 255 255 / .62), rgb(255 255 255 / .10) 22%,
+    transparent 42%, transparent 74%, rgb(255 255 255 / .26) 93%, transparent);
+  opacity: var(--glass-sheen);
+}
+.glass > .paper { position: relative; z-index: 1; height: 100%; border-radius: var(--t-radius-paper, 7px); background: transparent; color: var(--ink); }
+[data-glass="frosted"] .glass::before, [data-glass="frosted"] .glass-bezel {
+  background: var(--glass-frost); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+}
+[data-glass="solid"] .glass::before, [data-glass="solid"] .glass-bezel {
+  background: var(--t-raised, var(--page)); -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+[data-glass="solid"] .glass::after { display: none; }

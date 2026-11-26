@@ -1,0 +1,18 @@
+/* The frame lab's page: one frame at its exact size, top left, nothing else on the page. */
+html, body { margin: 0; padding: 0; overflow: hidden; background: var(--t-chrome); }
+body { -webkit-font-smoothing: antialiased; }
+.world { position: absolute; left: 0; top: 0; overflow: hidden; isolation: isolate; color: var(--w-fg); font-family: var(--w-font-sans);
+  background: var(--t-chrome); }
+.world-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.world-overlay, .world-plates { position: absolute; inset: 0; pointer-events: none; }
+.world-overlay { z-index: 10; }
+.world-plates { z-index: 22; }
+.world-error { position: absolute; left: 24px; top: 24px; right: 24px; z-index: 90; margin: 0; padding: 14px 16px; border-radius: 8px;
+  font: 500 13px/1.5 var(--t-font-code); white-space: pre-wrap; color: #ffd2c4; background: rgba(13, 17, 23, 0.94);
+  box-shadow: 0 0 0 1px rgba(255, 163, 131, 0.5); }
+.world-index { position: absolute; inset: 0; overflow: auto; padding: 48px 56px; box-sizing: border-box; font: 400 15px/1.6 var(--w-font-sans); }
+.world-index h1 { margin: 0 0 20px; font: 600 28px/1.2 var(--t-font-display); letter-spacing: -0.012em; }
+.world-index h2 { margin: 24px 0 6px; font: 600 15px/1.3 var(--t-font-code); color: var(--t-accent-text); }
+.world-index ul { margin: 0; padding-left: 18px; }
+.world-index a { color: var(--w-fg); text-decoration-color: var(--t-accent-mark); text-underline-offset: 3px; }
+.world-index .bad { color: #ffa383; white-space: pre-wrap; font: 500 13px/1.5 var(--t-font-code); }

@@ -1,5 +1,5 @@
 import { SHOWCASE, SOURCE_LINE } from "../../config";
-import { combine, loadScenarios, useLoad, type ScenarioDigest } from "../../data";
+import { combine, loadScenarios, useLoad, useReceipts, type ScenarioDigest } from "../../data";
 import { useDesk, useDeskCommon, type Desk, type DeskCommon } from "../../data/plan";
 import { formatOperatingDay } from "../../lib/time";
 import { BatteryBar, PageHeader, Ready, Section, Table, useBatteryChoice, type Column } from "../../ui";
@@ -29,6 +29,7 @@ import {
   useHubs,
   type HubBands,
 } from "../Battery/kit";
+import { CournotCard, weightingWords } from "./Cournot";
 import "./styles.css";
 
 // Forecast: the prices a plan is solved against. The node's day-ahead forecast
@@ -122,6 +123,8 @@ export default function ForecastPage() {
   const hourState = useHourState();
   const narrow = useNarrow();
   const all = combine(useDesk(choice.resource), useDeskCommon(), useHubs(), useDigest(choice.resource));
+  const receipts = useReceipts();
+  const sealedUnix = receipts.status === "ready" && receipts.data.receipts.length ? Math.min(...receipts.data.receipts.map((r) => r.blockTime)) : null;
 
   return (
     <HourContext.Provider value={hourState}>
@@ -148,6 +151,7 @@ export default function ForecastPage() {
             const domain = fanDomain(desk.nodeForecastCents, b?.p05, b?.p95, hubFc, hub?.bands.p05, hub?.bands.p95, ...(nodePaths ?? []), ...(hub?.paths ?? []));
             const day0 = formatOperatingDay(common.operatingDay);
             const ref = hubs.reference;
+            const weighted = weightingWords(common.scenarios.weighting);
             const cols: Column<Row>[] = narrow
               ? [
                   { key: "hour", label: "Hour (CT)", kind: "number", align: "left", value: (r) => r.hour, render: (r) => hourStart(r.hour) },
@@ -170,7 +174,7 @@ export default function ForecastPage() {
                 <Section
                   className="fc-lead"
                   title={`Price Scenarios at the Node (${desk.settlementPoint})`}
-                  lede={`The day-ahead forecast this battery's plans used for ${day0}, and the ${count(common.scenarios.count)} equally weighted scenarios around it, in $/MWh.`}
+                  lede={`The day-ahead forecast this battery's plans used for ${day0}, and the ${count(common.scenarios.count)} ${weighted} scenarios around it, in $/MWh.`}
                   source={`${SOURCE_LINE} Operating day ${day0}, hours in CT. Forecast: the hub forecast plus the node's average day-ahead basis to the hub over the basis days.${
                     nodePaths ? ` Thin lines: ${nodePaths.length} of the ${count(common.scenarios.count)} scenarios, one per history day, each with the first basis day.` : ""
                   }`}
@@ -244,7 +248,7 @@ export default function ForecastPage() {
                       <Fact label="History days" note="Each gives the hub's day-ahead and real-time misses against the same forecast rule.">
                         {count(hubs.historyDays.length)} days, {dayRange(hubs.historyDays)}
                       </Fact>
-                      <Fact label="Scenarios" note="Every history day crossed with every basis day, equally weighted, no random numbers.">
+                      <Fact label="Scenarios" note={`Every history day crossed with every basis day, ${weighted === "equally weighted" ? "equally weighted" : "weighted by the weather rule below"}, no random numbers.`}>
                         <span className="num">
                           {count(hubs.count)} = {hubs.historyDays.length} × {hubs.basisDays.length}
                         </span>
@@ -252,6 +256,15 @@ export default function ForecastPage() {
                     </Facts>
                   </Section>
                 </div>
+
+                <CournotCard
+                  common={common}
+                  hubName={desk.hub}
+                  hub={hub}
+                  historyDays={hubs.historyDays}
+                  basisCount={hubs.basisDays.length}
+                  sealedUnix={common.operatingDay === "2026-11-26" ? sealedUnix : null}
+                />
 
                 <Section
                   title="Hour by Hour"

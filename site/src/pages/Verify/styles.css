@@ -744,6 +744,25 @@
 .vf-code code {
   font-size: inherit;
 }
+/* the edge Worker's verdict for the battery and chain shown: one line, its address in mono, wrapping on a phone */
+.vf-edge {
+  margin-top: var(--t-space-5);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.vf-edge__link {
+  color: var(--w-fg);
+  overflow-wrap: anywhere;
+}
+.vf-edge__link .glyph {
+  margin-left: 3px;
+  vertical-align: -1px;
+  color: var(--w-muted);
+}
+.vf-edge + .vf-contract {
+  margin-top: var(--t-space-3);
+}
 .vf-contract {
   margin-top: var(--t-space-5);
   font-size: var(--t-fs-sm);

@@ -1,0 +1,150 @@
+{
+ "cut": "90s",
+ "mp4": "cut-90.mp4",
+ "bytes": 85046606,
+ "sha256": "cb367ccff0f8aa1b02b740573f9188591d5a1bb3c497c023d310f332478d9ffc",
+ "stream": {
+  "codec_name": "h264",
+  "width": 1920,
+  "height": 1080,
+  "pix_fmt": "yuv420p",
+  "r_frame_rate": "60/1",
+  "duration": "90.000000",
+  "nb_frames": "5400"
+ },
+ "encode": "libx264, preset slow, crf 14, yuv420p, +faststart, from 1920 x 1080 PNGs at scale 1",
+ "source": {
+  "page": "src/story/story.html?mode=capture&captions=film",
+  "player_commit": "f3d35ce",
+  "how": "scripts/capture-story.mjs per range (--no-encode), ranges split inside holds and run in parallel, one headless Chrome each; frames numbered from the film's start, so the ranges meet frame for frame"
+ },
+ "rendered": "Nov 26 2026, 13:01 to 13:15 Bangkok (Nov 26, 00:01 to 00:15 CT), on this Mac (Apple M1 Max, Chrome's ANGLE on Metal, headless), with the master's ranges and other renders on the GPU. One range was stopped early and split (0 to 23.5 s, which rendered 0 to 18.05 s; its frames kept, no receipt; the replacing ranges start at 17.9 s). No errors. The rendered code is commit f3d35ce's, but for one comment line in player.ts.",
+ "chunks": [
+  {
+   "from": 17.9,
+   "to": 19.8,
+   "frames": 114,
+   "perFrameMs": {
+    "mean": 845,
+    "p95": 1062,
+    "max": 11876
+   },
+   "wallMs": 100282,
+   "gpuLoad": {
+    "before": 25,
+    "after": 91
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 19.8,
+   "to": 21.6,
+   "frames": 108,
+   "perFrameMs": {
+    "mean": 849,
+    "p95": 1089,
+    "max": 2443
+   },
+   "wallMs": 95324,
+   "gpuLoad": {
+    "before": 74,
+    "after": 91
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 21.6,
+   "to": 23.5,
+   "frames": 114,
+   "perFrameMs": {
+    "mean": 613,
+    "p95": 1027,
+    "max": 9189
+   },
+   "wallMs": 73703,
+   "gpuLoad": {
+    "before": 88,
+    "after": 96
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 23.5,
+   "to": 33.5,
+   "frames": 600,
+   "perFrameMs": {
+    "mean": 709,
+    "p95": 1029,
+    "max": 13496
+   },
+   "wallMs": 434050,
+   "gpuLoad": {
+    "before": 100,
+    "after": 100
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 33.5,
+   "to": 45,
+   "frames": 690,
+   "perFrameMs": {
+    "mean": 608,
+    "p95": 967,
+    "max": 10717
+   },
+   "wallMs": 428728,
+   "gpuLoad": {
+    "before": 100,
+    "after": 83
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 45,
+   "to": 62.5,
+   "frames": 1050,
+   "perFrameMs": {
+    "mean": 337,
+    "p95": 558,
+    "max": 9037
+   },
+   "wallMs": 363235,
+   "gpuLoad": {
+    "before": 100,
+    "after": 94
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  },
+  {
+   "from": 62.5,
+   "to": 90,
+   "frames": 1650,
+   "perFrameMs": {
+    "mean": 260,
+    "p95": 459,
+    "max": 7646
+   },
+   "wallMs": 440055,
+   "gpuLoad": {
+    "before": 100,
+    "after": 95
+   },
+   "errors": {},
+   "warnings": 0,
+   "refused": []
+  }
+ ]
+}

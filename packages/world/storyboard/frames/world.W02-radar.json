@@ -1,0 +1,75 @@
+{
+ "id": "world.W02-radar",
+ "url": "http://127.0.0.1:15196/lab.html?frame=world.W02-radar&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/world.W02-radar.png",
+ "sha256": "fb3e79e3cc39ca18a467ff76d439aea6380e3b38ba4a13b2e7b9707aa7d2dc5f",
+ "deterministic": null,
+ "renderMs": 1146,
+ "wallMs": 1221,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 74
+ },
+ "underLoad": false,
+ "note": "Real: the market Cournot resolved (24962617, Dallas (CLIDFW), below 29\u00b0F on 2026-11-26, matching confidence 0.912) and its probability 0.01 (KXLOWTDAL-26NOV26-T29), whose only basis is the Kalshi YES quote 0.0100 at 09:50:29 CT, read 09:51:43 CT on 25 Nov, after the seal (09:15:17 CT): a review, not an input (the 26 Nov plan had no outside inputs). Houston high and natural gas close are markets Cournot found (titles only; resolve-houston.json, resolve-natural-gas.json), not priced. The scope's Texas is the intro's HIFLD ERCOT polygon and its faint dots the fleet's mapped points (fleet_geo); the Dallas blip sits at the resolving station (CLIDFW, Dallas/Fort Worth airport) and Houston's at the city, positions from public station metadata, not the frame data; the natural gas ring sits outside the outline (a price, not a place). Illustrative: the mast, dish, stand and lights; A2 is drawn dashed as a review. Sponsor values stay internal until the sponsor release.",
+ "frame": {
+  "id": "world.W02-radar",
+  "station": "world",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 2.0453110453699166,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real: the market Cournot resolved (24962617, Dallas (CLIDFW), below 29\u00b0F on 2026-11-26, matching confidence 0.912) and its probability 0.01 (KXLOWTDAL-26NOV26-T29), whose only basis is the Kalshi YES quote 0.0100 at 09:50:29 CT, read 09:51:43 CT on 25 Nov, after the seal (09:15:17 CT): a review, not an input (the 26 Nov plan had no outside inputs). Houston high and natural gas close are markets Cournot found (titles only; resolve-houston.json, resolve-natural-gas.json), not priced. The scope's Texas is the intro's HIFLD ERCOT polygon and its faint dots the fleet's mapped points (fleet_geo); the Dallas blip sits at the resolving station (CLIDFW, Dallas/Fort Worth airport) and Houston's at the city, positions from public station metadata, not the frame data; the natural gas ring sits outside the outline (a price, not a place). Illustrative: the mast, dish, stand and lights; A2 is drawn dashed as a review. Sponsor values stay internal until the sponsor release.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1146,
+  "programs": {
+   "state": "ready",
+   "programs": 24
+  },
+  "frameInfo": {
+   "calls": 141,
+   "triangles": 116518,
+   "passes": {
+    "shadow": 32,
+    "ShadowOncePass": 0,
+    "opaque": 76,
+    "aoNormalAndBlend": 45,
+    "copyBack": 1,
+    "overlay": 18,
+    "OutputPass": 1,
+    "opaqueColour": 44
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "fb3e79e3cc39ca18a467ff76d439aea6380e3b38ba4a13b2e7b9707aa7d2dc5f",
+   "wallMs": 1221,
+   "renderMs": 1146,
+   "gpuLoad": {
+    "before": 0,
+    "after": 74
+   }
+  }
+ ]
+}

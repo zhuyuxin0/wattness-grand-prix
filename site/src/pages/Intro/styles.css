@@ -27,22 +27,37 @@
 .intro-scene__hold {
   background: var(--t-chrome);
 }
+/* While the story is open the scene is hidden inside its box, which keeps its
+   height so nothing below moves: out of view, its loop stops, and it resumes
+   where it was when the story closes. */
+.intro-scene[data-paused] > * {
+  display: none;
+}
 
-/* The stage's own bar: what the scene shows, and the replay. */
+/* The stage's own bar: what the scene shows, the replay, and the story. */
 .intro-stagebar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--t-space-4);
+  gap: var(--t-space-3) var(--t-space-5);
   min-height: 40px;
   padding: 6px var(--gp-gutter);
   border-top: 1px solid var(--w-border);
   background: var(--t-chrome);
 }
 .intro-stagebar__caption {
+  flex: 1 1 24rem;
   min-width: 0;
   font-size: var(--t-fs-xs);
   color: var(--w-muted);
+}
+.intro-stagebar__actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--t-space-4);
+  margin-left: auto;
 }
 .intro-stagebar__replay {
   flex: none;
@@ -50,9 +65,33 @@
   padding: 0 8px;
   font-size: var(--t-fs-xs);
 }
+.intro-stagebar__length {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  white-space: nowrap;
+}
+.intro-stagebar__play {
+  flex: none;
+  border-radius: var(--t-radius-paper);
+}
 @media (max-width: 767px) {
   .intro-scene {
     height: clamp(260px, 74vw, 380px);
+  }
+}
+@media (max-width: 599px) {
+  .intro-stagebar {
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+  /* The actions take their own row under the caption: the replay at the
+     start, the story's length and its button at the end. */
+  .intro-stagebar__actions {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+  .intro-stagebar__length {
+    margin-left: auto;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -86,6 +125,7 @@
 /* The one hero line: wattness.tech's "Watt + Witness." voice. */
 .intro__line {
   max-width: 30ch;
+  text-wrap: balance;
   font-family: var(--t-font-display);
   font-size: var(--gp-fs-hero);
   font-weight: 650;

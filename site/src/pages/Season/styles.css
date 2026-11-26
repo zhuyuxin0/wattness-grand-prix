@@ -1,0 +1,469 @@
+/* Season. Blocks: season-*. One surface, hairline rules; yellow only on a
+   sealed record, the ok and bad colors only on a transaction's status. */
+
+.season-stack {
+  display: grid;
+  gap: var(--t-space-6);
+  min-width: 0;
+}
+.season-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  margin-bottom: var(--t-space-3);
+  font-size: var(--t-fs);
+  font-weight: 600;
+}
+.season-note,
+.season-prose {
+  max-width: 88ch;
+  line-height: var(--t-lh-prose);
+}
+.season-note {
+  margin-top: var(--t-space-3);
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+/* Straight under a stat row, inside the stack's own gap. */
+.season-note--tight {
+  margin-top: calc(-1 * var(--t-space-4));
+}
+.season-when {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 var(--t-space-2);
+}
+.season-when .muted::before {
+  content: "· ";
+}
+.season-agent {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-1) var(--t-space-3);
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------- the steps */
+
+.season-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--t-space-5) var(--gp-space-7);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+.season-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  gap: var(--t-space-2) var(--t-space-3);
+  align-content: start;
+  min-width: 0;
+}
+.season-step__n {
+  grid-row: 1 / span 2;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--w-border);
+  border-radius: 50%;
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.season-step__title {
+  font-size: var(--t-fs);
+  font-weight: 600;
+  line-height: 22px;
+}
+.season-step__body {
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+@media (max-width: 1099px) {
+  .season-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 599px) {
+  .season-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------------------------------------------------------------- definition lists */
+
+.season-dl {
+  margin: 0;
+  display: grid;
+  min-width: 0;
+}
+.season-dl > div {
+  display: grid;
+  grid-template-columns: 11em minmax(0, 1fr);
+  gap: var(--t-space-4);
+  align-items: baseline;
+  padding: 7px 0;
+  border-top: 1px solid var(--t-rule);
+}
+.season-dl > div:last-child {
+  border-bottom: 1px solid var(--t-rule);
+}
+.season-dl dt {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.season-dl dd {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh);
+}
+.season-dl__note {
+  margin-top: 3px;
+  max-width: 80ch;
+  color: var(--w-muted);
+  line-height: var(--t-lh-prose);
+}
+.season-dl--contracts > div {
+  grid-template-columns: 6em minmax(0, 1fr);
+}
+.season-dl--tight > div {
+  grid-template-columns: 5.5em minmax(0, 1fr);
+  padding: 5px 0;
+}
+@media (max-width: 599px) {
+  .season-dl > div,
+  .season-dl--contracts > div,
+  .season-dl--tight > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------- season days */
+
+.season-days__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.season-day {
+  display: grid;
+  grid-template-columns: minmax(0, 15em) minmax(0, 1fr) auto;
+  gap: var(--t-space-2) var(--t-space-5);
+  align-items: center;
+  padding: 9px 0;
+  border-top: 1px solid var(--t-rule);
+  font-size: var(--t-fs-sm);
+}
+.season-day:last-child {
+  border-bottom: 1px solid var(--t-rule);
+}
+.season-day__when,
+.season-day__record {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.season-day__when .muted {
+  font-size: var(--t-fs-xs);
+}
+.season-day__record .muted {
+  font-size: var(--t-fs-xs);
+}
+.season-day__record a {
+  color: inherit;
+}
+.season-day__miss {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+@media (max-width: 599px) {
+  .season-day {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .season-day__record {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+
+/* ---------------------------------------------------------------- claims and transactions */
+
+.season-claims__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+  gap: var(--t-space-5);
+}
+.season-claim {
+  min-width: 0;
+  max-width: 880px;
+}
+.season-txs {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.season-txs > li {
+  display: grid;
+  grid-template-columns: 8em auto auto minmax(0, 1fr) auto;
+  gap: var(--t-space-2) var(--t-space-5);
+  align-items: center;
+  padding: 7px 0;
+  border-top: 1px solid var(--t-rule);
+  font-size: var(--t-fs-sm);
+}
+.season-txs > li:last-child {
+  border-bottom: 1px solid var(--t-rule);
+}
+.season-txs a {
+  color: inherit;
+}
+.season-txs__label {
+  font-weight: 600;
+}
+.season-ok,
+.season-bad {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.season-ok {
+  color: var(--s-ok);
+}
+.season-bad {
+  color: var(--s-bad);
+}
+@media (max-width: 899px) {
+  .season-txs > li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .season-txs > li > .hash,
+  .season-txs > li > .season-when,
+  .season-txs > li > .muted {
+    grid-column: 1 / -1;
+  }
+  .season-txs > li > .season-ok,
+  .season-txs > li > .season-bad {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+/* ---------------------------------------------------------------- round 3 */
+
+.season-meter {
+  display: grid;
+  gap: var(--t-space-3);
+}
+.season-meter__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--t-space-2) var(--t-space-4);
+}
+.season-meter__raised {
+  font-size: var(--t-fs-stat);
+  font-weight: 600;
+}
+.season-meter__track {
+  position: relative;
+  height: 10px;
+  border-radius: var(--t-radius-xs);
+  background: var(--t-chrome);
+  box-shadow: inset 0 0 0 1px var(--w-border);
+}
+.season-meter__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--t-radius-xs);
+  background: color-mix(in srgb, var(--w-fg) 55%, transparent);
+}
+.season-meter__min {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--w-fg);
+}
+.season-meter__scale {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  height: 16px;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+/* Ends just short of its tick, so it never runs into the cap's label. */
+.season-meter__min-label {
+  position: absolute;
+  top: 0;
+  margin-left: -8px;
+  transform: translateX(-100%);
+  white-space: nowrap;
+  color: var(--w-fg);
+}
+
+.season-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--t-space-5);
+}
+@media (max-width: 1099px) {
+  .season-cards {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.season-card {
+  display: grid;
+  gap: var(--t-space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--t-space-4) var(--t-space-5);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+.season-card__title {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.season-card__state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+}
+.season-card__state a {
+  color: inherit;
+}
+.season-card__big {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.season-card__big .season-when .muted {
+  font-weight: 400;
+}
+.season-status {
+  font-weight: 600;
+}
+/* No node answered: one muted line and the stamp's compact Read again. */
+.season-pending {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  margin: 0;
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- before you contribute */
+
+.season-disclose {
+  display: grid;
+  gap: var(--t-space-3);
+  margin: 0;
+  padding: 0 0 0 1.2em;
+  max-width: 96ch;
+  line-height: var(--t-lh-prose);
+}
+.season-disclose strong {
+  font-weight: var(--t-fw-strong);
+}
+
+/* ---------------------------------------------------------------- the example */
+
+.season-people {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--t-space-5);
+  margin-top: var(--t-space-5);
+}
+@media (max-width: 1099px) {
+  .season-people {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.season-person {
+  display: grid;
+  gap: var(--t-space-3);
+  align-content: start;
+  min-width: 0;
+  padding: var(--t-space-4) var(--t-space-5);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+}
+.season-person__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--t-space-4);
+}
+.season-person__name {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.season-person__deposit {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.season-person__backs {
+  min-height: 3em;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.season-person__rows {
+  margin: 0;
+  display: grid;
+}
+.season-person__rows > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--t-space-4);
+  padding: 6px 0;
+  border-top: 1px solid var(--t-rule);
+  font-size: var(--t-fs-sm);
+}
+.season-person__rows dt {
+  color: var(--w-muted);
+}
+.season-person__rows dd {
+  margin: 0;
+  text-align: right;
+  white-space: nowrap;
+}
+.season-person__total dt,
+.season-person__total dd {
+  color: var(--w-fg);
+  font-weight: 600;
+}
+.season-facts {
+  display: grid;
+  gap: var(--t-space-2);
+  margin: var(--t-space-5) 0 0;
+  padding: 0 0 0 1.2em;
+  max-width: 96ch;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}

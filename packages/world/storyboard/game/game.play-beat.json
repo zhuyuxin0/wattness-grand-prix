@@ -1,0 +1,19 @@
+{
+ "id": "game.play-beat",
+ "note": "The beat-the-planner moment: whole contracts on C’s schedule that score above the sealed plan.",
+ "url": "http://127.0.0.1:15192/src/game/play.html?mode=story&dial=20&glass=5:14,7:34,9:-17,10:-71,11:-100,12:-14,17:95&select=12&still=1&w=1920&h=1080&dpr=2",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "score": {
+  "step": 20,
+  "mean": 3541864004,
+  "cvar": -414275918,
+  "objective": 3749001963,
+  "losing": 9,
+  "lit": false,
+  "limits": []
+ },
+ "warnings": [],
+ "refused": []
+}

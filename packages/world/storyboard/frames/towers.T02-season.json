@@ -1,0 +1,75 @@
+{
+ "id": "towers.T02-season",
+ "url": "http://127.0.0.1:15196/lab.html?frame=towers.T02-season&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/towers.T02-season.png",
+ "sha256": "d960430c210662aff426be22911e569f3bdb5075c4b437aff5a6f126ce78bf61",
+ "deterministic": null,
+ "renderMs": 2391,
+ "wallMs": 2440,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 76
+ },
+ "underLoad": false,
+ "note": "Season purse: a design. Nothing has launched: no Wattness factory, Launcher, Vault, PRIX token or deposit exists, so the presale tube and the vault are empty and the allocation screen shows the rules, not counts. Real: the Flap Portal's live configuration on BSC testnet (frame-data.json sponsors.flap: Portal v1.2.0, block 144,817,512 at 10:09:42 CT, creation open, salt-lock fee 0.005 tBNB) and its floors at half the supply in the pool, $1,500 to create and $3,000 to graduate; the tube's brass marks stand at those floors on a linear scale whose graduation floor is 90% of the tube (the ratio is the Portal's, the scale the design's). PRIX is a placeholder held in one constant (season.ts SEASON_TOKEN): the organizers have not said whether 'no token tickers' covers testnet tokens. The visitor is the kit's figure for scale; the bulbs chase at 0.8 Hz. The License to launch tower stands east of the frame, so it is not in this view.",
+ "frame": {
+  "id": "towers.T02-season",
+  "station": "towers",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 1.4,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Season purse: a design. Nothing has launched: no Wattness factory, Launcher, Vault, PRIX token or deposit exists, so the presale tube and the vault are empty and the allocation screen shows the rules, not counts. Real: the Flap Portal's live configuration on BSC testnet (frame-data.json sponsors.flap: Portal v1.2.0, block 144,817,512 at 10:09:42 CT, creation open, salt-lock fee 0.005 tBNB) and its floors at half the supply in the pool, $1,500 to create and $3,000 to graduate; the tube's brass marks stand at those floors on a linear scale whose graduation floor is 90% of the tube (the ratio is the Portal's, the scale the design's). PRIX is a placeholder held in one constant (season.ts SEASON_TOKEN): the organizers have not said whether 'no token tickers' covers testnet tokens. The visitor is the kit's figure for scale; the bulbs chase at 0.8 Hz. The License to launch tower stands east of the frame, so it is not in this view.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 2391,
+  "programs": {
+   "state": "ready",
+   "programs": 43
+  },
+  "frameInfo": {
+   "calls": 360,
+   "triangles": 223342,
+   "passes": {
+    "shadow": 38,
+    "ShadowOncePass": 0,
+    "opaque": 185,
+    "aoNormalAndBlend": 148,
+    "copyBack": 1,
+    "overlay": 19,
+    "OutputPass": 1,
+    "opaqueColour": 147
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "d960430c210662aff426be22911e569f3bdb5075c4b437aff5a6f126ce78bf61",
+   "wallMs": 2440,
+   "renderMs": 2391,
+   "gpuLoad": {
+    "before": 0,
+    "after": 76
+   }
+  }
+ ]
+}

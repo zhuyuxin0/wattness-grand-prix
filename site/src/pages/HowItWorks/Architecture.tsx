@@ -23,8 +23,8 @@ function parts(day: DayIndex | null): Part[] {
       artifact: day ? day.inputsRelease.replace(/^terminal-/, "") : "daily release",
       tone: "existing",
     },
-    { id: "agents", name: "Agents", what: "Plan tomorrow, per battery", artifact: day ? `${day.leafCount} batteries` : "every battery" },
-    { id: "planner", name: "Planner", what: "Dispatch and hedge LP", artifact: "HiGHS · three plans" },
+    { id: "agents", name: "Agents", what: "Plan tomorrow, per battery", artifact: day ? `${day.leafCount} batteries` : "one plan per battery" },
+    { id: "planner", name: "Planner", what: "Dispatch and hedge MILP", artifact: "HiGHS · three plans" },
     { id: "root", name: "Merkle root", what: "RFC 8785 leaves, RFC 6962", artifact: day ? middle(day.root, 6, 4) : "one root per day" },
     { id: "gate", name: "GateRecord", what: "Write-once, on BNB Chain", artifact: middle(CONTRACT_ADDRESS, 4, 4), tone: "sealed" },
   ];

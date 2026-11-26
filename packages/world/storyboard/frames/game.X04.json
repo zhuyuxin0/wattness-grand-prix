@@ -1,0 +1,75 @@
+{
+ "id": "game.X04",
+ "url": "http://127.0.0.1:15192/lab.html?frame=game.X04&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/game.X04.png",
+ "sha256": "e8248f646ed1be7a1640b83feaa2d370968a0e75424e391454752c6921e77b95",
+ "deterministic": null,
+ "renderMs": 680,
+ "wallMs": 756,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 0
+ },
+ "underLoad": false,
+ "note": "Real: C is the sealed plan under root 0xf4d4…bce7 (BSC mainnet tx at 09:15:17 CT); every cell, coin and figure re-derives to the micro-dollar from game.results.C and from the engine's formula. The plane's marks are the three solved arms (not a frontier). Unlike the Terminal walkthrough's beat 7, which is labeled an illustration, this rest is the sealed result itself. Illustrative: the column order, the bulbs and the visitors.",
+ "frame": {
+  "id": "game.X04",
+  "station": "game",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 8,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real: C is the sealed plan under root 0xf4d4…bce7 (BSC mainnet tx at 09:15:17 CT); every cell, coin and figure re-derives to the micro-dollar from game.results.C and from the engine's formula. The plane's marks are the three solved arms (not a frontier). Unlike the Terminal walkthrough's beat 7, which is labeled an illustration, this rest is the sealed result itself. Illustrative: the column order, the bulbs and the visitors.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 680,
+  "programs": {
+   "state": "ready",
+   "programs": 37
+  },
+  "frameInfo": {
+   "calls": 251,
+   "triangles": 2088842,
+   "passes": {
+    "shadow": 52,
+    "ShadowOncePass": 0,
+    "opaque": 128,
+    "aoNormalAndBlend": 73,
+    "copyBack": 1,
+    "overlay": 21,
+    "OutputPass": 1,
+    "opaqueColour": 76
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "e8248f646ed1be7a1640b83feaa2d370968a0e75424e391454752c6921e77b95",
+   "wallMs": 756,
+   "renderMs": 680,
+   "gpuLoad": {
+    "before": 0,
+    "after": 0
+   }
+  }
+ ]
+}

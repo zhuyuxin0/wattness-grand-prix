@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { CONTRACT_ADDRESS, REPO_URL, SOURCE_LINE } from "../../config";
 import { useDay, type DayIndex } from "../../data";
 import { isCapture } from "../../lib/capture";
+import { EDGE_HOST, edgeVerifyUrl } from "../../lib/edge";
 import { formatDec1 } from "../../lib/format";
 import { useSelectedBattery } from "../../shell/battery";
 import { BATTERY_NAMES, BatteryPicker, Glyph, Hash, PageHeader, Ready, Section } from "../../ui";
@@ -249,6 +250,15 @@ pnpm verify fixtures/od-20261126/manifest.json \\
             </pre>
           </div>
         </div>
+        <p className="vf-edge">
+          A Cloudflare Worker gives the sealed plan's verdict on {network.short} as JSON, each check named with pass or fail and the values compared:{" "}
+          <a className="vf-edge__link" href={edgeVerifyUrl(resource, day.operatingDay, networkName === "mainnet" ? "bsc-mainnet" : "bsc-testnet")} target="_blank" rel="noreferrer">
+            <span className="mono">
+              {EDGE_HOST}/verify/{resource}
+            </span>
+            <Glyph name="popout" />
+          </a>
+        </p>
         <p className="vf-contract">
           GateRecord <Hash value={CONTRACT_ADDRESS} href={`${network.explorer}/address/${CONTRACT_ADDRESS}`} label="contract address" /> on {network.short}. Its verified source
           is under <Link to="/about/agents">Add Your Agent</Link>.

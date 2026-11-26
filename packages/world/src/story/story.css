@@ -1,0 +1,90 @@
+/* The story player's page: the canvases, each frame's layer of plates, the film's line, and on the site the chapter
+   rail and the link to the beat's tab. The 3D holds dark in either site theme, as wattness.tech's intro does, so the
+   dark tokens (lib/tokens.css, kit/css/glass.css) are set again on the story's own root: a light page around it keeps
+   its own. Display words in Libre Franklin, interface words in the system face, figures tabular. */
+.gp-story {
+  --t-font-display: "Libre Franklin Brand", "Franklin Gothic Medium", "Helvetica Neue", Arial, sans-serif;
+  --w-font-sans: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  --t-font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --w-accent: #2ec7a6; --t-accent-mark: #2ec7a6;
+  --t-chrome: #101315; --t-raised: #1f2429; --page: #191d21; --w-fg: #d7d9d4; --w-muted: #969ca3; --t-accent-text: #2ec7a6;
+  --ch-heat-0: #ffa383; --ch-heat-1: #e27d59; --ch-heat-2: #b36549; --ch-heat-3: #854f3c; --ch-heat-4: #414344;
+  --ch-heat-5: #3c618b; --ch-heat-6: #4c80ba; --ch-heat-7: #5ea1ea; --ch-heat-8: #8cc2ff;
+  --glass-fill: color-mix(in srgb, #1f2429 78%, transparent);
+  --glass-matte: color-mix(in srgb, #1f2429 94%, transparent);
+  --glass-blur: blur(6px) saturate(1.4);
+  --glass-hairline: color-mix(in srgb, white 22%, transparent);
+  --glass-graze: rgb(0 0 0 / .55);
+  --glass-rim: inset 0 1.5px 1px -.5px rgb(255 255 255 / .34), inset 0 -1.5px 1px -.5px rgb(0 0 0 / .50),
+    inset 0 0 4px -2px rgb(255 255 255 / .14), inset 0 0 0 1px rgb(255 255 255 / .08);
+  --glass-lift: 0 3px 10px -7px rgb(0 0 0 / .60);
+  --glass-depth: 0 14px 32px -12px rgb(0 0 0 / .60);
+  --glass-sheen: .08;
+  --glass-frost: color-mix(in srgb, #1f2429 88%, transparent);
+  --glass-icon: color-mix(in srgb, #1f2429 61%, transparent);
+  --glass-surface: linear-gradient(145deg, color-mix(in srgb, white 12%, transparent), transparent 48%, color-mix(in srgb, #2ec7a6 3%, transparent)), var(--glass-fill);
+  --intro-plate: rgba(13, 17, 23, 0.86); --intro-plate-ink: #eef2f6; --intro-teal: #2ec7a6;
+  position: relative; overflow: hidden; isolation: isolate; color-scheme: dark;
+  background: #101315; color: var(--w-fg); font-family: var(--w-font-sans); -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+.gp-story .gp-under, .gp-story .gp-canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+.gp-story .gp-under { z-index: 0; visibility: hidden; }
+.gp-story .gp-canvas { z-index: 1; }
+.gp-story .gp-layers { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+/* each frame's layer carries the lab root's classes (.world.intro.hwalk.is-x), without its page background */
+.gp-story .gp-layer { position: absolute; inset: 0; background: none; }
+.gp-story .gp-layer .world-overlay, .gp-story .gp-layer .world-plates { position: absolute; inset: 0; pointer-events: none; }
+.gp-story .gp-layer .world-overlay { z-index: 10; }
+.gp-story .gp-layer .world-plates { z-index: 22; }
+/* the film's line: the frame's caption plate, one sentence, a size between the plate's head and its line */
+.gp-story .gp-line { z-index: 41; }
+/* a station's styles are global once it loads: the arcade's caption rule (game/scene.ts, 740 px) stays its own, and
+   never narrows another frame's caption or the film's line */
+.gp-story .gp-layer:not([data-frame^="game."]) .hwalk-cap { max-width: min(calc(100% - 2 * max(16px, calc(96px * var(--u)))), calc(1180px * var(--u))); }
+.gp-story.hwalk.is-x > .gp-line.hwalk-cap { max-width: min(calc(100% - 2 * max(16px, calc(96px * var(--u)))), calc(1180px * var(--u))); }
+.gp-story .gp-line h3 { font-size: max(16px, calc(34px * var(--u))); line-height: 1.22; letter-spacing: -0.01em; text-wrap: pretty; }
+.gp-story .gp-line:empty { display: none; }
+
+/* the site: the chapter rail (top left), its beat's name, the link to the tab, the first hint */
+.gp-story .gp-chrome { position: absolute; inset: 0; z-index: 50; pointer-events: none; }
+/* one thin bar along the top edge, centered: the frames keep their key cards and banners below it (from 60 px at 1920)
+   and their captions along the bottom. Narrow stages keep the beat's name and drop the rail. */
+.gp-story { container-type: size; container-name: gp-story; }
+.gp-story .gp-bar { position: absolute; left: 50%; top: max(8px, calc(12px * var(--u))); transform: translateX(-50%); display: flex; align-items: center;
+  gap: max(10px, calc(14px * var(--u))); max-width: calc(100% - 32px); pointer-events: none; }
+.gp-story .gp-rail { display: flex; align-items: center; gap: 6px; margin: 0; padding: 0; list-style: none; pointer-events: auto; flex: none; }
+.gp-story .gp-rail ol { display: flex; gap: 0; margin: 0; padding: 0; list-style: none; }
+.gp-story .gp-rail button { display: block; width: 12px; height: 22px; margin: 0; padding: 0; border: 0; background: none; cursor: pointer; position: relative; }
+.gp-story .gp-rail button::before { content: ''; position: absolute; left: 3px; top: 8px; width: 6px; height: 6px; border-radius: 3px;
+  background: color-mix(in srgb, var(--w-fg) 26%, transparent); transition: background-color 160ms ease, transform 160ms ease; }
+.gp-story .gp-rail button[data-past]::before { background: color-mix(in srgb, var(--t-accent-mark) 55%, transparent); }
+.gp-story .gp-rail button[aria-current]::before { background: var(--t-accent-mark); transform: scaleY(1.7); }
+.gp-story .gp-rail button:hover::before, .gp-story .gp-rail button:focus-visible::before { background: var(--w-fg); }
+.gp-story .gp-rail button:focus-visible { outline: 2px solid var(--t-accent-mark); outline-offset: 1px; border-radius: 4px; }
+.gp-story .gp-now { display: flex; align-items: baseline; gap: 8px; min-width: 0; pointer-events: none; white-space: nowrap;
+  padding: 5px 6px 5px 12px; border-radius: 8px; background: var(--intro-plate); box-shadow: 0 0 0 1px color-mix(in srgb, var(--w-fg) 10%, transparent); }
+.gp-story .gp-now b { font: 600 max(12px, calc(13px * var(--u))) / 1.2 var(--w-font-sans); color: var(--t-accent-text); }
+.gp-story .gp-now span { font: 600 max(13px, calc(16px * var(--u))) / 1.25 var(--t-font-display); color: #eef2f6; letter-spacing: -0.005em; overflow: hidden; text-overflow: ellipsis; }
+.gp-story .gp-now small { font: 400 max(11px, calc(13px * var(--u))) / 1.3 var(--t-font-display); color: #a9b1ba; }
+@container gp-story (max-width: 900px) { .gp-story .gp-rail, .gp-story .gp-now small { display: none; } }
+/* a phone's stage: the stack's zone titles ran into each other and the end card's lockup sat past the right edge; the
+   caption already names both */
+@container gp-story (max-width: 720px) { .gp-story .stk-zone, .gp-story .stk-lockup { display: none; } }
+.gp-story .gp-route { display: inline-flex; align-items: center; gap: 6px; margin: 0 0 0 4px; padding: 3px 10px 4px; align-self: center; border: 0; border-radius: 999px; cursor: pointer;
+  vertical-align: 2px; pointer-events: auto; font: 500 max(11px, calc(13px * var(--u))) / 1.2 var(--w-font-sans); color: #eef2f6; background: transparent;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--t-accent-mark) 60%, transparent); }
+.gp-story .gp-route:hover, .gp-story .gp-route:focus-visible { box-shadow: 0 0 0 1.5px var(--t-accent-mark); background: color-mix(in srgb, var(--t-accent-mark) 14%, transparent); outline: none; }
+.gp-story .gp-route svg { width: 13px; height: 13px; }
+.gp-story .gp-route[hidden] { display: none; }
+.gp-story .gp-hint { position: absolute; left: 50%; top: max(44px, calc(50px * var(--u))); transform: translateX(-50%); margin: 0; pointer-events: none;
+  font: 400 max(12px, calc(14px * var(--u))) / 1 var(--w-font-sans); color: #a9b1ba; opacity: 0; transition: opacity 300ms ease; }
+.gp-story .gp-hint.is-on { opacity: 1; }
+.gp-story .gp-wait { position: absolute; right: max(16px, calc(96px * var(--u))); top: max(14px, calc(40px * var(--u))); margin: 0; pointer-events: none;
+  font: 400 max(11px, calc(13px * var(--u))) / 1 var(--w-font-sans); color: #a9b1ba; opacity: 0; transition: opacity 200ms ease; }
+.gp-story .gp-wait.is-on { opacity: 1; }
+.gp-story:focus { outline: none; }
+.gp-story:focus-visible { box-shadow: inset 0 0 0 2px var(--t-accent-mark); }
+@media (prefers-reduced-motion: reduce) {
+  .gp-story .gp-rail button::before, .gp-story .gp-hint, .gp-story .gp-wait { transition: none; }
+}

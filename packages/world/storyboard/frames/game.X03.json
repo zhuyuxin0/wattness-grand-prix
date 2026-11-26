@@ -1,0 +1,75 @@
+{
+ "id": "game.X03",
+ "url": "http://127.0.0.1:15192/lab.html?frame=game.X03&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/game.X03.png",
+ "sha256": "45231b49fcae44a1378af9db1d596661e673351b24a9d2d56c3165673642e42a",
+ "deterministic": null,
+ "renderMs": 585,
+ "wallMs": 636,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 76,
+  "after": 67
+ },
+ "underLoad": true,
+ "note": "A drawn in-between, not a plan: the schedule at s = 0.35 (0.65 x A's kW + 0.35 x C's, whole kW) under C's contracts, each cell from the engine's formula on showcase.scenarios (game.scoring_a_new_plan). It breaks the hedge cap at HE10 (buys 17, the schedule charges 6.0 MWh), which is what the light marks (weight 0.1 + 0.9 shortfall^1.5 = 0.57); HE06 is met (its light went out at s = 0.23). No figure prints, as the storyboard says. The sealed C was solved in one program, not in these two steps: this path is a teaching route between two real plans.",
+ "frame": {
+  "id": "game.X03",
+  "station": "game",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 8,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "A drawn in-between, not a plan: the schedule at s = 0.35 (0.65 x A's kW + 0.35 x C's, whole kW) under C's contracts, each cell from the engine's formula on showcase.scenarios (game.scoring_a_new_plan). It breaks the hedge cap at HE10 (buys 17, the schedule charges 6.0 MWh), which is what the light marks (weight 0.1 + 0.9 shortfall^1.5 = 0.57); HE06 is met (its light went out at s = 0.23). No figure prints, as the storyboard says. The sealed C was solved in one program, not in these two steps: this path is a teaching route between two real plans.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 585,
+  "programs": {
+   "state": "ready",
+   "programs": 36
+  },
+  "frameInfo": {
+   "calls": 148,
+   "triangles": 1942332,
+   "passes": {
+    "shadow": 25,
+    "ShadowOncePass": 0,
+    "opaque": 64,
+    "aoNormalAndBlend": 37,
+    "copyBack": 1,
+    "overlay": 22,
+    "OutputPass": 1,
+    "opaqueColour": 39
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "45231b49fcae44a1378af9db1d596661e673351b24a9d2d56c3165673642e42a",
+   "wallMs": 636,
+   "renderMs": 585,
+   "gpuLoad": {
+    "before": 76,
+    "after": 67
+   }
+  }
+ ]
+}

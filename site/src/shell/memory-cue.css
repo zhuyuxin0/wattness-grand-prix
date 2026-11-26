@@ -1,0 +1,40 @@
+/* The quiet line under the pager: this tab's page in the build's memory. */
+.memory-cue {
+  margin-top: var(--t-space-4);
+  font-size: var(--t-fs-xs);
+  line-height: var(--t-lh-prose);
+}
+.memory-cue a {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  color: var(--w-muted);
+  text-decoration: none;
+}
+.memory-cue a:hover {
+  color: var(--w-fg);
+}
+.memory-cue a:hover .memory-cue__page {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.memory-cue__page::before {
+  content: "·";
+  margin-right: 6px;
+}
+/* The Intro runs full bleed, without the pager: the line takes the page's gutter. */
+.memory-cue--bleed {
+  max-width: calc(var(--gp-max) + 2 * var(--gp-gutter));
+  margin-top: calc(var(--t-space-4) - var(--gp-space-9));
+  padding: 0 var(--gp-gutter) var(--gp-space-7);
+}
+@media (max-width: 479px) {
+  .memory-cue__page {
+    flex-basis: 100%;
+    padding-left: 16px;
+  }
+  .memory-cue__page::before {
+    content: none;
+  }
+}

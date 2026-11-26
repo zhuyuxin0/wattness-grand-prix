@@ -1,0 +1,75 @@
+{
+ "id": "towers.T01-timing",
+ "url": "http://127.0.0.1:15196/lab.html?frame=towers.T01-timing&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/towers.T01-timing.png",
+ "sha256": "38994dcb4625db59831133bb64b380541cdc8769158f1fd32fc4af1595a8d399",
+ "deterministic": null,
+ "renderMs": 1032,
+ "wallMs": 1077,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 74
+ },
+ "underLoad": false,
+ "note": "Timing screens, built for the storyboard on the intro's stage. Every figure on the screens and plates is a live read from the sponsor lanes' evidence (frame-data.json sponsors.atlas and sponsors.cmc), taken after the seal: Atlas signed Pull for BNB/USD (feed 633) and USDT/USD (feed 649) at 09:54:38 CT with the signer verified, Atlas's consensus median and TWAP, CoinMarketCap Pro quotes at 09:53:04 CT, CoinMarketCap's security detail for BSC-USDT, Atlas's catalog of 186 public feeds, and the chain-97 feed refused as 10,817 s stale. The 0.25 BNB is a declared planning budget, not a wallet balance, priced at the lower quote; testnet funds have no cash value. Illustrative: the towers' design, their order on the plinth, and their facing (turned to 55 degrees, toward A7 as it leaves the stewards; the layout says they face north); the catalog's pips mark the feeds used at their share of the id range, not the catalog's order; the refused panel stands by the gantries (x -78) rather than at the plinth's east end, so the camera looking west down the row sees it far, with the gantries and the Arena's glow beyond. Sponsor values stay internal until the sponsor release.",
+ "frame": {
+  "id": "towers.T01-timing",
+  "station": "towers",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Timing screens, built for the storyboard on the intro's stage. Every figure on the screens and plates is a live read from the sponsor lanes' evidence (frame-data.json sponsors.atlas and sponsors.cmc), taken after the seal: Atlas signed Pull for BNB/USD (feed 633) and USDT/USD (feed 649) at 09:54:38 CT with the signer verified, Atlas's consensus median and TWAP, CoinMarketCap Pro quotes at 09:53:04 CT, CoinMarketCap's security detail for BSC-USDT, Atlas's catalog of 186 public feeds, and the chain-97 feed refused as 10,817 s stale. The 0.25 BNB is a declared planning budget, not a wallet balance, priced at the lower quote; testnet funds have no cash value. Illustrative: the towers' design, their order on the plinth, and their facing (turned to 55 degrees, toward A7 as it leaves the stewards; the layout says they face north); the catalog's pips mark the feeds used at their share of the id range, not the catalog's order; the refused panel stands by the gantries (x -78) rather than at the plinth's east end, so the camera looking west down the row sees it far, with the gantries and the Arena's glow beyond. Sponsor values stay internal until the sponsor release.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1032,
+  "programs": {
+   "state": "ready",
+   "programs": 35
+  },
+  "frameInfo": {
+   "calls": 268,
+   "triangles": 34292,
+   "passes": {
+    "shadow": 79,
+    "ShadowOncePass": 0,
+    "opaque": 150,
+    "aoNormalAndBlend": 72,
+    "copyBack": 1,
+    "overlay": 44,
+    "OutputPass": 1,
+    "opaqueColour": 71
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "38994dcb4625db59831133bb64b380541cdc8769158f1fd32fc4af1595a8d399",
+   "wallMs": 1077,
+   "renderMs": 1032,
+   "gpuLoad": {
+    "before": 0,
+    "after": 74
+   }
+  }
+ ]
+}

@@ -1,0 +1,118 @@
+/* The towers' in-scene screens: DOM laid onto 3D faces by a homography (set.ts placeScreen), drawn in the Grand Prix
+   site's tokens (site/src/styles/tokens.css): graphite surfaces, teal for live and passing, the refused red, muted
+   ink. Sizes are CSS px at the screen's own scale (px per meter, set per screen), so they read as physical type.
+   No backticks in here. */
+.tw-screen {
+  position: absolute; left: 0; top: 0; transform-origin: 0 0; box-sizing: border-box; overflow: hidden;
+  --tw-bg: #0e1113; --tw-raised: #171b1f; --tw-line: #2b3036; --tw-text: #e6e8ea; --tw-strong: #f6f7f8; --tw-muted: #969ca3;
+  --tw-faint: #6b7178; --tw-teal: #2ec7a6; --tw-refused: #e5534b; --tw-bnb: #f0b90b; --tw-tungsten: #ffcf8f;
+  background: var(--tw-bg); color: var(--tw-text);
+  font-family: "Libre Franklin Brand", "Libre Franklin", "Helvetica Neue", Arial, sans-serif;
+  font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; backface-visibility: hidden;
+}
+/* the panel's own light: a faint LED pitch, and the glass cover's 122-degree sheen over everything */
+.tw-screen::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.045) 0.9px, transparent 1.1px); background-size: 6px 6px; }
+.tw-screen::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 5;
+  background: linear-gradient(122deg, rgba(255, 255, 255, 0.10) 0%, rgba(255, 255, 255, 0.025) 22%, transparent 42%, transparent 74%,
+    rgba(255, 255, 255, 0.035) 90%, transparent 100%);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.07), inset 0 3px 0 rgba(255, 255, 255, 0.05); }
+.tw-screen > * { position: relative; z-index: 1; }
+.tw-screen .caps { text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; }
+.tw-screen .muted { color: var(--tw-muted); }
+.tw-screen .teal { color: var(--tw-teal); }
+.tw-screen .red { color: var(--tw-refused); }
+.tw-screen .mono { font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+/* a timing tower: the instrument across the top, then its sources side by side under one rule */
+.tw-tower { display: flex; flex-direction: column; padding: 34px 30px 30px; gap: 0; }
+.tw-tower .hd { display: flex; align-items: baseline; justify-content: space-between; padding: 0 6px 18px; border-bottom: 3px solid var(--tw-line); }
+.tw-tower .hd b { font-weight: 600; font-size: 92px; line-height: 1; letter-spacing: -0.02em; color: var(--tw-strong); }
+.tw-tower .hd i { font-style: normal; font-size: 26px; color: var(--tw-muted); }
+.tw-tower .lamp { width: 26px; height: 26px; border-radius: 50%; background: var(--tw-teal); box-shadow: 0 0 18px 4px rgba(46, 199, 166, 0.55); }
+.tw-tower .lamp.red { background: var(--tw-refused); box-shadow: 0 0 18px 4px rgba(229, 83, 75, 0.55); }
+.tw-tower .cols { flex: 1; display: grid; grid-template-columns: 1fr 10px 1fr; margin-top: 22px; }
+.tw-tower .mull { background: linear-gradient(var(--tw-line), var(--tw-line)) center / 2px 100% no-repeat; position: relative; }
+.tw-tower .col { display: flex; flex-direction: column; padding: 0 8px; min-width: 0; }
+.tw-tower .src { font-size: 30px; line-height: 1.1; color: var(--tw-text); }
+.tw-tower .how { font-size: 23px; line-height: 1.3; color: var(--tw-muted); margin-top: 8px; }
+.tw-tower .px { margin-top: 44px; white-space: nowrap; color: var(--tw-strong); font-weight: 600; letter-spacing: -0.03em; line-height: 1; }
+.tw-tower .px small { font-size: 0.46em; font-weight: 500; letter-spacing: 0; color: var(--tw-muted); vertical-align: 0.8em; margin-right: 4px; }
+.tw-tower .px em { font-style: normal; font-size: 0.56em; letter-spacing: -0.01em; }
+.tw-tower .at { margin-top: 18px; font-size: 34px; line-height: 1.1; color: var(--tw-text); }
+.tw-tower .age { margin-top: 8px; font-size: 23px; color: var(--tw-muted); }
+.tw-tower .rows { margin-top: auto; display: grid; gap: 10px; padding-top: 22px; border-top: 2px solid var(--tw-line); }
+.tw-tower .row { display: flex; justify-content: space-between; gap: 10px; font-size: 22px; line-height: 1.25; color: var(--tw-muted); white-space: nowrap; }
+.tw-tower .row b { font-weight: 600; color: var(--tw-text); }
+.tw-tower .row b.teal { color: var(--tw-teal); }
+.tw-tower .gap { position: absolute; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; }
+.tw-tower .gap span { background: var(--tw-bg); padding: 4px 12px; border: 2px solid var(--tw-line); border-radius: 22px; font-size: 22px; color: var(--tw-text); white-space: nowrap; }
+.tw-tower .hair { position: absolute; left: 22px; right: 22px; height: 2px; background: var(--tw-teal); opacity: 0.75; }
+.tw-tower .foot { margin-top: 18px; display: flex; justify-content: space-between; font-size: 22px; color: var(--tw-muted); }
+
+/* pips: one per item (checks, evaluations, feeds) */
+.tw-pips { display: grid; gap: 8px; }
+.tw-pips i { display: block; aspect-ratio: 1; border-radius: 3px; background: #2b3036; }
+.tw-pips i.on { background: var(--tw-teal); box-shadow: 0 0 10px rgba(46, 199, 166, 0.5); }
+.tw-pips i.warn { background: transparent; box-shadow: inset 0 0 0 3px var(--tw-muted); }
+.tw-pips i.res { background: #3a4148; }
+
+.tw-big { font-size: 150px; line-height: 0.95; font-weight: 600; letter-spacing: -0.03em; color: var(--tw-teal); margin-top: 34px; }
+.tw-kv { display: grid; grid-template-columns: auto 1fr; column-gap: 18px; row-gap: 10px; font-size: 26px; line-height: 1.25; margin-top: 30px; }
+.tw-kv dt { color: var(--tw-muted); white-space: nowrap; }
+.tw-kv dd { margin: 0; color: var(--tw-text); text-align: right; white-space: nowrap; font-weight: 600; }
+.tw-kv dd.teal { color: var(--tw-teal); }
+.tw-bar { display: flex; height: 26px; border-radius: 4px; overflow: hidden; margin-top: 16px; box-shadow: inset 0 0 0 2px var(--tw-line); }
+.tw-bar i { display: block; height: 100%; }
+
+/* the refused panel: dimmed, with the site's refused stripe down its left edge */
+.tw-refused { padding: 26px 30px 26px 44px; box-shadow: inset 10px 0 0 var(--tw-refused); filter: brightness(0.82); }
+.tw-refused .hd b { color: var(--tw-refused); }
+
+/* leader plates with the site's livery stripes: sealed (BNB yellow) and refused (red) */
+.world .intro-plate.tw-sealed { box-shadow: inset 3px 0 0 #f0b90b, 0 0 0 1px rgba(255, 255, 255, 0.12), 0 6px 16px -10px rgba(0, 0, 0, 0.3); }
+.world .intro-plate.tw-refused-plate { box-shadow: inset 3px 0 0 #e5534b, 0 0 0 1px rgba(255, 255, 255, 0.12), 0 6px 16px -10px rgba(0, 0, 0, 0.3); }
+.world .intro-plate.tw-design { box-shadow: inset 3px 0 0 #969ca3, 0 0 0 1px rgba(255, 255, 255, 0.12), 0 6px 16px -10px rgba(0, 0, 0, 0.3); }
+
+/* the season's rules, set as a short ledger: the term on the left, its rule on the right */
+.tw-formula { display: grid; grid-template-columns: auto 1fr; column-gap: 22px; row-gap: 14px; margin-top: 30px; padding: 24px 0;
+  border-top: 2px solid var(--tw-line); border-bottom: 2px solid var(--tw-line); align-items: baseline; }
+.tw-formula .k { font-size: 26px; color: var(--tw-muted); white-space: nowrap; }
+.tw-formula .v { font-size: 34px; font-weight: 600; color: var(--tw-strong); letter-spacing: -0.01em; }
+
+/* the pair's number line: the two sources (first row of labels) and Atlas's consensus median and TWAP (second) */
+.tw-tower .cols { position: relative; }
+.tw-tower .gap { position: absolute; left: 0; right: 0; display: flex; justify-content: center; pointer-events: none; }
+.tw-scale { margin-top: auto; padding: 20px 6px 4px; border-top: 3px solid var(--tw-line); }
+.tw-scale .cap { font-size: 22px; color: var(--tw-muted); text-transform: uppercase; letter-spacing: 0.14em; font-weight: 600; }
+.tw-line { position: relative; height: 120px; margin: 92px 26px 30px; }
+.tw-line .axis { position: absolute; left: -14px; right: -14px; top: 40px; height: 3px; background: #3a4148; }
+.tw-line .tick { position: absolute; top: 34px; width: 2px; height: 15px; background: #59616a; transform: translateX(-1px); }
+.tw-line .tl { position: absolute; top: 58px; font-size: 21px; color: var(--tw-faint); transform: translateX(-50%); white-space: nowrap; }
+.tw-line .mk { position: absolute; top: 18px; width: 7px; height: 46px; border-radius: 3px; transform: translateX(-3.5px); background: var(--tw-strong); }
+.tw-line .mk.a { background: var(--tw-teal); box-shadow: 0 0 14px rgba(46, 199, 166, 0.65); }
+.tw-line .mk.m { background: var(--tw-muted); height: 28px; top: 27px; width: 5px; }
+.tw-line .ml { position: absolute; top: -76px; font-size: 25px; font-weight: 600; transform: translateX(-50%); white-space: nowrap; color: var(--tw-strong); }
+.tw-line .ml.a { color: var(--tw-teal); }
+.tw-line .ml.m { top: -36px; font-size: 21px; font-weight: 500; color: var(--tw-muted); }
+.tw-tower .px { margin-top: 30px; }
+.tw-tower .px em { font-size: 0.5em; color: var(--tw-text); }
+.tw-tower .at { font-size: 40px; margin-top: 16px; }
+.tw-tower .src { font-size: 28px; }
+.tw-tower .how { font-size: 22px; }
+.tw-tower .foot { margin-top: 14px; }
+
+/* the pair's detail table under the number line */
+.tw-table { display: grid; grid-template-columns: 1fr 1fr; column-gap: 28px; row-gap: 12px; padding: 22px 6px 0; border-top: 2px solid var(--tw-line); }
+.tw-table div { display: flex; justify-content: space-between; font-size: 24px; line-height: 1.2; color: var(--tw-muted); white-space: nowrap; }
+.tw-table b { font-weight: 600; color: var(--tw-text); }
+.tw-table b.teal { color: var(--tw-teal); }
+
+/* the gap between the two sources, bracketed on the number line under its marks */
+.tw-line { height: 210px; margin-bottom: 0; }
+.tw-line .br { position: absolute; top: 96px; height: 22px; border: 3px solid var(--tw-teal); border-top: none; border-radius: 0 0 6px 6px; opacity: 0.8; }
+.tw-line .gl { position: absolute; top: 132px; transform: translateX(-50%); white-space: nowrap; font-size: 27px; font-weight: 600; color: var(--tw-strong);
+  background: var(--tw-bg); padding: 2px 10px; }
+.tw-line .tl { top: 58px; }
+.tw-scale { flex: 1; display: flex; flex-direction: column; justify-content: center; margin-top: 30px; }
+.tw-season .hd b { font-size: 70px; }

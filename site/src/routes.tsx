@@ -37,7 +37,7 @@ const movedRoutes: RouteObject[] = [
   { path: "stewards/*", element: <Moved to="/verify" /> },
   { path: "garage/*", element: <Moved to="/about/agents" /> },
   { path: "paddock/*", element: <Moved to="/about" /> },
-  { path: "agents", element: <Navigate replace to="/agents/forecast" /> },
+  { path: "agents", element: <Navigate replace to="/agents/ids" /> },
 ];
 
 export const routes: RouteObject[] = [

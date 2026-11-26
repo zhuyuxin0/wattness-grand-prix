@@ -1,0 +1,85 @@
+{
+ "id": "opening.gather",
+ "url": "http://127.0.0.1:15193/lab.html?frame=opening.gather&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/opening.gather.png",
+ "sha256": "9b0ab214ad698762b67fc04eef3b050c88e87ae3a7f51296f6741174f5812730",
+ "deterministic": true,
+ "renderMs": 545,
+ "wallMs": 625,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 9,
+  "after": 71
+ },
+ "underLoad": false,
+ "note": "Motion still between O01 and O02 (t 3.60 s of the opening's clock): the 65 enclosures slide to the intro's packed slots round the pad's center (radius 22 m), southern lines first, while the skids, the yard, the line, the fence and the road fade toward a 15% footprint and the pole lights dim. Illustrative: the enclosures do not move; this is the intro's chapter 06 gather.",
+ "frame": {
+  "id": "opening.gather",
+  "station": "opening",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 3.6,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Motion still between O01 and O02 (t 3.60 s of the opening's clock): the 65 enclosures slide to the intro's packed slots round the pad's center (radius 22 m), southern lines first, while the skids, the yard, the line, the fence and the road fade toward a 15% footprint and the pole lights dim. Illustrative: the enclosures do not move; this is the intro's chapter 06 gather.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 545,
+  "programs": {
+   "state": "ready",
+   "programs": 35
+  },
+  "frameInfo": {
+   "calls": 217,
+   "triangles": 2052836,
+   "passes": {
+    "shadow": 57,
+    "ShadowOncePass": 0,
+    "opaque": 160,
+    "aoNormalAndBlend": 55,
+    "copyBack": 1,
+    "overlay": 0,
+    "OutputPass": 1,
+    "opaqueColour": 103
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "9b0ab214ad698762b67fc04eef3b050c88e87ae3a7f51296f6741174f5812730",
+   "wallMs": 625,
+   "renderMs": 545,
+   "gpuLoad": {
+    "before": 9,
+    "after": 71
+   }
+  },
+  {
+   "ok": true,
+   "sha256": "9b0ab214ad698762b67fc04eef3b050c88e87ae3a7f51296f6741174f5812730",
+   "wallMs": 596,
+   "renderMs": 523,
+   "gpuLoad": {
+    "before": 0,
+    "after": 69
+   }
+  }
+ ]
+}

@@ -1,0 +1,27 @@
+{
+ "id": "garage.living-brain",
+ "frame": "G04",
+ "what": "The Wattness Brain on Living Brain's Explore view, the activity panel folded: its 18 pages as labels in the particle brain, its connections as the faint threads through it.",
+ "source": "livingbrain.com/workspace, Brain, \"Wattness Brain\", Explore (a third-party UI, captured as it is)",
+ "captured": {
+  "ct": "2026-11-25 14:04 CT",
+  "bangkok": "2026-11-26 03:04 Bangkok"
+ },
+ "how": "src/stations/garage/capture-living-brain.mjs --seed 2 --mode whole; 1920 x 1080 CSS px at device scale 2, Lanczos to 1920 x 1080 (ffmpeg)",
+ "seed": 2,
+ "seed_note": "Math.random seeded before the app's code runs; the view also turns over time, so the labels fall differently from take to take",
+ "app_counts": {
+  "memories": 18,
+  "connections": 53,
+  "strong": 20
+ },
+ "crosscheck": "frame-data.json brain_graph.stats: 18 pages, 53 connections; strength_counts strong 20: equal",
+ "band": "Living Brain · the Terminal brain: 18 pages, 53 connections · read 25 Nov, 14:04 CT",
+ "read_only": "one new page in the signed-in browser; views, a panel toggle and a node selection only; nothing created, edited or deleted; the reader's own tab untouched",
+ "account": "sidebar workspace name, plan card, email and avatar hidden (CSS); no other visible text carried the account's name or address",
+ "png": {
+  "sha256": "564ba128ff1a648513ef1eb630e5d37fe7ea756898511f7c6442398a5645c448",
+  "bytes": 1228812,
+  "size": "1920 x 1080"
+ }
+}

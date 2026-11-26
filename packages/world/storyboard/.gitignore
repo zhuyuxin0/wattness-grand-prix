@@ -1,0 +1,14 @@
+# The storyboard's stills and their receipts are committed (frames/, frames/light/, web/, game/, player/, cut/, the
+# contact sheets and index.json). What renders and captures write beside them stays out of git; git add -f takes one
+# in on purpose.
+#
+# PNG sequences a film is encoded from: scripts/capture-story.mjs writes <out>/frames/<i>.png, by default under
+# player/film-<cut>/. The top-level frames/ holds the stills and is not matched.
+*/**/frames/
+# Films: master.mp4 is about 150 MB, over GitHub's 100 MB file limit. Each film's .json receipt carries its size and
+# SHA-256.
+*.mp4
+*.webm
+*.mov
+# Stills from capture-story.mjs --times (t-<seconds>.png).
+player/t-*.png

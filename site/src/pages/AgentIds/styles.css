@@ -1,0 +1,277 @@
+/* Agent IDs. Blocks: ids-*. One card per identity and per job, in the
+   receipt's grammar; rows stack on a phone. */
+
+
+.ids-when {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 var(--t-space-3);
+}
+.ids-at {
+  margin-bottom: var(--t-space-3);
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.ids-again {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--t-ctl-h);
+  padding: 0 var(--t-space-3);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: none;
+  color: var(--w-fg);
+  font: inherit;
+  font-size: var(--t-fs-xs);
+  cursor: pointer;
+}
+.ids-again:hover:not(:disabled) {
+  background: var(--t-hover);
+}
+.ids-again:disabled {
+  color: var(--w-muted);
+  cursor: default;
+}
+.ids-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.ids-link .glyph {
+  flex: none;
+  color: var(--w-muted);
+}
+.ids-ok {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+/* A check that holds takes the state color, as on Verify; teal marks selection only. */
+.ids-ok .glyph {
+  flex: none;
+  position: relative;
+  top: 1px;
+  color: var(--s-ok);
+}
+.ids-ok--no .glyph {
+  color: var(--refused);
+}
+
+/* ---------------------------------------------------------------- identities */
+
+.ids-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr));
+  gap: var(--t-space-5);
+}
+.ids-card {
+  display: grid;
+  align-content: start;
+  gap: var(--t-space-3);
+  min-width: 0;
+  padding: var(--t-space-4);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+}
+.ids-card--hosted {
+  grid-column: 1 / -1;
+}
+.ids-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--t-space-4);
+}
+/* The role's name first, its registry number under it, muted. */
+.ids-card__id {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.ids-card__titles {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.ids-card__name {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.ids-runs {
+  justify-self: start;
+  padding: 1px 7px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-pill);
+  font-size: var(--t-fs-2xs);
+  color: var(--w-muted);
+  white-space: nowrap;
+}
+.ids-runs--hosted {
+  border-color: var(--w-muted);
+  color: var(--w-fg);
+}
+.ids-rows {
+  margin: 0;
+  display: grid;
+}
+.ids-rows > div {
+  display: grid;
+  grid-template-columns: 7.5em minmax(0, 1fr);
+  gap: var(--t-space-3);
+  align-items: baseline;
+  padding: 6px 0;
+  border-top: 1px solid var(--t-rule);
+}
+.ids-rows dt {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.ids-rows dd {
+  margin: 0;
+  min-width: 0;
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+.ids-runs-text {
+  color: var(--w-muted);
+}
+@media (min-width: 1000px) {
+  .ids-card--hosted {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: var(--gp-space-7);
+  }
+  .ids-card--hosted > .ids-card__head {
+    grid-column: 1 / -1;
+  }
+  .ids-rows--hosted {
+    align-content: start;
+  }
+}
+@media (max-width: 479px) {
+  .ids-rows > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}
+
+/* ---------------------------------------------------------------- jobs */
+
+.ids-jobs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+  gap: var(--t-space-5);
+}
+.ids-job {
+  display: grid;
+  align-content: start;
+  gap: var(--t-space-3);
+  min-width: 0;
+  padding: var(--t-space-4);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+}
+.ids-job__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--t-space-3);
+}
+.ids-job__titles {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.ids-job__name {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.ids-job__task {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.ids-status {
+  flex: none;
+  padding: 1px 7px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-pill);
+  font-size: var(--t-fs-2xs);
+  color: var(--w-fg);
+}
+.ids-job__paid {
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+.ids-party {
+  display: inline;
+}
+.ids-party .hash {
+  vertical-align: baseline;
+}
+.ids-steps__day {
+  margin-bottom: var(--t-space-2);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.ids-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  font-size: var(--t-fs-xs);
+}
+.ids-steps li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--t-space-3);
+  align-items: baseline;
+  padding: 4px 0;
+  border-top: 1px solid var(--t-rule);
+}
+.ids-step__name {
+  min-width: 0;
+}
+.ids-step__when {
+  color: var(--w-fg);
+  white-space: nowrap;
+}
+@media (max-width: 479px) {
+  .ids-steps li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .ids-steps li .hash {
+    grid-column: 1 / -1;
+  }
+}
+
+.ids-what {
+  display: grid;
+  gap: var(--t-space-3);
+  max-width: 88ch;
+  line-height: var(--t-lh-prose);
+}
+.ids-jobs {
+  align-items: start;
+}
+
+/* No node answered: one muted line and the stamp's compact Read again. */
+.ids-unread {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  margin: 0 0 var(--t-space-4);
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+/* the live stamp keeps a step of air above the cards it stamps */
+.page--agent-ids .live-read {
+  margin-bottom: var(--t-space-4);
+}

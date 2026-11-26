@@ -1,0 +1,440 @@
+{
+ "schema": "grand-prix.story.films.v1",
+ "source": {
+  "file": "storyboard/v2/index.json (STORY.md sections 4 and 5)",
+  "sha256": "7bb022c320fa58546594f92cbdfab7fab4eba589aa622fa39979e3515daf98d4",
+  "written": {
+   "bangkok": "2026-11-26 03:46 Bangkok",
+   "ct": "2026-11-25 14:46 CT"
+  }
+ },
+ "note": "The films' rows as the story sets them: start and end in seconds, the beats and frames shown, and the one line the viewer reads (null: no words). Copied from the source, with one change on Nov 26: the end card's line names the batteries planned, every ERCOT battery with complete public data (316 on Nov 26), as the end card does. The player reads only these fields.",
+ "master": [
+  {
+   "start_s": 0,
+   "end_s": 5,
+   "beats": [
+    1
+   ],
+   "frames": [
+    "opening.pad"
+   ],
+   "line": "This is Desert Willow: 150 MW and 338.307 MWh in Ellis County, Texas."
+  },
+  {
+   "start_s": 5,
+   "end_s": 12,
+   "beats": [
+    2
+   ],
+   "frames": [
+    "opening.gather",
+    "opening.column"
+   ],
+   "line": "We draw it as one column. Its plan for Nov 26 discharges 304.2 MWh."
+  },
+  {
+   "start_s": 12,
+   "end_s": 18,
+   "beats": [
+    3
+   ],
+   "frames": [
+    "opening.lock",
+    "W01"
+   ],
+   "line": "It is one of 316 real ERCOT batteries, each with a plan for Nov 26."
+  },
+  {
+   "start_s": 18,
+   "end_s": 25,
+   "beats": [
+    4
+   ],
+   "frames": [
+    "R01"
+   ],
+   "line": "Any plan can look good once prices are out. These were sealed before ERCOT's 10:00 CT gate."
+  },
+  {
+   "start_s": 25,
+   "end_s": 30,
+   "beats": [
+    5
+   ],
+   "frames": [
+    "V01"
+   ],
+   "line": "Each operating day: planned by agents, sealed on BNB Chain, run by ERCOT, checked by anyone."
+  },
+  {
+   "start_s": 30,
+   "end_s": 35,
+   "beats": [
+    6
+   ],
+   "frames": [
+    "G01"
+   ],
+   "line": "Six crews plan each battery's day; the planner itself is a mixed-integer program."
+  },
+  {
+   "start_s": 35,
+   "end_s": 41,
+   "beats": [
+    7
+   ],
+   "frames": [
+    "G02"
+   ],
+   "line": "Three plans per battery: no hedge (A), a hedge on A's schedule (B), both chosen together (C)."
+  },
+  {
+   "start_s": 41,
+   "end_s": 47,
+   "beats": [
+    8
+   ],
+   "frames": [
+    "X01"
+   ],
+   "line": "Desert Willow's sealed day under 301 price scenarios. With no hedge, 56 lose money."
+  },
+  {
+   "start_s": 47,
+   "end_s": 54,
+   "beats": [
+    9
+   ],
+   "frames": [
+    "X02"
+   ],
+   "line": "A hedge on the same schedule (B) draws each hedged hour together: 11 days lose money."
+  },
+  {
+   "start_s": 54,
+   "end_s": 61,
+   "beats": [
+    10
+   ],
+   "frames": [
+    "X03"
+   ],
+   "line": "Chosen together (C), the schedule moves under the hedge until the battery backs every contract."
+  },
+  {
+   "start_s": 61,
+   "end_s": 70,
+   "beats": [
+    11
+   ],
+   "frames": [
+    "X04"
+   ],
+   "line": "The sealed plan (C) gives up $124.17 of mean against A and lifts the worst tenth from a $1,749.13 loss to a $406.91 gain."
+  },
+  {
+   "start_s": 70,
+   "end_s": 75,
+   "beats": [
+    12
+   ],
+   "frames": [
+    "X05"
+   ],
+   "line": "Your turn: the same day, the same 301 scenarios, the planner's own score."
+  },
+  {
+   "start_s": 75,
+   "end_s": 87,
+   "beats": [
+    13
+   ],
+   "frames": [
+    "R02"
+   ],
+   "line": "09:15:17 CT (22:15 Bangkok): one root for all 316 plans, sealed on BNB Chain 2,683 s before ERCOT's 10:00 CT gate."
+  },
+  {
+   "start_s": 87,
+   "end_s": 93,
+   "beats": [
+    14
+   ],
+   "frames": [
+    "W02"
+   ],
+   "line": "09:51 CT, after the seal and before the gate: Kalshi's odds on a cold Dallas morning, via Cournot."
+  },
+  {
+   "start_s": 93,
+   "end_s": 105,
+   "beats": [
+    15
+   ],
+   "frames": [
+    "R02"
+   ],
+   "line": "10:00:22 CT: a late seal. The contract computes the gate itself and refuses it."
+  },
+  {
+   "start_s": 105,
+   "end_s": 115,
+   "beats": [
+    16
+   ],
+   "frames": [
+    "W03"
+   ],
+   "line": "Race day, Nov 26: real-time prices arrive against the sealed schedule, which does not change."
+  },
+  {
+   "start_s": 115,
+   "end_s": 125,
+   "beats": [
+    17
+   ],
+   "frames": [
+    "R03"
+   ],
+   "line": "Anyone can check any plan against the chain, in a browser. All five checks pass."
+  },
+  {
+   "start_s": 125,
+   "end_s": 135,
+   "beats": [
+    17
+   ],
+   "frames": [
+    "R03"
+   ],
+   "line": "Change one hourly number and three checks fail. The record on chain is untouched."
+  },
+  {
+   "start_s": 135,
+   "end_s": 142,
+   "beats": [
+    17
+   ],
+   "frames": [
+    "R03"
+   ],
+   "line": "Each of the plan's 527 inputs is a Wattness Terminal file, named by its SHA-256."
+  },
+  {
+   "start_s": 142,
+   "end_s": 147,
+   "beats": [
+    18
+   ],
+   "frames": [
+    "V02",
+    "R04"
+   ],
+   "line": "316 sealed plans, ranked by expected value. Settled scores follow race day."
+  },
+  {
+   "start_s": 147,
+   "end_s": 151,
+   "beats": [
+    19
+   ],
+   "frames": [
+    "T02"
+   ],
+   "line": "Season purse, on BSC testnet: the vault pays by days sealed before the gate."
+  },
+  {
+   "start_s": 151,
+   "end_s": 157,
+   "beats": [
+    20
+   ],
+   "frames": [
+    "T03",
+    "T04"
+   ],
+   "line": "No sealed record, no launch: graduation was refused, then passed once Nov 26's record was bound."
+  },
+  {
+   "start_s": 157,
+   "end_s": 160,
+   "beats": [
+    21
+   ],
+   "frames": [
+    "V04"
+   ],
+   "line": null
+  },
+  {
+   "start_s": 160,
+   "end_s": 167,
+   "beats": [
+    22
+   ],
+   "frames": [
+    "stack.rest"
+   ],
+   "line": "The whole stack: real batteries, the agents, the witness on BNB Chain, the arena."
+  },
+  {
+   "start_s": 167,
+   "end_s": 175,
+   "beats": [
+    23
+   ],
+   "frames": [
+    "stack.seal",
+    "stack.seal-late"
+   ],
+   "line": "The root goes to GateRecord, the day's 953 files to Greenfield, and anyone's check returns a match."
+  },
+  {
+   "start_s": 175,
+   "end_s": 180,
+   "beats": [
+    24
+   ],
+   "frames": [
+    "stack.close"
+   ],
+   "line": "Wattness Grand Prix. Every ERCOT battery with complete public data (316 on Nov 26), planned for tomorrow and sealed on BNB Chain before the gate. Anyone can check any plan. gp.wattness.tech · wattness.tech"
+  }
+ ],
+ "cut_90s": [
+  {
+   "start_s": 0,
+   "end_s": 4,
+   "beats": [
+    1
+   ],
+   "frames": [
+    "opening.pad"
+   ],
+   "line": "This is Desert Willow: 150 MW in Ellis County, Texas."
+  },
+  {
+   "start_s": 4,
+   "end_s": 10,
+   "beats": [
+    2
+   ],
+   "frames": [
+    "opening.gather",
+    "opening.column"
+   ],
+   "line": "We draw it as one column: 304.2 MWh of discharge planned for Nov 26."
+  },
+  {
+   "start_s": 10,
+   "end_s": 16,
+   "beats": [
+    3,
+    4
+   ],
+   "frames": [
+    "opening.lock",
+    "W01",
+    "R01"
+   ],
+   "line": "One of 316 real ERCOT batteries. Any plan can look good once prices are out."
+  },
+  {
+   "start_s": 16,
+   "end_s": 25,
+   "beats": [
+    7
+   ],
+   "frames": [
+    "G02"
+   ],
+   "line": "Six crews plan each battery's day; the planner itself is a mixed-integer program."
+  },
+  {
+   "start_s": 25,
+   "end_s": 40,
+   "beats": [
+    8,
+    9,
+    10,
+    11
+   ],
+   "frames": [
+    "X01",
+    "X02",
+    "X03",
+    "X04"
+   ],
+   "line": "Dispatch and hedge chosen together lift the worst tenth from a $1,749.13 loss to a $406.91 gain."
+  },
+  {
+   "start_s": 40,
+   "end_s": 52,
+   "beats": [
+    13,
+    15
+   ],
+   "frames": [
+    "R02"
+   ],
+   "line": "Sealed on BNB Chain at 09:15:17 CT, 2,683 s before the gate. A late seal is refused."
+  },
+  {
+   "start_s": 52,
+   "end_s": 65,
+   "beats": [
+    17
+   ],
+   "frames": [
+    "R03"
+   ],
+   "line": "Anyone can check any plan in a browser. Change one number and three checks fail."
+  },
+  {
+   "start_s": 65,
+   "end_s": 68,
+   "beats": [
+    21
+   ],
+   "frames": [
+    "V04"
+   ],
+   "line": null
+  },
+  {
+   "start_s": 68,
+   "end_s": 76,
+   "beats": [
+    22
+   ],
+   "frames": [
+    "stack.rest"
+   ],
+   "line": "The whole stack: real batteries, the agents, the witness on BNB Chain, the arena."
+  },
+  {
+   "start_s": 76,
+   "end_s": 83,
+   "beats": [
+    23
+   ],
+   "frames": [
+    "stack.seal",
+    "stack.seal-late"
+   ],
+   "line": "One root on GateRecord, the day's files on Greenfield, anyone's check: match."
+  },
+  {
+   "start_s": 83,
+   "end_s": 90,
+   "beats": [
+    24
+   ],
+   "frames": [
+    "stack.close"
+   ],
+   "line": "Wattness Grand Prix. Every ERCOT battery with complete public data (316 on Nov 26), planned for tomorrow and sealed on BNB Chain before the gate. Anyone can check any plan. gp.wattness.tech · wattness.tech"
+  }
+ ]
+}

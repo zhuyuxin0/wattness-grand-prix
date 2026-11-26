@@ -1,0 +1,85 @@
+{
+ "id": "opening.pad",
+ "url": "http://127.0.0.1:15193/lab.html?frame=opening.pad&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/opening.pad.png",
+ "sha256": "afd839ee50e04f5855ca4f0f8f58e859d1007af8a1fd4e486e33272a382beee7",
+ "deterministic": true,
+ "renderMs": 551,
+ "wallMs": 608,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 6,
+  "after": 60
+ },
+ "underLoad": false,
+ "note": "O01. Real: the name, DSWL_ESS_ESR1 at node DSWL_BES1, 150 MW and 338.307 MWh (frame-data.json showcase, its size from /api/hedging/v1/walkthrough, sha256 3d3be026...), Ellis County, the map point (EIA-860, site precision) and the substation's name (the Terminal's public fleet reference, release terminal-daily-20261124-1120, opening/evidence.json). Illustrative: every position, both counts (65 enclosures = 338.307 / 5.2 MWh and 36 skids = 150 / 4.17 MW, the intro's unit sizes, not the site's equipment), the substation's equipment and the line's route. No line voltage is on file, so none is named. The census row's 349.5 MWh differs; the frame prints the plan's 338.307 MWh.",
+ "frame": {
+  "id": "opening.pad",
+  "station": "opening",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 1,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "O01. Real: the name, DSWL_ESS_ESR1 at node DSWL_BES1, 150 MW and 338.307 MWh (frame-data.json showcase, its size from /api/hedging/v1/walkthrough, sha256 3d3be026...), Ellis County, the map point (EIA-860, site precision) and the substation's name (the Terminal's public fleet reference, release terminal-daily-20261124-1120, opening/evidence.json). Illustrative: every position, both counts (65 enclosures = 338.307 / 5.2 MWh and 36 skids = 150 / 4.17 MW, the intro's unit sizes, not the site's equipment), the substation's equipment and the line's route. No line voltage is on file, so none is named. The census row's 349.5 MWh differs; the frame prints the plan's 338.307 MWh.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 551,
+  "programs": {
+   "state": "ready",
+   "programs": 32
+  },
+  "frameInfo": {
+   "calls": 217,
+   "triangles": 2052836,
+   "passes": {
+    "shadow": 57,
+    "ShadowOncePass": 0,
+    "opaque": 160,
+    "aoNormalAndBlend": 55,
+    "copyBack": 1,
+    "overlay": 0,
+    "OutputPass": 1,
+    "opaqueColour": 103
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "afd839ee50e04f5855ca4f0f8f58e859d1007af8a1fd4e486e33272a382beee7",
+   "wallMs": 608,
+   "renderMs": 551,
+   "gpuLoad": {
+    "before": 6,
+    "after": 60
+   }
+  },
+  {
+   "ok": true,
+   "sha256": "afd839ee50e04f5855ca4f0f8f58e859d1007af8a1fd4e486e33272a382beee7",
+   "wallMs": 614,
+   "renderMs": 535,
+   "gpuLoad": {
+    "before": 0,
+    "after": 7
+   }
+  }
+ ]
+}

@@ -1,0 +1,158 @@
+{
+  "what": "The steps of ERC-8183 jobs 1871 and 1873 on BSC testnet (chain 97), and agent 2922's registration and URI update. Each transaction was read back with eth_getTransactionReceipt from a public BSC testnet RPC on 26 Nov 2026: status success, with the block, block time, sender and target recorded here; each job's budget, deliverable and submit time as getJob returned them that day. The repository records each job's submit and settle transactions in packages/world/src/stations/stack/integrations.json, and job 1872's steps in contracts/deployments/agents.bsc-testnet.json.",
+  "readBack": {
+    "rpc": "https://bsc-testnet-dataseed.bnbchain.org",
+    "day": "2026-11-26"
+  },
+  "evaluator": {
+    "agentId": 2922,
+    "transactions": [
+      {
+        "step": "register",
+        "hash": "0x018e3939e1a11427801d552db0e31a91e64312211d9dc72dd6ca23dc44b77e1c",
+        "blockNumber": 144840710,
+        "blockTime": 1795633440,
+        "from": "0x333bfe3905210a5e3e985fe12d324d0de9fe6fbc",
+        "to": "0x8004a818bfb912233c491871b3d84c89a494bd9e"
+      },
+      {
+        "step": "setAgentURI",
+        "hash": "0x1715b7ee8824a2fc79b304da0573d25a47e7acfec8b93f58bebcf5148d110561",
+        "blockNumber": 144853424,
+        "blockTime": 1795639170,
+        "from": "0x333bfe3905210a5e3e985fe12d324d0de9fe6fbc",
+        "to": "0x8004a818bfb912233c491871b3d84c89a494bd9e"
+      }
+    ]
+  },
+  "jobs": [
+    {
+      "jobId": 1871,
+      "budgetWei": "100000000000000000",
+      "deliverable": "0x28d6d1c88878e1957ede994b1c8a2b410dbe42caf6573213def1e8a47feee09a",
+      "submittedAt": 1795634023,
+      "transactions": [
+        {
+          "step": "createJob",
+          "hash": "0x7d077049f344bf99822a8098f870a5987e232e256ba8e555452e4df9be3882b0",
+          "blockNumber": 144841250,
+          "blockTime": 1795633684,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de"
+        },
+        {
+          "step": "registerJob",
+          "hash": "0x50460fa56573b84339d8d8ab40141d278d83a2b4b687a9717899052ccfd11cce",
+          "blockNumber": 144841257,
+          "blockTime": 1795633687,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xd7d36d66d2f1b608a0f943f722d27e3744f66f25"
+        },
+        {
+          "step": "setBudget",
+          "hash": "0xdcb85fc8dcaf9374b87ce98396b929b3f6829567cf636e61112129a830f63389",
+          "blockNumber": 144841262,
+          "blockTime": 1795633689,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de"
+        },
+        {
+          "step": "approve",
+          "hash": "0xa0b94033d88c7ede06108a188c3ba8b72cebd8e724dd60161ff0145dd576aa0f",
+          "blockNumber": 144841269,
+          "blockTime": 1795633692,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xc70b8741b8b07a6d61e54fd4b20f22fa648e5565"
+        },
+        {
+          "step": "fund",
+          "hash": "0x4d46b775119ee4b9138b73033ca03fe0e95ed4c3908885323b61ff1bc3a0327a",
+          "blockNumber": 144841274,
+          "blockTime": 1795633695,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de"
+        },
+        {
+          "step": "submit",
+          "hash": "0x4fb4fa287dcd08c6abdccc2d5ed5dd2d628b7961971ae0a0f9437c0986db3cf2",
+          "blockNumber": 144841999,
+          "blockTime": 1795634023,
+          "from": "0x333bfe3905210a5e3e985fe12d324d0de9fe6fbc",
+          "to": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de"
+        },
+        {
+          "step": "settle",
+          "hash": "0xc98c6bcaaa887339c0bd91fc6d3ab3226613aa50ce9b9ac3c639573ed4240c22",
+          "blockNumber": 144844254,
+          "blockTime": 1795635040,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xd7d36d66d2f1b608a0f943f722d27e3744f66f25"
+        }
+      ]
+    },
+    {
+      "jobId": 1873,
+      "budgetWei": "100000000000000000",
+      "deliverable": "0x489fb2f79c84b715f4c329c1aec849631d491d42ac4b80de39103fc91613061b",
+      "submittedAt": 1795639535,
+      "transactions": [
+        {
+          "step": "createJob",
+          "hash": "0xfb2fb181c331a46a56eb80097328ce960dd070e40001a7195f74d753a3ef3020",
+          "blockNumber": 144854046,
+          "blockTime": 1795639451,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de"
+        },
+        {
+          "step": "registerJob",
+          "hash": "0x02ff394ea0fb4785e45f8e740ce8f1e55f679480c94c688382271ab41c26c945",
+          "blockNumber": 144854096,
+          "blockTime": 1795639473,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xd7d36d66d2f1b608a0f943f722d27e3744f66f25"
+        },
+        {
+          "step": "setBudget",
+          "hash": "0xc39845b24a8d393fb0682dfcf3aca2b26ebecbdf3f3c1986811570d57f668f15",
+          "blockNumber": 144854101,
+          "blockTime": 1795639475,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de"
+        },
+        {
+          "step": "approve",
+          "hash": "0x643b17ab43f3d239838b8be7f34ad9b2e8b11421d47c6ecef33dd01679166fad",
+          "blockNumber": 144854105,
+          "blockTime": 1795639477,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xc70b8741b8b07a6d61e54fd4b20f22fa648e5565"
+        },
+        {
+          "step": "fund",
+          "hash": "0xc4b6ab54ac87992b90085daca332a47d347a0e153d5336f9e12777113bd13943",
+          "blockNumber": 144854162,
+          "blockTime": 1795639503,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de"
+        },
+        {
+          "step": "submit",
+          "hash": "0x1abfbbfd619a5c9852dc41453f10cfacde6b0dbf8c6f58d76c5ab0ce4f0c6767",
+          "blockNumber": 144854232,
+          "blockTime": 1795639535,
+          "from": "0x333bfe3905210a5e3e985fe12d324d0de9fe6fbc",
+          "to": "0xa206c0517b6371c6638cd9e4a42cc9f02a33b0de"
+        },
+        {
+          "step": "settle",
+          "hash": "0x31b15cbe6d5a65e8b2c011c750ba5f1055b769d047ff23728bb38c9e0dc03aab",
+          "blockNumber": 144856336,
+          "blockTime": 1795640484,
+          "from": "0x5aa0f714af7598d490526c783490fb144344890c",
+          "to": "0xd7d36d66d2f1b608a0f943f722d27e3744f66f25"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+ "id": "venue.drive",
+ "url": "http://127.0.0.1:15196/lab.html?frame=venue.drive&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/venue.drive.png",
+ "sha256": "78486f387f6ad63cf107a16d9017ca920a6af4f12f27e10f8ee93d793edc81a3",
+ "deterministic": null,
+ "renderMs": 1481,
+ "wallMs": 1544,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 68
+ },
+ "underLoad": false,
+ "note": "The drive down A7, Stewards to the Arena. Real: the towers' screens carry the Atlas and CoinMarketCap reads of 25 Nov (sponsors.atlas.signed_pull, sponsors.cmc.quotes, .security, .funding_decision; read after the seal, internal until the sponsor release) and the arch's screens repeat the two prices; the lane is the layout's track (A7, under the timing gantry). Illustrative: the comets running ahead on the lane (the plan capsule was dropped: it read as a toy), the pole lights and the Arcade's glow are the venue's own light.",
+ "frame": {
+  "id": "venue.drive",
+  "station": "venue",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 5,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "The drive down A7, Stewards to the Arena. Real: the towers' screens carry the Atlas and CoinMarketCap reads of 25 Nov (sponsors.atlas.signed_pull, sponsors.cmc.quotes, .security, .funding_decision; read after the seal, internal until the sponsor release) and the arch's screens repeat the two prices; the lane is the layout's track (A7, under the timing gantry). Illustrative: the comets running ahead on the lane (the plan capsule was dropped: it read as a toy), the pole lights and the Arcade's glow are the venue's own light.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1481,
+  "programs": {
+   "state": "ready",
+   "programs": 37
+  },
+  "frameInfo": {
+   "calls": 473,
+   "triangles": 532637,
+   "passes": {
+    "shadow": 22,
+    "ShadowOncePass": 0,
+    "opaque": 259,
+    "aoNormalAndBlend": 129,
+    "copyBack": 1,
+    "overlay": 78,
+    "OutputPass": 1,
+    "opaqueColour": 237
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "78486f387f6ad63cf107a16d9017ca920a6af4f12f27e10f8ee93d793edc81a3",
+   "wallMs": 1544,
+   "renderMs": 1481,
+   "gpuLoad": {
+    "before": 0,
+    "after": 68
+   }
+  }
+ ]
+}

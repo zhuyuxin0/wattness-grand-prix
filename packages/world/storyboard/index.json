@@ -1,0 +1,1945 @@
+{
+ "schema": "grand-prix.storyboard.index.v1",
+ "story_doc": "STORY.md (the storyboard scratchpad, v2/STORY.md): the order, the beats and the links",
+ "paths": "relative to this file; png is the 1920 x 1080 render, webp the same at quality 86, thumb 640 x 360",
+ "encoding": "cwebp (libwebp) -q 86 -m 6 -sharp_yuv; thumbnails scaled by ffmpeg, Lanczos",
+ "contact_sheet": "contact.webp",
+ "count": 36,
+ "parts": [
+  {
+   "part": "I",
+   "title": "The battery"
+  },
+  {
+   "part": "II",
+   "title": "Out to Texas and the fleet"
+  },
+  {
+   "part": "III",
+   "title": "The race weekend"
+  },
+  {
+   "part": "IV",
+   "title": "Out to the stack"
+  }
+ ],
+ "kinds": {
+  "story": "a beat of the story",
+  "motion": "a still of a move between beats",
+  "capture": "a third-party interface captured as it is",
+  "pair": "the world beside the real page",
+  "check": "a check frame, not for the cut"
+ },
+ "links_note": "links.tabs are the redesigned Grand Prix site's tabs (site/src/shell/tabs.ts); the old routes (#/pit-wall, #/stewards, #/standings, #/garage, #/paddock) redirect to them. links.terminal is the wattness.tech screen that does the same job. links.to_next is the move on the story path.",
+ "venue": {
+  "station_order": [
+   {
+    "order": 1,
+    "id": "starting-grid",
+    "name": "Starting grid",
+    "code": "ERCOT",
+    "zone": "REAL WORLD",
+    "lanes_in": [],
+    "lanes_out": [
+     "A1"
+    ],
+    "lap_m": 208,
+    "rim": "live",
+    "frames": [
+     "W01",
+     "R01"
+    ],
+    "tabs": [
+     {
+      "label": "Intro",
+      "path": "#/"
+     },
+     {
+      "label": "Fleet",
+      "path": "#/fleet"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 2,
+    "id": "weather-radar",
+    "name": "Weather radar",
+    "code": "Kalshi markets (Cournot)",
+    "zone": "REAL WORLD",
+    "lanes_in": [],
+    "lanes_out": [
+     "A2"
+    ],
+    "lap_m": 5263.3,
+    "rim": "live",
+    "frames": [
+     "W02"
+    ],
+    "tabs": [],
+    "tab_not_built": "Risk, once Cournot's file is published"
+   },
+   {
+    "order": 3,
+    "id": "garage",
+    "name": "Garage",
+    "code": "Agents enclosure (BNB Agent Studio)",
+    "zone": "AGENTS",
+    "lanes_in": [],
+    "lanes_out": [],
+    "lap_m": 272,
+    "rim": "idle",
+    "frames": [
+     "G01"
+    ],
+    "tabs": [
+     {
+      "label": "Add Your Agent",
+      "path": "#/about/agents"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 4,
+    "id": "race-day-forecast",
+    "name": "Race-day forecast",
+    "code": "Forecaster",
+    "zone": "AGENTS",
+    "lanes_in": [
+     "A1"
+    ],
+    "lanes_out": [],
+    "lap_m": 340,
+    "rim": "live",
+    "frames": [
+     "G02"
+    ],
+    "tabs": [
+     {
+      "label": "Forecast",
+      "path": "#/agents/forecast"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 5,
+    "id": "fuel-and-wear",
+    "name": "Fuel and wear",
+    "code": "State keeper",
+    "zone": "AGENTS",
+    "lanes_in": [],
+    "lanes_out": [],
+    "lap_m": 480,
+    "rim": "live",
+    "frames": [
+     "G02"
+    ],
+    "tabs": [
+     {
+      "label": "State of Charge",
+      "path": "#/agents/state"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 6,
+    "id": "spotter",
+    "name": "Spotter",
+    "code": "Market reader",
+    "zone": "AGENTS",
+    "lanes_in": [],
+    "lanes_out": [],
+    "lap_m": 620,
+    "rim": "live",
+    "frames": [
+     "G02"
+    ],
+    "tabs": [],
+    "tab_not_built": null
+   },
+   {
+    "order": 7,
+    "id": "setup",
+    "name": "Setup",
+    "code": "Hedger",
+    "zone": "AGENTS",
+    "lanes_in": [],
+    "lanes_out": [],
+    "lap_m": 1210,
+    "rim": "live",
+    "frames": [
+     "G02"
+    ],
+    "tabs": [
+     {
+      "label": "Hedge",
+      "path": "#/agents/hedge"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 8,
+    "id": "risk-desk",
+    "name": "Risk desk",
+    "code": "Risk officer",
+    "zone": "AGENTS",
+    "lanes_in": [
+     "A2"
+    ],
+    "lanes_out": [],
+    "lap_m": 1350.7,
+    "rim": "live",
+    "frames": [
+     "G02"
+    ],
+    "tabs": [
+     {
+      "label": "Risk",
+      "path": "#/agents/risk"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 9,
+    "id": "pit-wall",
+    "name": "Pit wall",
+    "code": "Planner",
+    "zone": "AGENTS",
+    "lanes_in": [],
+    "lanes_out": [
+     "A3"
+    ],
+    "lap_m": 1487.3,
+    "rim": "gold",
+    "frames": [
+     "G02"
+    ],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1?arm=C"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 10,
+    "id": "team-data",
+    "name": "Team data",
+    "code": "Shared memory (Living Brain)",
+    "zone": "AGENTS",
+    "lanes_in": [],
+    "lanes_out": [],
+    "lap_m": 1350.7,
+    "rim": "live",
+    "frames": [
+     "G03",
+     "G04",
+     "G04-connections"
+    ],
+    "tabs": [
+     {
+      "label": "Memory",
+      "path": "#/agents/memory"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 11,
+    "id": "parc-ferme",
+    "name": "Parc Ferme",
+    "code": "GateRecord (BNB mainnet)",
+    "zone": "SEALED AND CHECKED · BNB CHAIN",
+    "lanes_in": [
+     "A3"
+    ],
+    "lanes_out": [
+     "A4"
+    ],
+    "lap_m": 1623.9,
+    "rim": "gold",
+    "frames": [
+     "R02"
+    ],
+    "tabs": [
+     {
+      "label": "Seal",
+      "path": "#/seal"
+     },
+     {
+      "label": "Files",
+      "path": "#/files"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 12,
+    "id": "race-day",
+    "name": "Race day",
+    "code": "Settlement witness",
+    "zone": "SEALED AND CHECKED · BNB CHAIN",
+    "lanes_in": [
+     "A4"
+    ],
+    "lanes_out": [
+     "A5"
+    ],
+    "lap_m": 1941.5,
+    "rim": "live",
+    "frames": [
+     "W03"
+    ],
+    "tabs": [
+     {
+      "label": "Overview",
+      "path": "#/overview"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 13,
+    "id": "stewards",
+    "name": "Stewards",
+    "code": "Verifier",
+    "zone": "SEALED AND CHECKED · BNB CHAIN",
+    "lanes_in": [
+     "A5"
+    ],
+    "lanes_out": [
+     "A6",
+     "A7"
+    ],
+    "lap_m": 2025,
+    "rim": "live",
+    "frames": [
+     "R03",
+     "V03"
+    ],
+    "tabs": [
+     {
+      "label": "Verify",
+      "path": "#/verify/DSWL_ESS_ESR1"
+     }
+    ],
+    "tab_not_built": null
+   },
+   {
+    "order": 14,
+    "id": "timing-screens",
+    "name": "Timing screens",
+    "code": "Money and market sense (Atlas + CMC)",
+    "zone": "MARKETS",
+    "lanes_in": [
+     "A6"
+    ],
+    "lanes_out": [],
+    "lap_m": 2348.6,
+    "rim": "live",
+    "frames": [
+     "V02",
+     "T01"
+    ],
+    "tabs": [],
+    "tab_not_built": "MARKETS · Prices"
+   },
+   {
+    "order": 15,
+    "id": "arena",
+    "name": "Arena",
+    "code": "Arena",
+    "zone": "MARKETS",
+    "lanes_in": [
+     "A7"
+    ],
+    "lanes_out": [
+     "A8"
+    ],
+    "lap_m": 3049.3,
+    "rim": "idle",
+    "frames": [
+     "X01",
+     "X02",
+     "X03",
+     "X04",
+     "X05",
+     "R04"
+    ],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     },
+     {
+      "label": "Hedge",
+      "path": "#/agents/hedge"
+     },
+     {
+      "label": "Risk",
+      "path": "#/agents/risk"
+     },
+     {
+      "label": "Fleet",
+      "path": "#/fleet"
+     }
+    ],
+    "tab_not_built": "MARKETS · the game"
+   },
+   {
+    "order": 16,
+    "id": "season-purse",
+    "name": "Season purse",
+    "code": "Season launch (Flap)",
+    "zone": "MARKETS",
+    "lanes_in": [
+     "A8"
+    ],
+    "lanes_out": [
+     "A9"
+    ],
+    "lap_m": 3402.5,
+    "rim": "idle",
+    "frames": [
+     "T02"
+    ],
+    "tabs": [],
+    "tab_not_built": "MARKETS · Season"
+   },
+   {
+    "order": 17,
+    "id": "license-to-launch",
+    "name": "License to launch",
+    "code": "Agent launchpad (OpenFour)",
+    "zone": "MARKETS",
+    "lanes_in": [
+     "A9"
+    ],
+    "lanes_out": [],
+    "lap_m": 3731.6,
+    "rim": "idle",
+    "frames": [
+     "T03",
+     "T04"
+    ],
+    "tabs": [],
+    "tab_not_built": "MARKETS · Launchpad"
+   }
+  ],
+  "station_order_note": "section 01's boxes in the venue's own order (layout.json and the hub's labels): zone by zone, REAL WORLD, AGENTS, WITNESS · BNB CHAIN, ARENA AND MARKETS. lap_m is where the track passes each station; rim is the hub's state (live teal, gold BNB yellow, idle gray).",
+  "lap_order": [
+   "starting-grid",
+   "garage",
+   "race-day-forecast",
+   "fuel-and-wear",
+   "spotter",
+   "setup",
+   "risk-desk",
+   "team-data",
+   "pit-wall",
+   "parc-ferme",
+   "race-day",
+   "stewards",
+   "timing-screens",
+   "arena",
+   "season-purse",
+   "license-to-launch",
+   "weather-radar"
+  ],
+  "lap_note": "the order the track passes the stations (lap_m): the arrows A1, A3, A4, A5, A7, A8, A9 in turn. Team data sits under the garage's glass floor beside the Risk desk; the weather radar feeds the Risk desk by A2 and stands on the return road (a design), so it comes last on the lap."
+ },
+ "frames": [
+  {
+   "order": 1,
+   "id": "O01",
+   "file": "opening.pad",
+   "code": "O01",
+   "group": "opening",
+   "station": "Desert Willow's site (the opening)",
+   "title": "This is Desert Willow",
+   "part": "I",
+   "part_title": "The battery",
+   "beats": [
+    1
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "This is Desert Willow. 150 MW and 338.307 MWh in Ellis County, Texas. To ERCOT the whole site is one battery: DSWL_ESS_ESR1, priced at node DSWL_BES1. Positions schematic, sized at about 5.2 MWh an enclosure and 4.2 MW a skid. Map point: EIA-860, at the site. Data: ERCOT; US Energy Information Administration. Calculation and display: Wattness.",
+   "real_vs_mechanism": "O01. Real: the name, DSWL_ESS_ESR1 at node DSWL_BES1, 150 MW and 338.307 MWh (frame-data.json showcase, its size from /api/hedging/v1/walkthrough, sha256 3d3be026...), Ellis County, the map point (EIA-860, site precision) and the substation's name (the Terminal's public fleet reference, release terminal-daily-20261124-1120, opening/evidence.json). Illustrative: every position, both counts (65 enclosures = 338.307 / 5.2 MWh and 36 skids = 150 / 4.17 MW, the intro's unit sizes, not the site's equipment), the substation's equipment and the line's route. No line voltage is on file, so none is named. The census row's 349.5 MWh differs; the frame prints the plan's 338.307 MWh.",
+   "links": {
+    "prev": null,
+    "next": "opening.gather",
+    "in": "the entrance gate lifts onto it",
+    "to_next": "in place, the gather",
+    "stations": [],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Battery Page (wattness.tech/terminal?battery=DSWL_ESS_ESR1)"
+   },
+   "webp": "web/O01.webp",
+   "thumb": "web/O01.thumb.webp",
+   "png": "frames/opening.pad.png",
+   "png_sha256": "afd839ee50e04f5855ca4f0f8f58e859d1007af8a1fd4e486e33272a382beee7"
+  },
+  {
+   "order": 2,
+   "id": "opening.gather",
+   "file": "opening.gather",
+   "code": null,
+   "group": "opening",
+   "station": "Desert Willow's site (the opening)",
+   "title": "The gather (motion still between O01 and O02)",
+   "part": "I",
+   "part_title": "The battery",
+   "beats": [
+    2
+   ],
+   "kind": "motion",
+   "films": "master, 90 s (a still of the move)",
+   "caption": "Motion still between O01 and O02: the gather, as the landing intro's site gathers in chapter 06. Illustrative: the enclosures do not move.",
+   "real_vs_mechanism": "Motion still between O01 and O02 (t 3.60 s of the opening's clock): the 65 enclosures slide to the intro's packed slots round the pad's center (radius 22 m), southern lines first, while the skids, the yard, the line, the fence and the road fade toward a 15% footprint and the pole lights dim. Illustrative: the enclosures do not move; this is the intro's chapter 06 gather.",
+   "links": {
+    "prev": "O01",
+    "next": "O02",
+    "in": "in place: gather, tint, fuse, rise",
+    "to_next": "in place, the gather",
+    "stations": [],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Battery Page"
+   },
+   "webp": "web/opening.gather.webp",
+   "thumb": "web/opening.gather.thumb.webp",
+   "png": "frames/opening.gather.png",
+   "png_sha256": "9b0ab214ad698762b67fc04eef3b050c88e87ae3a7f51296f6741174f5812730"
+  },
+  {
+   "order": 3,
+   "id": "O02",
+   "file": "opening.column",
+   "code": "O02",
+   "group": "opening",
+   "station": "Desert Willow's site (the opening)",
+   "title": "On the map it stands as one column",
+   "part": "I",
+   "part_title": "The battery",
+   "beats": [
+    2
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "On the map it stands as one column. Its height is tomorrow's planned discharge: 304.2 MWh on Nov 26, about 0.9 of a full cycle. Its selected plan (arm C), sealed on BNB Chain on Nov 25 at 9:15 am CT (10:15 pm Bangkok). A shadow plan computed from public data, never used to operate the battery.",
+   "real_vs_mechanism": "O02. Real: the column's height and color are the sealed leaf's planned discharge, 304.176 MWh for 2026-11-26 (showcase.arms.C.discharge_mwh; arms A, B and C all discharge 304.176 MWh), on W01's rules: height 0.3 + 9.7 x d / 564.13 (SOLC_SLR_ESR1, the fleet's largest), color the discharge ramp at sqrt(d / 564.13) = 0.734; W01's own column object (stations/world/common.ts) at 52.22 x W01's size: 47.0 m across, 288.8 m tall. Sealed 2026-11-25 09:15:17 CT (block 135677078). Illustrative: the gather (the enclosures do not move); the packing is the intro's (radius 22 m for 65).",
+   "links": {
+    "prev": "opening.gather",
+    "next": "opening.lock",
+    "in": "in place: gather, tint, fuse, rise",
+    "to_next": "the lock: the climb",
+    "stations": [],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Battery Page (pair 1)"
+   },
+   "webp": "web/O02.webp",
+   "thumb": "web/O02.thumb.webp",
+   "png": "frames/opening.column.png",
+   "png_sha256": "febc88d706754acef80c0a6f68fed2c790d1b8f72be979626527d16deaf45f49"
+  },
+  {
+   "order": 4,
+   "id": "opening.lock",
+   "file": "opening.lock",
+   "code": null,
+   "group": "opening",
+   "station": "Desert Willow's site (the opening)",
+   "title": "The lock, real side (check frame, not for the cut)",
+   "part": "I",
+   "part_title": "The battery",
+   "beats": [],
+   "kind": "check",
+   "films": "not for the cut (the cut point between beats 2 and 3)",
+   "caption": "Check frame: the real column at the lock, 658 m (opening.lock); W01's at 12.6 m (opening.lock-venue).",
+   "real_vs_mechanism": "Check frame, not a storyboard frame: the real column (47.0 x 288.8 m) at the lock, target 0.42 of its height, az 160, el 44, 658 m, 34 deg lens, shift 0.17; pairs with opening.lock-venue (W01's column at 12.6 m). Through the climb the night ground eases to W01's map top (#212c30) and the shadow box to W01's at the column's scale (radius 5013 m, W01's 96 m x 52.22), so the pair agree in ground and shadow as well as in the column.",
+   "links": {
+    "prev": "O02",
+    "next": "opening.lock-venue",
+    "in": "climb to el 44, 658 m",
+    "to_next": "the swap at 12.6 m",
+    "stations": [],
+    "tabs": [],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/opening.lock.webp",
+   "thumb": "web/opening.lock.thumb.webp",
+   "png": "frames/opening.lock.png",
+   "png_sha256": "80b067536226e7b2f3379422c6660a5b4d26e84596dc4872e6f4da863863effb"
+  },
+  {
+   "order": 5,
+   "id": "opening.lock-venue",
+   "file": "opening.lock-venue",
+   "code": null,
+   "group": "opening",
+   "station": "Desert Willow's site (the opening)",
+   "title": "The lock, venue side (check frame, not for the cut)",
+   "part": "I",
+   "part_title": "The battery",
+   "beats": [],
+   "kind": "check",
+   "films": "not for the cut (the cut point between beats 2 and 3)",
+   "caption": "Check frame: W01's column at the venue's lock, 12.6 m (opening.lock-venue); the real one at 658 m (opening.lock).",
+   "real_vs_mechanism": "Check frame, not a storyboard frame: W01's own scene (stations/world/texas.ts, wrapped), only Desert Willow's column standing (0.9 x 5.530 m at [-348.2, -213.2]), no halo, at the venue's lock: az 160, el 44, 12.6 m (the real lock's 658 m / 52.22).",
+   "links": {
+    "prev": "opening.lock",
+    "next": "W01",
+    "in": "the swap to the venue at 12.6 m",
+    "to_next": "the pull-back",
+    "stations": [
+     "starting-grid"
+    ],
+    "tabs": [],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/opening.lock-venue.webp",
+   "thumb": "web/opening.lock-venue.thumb.webp",
+   "png": "frames/opening.lock-venue.png",
+   "png_sha256": "daf33fcfd33b9f3d584328afd2f8320c1e7e6ebb82dddca2caac47680555a927"
+  },
+  {
+   "order": 6,
+   "id": "W01",
+   "file": "world.W01-texas",
+   "code": "W01",
+   "group": "world",
+   "station": "Starting grid (ERCOT): Texas",
+   "title": "Texas: where the 316 batteries are",
+   "part": "II",
+   "part_title": "Out to Texas and the fleet",
+   "beats": [
+    3
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "The ERCOT plinth seen from the south-south-east, with Texas filling the middle of the frame. Each of the 270 mapped batteries stands as a column at its own point, its height and color showing its planned discharge for 26 Nov (2 to 564 MWh). Desert Willow is ringed in Ellis County (150 MW · 338.307 MWh, 304 MWh planned), and the 38 approximately placed points are hollow. The 46 batteries with no coordinates lie in four trays squared into one block, deepest first (Houston 20, South 15, North 8, West 3), under one head: \"Not on the map: 46, no coordinates on file\". Every point, height and total is real (the fleet geo file and the sealed plans). The plinth, trays and lane are design.",
+   "real_vs_mechanism": "Real: every column stands at its battery's point in the fleet geo file every leaf cites (fleet_geo /api/fleet-geo/v2/native, sha256 fb3d4e53..., release terminal-daily-20261124-1120), projected with layout.texas (1:10,300). 232 exact sites stand solid; 38 points placed by county (19), substation (15), sibling (2) or co-located plant (2) stand hollow; county points are county interior points. The 46 batteries with no coordinates on file lie in four trays by load zone (Houston 20, South 15, North 8, West 3); no coordinate is invented for them. Height is 0.3 + 9.7 x planned discharge / 564.13 MWh (the fleet's largest) and color the site's discharge ramp at its square root, from fleet.batteries[].planned_discharge_mwh (the selected arm's sealed schedule). Desert Willow's size is the sealed 338.307 MWh. The map is the intro's HIFLD ERCOT polygon (iso-regions.geojson, copied into ercot-ring.ts). Illustrative: the plinths, trays and the faint comets on the start straight (a drawing of the lap's direction, carrying no figure).",
+   "links": {
+    "prev": "opening.lock-venue",
+    "next": "R01",
+    "in": "straight pull-back from the lock, the field rising",
+    "to_next": "the qualifying drive",
+    "stations": [
+     "starting-grid"
+    ],
+    "tabs": [
+     {
+      "label": "Intro",
+      "path": "#/"
+     },
+     {
+      "label": "Fleet",
+      "path": "#/fleet"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Fleet Map (wattness.tech/terminal/fleet; pair 2)"
+   },
+   "webp": "web/W01.webp",
+   "thumb": "web/W01.thumb.webp",
+   "png": "frames/world.W01-texas.png",
+   "png_sha256": "c5c790dcdde3ff14df62c46bfbdb9cc5ffe84b168e012290aa8399eecf0f9524"
+  },
+  {
+   "order": 7,
+   "id": "R01",
+   "file": "grid.R01",
+   "code": "R01",
+   "group": "grid",
+   "station": "Starting grid (ERCOT)",
+   "title": "Starting grid: Desert Willow on pole",
+   "part": "II",
+   "part_title": "Out to Texas and the fleet",
+   "beats": [
+    4
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "The 316 sealed plans stand as columns four abreast down the start straight. Desert Willow is on pole, drawn as the Hedging walkthrough's own column and lit teal, with the tallest plans right behind it and the BNB-yellow lock line waiting at the back row over a faint ERCOT outline. Every height (planned discharge), body color and arm cap (294 C teal, 22 B violet) comes from a sealed leaf in frame-data.json. The ramp's top color is held at a bright teal so the tallest columns stay teal when lit. The pole is a presentation choice, not a rank (Standings has Desert Willow at P33), so its label says \"On pole\". The venue's surfaces, pole lights and comets are illustrative, and the lock line's sweep is motion this still does not show.",
+   "real_vs_mechanism": "Real: all 316 columns are the sealed leaves in frame-data.json fleet.batteries, in the site's gridOrder (the showcase on pole, then planned discharge of the selected arm, most first, ties by resource) on layout.grid's slot rule; height 0.3 + 9.7 x planned discharge / 564 MWh (the fleet's largest), body color the site's discharge ramp at its square root (its top stop held at #7fe6cf, so the tallest stay teal when lit), cap the selected arm (C 294, B 22). The pole is Desert Willow, drawn as the Hedging walkthrough's own column (5.53 m for 304.176 MWh): a presentation choice, not a rank. Figures: fleet.totals and fleet.hub_counts; 274 settlement points counted from the leaves. The Texas outline is HIFLD's ERCOT region (the Terminal intro's file) on layout.texas's scale. Illustrative: the venue's surfaces, pole lights and comets; the lock line is shown waiting, before its sweep (motion, not run in this still).",
+   "links": {
+    "prev": "W01",
+    "next": "V01",
+    "in": "W01's qualifying drive",
+    "to_next": "A1, by way of the map: a rise to V01",
+    "stations": [
+     "starting-grid"
+    ],
+    "tabs": [
+     {
+      "label": "Intro",
+      "path": "#/"
+     },
+     {
+      "label": "Fleet",
+      "path": "#/fleet"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Fleet Board (pair 2)"
+   },
+   "webp": "web/R01.webp",
+   "thumb": "web/R01.thumb.webp",
+   "png": "frames/grid.R01.png",
+   "png_sha256": "9a4448472f2c27d27187631c6d31846ddaf5432ec2ef94dfa98471e1cbabf2b8"
+  },
+  {
+   "order": 8,
+   "id": "V01",
+   "file": "venue.hub",
+   "code": "V01",
+   "group": "venue",
+   "station": "Hub (map mode)",
+   "title": "The venue at night, seen as the flowchart",
+   "part": "II",
+   "part_title": "Out to Texas and the fleet",
+   "beats": [
+    5
+   ],
+   "kind": "story",
+   "films": "master only (the site's menu)",
+   "caption": "The venue at night, read as section 01's flowchart. Each plinth is a diagram box at its own footprint, and A1 to A9 are lit lanes ending in the diagram's arrowheads. The garage's glass roof shows the six bays and, in Team data's pit, the brain's 18 pages and 53 links glowing. Real: the footprints, the 316 sealed plans on the grid and 270 mapped dots, Parc Ferme's 316 ticks, the Arcade's arm-C field and coins, the Living Brain readback's pages and links, and the chip (Operating day Nov 26 · 316 plans sealed · 2,683 s before the close). Illustrative: the radar sweep and where the pages sit in the pit. A design: the return road. The zone titles are the finale's plain words (REAL WORLD; AGENTS · BNB AGENT STUDIO; SEALED AND CHECKED · BNB CHAIN; MARKETS) and the agents' pill reads AGENT STUDIO. The Arena, Season purse and License to launch boxes are drawn gray, though Flap's launch and OpenFour's graduation ran on BSC testnet on Nov 25; the stack's finale draws them lit.",
+   "real_vs_mechanism": "The hub. Real: every plinth is section 01's box at its own footprint and corner radius (layout.json); the rims' colors say what runs (teal), the two gold boxes (BNB yellow) and what has not run (idle gray). The starting grid's 316 columns are the sealed plans (heights by planned discharge, frame-data.json fleet.batteries), the dots on Texas the 270 mapped batteries; Parc Ferme's ring holds 316 ticks, one a sealed leaf; the Arcade's field and coins are arm C's 301 scenarios (game.results.C, game.histogram); the timing towers carry the Atlas and CMC reads (sponsors.atlas, sponsors.cmc); Team data's 18 tiles and their links are the Living Brain readback (brain_graph). Illustrative: the radar's sweep, the bays' heroes at hub scale, the pole lights. Design: the return road (the diagram draws no lane back to the grid), dashed and dim. Drawn idle here: the season purse and the launch tower; Flap's launch and OpenFour's graduation ran on BSC testnet on Nov 25 and are lit in the stack's finale. The agents' title names Agent Studio, which gives the six roles their identities and paid jobs; the one hosted agent, the evaluator, is drawn in the stack's finale.",
+   "links": {
+    "prev": "R01",
+    "next": "G01",
+    "in": "rise to the plan view, lens to 5 deg",
+    "to_next": "the dive by A1 through the roof",
+    "stations": [
+     "starting-grid",
+     "weather-radar",
+     "garage",
+     "race-day-forecast",
+     "fuel-and-wear",
+     "spotter",
+     "setup",
+     "risk-desk",
+     "pit-wall",
+     "team-data",
+     "parc-ferme",
+     "race-day",
+     "stewards",
+     "timing-screens",
+     "arena",
+     "season-purse",
+     "license-to-launch"
+    ],
+    "tabs": [
+     {
+      "label": "How It Works",
+      "path": "#/about"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/V01.webp",
+   "thumb": "web/V01.thumb.webp",
+   "png": "frames/venue.hub.png",
+   "png_sha256": "b249fcfc1fe899c3a57534b233750b75de4dde5a174ca196b17d56e4c5d96898"
+  },
+  {
+   "order": 9,
+   "id": "G01",
+   "file": "garage.hangar",
+   "code": "G01",
+   "group": "garage",
+   "station": "Garage (agents; BNB Agent Studio)",
+   "title": "The garage: six agents, one plan",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    6
+   ],
+   "kind": "story",
+   "films": "master",
+   "caption": "Six agents, one plan. Each agent shows its own part of Desert Willow's sealed plan for Nov 26 on the garage floor's six screens, each with its ERC-8004 identity on BSC testnet; the planner itself is a mixed-integer program. Desert Willow (DSWL_ESS_ESR1), operating day Nov 26. Engine e7dfe2f, HiGHS 1.15.4. Checked by the Agent Studio evaluator, agent 2922: 8 of 10 checks pass, 2 skipped. The workshop's bench and racks are below this frame; the one hosted agent, the evaluator, runs on Amazon Bedrock AgentCore through Agent Studio's managed hosting and is drawn in the stack's finale.",
+   "real_vs_mechanism": "Real, every figure on the six floor screens is read from frame-data.json for Desert Willow's sealed plan (operating day 2026-11-26, plan C): Forecast draws showcase.scenarios.node_bands_cents (p05 to p95 and p25 to p75 of the 301 scenarios) under showcase.forecast.node_da_cents; State of charge draws showcase.arms.C.soc_pct from assumptions.soc_open_ppm inside soc_min and soc_max, colored by C.kw (discharging teal, charging blue); Market inputs draws the sealed leaf's 527 inputs.files (files.json for the tiles, inputs.json for the kinds, both derived from out/od-20261126/leaves/DSWL_ESS_ESR1.json, sha256 08997a73...); Hedge prints showcase.instrument (ElectronX's published terms) over C.contracts by hour, with C's sold and bought counts and collateral, the entry assumed at fair value; Risk draws game.results.C.total_uusd in $250 bins with the worst tenth's 31 members outlined, C's and A's worst-tenth averages (cvar), and Cournot's probability (sponsors.cournot.probability: 1%, observed 09:51:43 CT on Nov 25, after the seal at 09:15:17, so marked \"read after the seal\"); Plan shows the three arms' objective_usd with C selected and sealed. The badges are the roles' ERC-8004 identities on BSC testnet (ids.json: Forecaster 2925, State keeper 2924, Market reader 2923, Hedger 2926, Risk officer 2927, Planner 2928; from contracts/deployments/agents.bsc-testnet.json on core/agents d69fe6e, registered 14:18 to 14:20 CT on Nov 25, after the seal); the evaluator is agent 2922 (ids.json from the Agent Studio project's studio.toml [identity], registered Nov 25, 14:39:31 CT). The sealed leaf's own agent field (erc8004_id) is null: the identities came after the plan. The evaluator's ten lamps are its report's checks (8 pass, 2 skipped, 2026-11-25 10:03:09 CT). Design: the floor as screens, their rims and the spill, the instruments' new places at each bay's north edge, the lights, and the roof lifted for this shot (the camera is diving through it). Camera from the storyboard's corner [-205, 15, 40] to above the garage at [8, 398, 46] looking at [8, 0, -142] on a 31 degree lens, so all six screens read in one frame; the workshop's bench is below the frame, so the evaluator is named in the scope line.",
+   "links": {
+    "prev": "V01",
+    "next": "G02",
+    "in": "dive by A1 through the glass roof",
+    "to_next": "the back straight",
+    "stations": [
+     "garage"
+    ],
+    "tabs": [
+     {
+      "label": "Add Your Agent",
+      "path": "#/about/agents"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/G01.webp",
+   "thumb": "web/G01.thumb.webp",
+   "png": "frames/garage.hangar.png",
+   "png_sha256": "9b974657a61565ac07a07c248fdb578c01d811ad2fc75db59bf539dd056082a5"
+  },
+  {
+   "order": 10,
+   "id": "G02",
+   "file": "garage.pit-lane",
+   "code": "G02",
+   "group": "garage",
+   "station": "Six bays: Forecaster, State keeper, Market reader, Hedger, Risk officer, Planner",
+   "title": "The pit lane: six crews facing the track, the sealed call at the end",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    7
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "The pit lane from just under the roof at the west hairpin, with all six bays and their plates: the forecast wall over the 301-scenario price fan; the state-of-charge column, under the roof, with arm C's day as a helix; the 527-tile file wall; the Setup strip under its 7 glass tiles; the coin board of C's 301 totals; the A, B and C boards turned to the lane, C edged in BNB yellow, with the plate naming their figures as scores. Every height, color and figure comes from frame-data.json and the sealed leaf's file list. The team radio line is computed from the sealed figures, not a Ness answer. The instruments' cases, sizes, their turn toward the lane and the lights are design.",
+   "real_vs_mechanism": "Real, from frame-data.json: the forecast wall draws showcase.forecast (hub and node day-ahead, the thin and the heavy step) over showcase.scenarios.node_bands_cents (p05 to p95, p25 to p75) with arm C's kw below; the column (15.6 m for 100%, so it stands under the roof) is at the plan's opening 50% (assumptions.soc_open_ppm) with rings at soc_min and soc_max and arm C's 24 soc_pct as one turn of its helix; the file wall is the sealed leaf's 527 inputs.files in order (59 release, 65 API, 403 live), each tile lit by its SHA-256's first byte (files.json, derived from the leaf, sha256 08997a73...); the Setup strip is arm C's hours on the walkthrough's scale (ground: the mean over 301 scenarios of physical plus wear; tiles: contracts x the assumed entry); the coin board is game.results.C.total_uusd in $250 slots with the 31 tail members rimmed; the three boards draw each arm's kw, contracts and 301 totals on one axis. The team radio line is computed from the sealed figures (the pit wall's brief), not a Ness answer. Design: the bays' cases, frames, stands and lights, the instruments' sizes, and the flat instruments turned toward the lane's approach so their faces read from the back straight (the forecast wall 30 degrees, the file wall 40, the coin board 50, each strategy board 55 on its own stand). Camera raised to just under the roof's ribs, at [-207, 15.6, -152] looking at [-30, -5.5, -180] on a 42 degree lens: from the storyboard's eye-level pose ([-207, 9, -175], 48 degrees) every instrument stood edge-on. The diagram's subtitles say \"load, wind, solar\" and \"offer stacks\"; the plates say what ran: prices forecast, prices read.",
+   "links": {
+    "prev": "G01",
+    "next": "G03",
+    "in": "dolly along the back straight to the boards",
+    "to_next": "off the story path: G02's floor down to Team data",
+    "stations": [
+     "race-day-forecast",
+     "fuel-and-wear",
+     "spotter",
+     "setup",
+     "risk-desk",
+     "pit-wall"
+    ],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1?arm=C"
+     },
+     {
+      "label": "Forecast",
+      "path": "#/agents/forecast"
+     },
+     {
+      "label": "State of Charge",
+      "path": "#/agents/state"
+     },
+     {
+      "label": "Hedge",
+      "path": "#/agents/hedge"
+     },
+     {
+      "label": "Risk",
+      "path": "#/agents/risk"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Trading Day (an Enterprise tab; the Grand Prix page carries pair 3)"
+   },
+   "webp": "web/G02.webp",
+   "thumb": "web/G02.thumb.webp",
+   "png": "frames/garage.pit-lane.png",
+   "png_sha256": "ca79d8a15a37c1849245166e294e58fa2fba9f479f94c96a4d3cde9836b2d526"
+  },
+  {
+   "order": 11,
+   "id": "G03",
+   "file": "garage.team-data",
+   "code": "G03",
+   "group": "garage",
+   "station": "Team data (Shared memory; Living Brain)",
+   "title": "Team data: the brain under the glass floor",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [],
+   "kind": "story",
+   "films": "site, Living Brain cut",
+   "caption": "Team data under the glass floor. Living Brain's Terminal brain appears as 18 stars sized by their sources and placed by a spring layout on its 53 similarity links (strong solid, medium thinner, weak dotted). Each star is tied by a hairline to its part in the Terminal's six-layer structure below, whose ends are named: 1 · Sources at the bottom, 6 · Ness routing at the top. Desert Willow's one-page brain sits apart at the east end, threaded to the C board. The pages, links, layers and the 10:58 CT review are real, and the 26 Nov plan read no memory (0 pages admitted at the 09:12:46 CT cutoff). The pit, its depth and the page-to-part mapping (ours, by name) are design.",
+   "real_vs_mechanism": "Two brains, named apart. The Terminal brain (frame-data.json brain_graph): its 18 pages as stars sized by their sources, placed by a deterministic spring layout on its 53 generated similarity links (20 strong solid, 20 medium thinner, 13 weak dotted), each tied by a hairline to the part of terminal_structure it describes (the mapping is ours, by name). Under it terminal_structure itself: 6 layers, 18 parts, 48 typed connections. Desert Willow's asset brain (sponsors.living_brain): 1 page, version 2, 1 citation, no edges, its thread to the C board. At the plan's cutoff (2026-11-25 09:12:46 CT) the memory check admitted 0 pages; the review came at 2026-11-25 10:58:39 CT, after the gate. The pit, its depth and the parts' positions along it are design. Camera lowered from the storyboard's [-60, 24, -8] (above the 18 m roof) to [-20, 14, -24], looking at [52, -4, -70].",
+   "links": {
+    "prev": "G02",
+    "next": "G04",
+    "in": "down through the glass floor",
+    "to_next": "the same memory in the real workspace",
+    "stations": [
+     "team-data"
+    ],
+    "tabs": [
+     {
+      "label": "Memory",
+      "path": "#/agents/memory"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/G03.webp",
+   "thumb": "web/G03.thumb.webp",
+   "png": "frames/garage.team-data.png",
+   "png_sha256": "f052fdada2f1d31446629dedabdddecba979a286d333ccee8c664819a33b2df8"
+  },
+  {
+   "order": 12,
+   "id": "G04",
+   "file": "garage.living-brain",
+   "code": "G04",
+   "group": "garage",
+   "station": "Living Brain web app",
+   "title": "Living Brain, the real workspace",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [],
+   "kind": "capture",
+   "films": "site, Living Brain cut",
+   "caption": "Living Brain's own Explore view of the Wattness Brain, captured read only from the signed-in session at 25 Nov 14:04 CT: 18 memories, 53 connections and 20 strong, matching frame-data.json's brain_graph. This is the third-party interface as it is (seed 2; the view also turns, so labels fall differently each take), with the account's name, email, avatar and plan hidden and our caption band added along the bottom.",
+   "real_vs_mechanism": "Real: Living Brain's own Explore view, a third-party interface captured as it is (The Wattness Brain on Living Brain's Explore view, the activity panel folded: its 18 pages as labels in the particle brain, its connections as the faint threads through it.). Read only: one new page in the signed-in browser; views, a panel toggle and a node selection only; nothing created, edited or deleted; the reader's own tab untouched. Its counts (18 memories, 53 connections, 20 strong) equal frame-data.json brain_graph. Ours: the caption band only. Hidden: sidebar workspace name, plan card, email and avatar hidden (CSS); no other visible text carried the account's name or address. Varies by take: Math.random seeded before the app's code runs; the view also turns over time, so the labels fall differently from take to take (seed 2).",
+   "links": {
+    "prev": "G03",
+    "next": "G04-connections",
+    "in": "the real workspace",
+    "to_next": "one page selected",
+    "stations": [
+     "team-data"
+    ],
+    "tabs": [
+     {
+      "label": "Memory",
+      "path": "#/agents/memory"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/G04.webp",
+   "thumb": "web/G04.thumb.webp",
+   "png": "frames/garage.living-brain.png",
+   "png_sha256": "564ba128ff1a648513ef1eb630e5d37fe7ea756898511f7c6442398a5645c448"
+  },
+  {
+   "order": 13,
+   "id": "G04-connections",
+   "file": "garage.living-brain-connections",
+   "code": "G04",
+   "group": "garage",
+   "station": "Living Brain web app",
+   "title": "Living Brain: one page and its connections",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [],
+   "kind": "capture",
+   "films": "site, Living Brain cut",
+   "caption": "The same view with the Wattness Terminal page selected: its 8 connections lit through the brain, and Living Brain's side panel listing each one with the reason it generated, its strength and its match percentage. Read only: a node selection, with nothing opened, edited or written.",
+   "real_vs_mechanism": "Real: Living Brain's own Explore view, a third-party interface captured as it is (The same view with the Wattness Terminal page selected: its 8 connections lit through the brain, and the side panel listing each with the reason Living Brain generated, its strength and its match.). Read only: one new page in the signed-in browser; views, a panel toggle and a node selection only; nothing created, edited or deleted; the reader's own tab untouched. Its counts (18 memories, 53 connections, 20 strong) equal frame-data.json brain_graph. Ours: the caption band only. Hidden: sidebar workspace name, plan card, email and avatar hidden (CSS); no other visible text carried the account's name or address. Varies by take: Math.random seeded before the app's code runs; the view also turns over time, so the labels fall differently from take to take (seed 2).",
+   "links": {
+    "prev": "G04",
+    "next": "X01",
+    "in": "one page selected in the real workspace",
+    "to_next": "back up to the pit wall, then the hop to the Arena",
+    "stations": [
+     "team-data"
+    ],
+    "tabs": [
+     {
+      "label": "Memory",
+      "path": "#/agents/memory"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/G04-connections.webp",
+   "thumb": "web/G04-connections.thumb.webp",
+   "png": "frames/garage.living-brain-connections.png",
+   "png_sha256": "88b07e8266a44129240e0988abf5bbd99492c47ba3207ae4177fe212cce76453"
+  },
+  {
+   "order": 14,
+   "id": "X01",
+   "file": "game.X01",
+   "code": "X01",
+   "group": "game",
+   "station": "Arena: Downforce",
+   "title": "No hedge: the bumpy day and a wide pile",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    8
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "The whole Downforce cabinet in attract mode, on a lit plinth. Arm A's sealed day is the field: ridges at HE08 and HE18, the charging trench at HE11-13. Its 301 coins sit in $250 tubes, the 56 losing ones red at the left. The scoreboard reads Mean $3,667.52 · Worst tenth −$1,749.13 · Score $2,792.96 · 56 of 301 days lose money, and the tower's puck sits low. The console (dial at A, 24 empty pucks, seal button dark) and three visitors are in view. Every bar, coin and figure is arm A's own accounting, re-derived to the micro-dollar. The column order, bulb chase and visitors are presentation, and the coin cascade can't show in a still.",
+   "real_vs_mechanism": "Real: every bar is arm A's own accounting for that scenario and hour (game.results.A physical + hedge + wear + fee, frame-data.json), and every coin its day total in its exact $250 bin (game.histogram); the figures (mean, worst tenth, score, 56 losing days) re-derive to the micro-dollar from the parts and from the engine's formula on showcase.scenarios. Illustrative: the column order (sorted by A's day total, worst west), the coins' resting order inside a tube, the bulbs' chase and the visitors. The marquee's neon word is the open naming decision. Not run: the attract-mode cascade is a still here.",
+   "links": {
+    "prev": "G04-connections",
+    "next": "X02",
+    "in": "hop to the Arena (the venue's glide)",
+    "to_next": "the lever's first part",
+    "stations": [
+     "arena"
+    ],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     },
+     {
+      "label": "Hedge",
+      "path": "#/agents/hedge"
+     },
+     {
+      "label": "Risk",
+      "path": "#/agents/risk"
+     }
+    ],
+    "tab_not_built": "MARKETS · the game",
+    "terminal": "Hedging walkthrough, rest 01 (wattness.tech/terminal/hedging; pair 4)"
+   },
+   "webp": "web/X01.webp",
+   "thumb": "web/X01.thumb.webp",
+   "png": "frames/game.X01.png",
+   "png_sha256": "95b63d8e58af22f8d71fc6cb37f6fb6cf477334e7ab884c02df14c23fff923e9"
+  },
+  {
+   "order": 15,
+   "id": "X02",
+   "file": "game.X02",
+   "code": "X02",
+   "group": "game",
+   "station": "Arena: Downforce",
+   "title": "Glass on a fixed schedule: the rows draw together",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    9
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "Arm B: five glass bars over A's unchanged schedule. HE18 sells 91 at $35.00 above its ridge; HE11 buys 100 at $14.00 down in the trench. The contract hours are outlined in dashed orange, the pile is narrower, and the pulled pucks show on the console. The whole marquee, the P1 banner and B's scoreboard are in frame: Mean $3,570.08 · Worst tenth $249.11 · Score $3,694.63 · 11 days losing · collateral $12,161.50. This is sealed arm B exactly. There is no light because B never sells or buys more than A's schedule delivers. The pour and the coins hopping are motion a still can't show.",
+   "real_vs_mechanism": "Real: arm B's sealed plan (A's schedule, 5 hedged hours) as game.results.B gives it, every cell and coin; each glass bar's height is its contracts at the hour's assumed entry (game.hedge.entry_cents), its thickness its contract count. No light: B's contracts never exceed A's scheduled MWh (checked). Illustrative: the column order. Motion, not shown in the still: the pour and the coins' hops.",
+   "links": {
+    "prev": "X01",
+    "next": "X03",
+    "in": "the lever's first part",
+    "to_next": "the lever's second part",
+    "stations": [
+     "arena"
+    ],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     },
+     {
+      "label": "Hedge",
+      "path": "#/agents/hedge"
+     },
+     {
+      "label": "Risk",
+      "path": "#/agents/risk"
+     }
+    ],
+    "tab_not_built": "MARKETS · the game",
+    "terminal": "Hedging walkthrough, rest 03 (pair 4)"
+   },
+   "webp": "web/X02.webp",
+   "thumb": "web/X02.thumb.webp",
+   "png": "frames/game.X02.png",
+   "png_sha256": "ee301d0db76c61e2115c6e05b6adc1d50760a170f125e190c63e5fd1ea0cc52b"
+  },
+  {
+   "order": 16,
+   "id": "X03",
+   "file": "game.X03",
+   "code": "X03",
+   "group": "game",
+   "station": "Arena: Downforce",
+   "title": "The meet: the schedule moves under the glass",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    10
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "The meet, seen from the field's south-west corner with the dial at 0.35 between A and C. HE06's bars have risen to meet its glass (sell 13, met), while HE10's pane glows warm because the schedule charges only 6.0 of the 17 MWh it buys. Every cell is exact engine arithmetic for that blended schedule. The state is a teaching route between two real plans, not a plan, so no figures print.",
+   "real_vs_mechanism": "A drawn in-between, not a plan: the schedule at s = 0.35 (0.65 x A's kW + 0.35 x C's, whole kW) under C's contracts, each cell from the engine's formula on showcase.scenarios (game.scoring_a_new_plan). It breaks the hedge cap at HE10 (buys 17, the schedule charges 6.0 MWh), which is what the light marks (weight 0.1 + 0.9 shortfall^1.5 = 0.57); HE06 is met (its light went out at s = 0.23). No figure prints, as the storyboard says. The sealed C was solved in one program, not in these two steps: this path is a teaching route between two real plans.",
+   "links": {
+    "prev": "X02",
+    "next": "X04",
+    "in": "the lever's second part",
+    "to_next": "the bell",
+    "stations": [
+     "arena"
+    ],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     },
+     {
+      "label": "Hedge",
+      "path": "#/agents/hedge"
+     },
+     {
+      "label": "Risk",
+      "path": "#/agents/risk"
+     }
+    ],
+    "tab_not_built": "MARKETS · the game",
+    "terminal": "Hedging walkthrough, rest 07 (pair 4)"
+   },
+   "webp": "web/X03.webp",
+   "thumb": "web/X03.thumb.webp",
+   "png": "frames/game.X03.png",
+   "png_sha256": "f97b1b96b7c38a40b0268c969ae627926af98a24f98b8e286acfaf2219bf15cd"
+  },
+  {
+   "order": 17,
+   "id": "X04",
+   "file": "game.X04",
+   "code": "X04",
+   "group": "game",
+   "station": "Arena: Downforce",
+   "title": "Chosen together: the sealed plan",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    11
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "The sealed plan C: a new HE06 ridge, the trench spread over HE10-13 under its glass, no light anywhere, and the tallest pile with only 9 red coins. The scoreboard reads $3,543.35 · $406.91 · Score $3,746.80, with the SEALED badge by the score. The plane shows A, B and C with equal-score diagonals, and a plate reads 'A $2,792.96 · B $3,694.63 · C $3,746.80, sealed 09:15:17 CT'. The puck is at the bell and the seal ring is lit BNB yellow. This is the sealed result itself under root 0xf4d4…bce7, every figure re-derived to the micro-dollar.",
+   "real_vs_mechanism": "Real: C is the sealed plan under root 0xf4d4…bce7 (BSC mainnet tx at 09:15:17 CT); every cell, coin and figure re-derives to the micro-dollar from game.results.C and from the engine's formula. The plane's marks are the three solved arms (not a frontier). Unlike the Terminal walkthrough's beat 7, which is labeled an illustration, this rest is the sealed result itself. Illustrative: the column order, the bulbs and the visitors.",
+   "links": {
+    "prev": "X03",
+    "next": "X05",
+    "in": "the bell",
+    "to_next": "down to the console",
+    "stations": [
+     "arena"
+    ],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     },
+     {
+      "label": "Hedge",
+      "path": "#/agents/hedge"
+     },
+     {
+      "label": "Risk",
+      "path": "#/agents/risk"
+     }
+    ],
+    "tab_not_built": "MARKETS · the game",
+    "terminal": "Hedging walkthrough, rest 07 and the payoff's hook card (pair 4)"
+   },
+   "webp": "web/X04.webp",
+   "thumb": "web/X04.thumb.webp",
+   "png": "frames/game.X04.png",
+   "png_sha256": "376e10e157ee372717058b1e463d1d140bcf205184143d2e1dfca33d48ab889f"
+  },
+  {
+   "order": 18,
+   "id": "X05",
+   "file": "game.X05",
+   "code": "X05",
+   "group": "game",
+   "station": "Arena: Downforce, play mode",
+   "title": "Your turn: the dial, the glass and the P1 banner",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    12
+   ],
+   "kind": "story",
+   "films": "master",
+   "caption": "Play mode: C's plan with HE18 pushed to 100 contracts. The scoreboard reads the what-if: Score $3,733.54, 8 losing days, $13.26 behind P1. Sealed C's pile shows as a yellow outline over the player's coins, the puck sits one notch under the bell (98.6% of the way from no hedge to P1), and the full P1 banner is up. Under the seal panel, a console readout gives the dial at C and each hedged hour's contracts and cap, with HE18 ringed and marked 'C +94'. The scoring and every limit check run exactly today. The arena's seal flow (wallet, arena scope on GateRecord, next-day scenarios) isn't built, and 26 Nov's gate has already closed.",
+   "real_vs_mechanism": "Real today: the scoring and every limit check. This plan (C's schedule and contracts with HE18 sold at 100) is a real what-if computed exactly with the engine's integer formula on showcase.scenarios: mean $3,541.98, worst tenth $383.12, score $3,733.54, 8 losing days, collateral $13,052.75, within every limit. Not built yet: the arena's seal flow (wallet, an arena scope on GateRecord, the next day's scenario set published before its gate) and the scoring of arena seals after settlement; the kiosk panel shows the design. 26 Nov's gate closed on 25 Nov at 10:00 CT.",
+   "links": {
+    "prev": "X04",
+    "next": "R02",
+    "in": "down to the console",
+    "to_next": "the hop to Parc Ferme",
+    "stations": [
+     "arena"
+    ],
+    "tabs": [
+     {
+      "label": "Battery",
+      "path": "#/battery/DSWL_ESS_ESR1"
+     },
+     {
+      "label": "Hedge",
+      "path": "#/agents/hedge"
+     },
+     {
+      "label": "Risk",
+      "path": "#/agents/risk"
+     }
+    ],
+    "tab_not_built": "MARKETS · the game",
+    "terminal": "Hedging walkthrough, the payoff's hook card (pair 4)"
+   },
+   "webp": "web/X05.webp",
+   "thumb": "web/X05.thumb.webp",
+   "png": "frames/game.X05.png",
+   "png_sha256": "37faea42aba16f3ddcf03209799187e425e8db781279310e0b1f6463ad7cec83"
+  },
+  {
+   "order": 19,
+   "id": "R02",
+   "file": "grid.R02",
+   "code": "R02",
+   "group": "grid",
+   "station": "Parc Ferme (GateRecord; BNB Chain)",
+   "title": "Parc Ferme: sealed 2,683 s before the gate; the late seal refused",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    13,
+    15
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "Parc Ferme at 10:00:22 CT. A late plan capsule has stopped short of the closed barrier, its core turned red under the gate clock. Behind it stand the gold ring of 316 ticks round the root plate and both chains' receipt pylons (2,683 s and 2,580 s before the gate). The root, the receipts, the GateRecord contract (source verified on Sourcify) and AfterGate(20261126, 1795622400) are the record's own. The late seal was a simulated call through the commit script and was never mined, so the capsule is a drawing of that refusal. The gate's architecture, lights and comets are illustrative.",
+   "real_vs_mechanism": "Real: the root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 over 316 leaves (one tick a leaf), both receipts (frame-data.json sealed_day.receipts: BSC block 135,677,078 at 09:15:17 CT, 2,683 s before the gate; testnet block 144,810,495 at 09:17:00 CT, 2,580 s before), GateRecord 0x2922c68cE15EB3e83B7f43b136e981dDc4262876 and the refusal AfterGate(20261126, 1795622400) from the rule \"if (block.timestamp >= gate) revert AfterGate(od, gate);\". The late seal was simulated through the commit script, never mined: bsc-mainnet at 10:00:22 CT (22 s after) and bsc-testnet at 10:00:25 CT (25 s after). The capsule is a drawing of that refused call; the clock shows the mainnet attempt's chain time. Illustrative: the hall's architecture, lights and comets.",
+   "links": {
+    "prev": "X05",
+    "next": "W02",
+    "in": "hop to Parc Ferme on its clock (beat 13); back to the barrier after the radar (beat 15)",
+    "to_next": "the cutaway at 09:51 CT",
+    "stations": [
+     "parc-ferme"
+    ],
+    "tabs": [
+     {
+      "label": "Seal",
+      "path": "#/seal"
+     },
+     {
+      "label": "Files",
+      "path": "#/files"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/R02.webp",
+   "thumb": "web/R02.thumb.webp",
+   "png": "frames/grid.R02.png",
+   "png_sha256": "0bd868956320a9fb2887ea9f575214b0de6205708aec52322f61a1e24e50f201"
+  },
+  {
+   "order": 20,
+   "id": "W02",
+   "file": "world.W02-radar",
+   "code": "W02",
+   "group": "world",
+   "station": "Weather radar (Kalshi via Cournot)",
+   "title": "Weather radar: Dallas's cold-morning odds",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    14
+   ],
+   "kind": "story",
+   "films": "master",
+   "caption": "The weather radar, with the scope as the subject. A 14 m scope on a graphite yoke draws the ERCOT region, the fleet's points and the sweep just past Dallas: Dallas below 29°F on 26 Nov at 1% (Kalshi YES 0.0100, 09:50:29 CT), plus the Houston and natural gas markets Cournot found. Behind it on the left stand the 22 m lattice mast and 9 m dish, with a site worker at the scope's foot for scale. The market, probability and times are Cournot's real read at 09:51:43 CT on 25 Nov, after the 09:15 CT seal, so the frame presents it as a review, not an input. The Dallas and Houston positions come from public station metadata. The hardware is design.",
+   "real_vs_mechanism": "Real: the market Cournot resolved (24962617, Dallas (CLIDFW), below 29°F on 2026-11-26, matching confidence 0.912) and its probability 0.01 (KXLOWTDAL-26NOV26-T29), whose only basis is the Kalshi YES quote 0.0100 at 09:50:29 CT, read 09:51:43 CT on 25 Nov, after the seal (09:15:17 CT): a review, not an input (the 26 Nov plan had no outside inputs). Houston high and natural gas close are markets Cournot found (titles only; resolve-houston.json, resolve-natural-gas.json), not priced. The scope's Texas is the intro's HIFLD ERCOT polygon and its faint dots the fleet's mapped points (fleet_geo); the Dallas blip sits at the resolving station (CLIDFW, Dallas/Fort Worth airport) and Houston's at the city, positions from public station metadata, not the frame data; the natural gas ring sits outside the outline (a price, not a place). Illustrative: the mast, dish, stand and lights; A2 is drawn dashed as a review. Sponsor values stay internal until the sponsor release.",
+   "links": {
+    "prev": "R02",
+    "next": "W03",
+    "in": "cutaway while the gate clock runs",
+    "to_next": "back to Parc Ferme for the gate and the late seal (R02), then A4",
+    "stations": [
+     "weather-radar"
+    ],
+    "tabs": [],
+    "tab_not_built": "Risk, once Cournot's file is published",
+    "terminal": "Forecast Vintages, expanded (wattness.tech/terminal/market; pair 5)"
+   },
+   "webp": "web/W02.webp",
+   "thumb": "web/W02.thumb.webp",
+   "png": "frames/world.W02-radar.png",
+   "png_sha256": "253689731724290c93dcc38df9855f597bb46afea0e9214ec0a4cf7f0f749772"
+  },
+  {
+   "order": 21,
+   "id": "W03",
+   "file": "world.W03-race-day",
+   "code": "W03",
+   "group": "world",
+   "station": "Race day (Settlement witness)",
+   "title": "Race day: telemetry against the sealed schedule",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    16
+   ],
+   "kind": "story",
+   "films": "master",
+   "caption": "Race day, seen from above the stewards, looking up the lane to Parc Ferme's gold. All of Desert Willow's day runs along the lane as its track: 24 hours, each bar's height the plan's forecast price at DSWL_BES1. Bars are filled where sealed arm C charges at 150 MW in the $13.22 valley (11 am to noon) and discharges at 150 MW on the $36.12 peak (5 pm to 6 pm). Three graphite outcome gates carry hatched stamps, and the timing pylon's 96 fifteen-minute rows are hatched beside the sealed schedule. The schedule and forecast prices are the sealed leaf's own. Nothing has linked yet: real-time prices start at 00:00 CT on 26 Nov, so this is the waiting state, to be rendered again when stage 1 links.",
+   "real_vs_mechanism": "Waiting state: operating day 2026-11-26 runs 26 Nov 00:00 to 24:00 CT and nothing has linked yet (no outcome stage exists), so the gates' stamps and the pylon's 96 rows are hatched, never zero. Real: the 24 hours along the lane are Desert Willow's sealed arm C (showcase.arms.C.kw: discharge teal, charge #7f9cc0, filled to its share of 150 MW) over each hour's price in the plan's own forecast at DSWL_BES1 (showcase.forecast.node_da_cents, day-type persistence), on the kit's price scale (0.14 m a $/MWh): $13.22 at 11 am (the valley it charges in) to $36.12 at 5 pm (the peak it discharges on). These are forecasts, not settled prices; real-time prices arrive as the day runs. The pylon's strip is the same schedule. The submission closes 2026-11-26 20:00:00 CT (2026-11-27 09:00:00 Bangkok), before the day ends, so a submission shows real-time rows up to about 20:00 CT and says the day is still running. Illustrative: the gates, pylon, lights and Parc Ferme's plate, ticks (316, the sealed leaf count) and glow; the comets carry no figure. Render again when stage 1 links.",
+   "links": {
+    "prev": "W02",
+    "next": "R03",
+    "in": "down A4, reverse dolly under the gates",
+    "to_next": "A5",
+    "stations": [
+     "race-day"
+    ],
+    "tabs": [
+     {
+      "label": "Overview",
+      "path": "#/overview"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Market at DSWL_BES1: the Tape, Candles (pair 7)"
+   },
+   "webp": "web/W03.webp",
+   "thumb": "web/W03.thumb.webp",
+   "png": "frames/world.W03-race-day.png",
+   "png_sha256": "ace1c9ea330e107e98b3f0fd1170246a7252bd5b265cf280840f0aebdf04b4ed"
+  },
+  {
+   "order": 22,
+   "id": "R03",
+   "file": "grid.R03",
+   "code": "R03",
+   "group": "grid",
+   "station": "Stewards (Verifier)",
+   "title": "Stewards: one changed number, three red lamps",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    17
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "The Stewards bay with the changed copy. Desert Willow's leaf card (leaf 94 of 316, the site's numbering) shows its 24-hour plan with hour 11 moved from −150,000 to −149,000 kW. Above it, the real nine-step RFC 6962 audit path (sibling hashes L1 to L9, computed in the frame and folding to the sealed root) breaks at L1. Lamps 01, 02 and 05 are red; 03 and 04 are teal. The proof, the hashes and the tamper rule are real. The lamp states follow the Stewards page's own words for a changed copy (\"checks 03 and 04 still pass; the leaf, the proof and the energy balance do not\"); this still does not run the verifier.",
+   "real_vs_mechanism": "Real: the audit path is RFC 6962 over the 316 leaf hashes of frame-data.json fleet.batteries in index order, for Desert Willow at index 93 (position 94 of 316): 9 steps, sides lrlllrlrr, folding to 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7, the sealed root. The changed value is the page's tamper rule on showcase.arms.C.kw: hour 11 (11:00 to 12:00 CT), -150000 to -149000 kW. The lamps' states follow the Stewards page's own words for a changed copy (\"checks 03 and 04 still pass; the leaf, the proof and the energy balance do not\": 01, 02 and 05 fail); this still does not run the verifier. Illustrative: the bay's architecture, the rails and lights.",
+   "links": {
+    "prev": "W03",
+    "next": "V03",
+    "in": "by A5 into the bay",
+    "to_next": "the same bay beside its page",
+    "stations": [
+     "stewards"
+    ],
+    "tabs": [
+     {
+      "label": "Verify",
+      "path": "#/verify/DSWL_ESS_ESR1"
+     },
+     {
+      "label": "Verify, changed copy",
+      "path": "#/verify/DSWL_ESS_ESR1?tamper=1"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Data and Methods, Versions and citations (pair 8)"
+   },
+   "webp": "web/R03.webp",
+   "thumb": "web/R03.thumb.webp",
+   "png": "frames/grid.R03.png",
+   "png_sha256": "a140ac7d7001adbdfc9afd4c9f0020cefb56528d104ba5ff359a42630ced216b"
+  },
+  {
+   "order": 23,
+   "id": "V03",
+   "file": "venue.side-by-side",
+   "code": "V03",
+   "group": "venue",
+   "station": "Stewards beside #/stewards",
+   "title": "The station and its page: the same file, the same checks",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    17
+   ],
+   "kind": "pair",
+   "films": "master, 90 s (pair 8, built in the world)",
+   "caption": "The Stewards bay in the tamper state beside the real #/stewards page. On the left: the leaf card with its changed row (arms.C.kw[11] −150,000 → −149,000 kW, leaf 94 of 316), the proof ladder broken at rung 1, lamps 01, 02 and 05 red and 03, 04 teal, and the page's own report board on the bay's screen. Real: the board on the screen is built from frame-data.json and matches the captured page word for word, with the same five check states (checked by script on this render). Illustrative: the 30 x 8.4 m screen (the layout says 10 x 6 m), the card's rows and the ladder's shape.",
+   "real_vs_mechanism": "Two halves joined with a 1 px #2b3036 divider. Left, the world (venue.stewards, 960 x 1080): The stewards' bay in the tamper state, the left half of the side-by-side. Real: the board on the bay's screen is built from frame-data.json (showcase name, resource, node, hub, rating; leaf 94 of 316, counted from one as the page counts it) with the page's own markup and rules, and the five lamps carry the page's verifier results on the changed copy (01, 02, 05 fail; 03, 04 pass), as captured from the site's preview; the change is the page's tamper rule computed here: arms.C.kw[11] −150,000 to −149,000 kW. Illustrative: the card's rows (the leaf's fields as bars, the changed one red), the ladder's geometry (nine rungs, one a sibling hash) and the bay's architecture. The screen is 30 x 8.4 m here, the board's own aspect (the layout's 10 x 6 m would hold it too small to read beside the page). Right, the page: the site's #/stewards page for DSWL_ESS_ESR1 with the tamper test on, captured at 960 x 1080 from a local preview of the site's build of Nov 26, 01:19 Bangkok (before the redesign), stopped after the capture. Agreement: checked by script after this render: the in-scene board (built in the lab from frame-data.json with the page's markup and rules) and the page's board read the same text, and their five strip states match: is-fail 01 | is-fail 02 | is-pass 03 | is-pass 04 | is-fail 05.",
+   "links": {
+    "prev": "R03",
+    "next": "V02",
+    "in": "the Stewards bay beside its page",
+    "to_next": "A7, past the timing screens",
+    "stations": [
+     "stewards"
+    ],
+    "tabs": [
+     {
+      "label": "Verify",
+      "path": "#/verify/DSWL_ESS_ESR1"
+     },
+     {
+      "label": "Verify, changed copy",
+      "path": "#/verify/DSWL_ESS_ESR1?tamper=1"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": "Data and Methods (pair 8)"
+   },
+   "webp": "web/V03.webp",
+   "thumb": "web/V03.thumb.webp",
+   "png": "frames/venue.side-by-side.png",
+   "png_sha256": "ca96beba38621d08813a3016c153a116717a8d0e3c5ce8bd88237ec56e39170c",
+   "parts": {
+    "left": {
+     "png": "frames/venue.stewards.png",
+     "png_sha256": "103a9e48dfd287e5485893bf637865334c0cc00728a9cb348d3b8c6c12059cc8",
+     "size": "960 x 1080",
+     "note": "The stewards' bay in the tamper state, the left half of the side-by-side. Real: the board on the bay's screen is built from frame-data.json (showcase name, resource, node, hub, rating; leaf 94 of 316, counted from one as the page counts it) with the page's own markup and rules, and the five lamps carry the page's verifier results on the changed copy (01, 02, 05 fail; 03, 04 pass), as captured from the site's preview; the change is the page's tamper rule computed here: arms.C.kw[11] −150,000 to −149,000 kW. Illustrative: the card's rows (the leaf's fields as bars, the changed one red), the ladder's geometry (nine rungs, one a sibling hash) and the bay's architecture. The screen is 30 x 8.4 m here, the board's own aspect (the layout's 10 x 6 m would hold it too small to read beside the page)."
+    },
+    "right": "the site's #/stewards page for DSWL_ESS_ESR1 with the tamper test on, captured at 960 x 1080 CSS px, device scale 2, Lanczos, dark theme"
+   }
+  },
+  {
+   "order": 24,
+   "id": "V02",
+   "file": "venue.drive",
+   "code": "V02",
+   "group": "venue",
+   "station": "Transition: lane A7, Stewards to Arena",
+   "title": "Driving A7 under the timing gantry, into the Arena's glow",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [],
+   "kind": "story",
+   "films": "master (as the glide from R03 to R04)",
+   "caption": "Driving A7 at eye level under the timing gantry, into the Arcade's warm haze; the garage roof reads as a glass canopy on the right. The BNB/USD tower shows Atlas's signed 537.46 (09:54:38 CT) and CoinMarketCap's 536.54 (09:53:04 CT), and the gantry's screens repeat BNB 537.46 and USDT 0.99876 (Atlas). Real: those 25 Nov prices, read after the seal and kept internal until the sponsor release. Illustrative: the comets, the pole lights, the Arcade's glow and its haze in the sky. No plan capsule: it read as a toy.",
+   "real_vs_mechanism": "The drive down A7, Stewards to the Arena. Real: the towers' screens carry the Atlas and CoinMarketCap reads of 25 Nov (sponsors.atlas.signed_pull, sponsors.cmc.quotes, .security, .funding_decision; read after the seal, internal until the sponsor release) and the arch's screens repeat the two prices; the lane is the layout's track (A7, under the timing gantry). Illustrative: the comets running ahead on the lane (the plan capsule was dropped: it read as a toy), the pole lights and the Arcade's glow are the venue's own light.",
+   "links": {
+    "prev": "V03",
+    "next": "T01",
+    "in": "the glide down A7 under the timing gantry",
+    "to_next": "the A6 spur (off the master path)",
+    "stations": [
+     "timing-screens"
+    ],
+    "tabs": [],
+    "tab_not_built": "MARKETS · Prices",
+    "terminal": null
+   },
+   "webp": "web/V02.webp",
+   "thumb": "web/V02.thumb.webp",
+   "png": "frames/venue.drive.png",
+   "png_sha256": "4313a1433b7c58b95467cdc7f2101b2045813452284593c3c20a17c2936af0f7"
+  },
+  {
+   "order": 25,
+   "id": "T01",
+   "file": "towers.T01-timing",
+   "code": "T01",
+   "group": "towers",
+   "station": "Timing screens (Atlas + CoinMarketCap)",
+   "title": "Timing screens: every price from two sources",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [],
+   "kind": "story",
+   "films": "site; Atlas and CoinMarketCap cut",
+   "caption": "Timing screens. A row of timing towers along A7. The near BNB/USD tower shows Atlas's signed $537.46 at 09:54:38 CT beside CoinMarketCap's $536.54 at 09:53:04 CT, with the $0.92 (0.17%) gap marked to scale against Atlas's consensus median and TWAP. Further down the row are USDT/USD (Atlas $0.99876, CoinMarketCap $0.99868), BSC-USDT's 'safe' screening (tax 0 / 0, one caution: mintable), the 0.25 BNB budget priced at the lower quote ($134.13, 57 evaluations at $2), Atlas's 186 public feeds, and the chain-97 feed refused as 10,817 s stale, by the gantries. Every number is a live read from 25 Nov, taken after the seal. The towers' design, order, 55-degree facing and the refused panel's position are illustrative.",
+   "real_vs_mechanism": "Timing screens, built for the storyboard on the intro's stage. Every figure on the screens and plates is a live read from the sponsor lanes' evidence (frame-data.json sponsors.atlas and sponsors.cmc), taken after the seal: Atlas signed Pull for BNB/USD (feed 633) and USDT/USD (feed 649) at 09:54:38 CT with the signer verified, Atlas's consensus median and TWAP, CoinMarketCap Pro quotes at 09:53:04 CT, CoinMarketCap's security detail for BSC-USDT, Atlas's catalog of 186 public feeds, and the chain-97 feed refused as 10,817 s stale. The 0.25 BNB is a declared planning budget, not a wallet balance, priced at the lower quote; testnet funds have no cash value. Illustrative: the towers' design, their order on the plinth, and their facing (turned to 55 degrees, toward A7 as it leaves the stewards; the layout says they face north); the catalog's pips mark the feeds used at their share of the id range, not the catalog's order; the refused panel stands by the gantries (x -78) rather than at the plinth's east end, so the camera looking west down the row sees it far, with the gantries and the Arena's glow beyond. Sponsor values stay internal until the sponsor release.",
+   "links": {
+    "prev": "V02",
+    "next": "R04",
+    "in": "by the Stewards' A6 spur",
+    "to_next": "A7 into the Arena",
+    "stations": [
+     "timing-screens"
+    ],
+    "tabs": [],
+    "tab_not_built": "MARKETS · Prices",
+    "terminal": null
+   },
+   "webp": "web/T01.webp",
+   "thumb": "web/T01.thumb.webp",
+   "png": "frames/towers.T01-timing.png",
+   "png_sha256": "7d0c629faace32e761a2e587a6556770fc35176af25851ea1ddf4405bfa6f1b2"
+  },
+  {
+   "order": 26,
+   "id": "R04",
+   "file": "grid.R04",
+   "code": "R04",
+   "group": "grid",
+   "station": "Standings (Arena)",
+   "title": "Standings: 316 sealed plans, modeled",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    18
+   ],
+   "kind": "story",
+   "films": "master",
+   "caption": "The Arena's timing tower, seen close from below, ranks the sealed plans by expected value: P1 SLK_BESS_ESR1 at $9,812.36 through P12, then Desert Willow pinned at P33 with $3,543.35. Each row carries its 24-hour plan sparkline and its arm. The crown sits on the arena's one committer, the agent 0xfa22…94b8, with 316 plans. The rows are modeled values from frame-data.json, not settled scores. The plaza, the two visitors at the tower's foot and the Arcade's warm light at the lower left are illustrative.",
+   "real_vs_mechanism": "Real: the tower's rows are frame-data.json fleet.batteries sorted by selected_expected_usd, most first (the Standings page's default sort): P1 SLK_BESS_ESR1 at $9,812.36 down to P12 FIVEWSLR_ESR1; Desert Willow at P33, $3,543.35; each sparkline is the row's selected_kw (24 hours), each letter its selected_arm. The crown sits on the arena's one committer, 0xfa22C29C4c3d975FCC617D899B1B695eFF2d94b8 (sealed_day.agent), with 316 plans. These are modeled expected values under each leaf's own scenarios, not settled scores, and rank our shadow plans, not any operator. Illustrative: the plaza, its brass, the two visitors (the kit's figure, recolored) and the Arcade's warm spill from off frame.",
+   "links": {
+    "prev": "T01",
+    "next": "T02",
+    "in": "round the Arena",
+    "to_next": "A8",
+    "stations": [
+     "arena"
+    ],
+    "tabs": [
+     {
+      "label": "Fleet",
+      "path": "#/fleet"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/R04.webp",
+   "thumb": "web/R04.thumb.webp",
+   "png": "frames/grid.R04.png",
+   "png_sha256": "41f5dbfeb9e1744a579861a4610042bc07fefbb57fb4080599880cc45923a281"
+  },
+  {
+   "order": 27,
+   "id": "T02",
+   "file": "towers.T02-season",
+   "code": "T02",
+   "group": "towers",
+   "station": "Season purse (Flap)",
+   "title": "Season purse: PRIX, earned by skill",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    19
+   ],
+   "kind": "story",
+   "films": "master",
+   "caption": "Season purse. A 30 m arcade vending machine in dark lacquered walnut and brass, ringed with tungsten bulbs. Left: the empty glass presale tube, with brass bands at the Portal's $1,500 creation floor and $3,000 graduation floor. Center: the allocation screen with the season's rules. Right: the empty glass vault and its dial, with the burn slot below. A visitor stands at the deposit slot for scale. Real: the live Flap Portal settings on BSC testnet (v1.2.0, block 144,817,512, creation open, salt-lock fee 0.005 tBNB) and its floors at half the supply in the pool. Nothing has launched, so the season mechanism is a design and PRIX is a placeholder.",
+   "real_vs_mechanism": "Season purse: a design. Nothing has launched: no Wattness factory, Launcher, Vault, PRIX token or deposit exists, so the presale tube and the vault are empty and the allocation screen shows the rules, not counts. Real: the Flap Portal's live configuration on BSC testnet (frame-data.json sponsors.flap: Portal v1.2.0, block 144,817,512 at 10:09:42 CT, creation open, salt-lock fee 0.005 tBNB) and its floors at half the supply in the pool, $1,500 to create and $3,000 to graduate; the tube's brass marks stand at those floors on a linear scale whose graduation floor is 90% of the tube (the ratio is the Portal's, the scale the design's). PRIX is a placeholder held in one constant (season.ts SEASON_TOKEN): the organizers have not said whether 'no token tickers' covers testnet tokens. The visitor is the kit's figure for scale; the bulbs chase at 0.8 Hz. The License to launch tower stands east of the frame, so it is not in this view.",
+   "superseded": "After this render the sponsor flows ran on BSC testnet, so these words no longer hold: 'Nothing has launched' and 'PRIX is a placeholder'. Re-render from the re-synced frame data before any cut.",
+   "links": {
+    "prev": "R04",
+    "next": "T03",
+    "in": "by A8",
+    "to_next": "A9",
+    "stations": [
+     "season-purse"
+    ],
+    "tabs": [],
+    "tab_not_built": "MARKETS · Season",
+    "terminal": null
+   },
+   "webp": "web/T02.webp",
+   "thumb": "web/T02.thumb.webp",
+   "png": "frames/towers.T02-season.png",
+   "png_sha256": "8930fe2e67a83b0204acef0f6afcde70015519680aa68d302b64875092bc6b03"
+  },
+  {
+   "order": 28,
+   "id": "T03",
+   "file": "towers.T03-launch-blocked",
+   "code": "T03",
+   "group": "towers",
+   "station": "License to launch (OpenFour)",
+   "title": "License to launch: one lamp lit, one to go",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    20
+   ],
+   "kind": "story",
+   "films": "master",
+   "caption": "License to launch today. On the signal head above the glass tower, the 'sealed before the gate' lamp is lit teal by the 26 Nov record (2,683 s before the gate). The liquidity lamp is dark and hatched, and the shutter is closed. The spiral in the bonding tube has one lit turn for the one sealed day, and the pool beside the tower is dark and still. The agent's card at the foot shows 0xfa22…94b8 with 8 checks passed and 2 skipped. Real: the record, the wallet, the checks, and OpenFour's Bonding V1 preset with its five modules from the discovery probe. The OpenFour testnet run is in progress: no custom module, token or migration exists yet, and PLNR is a working name. The signal head, the spiral's rise per day, the card's angle and the pool are illustrative.",
+   "real_vs_mechanism": "The state today. Real: the right lamp reads the 26 Nov record, sealed 2,683 s before the gate (frame-data.json sealed_day.receipts[0]); the agent's wallet 0xfa22…94b8 and its evaluation, 8 checks pass and 2 skipped (sponsors.agent_studio.evaluation); OpenFour's Bonding V1 preset and its 5 modules, found by the testnet discovery probe (block 144,816,767, 10:04:06 CT). The OpenFour testnet run is in progress; at this data no custom module is deployed, no token created and no migration run, so the liquidity lamp has nothing to read and stays dark and hatched, and the spiral has one lit turn for the one sealed day. PLNR is a working name held in one constant. Illustrative: the tower and its signal head (on the crown, turned toward A9), the spiral's rise per day, the card's angle toward the lane, and the pool. Whether a developer-owned registry qualifies for OpenFour's Hub is an open question to OpenFour.",
+   "superseded": "After this render the sponsor flows ran on BSC testnet, so these words no longer hold: 'no custom module, token or migration exists yet' and the lamp states. Re-render from the re-synced frame data before any cut.",
+   "links": {
+    "prev": "T02",
+    "next": "T04",
+    "in": "by A9",
+    "to_next": "the same view after graduation",
+    "stations": [
+     "license-to-launch"
+    ],
+    "tabs": [],
+    "tab_not_built": "MARKETS · Launchpad",
+    "terminal": null
+   },
+   "webp": "web/T03.webp",
+   "thumb": "web/T03.thumb.webp",
+   "png": "frames/towers.T03-launch-blocked.png",
+   "png_sha256": "ac767de09ef4f6fa2efdc5c2c2942e56831c41ece61a0ab680961ba255070a84"
+  },
+  {
+   "order": 29,
+   "id": "T04",
+   "file": "towers.T04-launch-graduate",
+   "code": "T04",
+   "group": "towers",
+   "station": "License to launch (OpenFour)",
+   "title": "License to launch: graduation",
+   "part": "III",
+   "part_title": "The race weekend",
+   "beats": [
+    20
+   ],
+   "kind": "story",
+   "films": "master",
+   "caption": "The same view after graduation: both lamps lit and the shutter open. The spiral is complete and the tube is filled to its mark, which is the module's threshold, not a market figure. The PLNR disc rides its arc with a teal comet, just above the pool as the ripples begin. This frame is entirely a design: no module, token, liquidity or migration exists, and the testnet run is still in progress. Its scope line says it shows how graduation works and claims no run.",
+   "real_vs_mechanism": "Entirely a design: no evidence-gated module is deployed, no PLNR token exists, no liquidity, no migration. The OpenFour testnet run is in progress; this frame claims no result from it. The plates describe how graduation works; the fill is the module's threshold mark, not a market figure. Real, as in T03: the agent's wallet, its one sealed day (26 Nov, 2,683 s before the gate on BSC mainnet) and its checks (8 pass, 2 skipped), from frame-data.json sealed_day and sponsors.agent_studio. PLNR is a working name held in one constant. Jo decides whether a design frame belongs in the public cut.",
+   "superseded": "After this render the sponsor flows ran on BSC testnet, so these words no longer hold: 'Entirely a design: no module, token, liquidity or migration'. Re-render from the re-synced frame data before any cut.",
+   "links": {
+    "prev": "T03",
+    "next": "V04",
+    "in": "by A9 (the same view after graduation)",
+    "to_next": "the climb",
+    "stations": [
+     "license-to-launch"
+    ],
+    "tabs": [],
+    "tab_not_built": "MARKETS · Launchpad",
+    "terminal": null
+   },
+   "webp": "web/T04.webp",
+   "thumb": "web/T04.thumb.webp",
+   "png": "frames/towers.T04-launch-graduate.png",
+   "png_sha256": "0cee42d1e730e26a4df533a43ea9ac8a0bd58817db3d847c3c4daf0666a44982"
+  },
+  {
+   "order": 30,
+   "id": "V04",
+   "file": "venue.closing",
+   "code": "V04",
+   "group": "venue",
+   "station": "Closing",
+   "title": "Every gate, every battery: the next gate",
+   "part": "IV",
+   "part_title": "Out to the stack",
+   "beats": [
+    21
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "The closing pull-back from the south-west, with the whole venue in frame. Nearest is the Arcade's warm glow. Then the garage's glass roof with the mark and the brain glowing under it, the nine arrows, one bright pulse on A7, and Parc Ferme's gold ring at the far right. The end card names the next gate: Thu 26 Nov, 10:00 CT · 23:00 Bangkok · operating day 27 Nov. Real: the venue's figures as in the hub. The next gate is computed from the sealed day's gate and the data's build time (25 Nov 12:30 CT), so a still made after Thu 26 Nov 10:00 CT must be re-rendered. A design: the return road. Not run yet: no season launch, graduation or Arena seal flow.",
+   "real_vs_mechanism": "The closing. Real: the venue as in the hub (plinths at the diagram's footprints, the grid's 316 sealed plans, Parc Ferme's 316 ticks, the Arcade's field, coins and score tower on arm C's sealed numbers, game.results.C). The next gate is computed from the sealed day's gate (sealed_day.gate) and the data's build time (built), the first 10:00 CT gate after it: Thu 26 Nov, 10:00 CT, 23:00 Bangkok, operating day 27 Nov; a still made after that gate must recompute it. Design: the return road, dim and dashed. Not run: no season launch, no graduation, no arena seal flow; the P1 banner holds the agent's sealed C, ranked on the modeled score until race day settles.",
+   "superseded": "After this render the sponsor flows ran on BSC testnet, so these words no longer hold: 'Not run: no season launch, no graduation'. Re-render from the re-synced frame data before any cut.",
+   "links": {
+    "prev": "T04",
+    "next": "S01",
+    "in": "pull back and climb, lanes pulse A1 to A9",
+    "to_next": "the cross-fade (the stack stands at the venue coordinates)",
+    "stations": [
+     "starting-grid",
+     "weather-radar",
+     "garage",
+     "race-day-forecast",
+     "fuel-and-wear",
+     "spotter",
+     "setup",
+     "risk-desk",
+     "pit-wall",
+     "team-data",
+     "parc-ferme",
+     "race-day",
+     "stewards",
+     "timing-screens",
+     "arena",
+     "season-purse",
+     "license-to-launch"
+    ],
+    "tabs": [
+     {
+      "label": "Overview",
+      "path": "#/overview"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/V04.webp",
+   "thumb": "web/V04.thumb.webp",
+   "png": "frames/venue.closing.png",
+   "png_sha256": "cb3522a289e5b3c9647b71606e5143ad35f47f3ff2ecd30597f91b0a2ae5a9b9"
+  },
+  {
+   "order": 31,
+   "id": "S01",
+   "file": "stack.rest",
+   "code": "S01",
+   "group": "stack",
+   "station": "The stack (the finale)",
+   "title": "This is the whole stack",
+   "part": "IV",
+   "part_title": "Out to the stack",
+   "beats": [
+    22
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "This is the whole stack. Real batteries on the left, the agents in the middle, the seal on BNB Chain to the right, the markets in front. Every solid line carries something real. Operating day Nov 26, 2026 · 316 batteries · Data: ERCOT. Calculation and display: Wattness.",
+   "real_vs_mechanism": "S01, the whole stack at rest. Real: every live strand's payload and each object's figures, from frame-data.json, the Greenfield record (scripts/greenfield/published.json, summarized beside this station) and integrations.json beside it (the sponsor flows on BSC testnet: addresses and transactions, each read back on a public RPC). The plinth's columns are the 270 mapped batteries of 316 (the rest have no point and are not drawn), height 0.14 m a MW. Lit since they ran on BSC testnet on Nov 25: Flap's season token and vault, OpenFour's graduation, the evaluator on Amazon Bedrock AgentCore and its hosted job 1873, the agents' identities and their paid job. After the seal: Cournot's odds, Living Brain's memory (read after 09:12:46 CT) and the paid job, drawn lit with a tick. Designed, drawn as ghosts with dotted lines: CMC's screening of launches, the outcome lamps. Comet speeds and spacing are drawn, not measured.",
+   "links": {
+    "prev": "V04",
+    "next": "S02",
+    "in": "cross-fade box on box (same coordinates)",
+    "to_next": "the hop to the witness",
+    "stations": [],
+    "tabs": [
+     {
+      "label": "How It Works",
+      "path": "#/about"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/S01.webp",
+   "thumb": "web/S01.thumb.webp",
+   "png": "frames/stack.rest.png",
+   "png_sha256": "a9e53eedd9f4926ae45f381d36415db12649a0d9881c696ef64a03f0e4ea290a",
+   "light": {
+    "webp": "web/S01.light.webp",
+    "thumb": "web/S01.light.thumb.webp",
+    "png": "frames/light/stack.rest.png",
+    "png_sha256": "519272532f0423c2312ff56df97f469187a55d37ae238100c699854484e16fdf"
+   }
+  },
+  {
+   "order": 32,
+   "id": "S02",
+   "file": "stack.seal",
+   "code": "S02",
+   "group": "stack",
+   "station": "The stack (the finale)",
+   "title": "Sealed before the gate",
+   "part": "IV",
+   "part_title": "Out to the stack",
+   "beats": [
+    23
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "Sealed before the gate. One root for 316 plans went onto BNB Chain at 09:15:17 CT, 2,683 seconds before ERCOT's day-ahead gate. The day's files sit in a public Greenfield bucket, so anyone can recompute the root. The contract computes the gate itself; a seal at or after it reverts. GateRecord 0x2922…2876 · source verified · BNB Smart Chain",
+   "real_vs_mechanism": "S02 at t 3.7 s of its 6 s loop: the root's path lit, the rest dimmed to 0.3. Real: plan time, root, the mainnet receipt (block, time, seconds before the gate), the 953 objects downloaded back and matched (all_verified true), leaf 93's check. The Greenfield bucket is on Greenfield testnet; the seal is on BSC mainnet. Comet timing is drawn.",
+   "links": {
+    "prev": "S01",
+    "next": "S02-late",
+    "in": "hop to the witness",
+    "to_next": "the same hop, later on its loop",
+    "stations": [],
+    "tabs": [
+     {
+      "label": "Seal",
+      "path": "#/seal"
+     },
+     {
+      "label": "Files",
+      "path": "#/files"
+     },
+     {
+      "label": "Verify",
+      "path": "#/verify/DSWL_ESS_ESR1"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/S02.webp",
+   "thumb": "web/S02.thumb.webp",
+   "png": "frames/stack.seal.png",
+   "png_sha256": "750a2860523affa7164bf7303ff03dd01dcd8b0fb094d0ed8422e7ef0ca7a1ac",
+   "light": {
+    "webp": "web/S02.light.webp",
+    "thumb": "web/S02.light.thumb.webp",
+    "png": "frames/light/stack.seal.png",
+    "png_sha256": "1522b8320bd822c72a03db5487e5139fe41e4bb834d31c32e90b27292103d6fd"
+   }
+  },
+  {
+   "order": 33,
+   "id": "S02-late",
+   "file": "stack.seal-late",
+   "code": "S02",
+   "group": "stack",
+   "station": "The stack (the finale)",
+   "title": "Sealed before the gate: the late seal refused",
+   "part": "IV",
+   "part_title": "Out to the stack",
+   "beats": [
+    23
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "Sealed before the gate. One root for 316 plans went onto BNB Chain at 09:15:17 CT, 2,683 seconds before ERCOT's day-ahead gate. The day's files sit in a public Greenfield bucket, so anyone can recompute the root. The contract computes the gate itself; a seal at or after it reverts. GateRecord 0x2922…2876 · source verified · BNB Smart Chain",
+   "real_vs_mechanism": "S02 at t 4.5 s: the late seal. The red comet draws the simulated commit refused with AfterGate(20261126, 1795622400) at chain time 22 s after the gate (BSC mainnet; testnet 25 s): a simulation, not a mined failed transaction. The cube does not change.",
+   "links": {
+    "prev": "S02",
+    "next": "S03",
+    "in": "the same hop: the late pulse stops dead in red",
+    "to_next": "a pointer on a piece",
+    "stations": [],
+    "tabs": [
+     {
+      "label": "Seal",
+      "path": "#/seal"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/S02-late.webp",
+   "thumb": "web/S02-late.thumb.webp",
+   "png": "frames/stack.seal-late.png",
+   "png_sha256": "524902032ec7050aad03e96caebd865fde7462d6320522022a088786299d98b3",
+   "light": {
+    "webp": "web/S02-late.light.webp",
+    "thumb": "web/S02-late.light.thumb.webp",
+    "png": "frames/light/stack.seal-late.png",
+    "png_sha256": "775731ec31cc985a3e0c9508b97ebcef69a1fe5a6fd2ea1aedb02e418ae8fecb"
+   }
+  },
+  {
+   "order": 34,
+   "id": "S03",
+   "file": "stack.inspect",
+   "code": "S03",
+   "group": "stack",
+   "station": "The stack (the finale)",
+   "title": "One piece, inspected: GateRecord (site and sponsor cuts)",
+   "part": "IV",
+   "part_title": "Out to the stack",
+   "beats": [],
+   "kind": "story",
+   "films": "site, every sponsor cut",
+   "caption": "S03, GateRecord inspected (the hover state: its halo, its own strands at full, the rest at 0.25; the chip and card).",
+   "real_vs_mechanism": "S03, GateRecord hovered: the live mount's hover state at its end (its halo, its own strands at full, the other strands at 0.25 and objects at 0.55; the chip and card beside it). Every line of the card is on file in frame-data.json sealed_day; the refusal is the simulated call. The pointer is drawn for the still.",
+   "links": {
+    "prev": "S02-late",
+    "next": "S04",
+    "in": "pointer on a piece",
+    "to_next": "the rise to plan",
+    "stations": [],
+    "tabs": [
+     {
+      "label": "Seal",
+      "path": "#/seal"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/S03.webp",
+   "thumb": "web/S03.thumb.webp",
+   "png": "frames/stack.inspect.png",
+   "png_sha256": "83c296b01f878f3cec48208086f4bc659c8f507bcb1d8cde71eab6974dcf26de",
+   "light": {
+    "webp": "web/S03.light.webp",
+    "thumb": "web/S03.light.thumb.webp",
+    "png": "frames/light/stack.inspect.png",
+    "png_sha256": "b764d8bc25dd021cbf3ac29512f2d98c2e75f7da65966cf33b9a62bedd16ae2b"
+   }
+  },
+  {
+   "order": 35,
+   "id": "S04",
+   "file": "stack.close",
+   "code": "S04",
+   "group": "stack",
+   "station": "The stack (the finale)",
+   "title": "The plan view, and the end",
+   "part": "IV",
+   "part_title": "Out to the stack",
+   "beats": [
+    24
+   ],
+   "kind": "story",
+   "films": "master, 90 s",
+   "caption": "Wattness Grand Prix. Every real ERCOT battery, planned for tomorrow and sealed on BNB Chain before the market closes. Anyone can check any plan. gp.wattness.tech · wattness.tech. Data: ERCOT. Calculation and display: Wattness.",
+   "real_vs_mechanism": "S04, the plan view and the end card: the space seen from above, as section 01's diagram; the cube's mark is carved along the iso view, so from above it reads as a cube. Real: every live strand's payload and each object's figures, from frame-data.json, the Greenfield record (scripts/greenfield/published.json, summarized beside this station) and integrations.json beside it (the sponsor flows on BSC testnet: addresses and transactions, each read back on a public RPC). The plinth's columns are the 270 mapped batteries of 316 (the rest have no point and are not drawn), height 0.14 m a MW. Lit since they ran on BSC testnet on Nov 25: Flap's season token and vault, OpenFour's graduation, the evaluator on Amazon Bedrock AgentCore and its hosted job 1873, the agents' identities and their paid job. After the seal: Cournot's odds, Living Brain's memory (read after 09:12:46 CT) and the paid job, drawn lit with a tick. Designed, drawn as ghosts with dotted lines: CMC's screening of launches, the outcome lamps. Comet speeds and spacing are drawn, not measured.",
+   "links": {
+    "prev": "S03",
+    "next": "stack.cube-check",
+    "in": "rise to plan",
+    "to_next": "the end; on the site, S04's click returns to the hub (V01)",
+    "stations": [],
+    "tabs": [
+     {
+      "label": "How It Works",
+      "path": "#/about"
+     }
+    ],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/S04.webp",
+   "thumb": "web/S04.thumb.webp",
+   "png": "frames/stack.close.png",
+   "png_sha256": "306cfe5f7e9f6c36a968a6eaef48c746214dd92e548079295ff8829a3ad5ab08",
+   "light": {
+    "webp": "web/S04.light.webp",
+    "thumb": "web/S04.light.thumb.webp",
+    "png": "frames/light/stack.close.png",
+    "png_sha256": "661f4e71140734fcc45269068c556288e67fd4719b62310a4bfcf26d2e1df6fd"
+   }
+  },
+  {
+   "order": 36,
+   "id": "stack.cube-check",
+   "file": "stack.cube-check",
+   "code": null,
+   "group": "stack",
+   "station": "The stack (the finale)",
+   "title": "GateRecord: the cube against the mark (check frame, not for the cut)",
+   "part": "IV",
+   "part_title": "Out to the stack",
+   "beats": [],
+   "kind": "check",
+   "films": "not for the cut",
+   "caption": "GateRecord: the cube against the mark. S01's camera, cropped 5.6 times round the cube. Red: BNB Chain's symbol as published, on the cube's iso hexagon (113 px wide in S01).",
+   "real_vs_mechanism": "Check, not a storyboard frame: the cube alone at S01's camera (a crop of the same projection), BNB Chain's symbol drawn over it in red as published (marks/bnbchain.svg). The cube shows the mark wherever the two agree.",
+   "links": {
+    "prev": "S04",
+    "next": null,
+    "in": "S01's camera, cropped round the cube",
+    "to_next": null,
+    "stations": [],
+    "tabs": [],
+    "tab_not_built": null,
+    "terminal": null
+   },
+   "webp": "web/stack.cube-check.webp",
+   "thumb": "web/stack.cube-check.thumb.webp",
+   "png": "frames/stack.cube-check.png",
+   "png_sha256": "03a6511f4ce0618ee5e0786ca519bbc566907a81061faac17675e813f78be949"
+  }
+ ]
+}

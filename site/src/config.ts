@@ -21,20 +21,3 @@ export const SHOWCASE = {
 } as const;
 
 export const CONTRACT_ADDRESS = "0x2922c68cE15EB3e83B7f43b136e981dDc4262876";
-
-/** Product vocabulary: the race weekend's terms and what each one is. */
-export const GLOSSARY = {
-  startingGrid: "ERCOT's grid of about 300 real batteries",
-  qualifying: "agents plan tomorrow",
-  parcFerme: "10:00 CT: plans sealed on BNB Chain; no changes, a late seal reverts",
-  raceDay: "the operating day; real-time prices are the telemetry",
-  weatherRadar: "Cournot's Texas weather odds",
-  pitWall: "the decision desk, with Ness as race engineer",
-  teamData: "Living Brain memory",
-  garage: "BNB Agent Studio builds the agents and AWS runs them",
-  stewards: "the verifier anyone can run",
-  standings: "scores per battery on matched conditions",
-  seasonPurse: "Flap season launch",
-  licenseToLaunch: "OpenFour evidence-gated graduation",
-  timingScreens: "Atlas and CoinMarketCap prices",
-} as const;

@@ -1,0 +1,317 @@
+/* ONE PLAN. Blocks: arcade-*, how-* (the package's own classes are .oneplan and op-*). */
+
+/* ---------------------------------------------------------------- the layout */
+
+/* The cabinet, its words folded above it on a narrow page, beside it on a wide one. */
+.arcade {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--t-space-5);
+  align-items: start;
+}
+.arcade--rail {
+  grid-template-columns: minmax(0, 1fr) 16rem;
+  gap: var(--gp-space-7);
+}
+.arcade__main {
+  display: grid;
+  gap: var(--gp-space-8);
+  min-width: 0;
+}
+.arcade__rail {
+  min-width: 0;
+}
+/* The words stay in view while the visitor plays, where the window is tall enough to hold them. */
+@media (min-height: 760px) {
+  .arcade__rail {
+    position: sticky;
+    top: calc(var(--gp-masthead-h) + var(--t-space-5));
+  }
+}
+
+/* ---------------------------------------------------------------- the cabinet */
+
+/* mountOnePlan fills it: the stage at 16:9 of its width, then the deck. Until
+   the package has loaded, the stage's place is held in the stage's own dark. */
+.arcade__cabinet {
+  min-width: 0;
+  container: arcade / inline-size;
+}
+.arcade__cabinet:empty {
+  aspect-ratio: 16 / 9;
+  background: #101315;
+}
+.arcade__cabinet .op-stage {
+  border-radius: var(--t-radius-md);
+}
+/* The mount marks its whole root dark for the stage, and the site grounds a dark
+   subtree on chrome: that would put the deck, which follows the page's theme, on
+   black. The stage keeps its own dark ground. */
+.arcade__cabinet > .oneplan[data-atmosphere="dark"] {
+  background: transparent;
+}
+
+/* The seal panel's status line is a .state, a name the site's shared loading
+   state also styles (a padded flex row): here it stays a line of text. */
+.arcade__cabinet .oneplan .op-seal .state {
+  display: block;
+  padding: 0;
+}
+
+/* The deck is laid out for a column of about 1,150 px: the controls with the
+   score beside them. In a narrower column (the site's side panel, or the words
+   beside it) it takes the package's own narrow layout, by the column's width
+   rather than the window's: the dial above the rack of hours, then the seal and
+   the score side by side while they fit. */
+@container arcade (max-width: 1149px) {
+  .arcade__cabinet .oneplan[data-layout="deck"] .op-deck {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .arcade__cabinet .oneplan[data-layout="deck"] .op-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .arcade__cabinet .oneplan .op-dialbox {
+    width: 100%;
+    grid-template-columns: auto 1fr;
+    justify-items: start;
+    align-items: center;
+    column-gap: 14px;
+  }
+  .arcade__cabinet .oneplan .op-rackbox {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .arcade__cabinet .oneplan .op-source {
+    grid-auto-flow: column;
+    justify-content: start;
+    padding-top: 0;
+  }
+  /* The mount places the hour's line in the wide deck's second column, inline. */
+  .arcade__cabinet .oneplan .op-controls > .op-detail {
+    grid-column: 1 / -1 !important;
+  }
+  /* A card's note drops under its title rather than squeeze it. */
+  .arcade__cabinet .oneplan .op-h {
+    flex-wrap: wrap;
+    row-gap: 2px;
+  }
+}
+/* Where it fits, the dial reads in one line: its name, the dial, its value, its two ends. */
+@container arcade (min-width: 640px) and (max-width: 1149px) {
+  .arcade__cabinet .oneplan .op-dialbox {
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+    column-gap: 18px;
+  }
+  .arcade__cabinet .oneplan .op-dialtitle {
+    margin-bottom: 0;
+  }
+}
+@container arcade (min-width: 760px) and (max-width: 1149px) {
+  .arcade__cabinet .oneplan[data-layout="deck"] .op-deck {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .arcade__cabinet .oneplan[data-layout="deck"] .op-main,
+  .arcade__cabinet .oneplan[data-layout="deck"] .op-side {
+    display: contents;
+  }
+  .arcade__cabinet .oneplan[data-layout="deck"] .op-controls {
+    grid-column: 1 / -1;
+  }
+}
+/* On a phone-sized stage the tray's dollar ticks, drawn at a fixed 12 px, would
+   run into each other. */
+@container arcade (max-width: 559px) {
+  .arcade__cabinet .oneplan .op-tag,
+  .arcade__cabinet .oneplan .op-tag.tail {
+    font-size: 9px;
+  }
+}
+/* Under 900 px the 24 hours would be too narrow for their figures ("cap 100"),
+   so each keeps a lane wide enough for them and the rack scrolls. */
+@container arcade (max-width: 899px) {
+  .arcade__cabinet .oneplan .op-rack {
+    overflow-x: auto;
+    grid-template-columns: repeat(24, 40px);
+    padding-bottom: 6px;
+  }
+}
+
+/* When the cabinet cannot start (no WebGL): one line on the pane, as the site's
+   other notes, pointing to the tabs that show the same plans. */
+.arcade__fallback {
+  margin: 0;
+  padding: var(--t-space-4);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  color: var(--w-muted);
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+
+/* ---------------------------------------------------------------- how it plays */
+
+.how {
+  display: grid;
+  gap: var(--t-space-5);
+  min-width: 0;
+}
+.how__title {
+  padding-bottom: var(--t-space-3);
+  border-bottom: 1px solid var(--t-rule);
+  font-size: var(--t-fs-title);
+}
+.how__list {
+  display: grid;
+  gap: var(--t-space-5);
+  margin: 0;
+}
+.how__item dt {
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.how__item dd {
+  margin: 0;
+  line-height: var(--t-lh-prose);
+  color: var(--w-fg);
+}
+.how__source {
+  font-size: var(--t-fs-xs);
+  line-height: var(--t-lh);
+  color: var(--w-muted);
+}
+
+/* Folded above the cabinet on a narrow page: one line until it is opened. */
+.how--folded {
+  display: block;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+}
+.how__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--t-space-4);
+  min-height: 40px;
+  padding: var(--t-space-3) var(--t-space-4);
+  list-style: none;
+  cursor: pointer;
+}
+.how__summary::-webkit-details-marker {
+  display: none;
+}
+.how__summary:hover {
+  background: var(--t-hover);
+}
+.how__caret {
+  flex: none;
+  color: var(--w-muted);
+  transition: transform var(--m-dur-s) ease-out;
+}
+.how--folded[open] .how__caret {
+  transform: rotate(180deg);
+}
+.how--folded[open] .how__summary {
+  border-bottom: 1px solid var(--t-rule);
+}
+.how--folded .how__list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+  gap: var(--t-space-5) var(--t-space-6);
+  padding: var(--t-space-5) var(--t-space-4) var(--t-space-4);
+}
+.how--folded .how__source {
+  padding: 0 var(--t-space-4) var(--t-space-4);
+}
+@media (max-width: 519px) {
+  .how__more {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------- the visitor's seal */
+
+.arcade-seal__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  gap: var(--t-space-6);
+  align-items: start;
+}
+.arcade-seal__plan {
+  display: grid;
+  gap: var(--t-space-4);
+  min-width: 0;
+}
+.arcade-seal__score {
+  display: grid;
+  margin: 0;
+}
+.arcade-seal__score > div {
+  display: grid;
+  grid-template-columns: 9em minmax(0, 1fr);
+  gap: var(--t-space-4);
+  align-items: baseline;
+  padding: 6px 0;
+  border-top: 1px solid var(--t-rule);
+}
+.arcade-seal__score > div:first-child {
+  border-top: 0;
+}
+.arcade-seal__score dt {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.arcade-seal__score dd {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--t-fs-sm);
+}
+.arcade-seal__score > div:first-child dd {
+  font-size: var(--t-fs-stat);
+  font-weight: 600;
+}
+.arcade-seal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--t-space-3);
+}
+.arcade-seal__doc summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--t-space-2);
+  min-height: var(--t-ctl-h);
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+  list-style: none;
+  cursor: pointer;
+}
+.arcade-seal__doc summary::-webkit-details-marker {
+  display: none;
+}
+.arcade-seal__doc summary:hover {
+  color: var(--w-fg);
+}
+.arcade-seal__caret {
+  transform: rotate(-90deg);
+  transition: transform var(--m-dur-s) ease-out;
+}
+.arcade-seal__doc[open] .arcade-seal__caret {
+  transform: none;
+}
+.arcade-seal__doc pre {
+  max-height: 280px;
+  margin: var(--t-space-3) 0 0;
+  padding: var(--t-space-4);
+  overflow: auto;
+  border-radius: var(--t-radius-md);
+  background: var(--t-chrome);
+  font-size: var(--t-fs-2xs);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+@media (max-width: 479px) {
+  .arcade-seal__score > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}

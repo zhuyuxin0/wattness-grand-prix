@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" data-skin="wattness" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>World frame lab</title>
+    <script>
+      // Seeded before any module runs: three's ambient occlusion draws its denoise noise from Math.random, and a
+      // frame must give the same pixels on every load. ?seed= picks another sequence.
+      (function () {
+        var s = (Number(new URLSearchParams(location.search).get("seed")) || 0x2f6b3a1d) >>> 0;
+        Math.random = function () {
+          s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+          return s / 4294967296;
+        };
+      })();
+    </script>
+    <script type="module" src="./src/lab.ts"></script>
+  </head>
+  <body>
+    <div id="world"></div>
+  </body>
+</html>

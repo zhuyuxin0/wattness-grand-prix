@@ -1,0 +1,19 @@
+{
+ "id": "game.play-light",
+ "note": "C’s glass at dial 0.35: the light marks glass the schedule does not deliver; the score counts what fits.",
+ "url": "http://127.0.0.1:15192/src/game/play.html?mode=story&dial=7&glass=5:13,7:33,9:-17,10:-71,11:-100,12:-12,17:94&select=9&still=1&w=1920&h=1080&dpr=2",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "score": {
+  "step": 7,
+  "mean": 3562585961,
+  "cvar": -298751341,
+  "objective": 3711961631,
+  "losing": 9,
+  "lit": true,
+  "limits": []
+ },
+ "warnings": [],
+ "refused": []
+}

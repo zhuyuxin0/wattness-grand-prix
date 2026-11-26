@@ -1,0 +1,68 @@
+{
+ "cut": "master",
+ "range": [
+  160,
+  180
+ ],
+ "scale": 1,
+ "viewport": "1920 x 1080 CSS px at 1x",
+ "gpuLoad": {
+  "before": 52,
+  "after": 86
+ },
+ "sharedGpu": true,
+ "t0": 160,
+ "t1": 180,
+ "frames": [
+  "venue.closing",
+  "stack.rest",
+  "stack.seal",
+  "stack.seal-late",
+  "stack.close"
+ ],
+ "cost": {
+  "n": 601,
+  "mean": 5.65,
+  "p50": 4.5,
+  "p95": 12.6,
+  "max": 22.7
+ },
+ "misses": 0,
+ "capped": false,
+ "intervals": {
+  "n": 2237,
+  "mean": 8.94,
+  "p50": 8.3,
+  "p95": 16.6,
+  "max": 208.4
+ },
+ "cpu": {
+  "n": 2237,
+  "mean": 3.67,
+  "p50": 3,
+  "p95": 8,
+  "max": 17.5
+ },
+ "gpu": null,
+ "gpuName": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "size": {
+  "w": 1920,
+  "h": 1080
+ },
+ "info": {
+  "calls": 383,
+  "triangles": 115738,
+  "passes": {
+   "shadow": 21,
+   "ShadowOncePass": 0,
+   "opaque": 54,
+   "aoNormalAndBlend": 34,
+   "copyBack": 1,
+   "overlay": 288,
+   "OutputPass": 1,
+   "opaqueColour": 33
+  }
+ },
+ "warnings": [],
+ "refused": []
+}

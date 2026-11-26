@@ -1,0 +1,75 @@
+{
+ "id": "garage.team-data",
+ "url": "http://127.0.0.1:15195/lab.html?frame=garage.team-data&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/garage.team-data.png",
+ "sha256": "1876f1f623660aaa9946b6eae1b7affd6865286f6c313a12f9526f94f4613636",
+ "deterministic": null,
+ "renderMs": 1328,
+ "wallMs": 1371,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 98
+ },
+ "underLoad": false,
+ "note": "Two brains, named apart. The Terminal brain (frame-data.json brain_graph): its 18 pages as stars sized by their sources, placed by a deterministic spring layout on its 53 generated similarity links (20 strong solid, 20 medium thinner, 13 weak dotted), each tied by a hairline to the part of terminal_structure it describes (the mapping is ours, by name). Under it terminal_structure itself: 6 layers, 18 parts, 48 typed connections. Desert Willow's asset brain (sponsors.living_brain): 1 page, version 2, 1 citation, no edges, its thread to the Planner's C board. At the plan's cutoff (2026-11-25 09:12:46 CT) the memory check admitted 0 pages; the review came at 2026-11-25 10:58:39 CT, after the gate. The pit, its depth and the parts' positions along it are design. The focal page's rings, glow and lamp are design (it is the page with the most sources). Camera lowered from the storyboard's [-60, 24, -8] (above the 18 m roof) to 17 m, south-west of the focal page and looking just past it.",
+ "frame": {
+  "id": "garage.team-data",
+  "station": "garage",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 4.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Two brains, named apart. The Terminal brain (frame-data.json brain_graph): its 18 pages as stars sized by their sources, placed by a deterministic spring layout on its 53 generated similarity links (20 strong solid, 20 medium thinner, 13 weak dotted), each tied by a hairline to the part of terminal_structure it describes (the mapping is ours, by name). Under it terminal_structure itself: 6 layers, 18 parts, 48 typed connections. Desert Willow's asset brain (sponsors.living_brain): 1 page, version 2, 1 citation, no edges, its thread to the Planner's C board. At the plan's cutoff (2026-11-25 09:12:46 CT) the memory check admitted 0 pages; the review came at 2026-11-25 10:58:39 CT, after the gate. The pit, its depth and the parts' positions along it are design. The focal page's rings, glow and lamp are design (it is the page with the most sources). Camera lowered from the storyboard's [-60, 24, -8] (above the 18 m roof) to 17 m, south-west of the focal page and looking just past it.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1328,
+  "programs": {
+   "state": "ready",
+   "programs": 45
+  },
+  "frameInfo": {
+   "calls": 452,
+   "triangles": 160586,
+   "passes": {
+    "shadow": 9,
+    "ShadowOncePass": 0,
+    "opaque": 354,
+    "aoNormalAndBlend": 44,
+    "copyBack": 1,
+    "overlay": 46,
+    "OutputPass": 1,
+    "opaqueColour": 345
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "1876f1f623660aaa9946b6eae1b7affd6865286f6c313a12f9526f94f4613636",
+   "wallMs": 1371,
+   "renderMs": 1328,
+   "gpuLoad": {
+    "before": 0,
+    "after": 98
+   }
+  }
+ ]
+}

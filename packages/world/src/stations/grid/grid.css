@@ -1,0 +1,15 @@
+/* The grid frames' plate liveries (the storyboard's art direction: a sealed figure carries a 3 px BNB-yellow left
+   stripe, the site's livery; a refused one a 3 px red stripe; a live one teal) and the key card's rows. */
+.hwalk .intro-plate.gp-sealed { box-shadow: inset 3px 0 0 #F0B90B, 0 0 0 1px color-mix(in srgb, var(--w-fg) 12%, transparent), 0 6px 16px -10px rgba(0, 0, 0, 0.3); padding-left: 13px; }
+.hwalk .intro-plate.gp-refused { box-shadow: inset 3px 0 0 #e5534b, 0 0 0 1px rgba(229, 83, 75, 0.35), 0 6px 16px -10px rgba(0, 0, 0, 0.3); padding-left: 13px; }
+.hwalk .intro-plate.gp-live { box-shadow: inset 3px 0 0 #2ec7a6, 0 0 0 1px color-mix(in srgb, var(--w-fg) 12%, transparent), 0 6px 16px -10px rgba(0, 0, 0, 0.3); padding-left: 13px; }
+.hwalk .intro-plate .gp-mono, .hwalk .gp-key .gp-mono { font-family: var(--t-font-code); font-variant-numeric: tabular-nums; }
+.intro-plate.gp-chip { position: absolute; left: 0; top: 0; z-index: 23; }
+.hwalk.is-x .intro-plate.gp-chip { font-size: max(11px, calc(16px * var(--u))); line-height: 1.3; }
+.gp-key { text-align: left; justify-items: stretch; }
+.gp-key .gp-key-title { font: 600 max(11px, calc(15px * var(--u))) / 1.3 var(--w-font-sans); color: #e6e8ea; margin-bottom: 2px; }
+.gp-key .gp-key-row { display: flex; align-items: center; gap: 10px; color: #c9ced3; white-space: nowrap; }
+.gp-key .gp-key-row.gp-strong { color: #e6e8ea; font-variant-numeric: tabular-nums; }
+.gp-key .gp-sw { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 3px; }
+.gp-key .gp-ring { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; border: 2px solid; box-sizing: border-box; }
+.gp-key .gp-ramp { display: inline-block; flex: none; width: 120px; height: 9px; border-radius: 2px; }

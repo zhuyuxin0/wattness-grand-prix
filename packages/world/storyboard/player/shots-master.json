@@ -1,0 +1,1066 @@
+{
+ "cut": "master",
+ "url": "http://127.0.0.1:15191/src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=film",
+ "scale": 2,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuLoad": {
+  "before": 26,
+  "after": 83
+ },
+ "wallMs": 49026,
+ "shots": [
+  {
+   "id": "01-desert-willow-rest",
+   "t": 1.4,
+   "key": "desert-willow",
+   "part": "I",
+   "stop": true,
+   "png": "storyboard/player/01-desert-willow-rest.png",
+   "sha256": "a356222d678ef5b64492e810217a9996f5884886607aad2aa80eed47cd66c91b",
+   "ms": 920,
+   "state": {
+    "t": 1.4,
+    "where": {
+     "kind": "hold",
+     "i": 0,
+     "since": 1.4,
+     "left": 3.6
+    },
+    "frames": [
+     {
+      "id": "opening.pad",
+      "local": 1,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "02-one-column-rest",
+   "t": 11.64,
+   "key": "one-column",
+   "part": "I",
+   "stop": true,
+   "png": "storyboard/player/02-one-column-rest.png",
+   "sha256": "1694d274d6d6dc8ccf20dc781a7b933ad91a7cce39ca60fe5d01b60ce88f959d",
+   "ms": 555,
+   "state": {
+    "t": 11.64,
+    "where": {
+     "kind": "hold",
+     "i": 1,
+     "since": 1.040000000000001,
+     "left": 0.35999999999999943
+    },
+    "frames": [
+     {
+      "id": "opening.column",
+      "local": 9.8,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "03-lock-rest",
+   "t": 14.1,
+   "key": "lock",
+   "part": "II",
+   "stop": false,
+   "png": "storyboard/player/03-lock-rest.png",
+   "sha256": "12ffd5fe05044fd371e8e5ab16bd96ee123b0abf40198d9ee1acf8b96f0e6266",
+   "ms": 478,
+   "state": {
+    "t": 14.1,
+    "where": {
+     "kind": "hold",
+     "i": 2,
+     "since": 0,
+     "left": 0
+    },
+    "frames": [
+     {
+      "id": "opening.lock-venue",
+      "local": 0,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "04-on-the-map-rest",
+   "t": 17.64,
+   "key": "on-the-map",
+   "part": "II",
+   "stop": true,
+   "png": "storyboard/player/04-on-the-map-rest.png",
+   "sha256": "95b72f75413a4bda0ba62fcb8f9a9f02127fc0c79dd068d9bfed24a2d7fb5fd8",
+   "ms": 1013,
+   "state": {
+    "t": 17.64,
+    "where": {
+     "kind": "hold",
+     "i": 3,
+     "since": 0.8399999999999999,
+     "left": 0.35999999999999943
+    },
+    "frames": [
+     {
+      "id": "world.W01-texas",
+      "local": 3,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "05-starting-grid-rest",
+   "t": 22.6,
+   "key": "starting-grid",
+   "part": "II",
+   "stop": true,
+   "png": "storyboard/player/05-starting-grid-rest.png",
+   "sha256": "98b290b809acde4fbe47a0d79534d6f6e61cf8078de066db75a15747559f951d",
+   "ms": 1221,
+   "state": {
+    "t": 22.6,
+    "where": {
+     "kind": "hold",
+     "i": 4,
+     "since": 1.4000000000000021,
+     "left": 2.3999999999999986
+    },
+    "frames": [
+     {
+      "id": "grid.R01",
+      "local": 4.2,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "06-the-map-rest",
+   "t": 29.64,
+   "key": "the-map",
+   "part": "II",
+   "stop": true,
+   "png": "storyboard/player/06-the-map-rest.png",
+   "sha256": "531a224cc6f2737319b44c35bf08bcbdcd9d7fb000521718a6182e7331bfa32f",
+   "ms": 1344,
+   "state": {
+    "t": 29.64,
+    "where": {
+     "kind": "hold",
+     "i": 5,
+     "since": 1.240000000000002,
+     "left": 0.35999999999999943
+    },
+    "frames": [
+     {
+      "id": "venue.hub",
+      "local": 6,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": [],
+   "rerendered": "Nov 26, 01:48 CT (14:48 Bangkok), after the hosted evaluator was drawn: capture-story --times at this t, scale 2"
+  },
+  {
+   "id": "07-garage-rest",
+   "t": 34.64,
+   "key": "garage",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/07-garage-rest.png",
+   "sha256": "638ed317012db609f9b009cbe3d5d41cef103fd46a9ba47b6f2ea5a29d42c9d2",
+   "ms": 3273,
+   "state": {
+    "t": 34.64,
+    "where": {
+     "kind": "hold",
+     "i": 6,
+     "since": 1.240000000000002,
+     "left": 0.35999999999999943
+    },
+    "frames": [
+     {
+      "id": "garage.hangar",
+      "local": 4.2,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "08-pit-wall-rest",
+   "t": 40,
+   "key": "pit-wall",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/08-pit-wall-rest.png",
+   "sha256": "255c39852d79bb0b0b4d7ce2a4bffc835521dea26683a19762a6ec91b53c51b3",
+   "ms": 2013,
+   "state": {
+    "t": 40,
+    "where": {
+     "kind": "hold",
+     "i": 7,
+     "since": 1.3999999999999986,
+     "left": 1
+    },
+    "frames": [
+     {
+      "id": "garage.pit-lane",
+      "local": 4.2,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "09-no-hedge-rest",
+   "t": 45,
+   "key": "no-hedge",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/09-no-hedge-rest.png",
+   "sha256": "7d15d06cd48ae9a710ae9a8b7e7f0cabbd1494db94b3bdf7000f1a48457d2fb6",
+   "ms": 2501,
+   "state": {
+    "t": 45,
+    "where": {
+     "kind": "hold",
+     "i": 8,
+     "since": 1.3999999999999986,
+     "left": 2
+    },
+    "frames": [
+     {
+      "id": "game.X01",
+      "local": 8,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "10-fixed-hedge-rest",
+   "t": 51.4,
+   "key": "fixed-hedge",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/10-fixed-hedge-rest.png",
+   "sha256": "a239c39e0a668245c6910e6a60cb7a043a990e6cdcdb08eb1f4c55c1b616dcf4",
+   "ms": 1907,
+   "state": {
+    "t": 51.4,
+    "where": {
+     "kind": "hold",
+     "i": 9,
+     "since": 1.3999999999999986,
+     "left": 2.6000000000000014
+    },
+    "frames": [
+     {
+      "id": "game.X02",
+      "local": 8,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "11-meet-rest",
+   "t": 58.4,
+   "key": "meet",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/11-meet-rest.png",
+   "sha256": "6e1fcefd804c588c054c7db7df88c74a7562a5bc60c2ffa37793bcc26dec5428",
+   "ms": 1854,
+   "state": {
+    "t": 58.4,
+    "where": {
+     "kind": "hold",
+     "i": 10,
+     "since": 1.3999999999999986,
+     "left": 2.6000000000000014
+    },
+    "frames": [
+     {
+      "id": "game.X03",
+      "local": 8,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "12-chosen-together-rest",
+   "t": 65.4,
+   "key": "chosen-together",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/12-chosen-together-rest.png",
+   "sha256": "1a0da5e631f19bad2180951603e108115b5d981ab7f920f8e75ab9f736dfcf22",
+   "ms": 1943,
+   "state": {
+    "t": 65.4,
+    "where": {
+     "kind": "hold",
+     "i": 11,
+     "since": 1.4000000000000057,
+     "left": 4.599999999999994
+    },
+    "frames": [
+     {
+      "id": "game.X04",
+      "local": 8,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "13-your-turn-rest",
+   "t": 74,
+   "key": "your-turn",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/13-your-turn-rest.png",
+   "sha256": "5c24b57f157dbf8a9bbf467f8bad3e983d9bffb160a6f2539ea92c374be32269",
+   "ms": 1888,
+   "state": {
+    "t": 74,
+    "where": {
+     "kind": "hold",
+     "i": 12,
+     "since": 1.4000000000000057,
+     "left": 1
+    },
+    "frames": [
+     {
+      "id": "game.X05",
+      "local": 8,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "14-sealed-rest",
+   "t": 79.4,
+   "key": "sealed",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/14-sealed-rest.png",
+   "sha256": "4e7520daa4d0dd76ed3cc088ccd1ac02e01abb573d89e307e4df19bb2464697c",
+   "ms": 1132,
+   "state": {
+    "t": 79.4,
+    "where": {
+     "kind": "hold",
+     "i": 13,
+     "since": 1.4000000000000057,
+     "left": 7.599999999999994
+    },
+    "frames": [
+     {
+      "id": "grid.R02",
+      "local": 3,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "15-odds-rest",
+   "t": 90.8,
+   "key": "odds",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/15-odds-rest.png",
+   "sha256": "dcc0332a938e847b7d00beed931fa8d54a3021fca7f064fb910d4fc9e732b3a8",
+   "ms": 892,
+   "state": {
+    "t": 90.8,
+    "where": {
+     "kind": "hold",
+     "i": 14,
+     "since": 1.3999999999999915,
+     "left": 2.200000000000003
+    },
+    "frames": [
+     {
+      "id": "world.W02-radar",
+      "local": 2.0453,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "16-late-seal-rest",
+   "t": 96.8,
+   "key": "late-seal",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/16-late-seal-rest.png",
+   "sha256": "79f066190fefe493149d1a59a9eeba4bde7beb77270e954232b57ad065853b0b",
+   "ms": 909,
+   "state": {
+    "t": 96.8,
+    "where": {
+     "kind": "hold",
+     "i": 15,
+     "since": 1.3999999999999915,
+     "left": 8.200000000000003
+    },
+    "frames": [
+     {
+      "id": "grid.R02",
+      "local": 3,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "17-operating-day-rest",
+   "t": 109.4,
+   "key": "operating-day",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/17-operating-day-rest.png",
+   "sha256": "636b8d4e75ed31d12f90592460531f443765586712d8e56896895820e5a3d499",
+   "ms": 895,
+   "state": {
+    "t": 109.4,
+    "where": {
+     "kind": "hold",
+     "i": 16,
+     "since": 1.4000000000000057,
+     "left": 5.599999999999994
+    },
+    "frames": [
+     {
+      "id": "world.W03-race-day",
+      "local": 2,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "18-check-rest",
+   "t": 119.4,
+   "key": "check",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/18-check-rest.png",
+   "sha256": "ffa957f8d6caed905c786c4b467c47c6f40db4d1c684c9d895ef53ad4edf3b40",
+   "ms": 807,
+   "state": {
+    "t": 119.4,
+    "where": {
+     "kind": "hold",
+     "i": 17,
+     "since": 1.4000000000000057,
+     "left": 5.599999999999994
+    },
+    "frames": [
+     {
+      "id": "grid.R03",
+      "local": 2,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "19-tamper-rest",
+   "t": 128.6,
+   "key": "tamper",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/19-tamper-rest.png",
+   "sha256": "a5abc46685b69e76cbc254b8fa9b36532086e80dcb0b1a58f1641364bbe9dcd2",
+   "ms": 1072,
+   "state": {
+    "t": 128.6,
+    "where": {
+     "kind": "hold",
+     "i": 18,
+     "since": 1.3999999999999915,
+     "left": 13.400000000000006
+    },
+    "frames": [
+     {
+      "id": "venue.stewards",
+      "local": 4,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "20-drive-rest",
+   "t": 144.5,
+   "key": "drive",
+   "part": "III",
+   "stop": false,
+   "png": "storyboard/player/20-drive-rest.png",
+   "sha256": "185e20e2ee9f086dae7ae698bc707925e4268bdd41eae929e1e363dfbd9cd643",
+   "ms": 975,
+   "state": {
+    "t": 144.5,
+    "where": {
+     "kind": "hold",
+     "i": 19,
+     "since": 0.09999999999999432,
+     "left": 0.09999999999999432
+    },
+    "frames": [
+     {
+      "id": "venue.drive",
+      "local": 5,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "21-ranked-rest",
+   "t": 146.64,
+   "key": "ranked",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/21-ranked-rest.png",
+   "sha256": "a98c5e1ca965460025a6864d358ea7816094a72f11e6e6b69eb425835e30e3ba",
+   "ms": 943,
+   "state": {
+    "t": 146.64,
+    "where": {
+     "kind": "hold",
+     "i": 20,
+     "since": 0.7399999999999807,
+     "left": 0.36000000000001364
+    },
+    "frames": [
+     {
+      "id": "grid.R04",
+      "local": 0,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "22-season-rest",
+   "t": 150.6,
+   "key": "season",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/22-season-rest.png",
+   "sha256": "ffdf381e663fa6b6ca713d1d1d997ecc356b167e44128cdd0b86d7efe4f1d220",
+   "ms": 2143,
+   "state": {
+    "t": 150.6,
+    "where": {
+     "kind": "hold",
+     "i": 21,
+     "since": 1.4000000000000057,
+     "left": 0.4000000000000057
+    },
+    "frames": [
+     {
+      "id": "towers.T02-season",
+      "local": 1.4,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "23-refused-rest",
+   "t": 154.04,
+   "key": "refused",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/23-refused-rest.png",
+   "sha256": "c27d8817541476a1fa86d32c37c105496ce03599c657473b93c79ab8cefb516c",
+   "ms": 1594,
+   "state": {
+    "t": 154.04,
+    "where": {
+     "kind": "hold",
+     "i": 22,
+     "since": 0.8400000000000034,
+     "left": 0.36000000000001364
+    },
+    "frames": [
+     {
+      "id": "towers.T03-launch-blocked",
+      "local": 1.6,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "24-graduated-rest",
+   "t": 156.6,
+   "key": "graduated",
+   "part": "III",
+   "stop": true,
+   "png": "storyboard/player/24-graduated-rest.png",
+   "sha256": "0c429f5d881ffc4afc75059cb0230e99c579ac553ea1e240ac963758aefddd36",
+   "ms": 1332,
+   "state": {
+    "t": 156.6,
+    "where": {
+     "kind": "hold",
+     "i": 23,
+     "since": 1.4000000000000057,
+     "left": 0.4000000000000057
+    },
+    "frames": [
+     {
+      "id": "towers.T04-launch-graduate",
+      "local": 1.6,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "25-every-gate-rest",
+   "t": 159.8,
+   "key": "every-gate",
+   "part": "IV",
+   "stop": true,
+   "png": "storyboard/player/25-every-gate-rest.png",
+   "sha256": "bd41f111835e77d45dd2e7795123ec0fa8d56dcd014f48bf7caa19c298ead085",
+   "ms": 692,
+   "state": {
+    "t": 159.8,
+    "where": {
+     "kind": "hold",
+     "i": 24,
+     "since": 0.20000000000001705,
+     "left": 0.19999999999998863
+    },
+    "frames": [
+     {
+      "id": "venue.closing",
+      "local": 8,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "26-stack-rest",
+   "t": 166,
+   "key": "stack",
+   "part": "IV",
+   "stop": true,
+   "png": "storyboard/player/26-stack-rest.png",
+   "sha256": "2faa9c53b194ed7a22cb96851d703aaad2d43b572e2c75bc700d7a69b1d0835f",
+   "ms": 931,
+   "state": {
+    "t": 166,
+    "where": {
+     "kind": "hold",
+     "i": 25,
+     "since": 1.4000000000000057,
+     "left": 1
+    },
+    "frames": [
+     {
+      "id": "stack.rest",
+      "local": 6,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": [],
+   "rerendered": "Nov 26, 01:48 CT (14:48 Bangkok), after the hosted evaluator was drawn: capture-story --times at this t, scale 2"
+  },
+  {
+   "id": "27-witness-rest",
+   "t": 171,
+   "key": "witness",
+   "part": "IV",
+   "stop": true,
+   "png": "storyboard/player/27-witness-rest.png",
+   "sha256": "d3e99efd4a266173d0ec5a0a387d88e3ea557aeb0f9f74902298c00d8fbc66e5",
+   "ms": 609,
+   "state": {
+    "t": 171,
+    "where": {
+     "kind": "hold",
+     "i": 26,
+     "since": 1.4000000000000057,
+     "left": 0.5999999999999943
+    },
+    "frames": [
+     {
+      "id": "stack.seal",
+      "local": 3.7,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "28-late-stops-rest",
+   "t": 173.8,
+   "key": "late-stops",
+   "part": "IV",
+   "stop": true,
+   "png": "storyboard/player/28-late-stops-rest.png",
+   "sha256": "0b6a794702051e456e6e457745b6922b653c5ba2870d0145d696bf1dfce3fddf",
+   "ms": 568,
+   "state": {
+    "t": 173.8,
+    "where": {
+     "kind": "hold",
+     "i": 27,
+     "since": 1.4000000000000057,
+     "left": 1.1999999999999886
+    },
+    "frames": [
+     {
+      "id": "stack.seal-late",
+      "local": 4.5,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "29-end-rest",
+   "t": 179,
+   "key": "end",
+   "part": "IV",
+   "stop": true,
+   "png": "storyboard/player/29-end-rest.png",
+   "sha256": "46391ff89ed2101f23f4cec42d52412e29ce8690d2ce5c1743ed76b765a66ae1",
+   "ms": 604,
+   "state": {
+    "t": 179,
+    "where": {
+     "kind": "hold",
+     "i": 28,
+     "since": 1.4000000000000057,
+     "left": 1
+    },
+    "frames": [
+     {
+      "id": "stack.close",
+      "local": 9,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": [],
+   "rerendered": "Nov 26, 01:48 CT (14:48 Bangkok), after the hosted evaluator was drawn: capture-story --times at this t, scale 2"
+  },
+  {
+   "id": "part-I-mid-1-one-column",
+   "t": 7.24,
+   "key": "one-column",
+   "part": "I",
+   "png": "storyboard/player/part-I-mid-1-one-column.png",
+   "sha256": "c6371d6d257417c17cc81b62e042358fa95b99ea18748e3e19e972e7e39c192d",
+   "ms": 855,
+   "state": {
+    "t": 7.24,
+    "where": {
+     "kind": "leg",
+     "i": 1,
+     "e": 0.4000000000000001,
+     "dur": 5.6,
+     "from": 5
+    },
+    "frames": [
+     {
+      "id": "opening.pad",
+      "local": 4.52,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "part-I-mid-2-one-column",
+   "t": 9.2,
+   "key": "one-column",
+   "part": "I",
+   "png": "storyboard/player/part-I-mid-2-one-column.png",
+   "sha256": "40ffb7161ea1bd1f7b6d024b1a2d47c94575ec0ba4d21977b16510ab5434cf59",
+   "ms": 295,
+   "state": {
+    "t": 9.2,
+    "where": {
+     "kind": "leg",
+     "i": 1,
+     "e": 0.7499999999999999,
+     "dur": 5.6,
+     "from": 5
+    },
+    "frames": [
+     {
+      "id": "opening.column",
+      "local": 7.6,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "part-II-mid-1-the-map",
+   "t": 26.36,
+   "key": "the-map",
+   "part": "II",
+   "png": "storyboard/player/part-II-mid-1-the-map.png",
+   "sha256": "1e7c036e1b37ab517ca98d7005a640f79aefac5c92a990e2e0917c0c92f65134",
+   "ms": 1312,
+   "state": {
+    "t": 26.36,
+    "where": {
+     "kind": "leg",
+     "i": 5,
+     "e": 0.4,
+     "dur": 3.3999999999999986,
+     "from": 25
+    },
+    "frames": [
+     {
+      "id": "venue.hub",
+      "local": 3.96,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "part-II-mid-2-starting-grid",
+   "t": 19.76,
+   "key": "starting-grid",
+   "part": "II",
+   "png": "storyboard/player/part-II-mid-2-starting-grid.png",
+   "sha256": "97e15ac4b3a37fecff894f466444da4113454ca69ff50ce1819393938c7b53b7",
+   "ms": 1300,
+   "state": {
+    "t": 19.76,
+    "where": {
+     "kind": "leg",
+     "i": 4,
+     "e": 0.5500000000000006,
+     "dur": 3.1999999999999993,
+     "from": 18
+    },
+    "frames": [
+     {
+      "id": "world.W01-texas",
+      "local": 3,
+      "alpha": 1
+     },
+     {
+      "id": "grid.R01",
+      "local": 2.76,
+      "alpha": 0.703
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "part-III-mid-1-pit-wall",
+   "t": 36.44,
+   "key": "pit-wall",
+   "part": "III",
+   "png": "storyboard/player/part-III-mid-1-pit-wall.png",
+   "sha256": "2610f2c7628a76bf3ecdded85507c8ae5169c35b5bdb4ccbbcae72f9e9e0dccd",
+   "ms": 3636,
+   "state": {
+    "t": 36.44,
+    "where": {
+     "kind": "leg",
+     "i": 7,
+     "e": 0.3999999999999992,
+     "dur": 3.6000000000000014,
+     "from": 35
+    },
+    "frames": [
+     {
+      "id": "garage.hangar",
+      "local": 4.2,
+      "alpha": 1
+     },
+     {
+      "id": "garage.pit-lane",
+      "local": 2.04,
+      "alpha": 0.0554
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "part-III-mid-2-garage",
+   "t": 31.87,
+   "key": "garage",
+   "part": "III",
+   "png": "storyboard/player/part-III-mid-2-garage.png",
+   "sha256": "830dbc5a474798a062d9c461a3107af88db7dbecee5363a5b5efe23bde4864d5",
+   "ms": 1363,
+   "state": {
+    "t": 31.87,
+    "where": {
+     "kind": "leg",
+     "i": 6,
+     "e": 0.5500000000000005,
+     "dur": 3.3999999999999986,
+     "from": 30
+    },
+    "frames": [
+     {
+      "id": "venue.hub",
+      "local": 6,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  },
+  {
+   "id": "part-IV-mid-1-stack",
+   "t": 161.84,
+   "key": "stack",
+   "part": "IV",
+   "png": "storyboard/player/part-IV-mid-1-stack.png",
+   "sha256": "760b9add73b3b10d95cd5482882a1a5db42147094b9e909b70dc58e5952ef99e",
+   "ms": 914,
+   "state": {
+    "t": 161.84,
+    "where": {
+     "kind": "leg",
+     "i": 25,
+     "e": 0.40000000000000124,
+     "dur": 4.599999999999994,
+     "from": 160
+    },
+    "frames": [
+     {
+      "id": "stack.rest",
+      "local": 3.24,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": [],
+   "rerendered": "Nov 26, 02:02 CT (15:02 Bangkok), after the hosted evaluator was drawn: capture-story --times at this t, scale 2"
+  },
+  {
+   "id": "part-IV-mid-2-every-gate",
+   "t": 158.43,
+   "key": "every-gate",
+   "part": "IV",
+   "png": "storyboard/player/part-IV-mid-2-every-gate.png",
+   "sha256": "e78387f260256dedcc139b073d6bdb347292da881a7afe64a7ac7eac99b83891",
+   "ms": 2080,
+   "state": {
+    "t": 158.43,
+    "where": {
+     "kind": "leg",
+     "i": 24,
+     "e": 0.5500000000000038,
+     "dur": 2.5999999999999943,
+     "from": 157
+    },
+    "frames": [
+     {
+      "id": "venue.closing",
+      "local": 6.83,
+      "alpha": 1
+     }
+    ]
+   },
+   "error": null,
+   "frames": []
+  }
+ ],
+ "errors": {},
+ "warnings": [],
+ "refused": []
+}

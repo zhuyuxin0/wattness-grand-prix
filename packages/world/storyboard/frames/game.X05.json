@@ -1,0 +1,75 @@
+{
+ "id": "game.X05",
+ "url": "http://127.0.0.1:15192/lab.html?frame=game.X05&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/game.X05.png",
+ "sha256": "f7c1870f178564537fa4fbcd54803aeb1bf8ec316a74f382c7a581ea3c285474",
+ "deterministic": null,
+ "renderMs": 598,
+ "wallMs": 646,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 51
+ },
+ "underLoad": false,
+ "note": "Real today: the scoring and every limit check. This plan (C's schedule and contracts with HE18 sold at 100) is a real what-if computed exactly with the engine's integer formula on showcase.scenarios: mean $3,541.98, worst tenth $383.12, score $3,733.54, 8 losing days, collateral $13,052.75, within every limit. The seal flow is built (src/game, mountOnePlan): the visitor's own wallet commits a one-leaf record under the arena scope to GateRecord on BSC testnet, refused for any other chain and after the day's gate. Not built yet: the next day's scenario set published before its gate, and the scoring of arena seals after settlement; this still shows the panel's design. 26 Nov's gate closed on 25 Nov at 10:00 CT.",
+ "frame": {
+  "id": "game.X05",
+  "station": "game",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 8,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real today: the scoring and every limit check. This plan (C's schedule and contracts with HE18 sold at 100) is a real what-if computed exactly with the engine's integer formula on showcase.scenarios: mean $3,541.98, worst tenth $383.12, score $3,733.54, 8 losing days, collateral $13,052.75, within every limit. The seal flow is built (src/game, mountOnePlan): the visitor's own wallet commits a one-leaf record under the arena scope to GateRecord on BSC testnet, refused for any other chain and after the day's gate. Not built yet: the next day's scenario set published before its gate, and the scoring of arena seals after settlement; this still shows the panel's design. 26 Nov's gate closed on 25 Nov at 10:00 CT.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 598,
+  "programs": {
+   "state": "ready",
+   "programs": 36
+  },
+  "frameInfo": {
+   "calls": 170,
+   "triangles": 1948090,
+   "passes": {
+    "shadow": 25,
+    "ShadowOncePass": 0,
+    "opaque": 74,
+    "aoNormalAndBlend": 46,
+    "copyBack": 1,
+    "overlay": 22,
+    "OutputPass": 1,
+    "opaqueColour": 49
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "f7c1870f178564537fa4fbcd54803aeb1bf8ec316a74f382c7a581ea3c285474",
+   "wallMs": 646,
+   "renderMs": 598,
+   "gpuLoad": {
+    "before": 0,
+    "after": 51
+   }
+  }
+ ]
+}

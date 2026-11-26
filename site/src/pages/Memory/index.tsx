@@ -4,12 +4,16 @@ import { formatInt } from "../../lib/format";
 import { dualTime } from "../../lib/time";
 import type { MemoryGraph } from "../../scenes/data";
 import { Glyph, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type SortKind, type SortState, type SortValue } from "../../ui";
+import { Build } from "./Build";
+import { loadBuild } from "./data";
 import "./styles.css";
 
-// Memory: what the agents keep about the Wattness Terminal, as Living Brain
-// holds it. One page per part of the Terminal, and the connections between
-// pages, each with Living Brain's similarity score and its reasoning. Selecting
-// a page narrows the connections to its own.
+// Memory: what Living Brain keeps on the build and on the Terminal. First the build's
+// own brain (Build.tsx): a page for every tab of this site, one page at a time
+// with its connections, in this brain and across brains, each correction
+// beside the text it corrects. Then the Terminal's brain: one page per part of
+// the Terminal, and the connections between pages, each with Living Brain's
+// similarity score and its reasoning; selecting a page narrows them to its own.
 
 const STRENGTH: Record<string, number> = { strong: 3, medium: 2, weak: 1 };
 const STRENGTHS = ["strong", "medium", "weak"] as const;
@@ -47,13 +51,15 @@ async function loadMemory(): Promise<Ctx | null> {
 
 export default function MemoryPage() {
   const ctx = useLoad(loadMemory, "memory-tab");
+  const build = useLoad(loadBuild, "memory-build");
   return (
     <div className="page page--memory">
       <PageHeader
         title="Memory"
-        lede="What the agents remember, kept in Living Brain: a page on each part of the Wattness Terminal, where every plan's inputs come from, and the connections between pages, each with the reasoning behind it."
+        lede="What Living Brain keeps on the build and on the Wattness Terminal: a brain on the build itself, with a page for every tab of this site, and a brain on the Wattness Terminal, where every plan's inputs come from. Between pages, the connections Living Brain draws, each with its reasoning; where its text misstates the repository or the chain record, a correction stands beside it."
       />
-      <Ready state={ctx}>{(c) => (c ? <Memory ctx={c} /> : <p className="muted">The Living Brain readback is not published with this build.</p>)}</Ready>
+      <Ready state={build}>{(b) => (b ? <Build b={b} /> : null)}</Ready>
+      <Ready state={ctx}>{(c) => (c ? <Memory ctx={c} /> : null)}</Ready>
     </div>
   );
 }
@@ -152,7 +158,8 @@ function Memory({ ctx }: { ctx: Ctx }) {
 
   return (
     <>
-      <section className="mem-lead" aria-label="The memory at a glance">
+      <section className="mem-lead mem-lead--terminal" aria-label="The Terminal's brain at a glance">
+        <h2 className="mem-part">The Terminal's Brain</h2>
         <StatRow className="mem-stats">
           <Stat
             label="Pages"
@@ -174,7 +181,7 @@ function Memory({ ctx }: { ctx: Ctx }) {
 
       <Section
         id="mem-pages"
-        title="Pages"
+        title="The Terminal's Pages"
         lede="By the part of the Terminal each describes, from its data sources to Ness. Pick a page to see its connections."
         source={SHORT}
       >
@@ -232,7 +239,7 @@ function Memory({ ctx }: { ctx: Ctx }) {
 
       <Section
         id="mem-links"
-        title={pickedPage ? `Connections of ${pickedPage.title}` : "Connections"}
+        title={pickedPage ? `Connections of ${pickedPage.title}` : "The Terminal's Connections"}
         lede={
           pickedPage ? (
             <>

@@ -1,0 +1,75 @@
+{
+ "id": "grid.R01",
+ "url": "http://127.0.0.1:15196/lab.html?frame=grid.R01&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/grid.R01.png",
+ "sha256": "1876bfb916eff0d5d13d87d850ad1dd4f2707f6da1b38e14b1df82d6cf8aa9b6",
+ "deterministic": null,
+ "renderMs": 925,
+ "wallMs": 1000,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 72
+ },
+ "underLoad": false,
+ "note": "Real: all 316 columns are the sealed leaves in frame-data.json fleet.batteries, in the site's gridOrder (the showcase on pole, then planned discharge of the selected arm, most first, ties by resource) on layout.grid's slot rule; height 0.3 + 9.7 x planned discharge / 564 MWh (the fleet's largest), body color the site's discharge ramp at its square root (its top stop held at #7fe6cf, so the tallest stay teal when lit), cap the selected arm (C 294, B 22). The pole is Desert Willow, drawn as the Hedging walkthrough's own column (5.53 m for 304.176 MWh): a presentation choice, not a rank. Figures: fleet.totals and fleet.hub_counts; 274 settlement points counted from the leaves. The Texas outline is HIFLD's ERCOT region (the Terminal intro's file) on layout.texas's scale. Illustrative: the venue's surfaces, pole lights and comets; the lock line is shown waiting, before its sweep (motion, not run in this still).",
+ "frame": {
+  "id": "grid.R01",
+  "station": "grid",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 4.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real: all 316 columns are the sealed leaves in frame-data.json fleet.batteries, in the site's gridOrder (the showcase on pole, then planned discharge of the selected arm, most first, ties by resource) on layout.grid's slot rule; height 0.3 + 9.7 x planned discharge / 564 MWh (the fleet's largest), body color the site's discharge ramp at its square root (its top stop held at #7fe6cf, so the tallest stay teal when lit), cap the selected arm (C 294, B 22). The pole is Desert Willow, drawn as the Hedging walkthrough's own column (5.53 m for 304.176 MWh): a presentation choice, not a rank. Figures: fleet.totals and fleet.hub_counts; 274 settlement points counted from the leaves. The Texas outline is HIFLD's ERCOT region (the Terminal intro's file) on layout.texas's scale. Illustrative: the venue's surfaces, pole lights and comets; the lock line is shown waiting, before its sweep (motion, not run in this still).",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 925,
+  "programs": {
+   "state": "ready",
+   "programs": 24
+  },
+  "frameInfo": {
+   "calls": 85,
+   "triangles": 54830,
+   "passes": {
+    "shadow": 5,
+    "ShadowOncePass": 0,
+    "opaque": 33,
+    "aoNormalAndBlend": 27,
+    "copyBack": 1,
+    "overlay": 23,
+    "OutputPass": 1,
+    "opaqueColour": 28
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "1876bfb916eff0d5d13d87d850ad1dd4f2707f6da1b38e14b1df82d6cf8aa9b6",
+   "wallMs": 1000,
+   "renderMs": 925,
+   "gpuLoad": {
+    "before": 0,
+    "after": 72
+   }
+  }
+ ]
+}

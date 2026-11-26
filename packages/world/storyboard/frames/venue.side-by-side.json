@@ -1,0 +1,44 @@
+{
+ "id": "venue.side-by-side",
+ "storyboard": "V03",
+ "png": "venue.side-by-side.png",
+ "sha256": "ca96beba38621d08813a3016c153a116717a8d0e3c5ce8bd88237ec56e39170c",
+ "size": "1920 x 1080",
+ "composition": "ffmpeg: the world's half and the page's half side by side, a 1 px #2b3036 divider at x 959, then the plates overlaid (the page half's title at the page's top left; the band on the world half's open floor, lower left, clear of the page)",
+ "left": {
+  "file": "venue.stewards.png",
+  "sha256": "103a9e48dfd287e5485893bf637865334c0cc00728a9cb348d3b8c6c12059cc8",
+  "frame": "venue.stewards at 960 x 1080, device scale 2, Lanczos (its receipt: venue.stewards.json); plates at the 1920 cut's sizes"
+ },
+ "right": {
+  "what": "the site's #/stewards page for DSWL_ESS_ESR1 with the tamper test on, captured at 960 x 1080 CSS px, device scale 2, Lanczos, dark theme",
+  "sha256": "a8aefd8d9254bf77f99d1443093215025f59c1b6eb80000c9cb929a4b8af594b",
+  "served_from": "a snapshot of gatelock site/dist (built 2026-11-26 01:19 Bangkok, identical to the build on 26 Nov), vite preview on 127.0.0.1:15198, stopped after the capture",
+  "url": "/?clock=1795631442000&capture=1#/stewards/DSWL_ESS_ESR1?tamper=1",
+  "checks_on_the_page": [
+   "is-fail 01",
+   "is-fail 02",
+   "is-pass 03",
+   "is-pass 04",
+   "is-fail 05"
+  ],
+  "outside_requests": [
+   "GET https://fonts.googleapis.com/css2 200",
+   "GET https://fonts.gstatic.com/s/librefranklin/v20/jizDREVItHgc8qDIbSTKq4XkRiUf2zcZiVbJ.woff2 200",
+   "GET https://fonts.gstatic.com/s/barlowcondensed/v13/HTxwL3I-JCGChYJ8VI-L6OO_au7B4873z3bWuYMBYro.woff2 200",
+   "GET https://fonts.gstatic.com/s/barlowcondensed/v13/HTxwL3I-JCGChYJ8VI-L6OO_au7B4-Lwz3bWuYMBYro.woff2 200",
+   "GET https://fonts.gstatic.com/s/barlowcondensed/v13/HTxwL3I-JCGChYJ8VI-L6OO_au7B46r2z3bWuYMBYro.woff2 200",
+   "POST https://bsc-dataseed.bnbchain.org/ 200",
+   "POST https://bsc-dataseed.bnbchain.org/ 200"
+  ]
+ },
+ "agreement": "checked by script after this render: the in-scene board (built in the lab from frame-data.json with the page's markup and rules) and the page's board read the same text, and their five strip states match: is-fail 01 | is-fail 02 | is-pass 03 | is-pass 04 | is-fail 05",
+ "plates": {
+  "sha256": "436eca0200a38789840063ced000287667b2e59f839106589fbd2f0055318b31",
+  "words": [
+   "The world \u00b7 Stewards",
+   "The page \u00b7 #/stewards",
+   "Same data file, same checks: 01, 02 and 05 fail on the changed copy."
+  ]
+ }
+}

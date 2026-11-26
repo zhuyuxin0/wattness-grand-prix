@@ -1,0 +1,26 @@
+/* The theme tokens the kit's stylesheets read (kit/css), with the Terminal's values at c5c182dc: the chrome, raised
+   surface, accent, muted ink and faces from apps/mms/src/skins/wattness.css, ink and panel from
+   packages/theme-wattness/tokens.css, the heat ramp from apps/mms/src/ui/chart/chart-tokens.css. The html element
+   carries data-skin="wattness" and data-theme; the world root carries data-theme again (the walkthrough's rules
+   read it there). */
+:root {
+  --t-font-display: "Libre Franklin Brand", "Franklin Gothic Medium", "Helvetica Neue", Arial, sans-serif;
+  --w-font-sans: -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  --t-font-code: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --w-accent: #2ec7a6;
+  --t-accent-mark: #2ec7a6;
+}
+:root[data-theme="dark"] {
+  --t-chrome: #101315; --t-raised: #1f2429; --page: #191d21; --w-fg: #d7d9d4; --w-muted: #969ca3; --t-accent-text: #2ec7a6;
+  --ch-heat-0: #ffa383; --ch-heat-1: #e27d59; --ch-heat-2: #b36549; --ch-heat-3: #854f3c; --ch-heat-4: #414344;
+  --ch-heat-5: #3c618b; --ch-heat-6: #4c80ba; --ch-heat-7: #5ea1ea; --ch-heat-8: #8cc2ff;
+}
+:root[data-theme="light"] {
+  --t-chrome: #f3f4f6; --t-raised: #ffffff; --page: #ffffff; --w-fg: #1a1a1a; --w-muted: #636a75; --t-accent-text: #0b6b58;
+  --ch-heat-0: #931b00; --ch-heat-1: #b54a35; --ch-heat-2: #d07865; --ch-heat-3: #e8a596; --ch-heat-4: #dfdedb;
+  --ch-heat-5: #93b8ee; --ch-heat-6: #6190d5; --ch-heat-7: #3169ba; --ch-heat-8: #004395;
+}
+/* The intro's plate colors (intro.css, its .intro rule): dark plates in both themes. The walkthrough's skin (.hwalk,
+   kit/css/plates.css, loaded after this) sets its own per theme. */
+.world { --intro-plate: rgba(13, 17, 23, 0.86); --intro-plate-ink: #eef2f6; --intro-teal: #2ec7a6; }

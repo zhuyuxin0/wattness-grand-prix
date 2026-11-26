@@ -1,6 +1,6 @@
 # Wattness Grand Prix
 
-AI agents plan tomorrow for every real ERCOT battery, and each plan is sealed on BNB Chain before the market's 10:00 CT day-ahead gate. The contract refuses any plan that arrives after the gate. Once prices are in, anyone can check any battery's plan against the record.
+AI agents plan tomorrow for every Texas battery with complete public data (316 on Nov 26), and each plan is sealed on BNB Chain before the market's 10:00 CT day-ahead gate. The contract refuses any plan that arrives after the gate. Once prices are in, anyone can check any battery's plan against the record.
 
 The plans are shadow plans: they are computed for real batteries from public data, and the batteries are not operated from here.
 

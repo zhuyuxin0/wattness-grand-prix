@@ -1,0 +1,19 @@
+{
+ "id": "game.markets-light",
+ "note": "The Markets tab in the site’s light theme: the stage holds dark, the deck below follows the page.",
+ "url": "http://127.0.0.1:15192/src/game/play.html?mode=play&theme=light&dial=20&glass=5:14,7:34,9:-17,10:-71,11:-100,12:-14,17:95&select=17&still=1&w=1920&h=1720&dpr=2",
+ "width": 1920,
+ "height": 1720,
+ "scale": 2,
+ "score": {
+  "step": 20,
+  "mean": 3541864004,
+  "cvar": -414275918,
+  "objective": 3749001963,
+  "losing": 9,
+  "lit": false,
+  "limits": []
+ },
+ "warnings": [],
+ "refused": []
+}

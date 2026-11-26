@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-skin="wattness" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Grand Prix story</title>
+    <script>
+      // Seeded before any module runs, as the frame lab seeds it: three's ambient occlusion draws its denoise noise from
+      // Math.random, and the film must give the same pixels at the same time on every load. ?seed= picks another.
+      (function () {
+        var s = (Number(new URLSearchParams(location.search).get("seed")) || 0x2f6b3a1d) >>> 0;
+        Math.random = function () {
+          s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+          return s / 4294967296;
+        };
+      })();
+    </script>
+    <style>
+      html, body { margin: 0; padding: 0; overflow: hidden; background: #101315; }
+      .gp-error { position: absolute; left: 24px; top: 24px; right: 24px; z-index: 90; margin: 0; padding: 14px 16px; border-radius: 8px;
+        font: 500 13px/1.5 ui-monospace, Menlo, monospace; white-space: pre-wrap; color: #ffd2c4; background: rgba(13, 17, 23, 0.94); box-shadow: 0 0 0 1px rgba(255, 163, 131, 0.5); }
+      .gp-toast { position: fixed; left: 50%; top: 18px; transform: translateX(-50%); z-index: 99; margin: 0; padding: 8px 14px; border-radius: 8px;
+        font: 500 13px/1.3 ui-monospace, Menlo, monospace; color: #eef2f6; background: rgba(13, 17, 23, 0.9); box-shadow: 0 0 0 1px #2ec7a6; }
+    </style>
+    <script type="module" src="./main.ts"></script>
+  </head>
+  <body>
+    <div id="story"></div>
+  </body>
+</html>

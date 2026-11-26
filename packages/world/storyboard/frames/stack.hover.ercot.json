@@ -1,0 +1,75 @@
+{
+ "id": "stack.hover.ercot",
+ "url": "http://127.0.0.1:15197/lab.html?frame=stack.hover.ercot&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/stack.hover.ercot.png",
+ "sha256": "b95296daba4ca8638f103e52b7bd5e63d2c4bb887bdf03bd290d3dffd81815e3",
+ "deterministic": null,
+ "renderMs": 434,
+ "wallMs": 506,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 64
+ },
+ "underLoad": false,
+ "note": "Hover still: ercot, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Fleet tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+ "frame": {
+  "id": "stack.hover.ercot",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 7.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Hover still: ercot, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Fleet tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 434,
+  "programs": {
+   "state": "ready",
+   "programs": 28
+  },
+  "frameInfo": {
+   "calls": 400,
+   "triangles": 119604,
+   "passes": {
+    "shadow": 23,
+    "ShadowOncePass": 0,
+    "opaque": 60,
+    "aoNormalAndBlend": 38,
+    "copyBack": 1,
+    "overlay": 295,
+    "OutputPass": 1,
+    "opaqueColour": 37
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "b95296daba4ca8638f103e52b7bd5e63d2c4bb887bdf03bd290d3dffd81815e3",
+   "wallMs": 506,
+   "renderMs": 434,
+   "gpuLoad": {
+    "before": 0,
+    "after": 64
+   }
+  }
+ ]
+}

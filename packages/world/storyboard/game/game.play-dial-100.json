@@ -1,0 +1,19 @@
+{
+ "id": "game.play-dial-100",
+ "note": "Dial at 1 (C’s schedule), no glass: the schedule chosen for the hedge, unhedged.",
+ "url": "http://127.0.0.1:15192/src/game/play.html?mode=story&dial=20&glass=&still=1&w=1920&h=1080&dpr=2",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "score": {
+  "step": 20,
+  "mean": 3642277958,
+  "cvar": 1893151771,
+  "objective": 2695702072,
+  "losing": 58,
+  "lit": false,
+  "limits": []
+ },
+ "warnings": [],
+ "refused": []
+}

@@ -1,0 +1,309 @@
+/* Prices. Blocks: px-*. The live feeds as cards, the two sources side by
+   side, the budget as a before and after; every block stacks on a phone. */
+
+
+.px-when {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 var(--t-space-3);
+}
+.px-note {
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+  line-height: var(--t-lh-prose);
+}
+.px-at {
+  margin-bottom: var(--t-space-3);
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+
+/* A small control in the segmented control's dress. */
+.px-again {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--t-ctl-h);
+  padding: 0 var(--t-space-3);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: none;
+  color: var(--w-fg);
+  font: inherit;
+  font-size: var(--t-fs-xs);
+  cursor: pointer;
+}
+.px-again:hover:not(:disabled) {
+  background: var(--t-hover);
+}
+.px-again:disabled {
+  color: var(--w-muted);
+  cursor: default;
+}
+
+/* ---------------------------------------------------------------- live feeds */
+
+.px-feeds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--t-space-5);
+}
+.px-feed {
+  display: grid;
+  align-content: start;
+  gap: var(--t-space-3);
+  min-width: 0;
+  padding: var(--t-space-4);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+}
+.px-feed--adapter {
+  border-style: dashed;
+}
+.px-feed__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--t-space-3);
+}
+.px-feed__titles {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.px-feed__pair {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.px-feed__sub {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.px-feed__price {
+  flex: none;
+  font-size: var(--t-fs-stat);
+  font-weight: 600;
+  line-height: 1.1;
+}
+.px-rows {
+  margin: 0;
+  display: grid;
+}
+.px-rows > div {
+  display: grid;
+  grid-template-columns: 8.5em minmax(0, 1fr);
+  gap: var(--t-space-3);
+  align-items: baseline;
+  padding: 5px 0;
+  border-top: 1px solid var(--t-rule);
+}
+.px-rows dt {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.px-rows dd {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--t-fs-sm);
+  overflow-wrap: anywhere;
+}
+.px-desc {
+  font-size: var(--t-fs-xs);
+}
+.px-verdict {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: var(--t-fs-xs);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.px-verdict .glyph {
+  flex: none;
+  position: relative;
+  top: 1px;
+}
+/* A check that holds takes the state color, as on Verify; teal marks selection only. */
+.px-verdict--in .glyph {
+  color: var(--s-ok);
+}
+@media (max-width: 479px) {
+  .px-rows > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1px;
+  }
+}
+
+/* ---------------------------------------------------------------- side by side */
+
+.px-pairs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: var(--t-space-5);
+}
+.px-pair {
+  display: grid;
+  gap: var(--t-space-3);
+  min-width: 0;
+  padding: var(--t-space-4);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+}
+.px-pair__name {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.px-pair__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--t-space-4);
+}
+.px-src {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+  font-size: var(--t-fs-xs);
+}
+.px-src + .px-src {
+  padding-left: var(--t-space-4);
+  border-left: 1px solid var(--t-rule);
+}
+.px-src__who {
+  color: var(--w-muted);
+  font-weight: 600;
+}
+.px-src__price {
+  font-size: var(--t-fs-stat);
+  font-weight: 600;
+  line-height: 1.15;
+}
+.px-src__more {
+  color: var(--w-muted);
+}
+.px-pair__agree {
+  padding-top: var(--t-space-3);
+  border-top: 1px solid var(--t-rule);
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+@media (max-width: 479px) {
+  .px-pair__cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .px-src + .px-src {
+    padding-left: 0;
+    padding-top: var(--t-space-3);
+    border-left: 0;
+    border-top: 1px solid var(--t-rule);
+  }
+}
+.px-checks {
+  margin-top: var(--t-space-5);
+}
+.px-signer {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--t-space-2);
+}
+.px-signer > .glyph-check {
+  color: var(--s-ok);
+}
+.px-signer > .glyph-close {
+  color: var(--refused);
+}
+
+/* ---------------------------------------------------------------- before and after */
+
+.px-ba {
+  display: grid;
+  font-size: var(--t-fs-sm);
+}
+.px-ba__row {
+  display: grid;
+  grid-template-columns: 12em minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: var(--t-space-4);
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--t-rule);
+}
+.px-ba__head {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+  border-bottom-color: var(--w-border);
+}
+.px-ba__label {
+  color: var(--w-muted);
+}
+.px-ba__before {
+  color: var(--w-muted);
+}
+.px-ba__row--strong .px-ba__after {
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.px-ba__tag {
+  display: none;
+}
+@media (max-width: 767px) {
+  .px-ba__head {
+    display: none;
+  }
+  .px-ba__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+  .px-ba__label {
+    font-weight: 600;
+    color: var(--w-fg);
+  }
+  .px-ba__tag {
+    display: inline-block;
+    min-width: 4.2em;
+    color: var(--w-muted);
+    font-size: var(--t-fs-xs);
+    font-weight: 400;
+  }
+}
+.px-move {
+  margin-top: var(--t-space-4);
+  max-width: 96ch;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+.px-move--live {
+  margin-top: var(--t-space-2);
+  color: var(--w-muted);
+}
+.px-rules {
+  margin-top: var(--t-space-5);
+}
+@media (min-width: 900px) {
+  /* six rules in two rows of three, and the three signature facts in one row, never a lone item */
+  .px-rules.pk-facts,
+  .px-checks.pk-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .px-checks.pk-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* No node answered before the first read: one muted line and the stamp's compact Read again. */
+.px-unread {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  margin: 0;
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+/* the live stamp keeps a step of air above the cards it stamps */
+.page--prices .live-read {
+  margin-bottom: var(--t-space-4);
+}

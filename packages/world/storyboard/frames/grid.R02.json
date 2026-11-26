@@ -1,0 +1,75 @@
+{
+ "id": "grid.R02",
+ "url": "http://127.0.0.1:15196/lab.html?frame=grid.R02&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/grid.R02.png",
+ "sha256": "be104a33ffdee1656b05f06d7980aa5982d297c60155788ba05a98972e907f71",
+ "deterministic": null,
+ "renderMs": 547,
+ "wallMs": 635,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 80
+ },
+ "underLoad": false,
+ "note": "Real: the root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 over 316 leaves (one tick a leaf), both receipts (frame-data.json sealed_day.receipts: BSC block 135,677,078 at 09:15:17 CT, 2,683 s before the gate; testnet block 144,810,495 at 09:17:00 CT, 2,580 s before), GateRecord 0x2922c68cE15EB3e83B7f43b136e981dDc4262876 and the refusal AfterGate(20261126, 1795622400) from the rule \"if (block.timestamp >= gate) revert AfterGate(od, gate);\". The late seal was simulated through the commit script, never mined: bsc-mainnet at 10:00:22 CT (22 s after) and bsc-testnet at 10:00:25 CT (25 s after). The capsule is a drawing of that refused call; the clock shows the mainnet attempt's chain time. Illustrative: the hall's architecture, lights and comets.",
+ "frame": {
+  "id": "grid.R02",
+  "station": "grid",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 3,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real: the root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 over 316 leaves (one tick a leaf), both receipts (frame-data.json sealed_day.receipts: BSC block 135,677,078 at 09:15:17 CT, 2,683 s before the gate; testnet block 144,810,495 at 09:17:00 CT, 2,580 s before), GateRecord 0x2922c68cE15EB3e83B7f43b136e981dDc4262876 and the refusal AfterGate(20261126, 1795622400) from the rule \"if (block.timestamp >= gate) revert AfterGate(od, gate);\". The late seal was simulated through the commit script, never mined: bsc-mainnet at 10:00:22 CT (22 s after) and bsc-testnet at 10:00:25 CT (25 s after). The capsule is a drawing of that refused call; the clock shows the mainnet attempt's chain time. Illustrative: the hall's architecture, lights and comets.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 547,
+  "programs": {
+   "state": "ready",
+   "programs": 20
+  },
+  "frameInfo": {
+   "calls": 171,
+   "triangles": 31884,
+   "passes": {
+    "shadow": 19,
+    "ShadowOncePass": 0,
+    "opaque": 74,
+    "aoNormalAndBlend": 56,
+    "copyBack": 1,
+    "overlay": 33,
+    "OutputPass": 1,
+    "opaqueColour": 55
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "be104a33ffdee1656b05f06d7980aa5982d297c60155788ba05a98972e907f71",
+   "wallMs": 635,
+   "renderMs": 547,
+   "gpuLoad": {
+    "before": 0,
+    "after": 80
+   }
+  }
+ ]
+}

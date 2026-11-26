@@ -1,0 +1,55 @@
+/* A live chain read's stamp: the block and its time, the node, and one control
+   to read again. The dot is the ok state's color; yellow stays the seal's. */
+
+.live-read {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-4);
+  font-size: var(--t-fs-xs);
+  color: var(--w-fg);
+}
+.live-read__text {
+  display: flex;
+  align-items: baseline;
+  gap: var(--t-space-3);
+  min-width: 0;
+  line-height: var(--t-lh);
+}
+.live-read__text a {
+  color: inherit;
+}
+.live-read__mark {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--s-ok);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s-ok) 18%, transparent);
+  transform: translateY(-1px);
+}
+.live-read__again {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-xs);
+  background: transparent;
+  color: var(--w-muted);
+  font: inherit;
+  cursor: pointer;
+}
+.live-read__again:hover:not(:disabled) {
+  background: var(--t-hover);
+  color: var(--w-fg);
+}
+.live-read__again:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+.live-read__failed {
+  flex-basis: 100%;
+  color: var(--s-bad);
+}

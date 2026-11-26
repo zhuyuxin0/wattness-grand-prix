@@ -1,0 +1,83 @@
+{
+ "id": "opening.lock",
+ "url": "http://127.0.0.1:15193/lab.html?frame=opening.lock&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/opening.lock.png",
+ "sha256": "80b067536226e7b2f3379422c6660a5b4d26e84596dc4872e6f4da863863effb",
+ "deterministic": false,
+ "renderMs": 474,
+ "wallMs": 595,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 42
+ },
+ "underLoad": false,
+ "note": "Check frame, not a storyboard frame: the real column (47.0 x 288.8 m) at the lock, target 0.42 of its height, az 160, el 44, 658 m, 34 deg lens, shift 0.17; pairs with opening.lock-venue (W01's column at 12.6 m). Through the climb the night ground eases to W01's map top (#212c30) and the shadow box to W01's at the column's scale (radius 5013 m, W01's 96 m x 52.22), so the pair agree in ground and shadow as well as in the column.",
+ "frame": {
+  "id": "opening.lock",
+  "station": "opening",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 12.6,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Check frame, not a storyboard frame: the real column (47.0 x 288.8 m) at the lock, target 0.42 of its height, az 160, el 44, 658 m, 34 deg lens, shift 0.17; pairs with opening.lock-venue (W01's column at 12.6 m). Through the climb the night ground eases to W01's map top (#212c30) and the shadow box to W01's at the column's scale (radius 5013 m, W01's 96 m x 52.22), so the pair agree in ground and shadow as well as in the column.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 474,
+  "programs": {
+   "state": "ready",
+   "programs": 34
+  },
+  "frameInfo": {
+   "calls": 6,
+   "triangles": 323,
+   "passes": {
+    "shadow": 1,
+    "ShadowOncePass": 0,
+    "opaque": 5,
+    "overlay": 0,
+    "OutputPass": 1,
+    "opaqueColour": 4
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "80b067536226e7b2f3379422c6660a5b4d26e84596dc4872e6f4da863863effb",
+   "wallMs": 595,
+   "renderMs": 474,
+   "gpuLoad": {
+    "before": 0,
+    "after": 42
+   }
+  },
+  {
+   "ok": true,
+   "sha256": "56984458bac6b17a0af3d10d3b436e04309b5746031f4a1ea73ed70e481537e2",
+   "wallMs": 605,
+   "renderMs": 483,
+   "gpuLoad": {
+    "before": 0,
+    "after": 56
+   }
+  }
+ ]
+}

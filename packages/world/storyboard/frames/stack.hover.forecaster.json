@@ -1,0 +1,75 @@
+{
+ "id": "stack.hover.forecaster",
+ "url": "http://127.0.0.1:15197/lab.html?frame=stack.hover.forecaster&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/stack.hover.forecaster.png",
+ "sha256": "79decd8e4bb6fb120509c0f7d3b2eb6dfccbcb444a68c8fab97a0dfe34bfd451",
+ "deterministic": null,
+ "renderMs": 403,
+ "wallMs": 488,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 77
+ },
+ "underLoad": false,
+ "note": "Hover still: forecaster, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Forecast tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+ "frame": {
+  "id": "stack.hover.forecaster",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 7.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Hover still: forecaster, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Forecast tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 403,
+  "programs": {
+   "state": "ready",
+   "programs": 29
+  },
+  "frameInfo": {
+   "calls": 400,
+   "triangles": 119604,
+   "passes": {
+    "shadow": 23,
+    "ShadowOncePass": 0,
+    "opaque": 60,
+    "aoNormalAndBlend": 38,
+    "copyBack": 1,
+    "overlay": 295,
+    "OutputPass": 1,
+    "opaqueColour": 37
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "79decd8e4bb6fb120509c0f7d3b2eb6dfccbcb444a68c8fab97a0dfe34bfd451",
+   "wallMs": 488,
+   "renderMs": 403,
+   "gpuLoad": {
+    "before": 0,
+    "after": 77
+   }
+  }
+ ]
+}

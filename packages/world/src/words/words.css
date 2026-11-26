@@ -1,0 +1,17 @@
+/* Plain words first (Jo, Nov 26): a caption's head says what happens in plain words, and the Grand Prix's own word for
+   it sits under the head as a small, quiet line. The lit frames (Parc fermé, race day, the drive, the timing screens,
+   the standings, the stewards' numbers) take their words a size up from the 1920 cut's, so the plates read at a glance
+   in the 90 s cut. Both wrap the kit's plates (kit/css/plates.css, unchanged): the flavor line sits inside the kit's
+   caption, and the sizes key off a class on the world root. No backticks in here. */
+
+.hwalk-cap .w-flavor { margin: 9px 0 0; font: 600 15px/1.2 var(--t-font-display); letter-spacing: 0.16em; text-transform: uppercase;
+  color: #8f979f; }
+.hwalk-cap .w-flavor + p { margin-top: 12px; }
+
+/* the lit frames: plates 16 to 20 px, ticks 15 to 18, the key 15 to 18, the scope 14 to 16 */
+.world.hwalk.is-x.w-lit .intro-plate { font-size: 20px; line-height: 1.28; padding: 6px 11px 7px; }
+.world.hwalk.is-x.w-lit .intro-plate .hwalk-plate-sub { font-size: 0.85em; }
+.world.hwalk.is-x.w-lit .intro-tick.hwalk-tick { font-size: 18px; }
+.world.hwalk.is-x.w-lit .hwalk-key { font-size: 18px; max-width: 760px; gap: 10px; }
+.world.hwalk.is-x.w-lit .hwalk-scope { font-size: 16px; }
+.world.hwalk.is-x.w-lit .gp-key .gp-key-title { font-size: 18px; }

@@ -1,0 +1,290 @@
+/* Tech Stack. Blocks: stack-* (the package's own classes are stk-*). */
+
+/* ---------------------------------------------------------------- the stage */
+
+/* The 3D keeps its own dark in either theme, framed as one pane, at the
+   composition's 16:9. mountStack fills the space and follows its size. */
+.stack-stage {
+  overflow: hidden;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+}
+.stack-stage__space {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  min-height: 200px;
+  background: var(--t-chrome);
+  container: stack / inline-size;
+}
+
+/* The scene's words are drawn at the 1,920 px cut's sizes, and the mount places
+   each label by its measured size. On a stage under 1,500 px they step down a
+   size, so neighbors keep apart; under 720 px the package drops them. */
+@container stack (max-width: 1499px) {
+  .stack-stage .stk-lab {
+    font-size: 12.5px;
+    line-height: 15px;
+  }
+  .stack-stage .stk-lab.stk-pod {
+    font-size: 12px;
+  }
+  .stack-stage .stk-lab span {
+    font-size: 11px;
+    line-height: 13px;
+  }
+  .stack-stage .stk-zone {
+    font-size: 11.5px;
+    letter-spacing: 0.12em;
+  }
+  .stack-stage .intro-tick.stk-after {
+    padding: 1px 7px 2px;
+    font-size: 11px;
+    line-height: 14px;
+  }
+  /* The "after the seal" notes are pinned to points in the scene, the last two
+     beside Living Brain's label and over the State keeper's: as the scene
+     shrinks they close on those labels, so they step down clear of them. */
+  .stack-stage .stk-labels > .stk-after:nth-last-child(2) {
+    margin-top: 7px;
+  }
+  .stack-stage .stk-labels > .stk-after:last-child {
+    margin-top: 11px;
+  }
+}
+
+/* The stack is mounted dark on either page theme, but one of the package's card
+   rules for a light stack keys on any ancestor's theme (dom.ts:
+   [data-theme="light"] .stk-card dd), so on a light page it set the dark card's
+   values (contract, records) in near-black on the card's near-black. They keep
+   the dark card's own value color here. */
+:root[data-theme="light"] .stack-stage [data-stk-theme="dark"] .stk-card dd {
+  color: #e6e8ea;
+}
+
+/* Under the scene: its key, then how to use it. */
+.stack-stage__bar {
+  display: grid;
+  gap: var(--t-space-3);
+  padding: var(--t-space-4);
+  border-top: 1px solid var(--w-border);
+  background: var(--t-chrome);
+}
+.stack-stage__hint {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.stack-legend:empty {
+  display: none;
+}
+/* The package's key card (dom.ts keyCard), set in a line rather than over the scene. */
+.stack-stage .stack-legend .stk-key {
+  position: static;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 20px;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--w-fg);
+  font: 400 var(--t-fs-sm) / 16px var(--w-font-sans);
+}
+.stack-stage .stack-legend .stk-key-title {
+  margin: 0 var(--t-space-2) 0 0;
+  font: 600 var(--t-fs-xs) / 16px var(--w-font-sans);
+  letter-spacing: 0.04em;
+  color: var(--w-muted);
+  opacity: 1;
+}
+.stack-stage .stack-legend .stk-key-row {
+  gap: 8px;
+  opacity: 1;
+}
+.stack-stage .stack-legend .stk-key-row svg {
+  width: 30px;
+  height: 12px;
+}
+
+/* ---------------------------------------------------------------- the list */
+
+.stack-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.stack-row {
+  display: grid;
+  grid-template-columns: 12rem minmax(0, 1fr) minmax(0, 1.15fr) 8rem;
+  gap: var(--t-space-2) var(--t-space-6);
+  align-items: baseline;
+  padding: var(--t-space-5) 10px;
+  border-bottom: 1px solid var(--t-rule);
+}
+.stack-list--names .stack-row {
+  grid-template-columns: minmax(0, 1fr) 8rem;
+}
+/* Heads on chrome, below the pane: 11px, 600, sentence case. */
+.stack-row--head {
+  align-items: center;
+  min-height: var(--t-hdr-h);
+  padding: 0 10px;
+  background: var(--t-chrome);
+  border-bottom-color: var(--w-border);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.stack-row__plain {
+  font-size: var(--t-fs);
+  font-weight: 600;
+}
+.stack-row__name {
+  margin-top: 2px;
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.stack-row__role {
+  line-height: var(--t-lh-prose);
+  color: var(--w-fg);
+}
+.stack-row__rows {
+  display: grid;
+  gap: 3px;
+  margin: 0;
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh);
+}
+.stack-row__rows > div {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: var(--t-space-3);
+}
+.stack-row__rows dt {
+  color: var(--w-muted);
+}
+.stack-row__rows dd {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--w-fg);
+}
+.stack-row__rows .mono {
+  font-size: 0.95em;
+}
+.stack-part--block {
+  display: block;
+}
+.stack-out {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.stack-out .glyph {
+  color: var(--w-muted);
+}
+.stack-row__tab {
+  justify-self: start;
+}
+/* On a phone each piece's records fold under one line. */
+.stack-row__more summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--t-space-2);
+  min-height: var(--t-ctl-h);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+  list-style: none;
+  cursor: pointer;
+}
+.stack-row__more summary::-webkit-details-marker {
+  display: none;
+}
+.stack-row__more summary:hover {
+  color: var(--w-fg);
+}
+.stack-row__caret {
+  transform: rotate(-90deg);
+  transition: transform var(--m-dur-s) ease-out;
+}
+.stack-row__more[open] .stack-row__caret {
+  transform: none;
+}
+.stack-row__more[open] summary {
+  margin-bottom: var(--t-space-2);
+}
+.stack-row__go {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.stack-note {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.stack-source {
+  max-width: 96ch;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+
+/* Narrower: the piece on the left, what it does, its records and its tab under one another beside it. */
+@media (max-width: 1023px) {
+  .stack-row--head {
+    display: none;
+  }
+  .stack-row,
+  .stack-list--names .stack-row {
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: var(--t-space-3) var(--t-space-5);
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .stack-row__piece {
+    grid-row: 1 / span 3;
+  }
+  .stack-list--names .stack-row__piece {
+    grid-row: auto;
+  }
+  .stack-row__role,
+  .stack-row__rows,
+  .stack-row__tab {
+    grid-column: 2;
+  }
+  .stack-row__tab::before {
+    content: attr(data-label);
+    margin-right: var(--t-space-3);
+    font-size: var(--t-fs-xs);
+    font-weight: 600;
+    color: var(--w-muted);
+  }
+}
+@media (max-width: 599px) {
+  .stack-stage .stack-legend .stk-key {
+    gap: 4px 14px;
+    font-size: var(--t-fs-xs);
+  }
+  .stack-stage .stack-legend .stk-key-title {
+    flex-basis: 100%;
+  }
+  .stack-row,
+  .stack-list--names .stack-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--t-space-3);
+  }
+  .stack-row__piece {
+    grid-row: auto;
+  }
+  .stack-row__role,
+  .stack-row__rows,
+  .stack-row__tab {
+    grid-column: 1;
+  }
+  .stack-row__rows > div {
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+  }
+}

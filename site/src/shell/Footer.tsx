@@ -23,7 +23,7 @@ export function Footer() {
             <span className="footer__word">Wattness</span>
             <span className="brand-product">Grand Prix</span>
           </div>
-          <p>Every ERCOT battery's plan for tomorrow, sealed on BNB Chain before the 10:00 CT day-ahead gate.</p>
+          <p>Tomorrow's plan for every Texas battery with complete public data (316 on Nov&nbsp;26), sealed on BNB Chain before the 10:00&nbsp;CT day-ahead gate.</p>
         </div>
         <div className="footer__lines">
           <p className="footer__source">{SOURCE_LINE}</p>

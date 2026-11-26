@@ -1,0 +1,65 @@
+{
+ "what": "The sealed leaf's 527 input files grouped by route: hub_prices /api/prices/HB_NORTH/<day>; node_prices /api/prices/DSWL_BES1/<day>; live_runs /live/v1/runs/<day>/<sha>; live_days and live_points the live tier's day and point files; release the Terminal release's catalogs and manifest; reference /api/fleet-geo/v2/native and /api/hedging/v1/walkthrough.",
+ "source": {
+  "path": "out/od-20261126/leaves/DSWL_ESS_ESR1.json",
+  "field": "inputs.files",
+  "sha256": "08997a73347eb8c24dc9321649f6d667a5972e33caa53a982402826fa1968578",
+  "count": 527,
+  "release_id": "terminal-daily-20261124-1120"
+ },
+ "groups": [
+  {
+   "kind": "release",
+   "count": 59,
+   "first_day": null,
+   "last_day": null,
+   "days": 0
+  },
+  {
+   "kind": "reference",
+   "count": 2,
+   "first_day": null,
+   "last_day": null,
+   "days": 0
+  },
+  {
+   "kind": "node_prices",
+   "count": 7,
+   "first_day": "2026-11-18",
+   "last_day": "2026-11-24",
+   "days": 7
+  },
+  {
+   "kind": "hub_prices",
+   "count": 56,
+   "first_day": "2026-09-30",
+   "last_day": "2026-11-24",
+   "days": 56
+  },
+  {
+   "kind": "live_days",
+   "count": 2,
+   "first_day": "2026-11-24",
+   "last_day": "2026-11-25",
+   "days": 2
+  },
+  {
+   "kind": "live_points",
+   "count": 2,
+   "first_day": null,
+   "last_day": null,
+   "days": 0
+  },
+  {
+   "kind": "live_runs",
+   "count": 399,
+   "first_day": "2026-11-24",
+   "last_day": "2026-11-25",
+   "days": 2
+  }
+ ],
+ "live_runs_by_day": {
+  "2026-11-24": 289,
+  "2026-11-25": 110
+ }
+}

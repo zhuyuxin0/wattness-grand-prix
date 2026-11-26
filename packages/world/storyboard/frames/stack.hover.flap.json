@@ -1,0 +1,75 @@
+{
+ "id": "stack.hover.flap",
+ "url": "http://127.0.0.1:15197/lab.html?frame=stack.hover.flap&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/stack.hover.flap.png",
+ "sha256": "1b4437fb7334400dbfc4953d1c5997db4f42e925e35cfb1ee14c8d45c6548a44",
+ "deterministic": null,
+ "renderMs": 451,
+ "wallMs": 532,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 75
+ },
+ "underLoad": false,
+ "note": "Hover still: flap, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Season tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+ "frame": {
+  "id": "stack.hover.flap",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 7.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Hover still: flap, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Season tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 451,
+  "programs": {
+   "state": "ready",
+   "programs": 28
+  },
+  "frameInfo": {
+   "calls": 400,
+   "triangles": 119604,
+   "passes": {
+    "shadow": 23,
+    "ShadowOncePass": 0,
+    "opaque": 60,
+    "aoNormalAndBlend": 38,
+    "copyBack": 1,
+    "overlay": 295,
+    "OutputPass": 1,
+    "opaqueColour": 37
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "1b4437fb7334400dbfc4953d1c5997db4f42e925e35cfb1ee14c8d45c6548a44",
+   "wallMs": 532,
+   "renderMs": 451,
+   "gpuLoad": {
+    "before": 0,
+    "after": 75
+   }
+  }
+ ]
+}

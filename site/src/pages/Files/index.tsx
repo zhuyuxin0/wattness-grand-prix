@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 import { formatInt } from "../../lib/format";
+import { EDGE_HOST, edgeVerifyUrl } from "../../lib/edge";
 import { dualTime, formatOperatingDay } from "../../lib/time";
-import { Glyph, Hash, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type SortKind, type SortState, type SortValue } from "../../ui";
+import { useSelectedBattery } from "../../shell/battery";
+import { BATTERY_NAMES, Glyph, Hash, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type SortKind, type SortState, type SortValue } from "../../ui";
 import { useGreenfield, type GreenfieldIndex } from "./data";
 import "./styles.css";
 
@@ -71,6 +73,10 @@ function Files({ g }: { g: GreenfieldIndex }) {
   const counts = useMemo(() => Object.fromEntries(KINDS.map((k) => [k.id, g.files.filter(k.match).length])), [g]);
   const opDay = formatOperatingDay(g.operatingDay);
   const testnet = /^greenfield_5600-/.test(g.network.greenfield);
+  // the battery the other tabs carry (Desert Willow until one is picked), for the edge's verdict
+  const [resource] = useSelectedBattery();
+  const edgeName = BATTERY_NAMES[resource] ?? resource;
+  const edgeDay = opDay.replace(/^\w+, /, "").replace(/, \d+$/, "");
   const where = `BNB Greenfield${testnet ? " testnet" : ""} (${g.network.greenfield})`;
 
   const rows = useMemo(() => {
@@ -112,6 +118,16 @@ function Files({ g }: { g: GreenfieldIndex }) {
         <p className="fs-source">
           Storage: {where}. Counts, sizes and SHA-256 from the publisher's upload record for operating day {opDay}, each file read back and compared after upload. Display:
           Wattness.
+        </p>
+        <p className="fs-edge">
+          A Cloudflare Worker also serves these files, each only after checking it against the root committed on GateRecord. {edgeName}'s verdict for {edgeDay}, as
+          JSON:{" "}
+          <a className="fs-edge__link" href={edgeVerifyUrl(resource, g.operatingDay)} target="_blank" rel="noreferrer">
+            <span className="mono">
+              {EDGE_HOST}/verify/{resource}
+            </span>
+            <Glyph name="popout" />
+          </a>
         </p>
       </section>
 

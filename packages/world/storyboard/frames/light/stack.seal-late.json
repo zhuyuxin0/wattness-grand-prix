@@ -1,0 +1,75 @@
+{
+ "id": "stack.seal-late",
+ "url": "http://127.0.0.1:15194/lab.html?frame=stack.seal-late&w=1920&h=1080&theme=light",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "light",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/light/stack.seal-late.png",
+ "sha256": "75d5eff4b54896478709e9ab80b3f452e84e3be846fc6791ae787355d637d4a4",
+ "deterministic": null,
+ "renderMs": 493,
+ "wallMs": 552,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 99,
+  "after": 89
+ },
+ "underLoad": true,
+ "note": "S02 at t 4.5 s: the late seal. The red comet draws the simulated commit refused with AfterGate(20261126, 1795622400) at chain time 22 s after the close (BSC mainnet; testnet 25 s): a simulation, not a mined failed transaction. The cube does not change.",
+ "frame": {
+  "id": "stack.seal-late",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "light",
+  "time": 4.5,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "S02 at t 4.5 s: the late seal. The red comet draws the simulated commit refused with AfterGate(20261126, 1795622400) at chain time 22 s after the close (BSC mainnet; testnet 25 s): a simulation, not a mined failed transaction. The cube does not change.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 493,
+  "programs": {
+   "state": "ready",
+   "programs": 29
+  },
+  "frameInfo": {
+   "calls": 251,
+   "triangles": 59073,
+   "passes": {
+    "shadow": 11,
+    "ShadowOncePass": 0,
+    "opaque": 30,
+    "aoNormalAndBlend": 20,
+    "copyBack": 1,
+    "overlay": 194,
+    "OutputPass": 1,
+    "opaqueColour": 19
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "75d5eff4b54896478709e9ab80b3f452e84e3be846fc6791ae787355d637d4a4",
+   "wallMs": 552,
+   "renderMs": 493,
+   "gpuLoad": {
+    "before": 99,
+    "after": 89
+   }
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "id": "stack.rest",
+ "url": "http://127.0.0.1:15197/lab.html?frame=stack.rest&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/stack.rest.png",
+ "sha256": "a9e53eedd9f4926ae45f381d36415db12649a0d9881c696ef64a03f0e4ea290a",
+ "deterministic": null,
+ "renderMs": 429,
+ "wallMs": 538,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 96,
+  "after": 68
+ },
+ "underLoad": true,
+ "note": "S01, the whole stack at rest. Real: every live strand's payload and each object's figures, from frame-data.json, the Greenfield record (scripts/greenfield/published.json, summarized beside this station) and integrations.json beside it (the sponsor flows on BSC testnet: addresses and transactions, each read back on a public RPC). The plinth's columns are the 270 mapped batteries of 316 (the rest have no point and are not drawn), height 0.14 m a MW. Lit since they ran on BSC testnet on Nov 25: Flap's season token and vault, OpenFour's graduation, the evaluator on Amazon Bedrock AgentCore and its hosted job 1873, the agents' identities and their paid job. After the seal: Cournot's odds, Living Brain's memory (read after 09:12:46 CT) and the paid job, drawn lit with a tick. Designed, drawn as ghosts with dotted lines: CMC's screening of launches, the outcome lamps. Comet speeds and spacing are drawn, not measured.",
+ "frame": {
+  "id": "stack.rest",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 6,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "S01, the whole stack at rest. Real: every live strand's payload and each object's figures, from frame-data.json, the Greenfield record (scripts/greenfield/published.json, summarized beside this station) and integrations.json beside it (the sponsor flows on BSC testnet: addresses and transactions, each read back on a public RPC). The plinth's columns are the 270 mapped batteries of 316 (the rest have no point and are not drawn), height 0.14 m a MW. Lit since they ran on BSC testnet on Nov 25: Flap's season token and vault, OpenFour's graduation, the evaluator on Amazon Bedrock AgentCore and its hosted job 1873, the agents' identities and their paid job. After the seal: Cournot's odds, Living Brain's memory (read after 09:12:46 CT) and the paid job, drawn lit with a tick. Designed, drawn as ghosts with dotted lines: CMC's screening of launches, the outcome lamps. Comet speeds and spacing are drawn, not measured.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 429,
+  "programs": {
+   "state": "ready",
+   "programs": 28
+  },
+  "frameInfo": {
+   "calls": 400,
+   "triangles": 119604,
+   "passes": {
+    "shadow": 23,
+    "ShadowOncePass": 0,
+    "opaque": 60,
+    "aoNormalAndBlend": 38,
+    "copyBack": 1,
+    "overlay": 295,
+    "OutputPass": 1,
+    "opaqueColour": 37
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "a9e53eedd9f4926ae45f381d36415db12649a0d9881c696ef64a03f0e4ea290a",
+   "wallMs": 538,
+   "renderMs": 429,
+   "gpuLoad": {
+    "before": 96,
+    "after": 68
+   }
+  }
+ ]
+}

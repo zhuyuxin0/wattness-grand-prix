@@ -1,0 +1,75 @@
+{
+ "id": "grid.R04",
+ "url": "http://127.0.0.1:15196/lab.html?frame=grid.R04&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/grid.R04.png",
+ "sha256": "5d5c1c2ed7c15e70e9baabbaf1fc906a765a50ab46640f463159327c6e156735",
+ "deterministic": null,
+ "renderMs": 1071,
+ "wallMs": 1136,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 69
+ },
+ "underLoad": false,
+ "note": "Real: the tower's rows are frame-data.json fleet.batteries sorted by selected_expected_usd, most first (the Standings page's default sort): P1 SLK_BESS_ESR1 at $9,812.36 down to P12 FIVEWSLR_ESR1; Desert Willow at P33, $3,543.35; each sparkline is the row's selected_kw (24 hours), each letter its selected_arm. The crown sits on the arena's one committer, 0xfa22C29C4c3d975FCC617D899B1B695eFF2d94b8 (sealed_day.agent), with 316 plans. These are modeled expected values under each leaf's own scenarios, not settled scores, and rank our shadow plans, not any operator. Illustrative: the plaza, its brass, the two visitors (the kit's figure, recolored) and the Arcade's warm spill from off frame.",
+ "frame": {
+  "id": "grid.R04",
+  "station": "grid",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 0,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real: the tower's rows are frame-data.json fleet.batteries sorted by selected_expected_usd, most first (the Standings page's default sort): P1 SLK_BESS_ESR1 at $9,812.36 down to P12 FIVEWSLR_ESR1; Desert Willow at P33, $3,543.35; each sparkline is the row's selected_kw (24 hours), each letter its selected_arm. The crown sits on the arena's one committer, 0xfa22C29C4c3d975FCC617D899B1B695eFF2d94b8 (sealed_day.agent), with 316 plans. These are modeled expected values under each leaf's own scenarios, not settled scores, and rank our shadow plans, not any operator. Illustrative: the plaza, its brass, the two visitors (the kit's figure, recolored) and the Arcade's warm spill from off frame.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1071,
+  "programs": {
+   "state": "ready",
+   "programs": 22
+  },
+  "frameInfo": {
+   "calls": 120,
+   "triangles": 154984,
+   "passes": {
+    "shadow": 24,
+    "ShadowOncePass": 0,
+    "opaque": 65,
+    "aoNormalAndBlend": 41,
+    "copyBack": 1,
+    "overlay": 6,
+    "OutputPass": 1,
+    "opaqueColour": 41
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "5d5c1c2ed7c15e70e9baabbaf1fc906a765a50ab46640f463159327c6e156735",
+   "wallMs": 1136,
+   "renderMs": 1071,
+   "gpuLoad": {
+    "before": 0,
+    "after": 69
+   }
+  }
+ ]
+}

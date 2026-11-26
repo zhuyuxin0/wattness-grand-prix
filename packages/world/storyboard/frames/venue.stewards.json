@@ -1,0 +1,75 @@
+{
+ "id": "venue.stewards",
+ "url": "http://127.0.0.1:15196/lab.html?frame=venue.stewards&w=960&h=1080&theme=dark",
+ "width": 960,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "1920 x 2160 device px, Lanczos to 960 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/venue.stewards.png",
+ "sha256": "fae5d74864f275d3c725dfbbf33a179d4b28b657e942cbd85600cdf9d92ef51f",
+ "deterministic": null,
+ "renderMs": 488,
+ "wallMs": 564,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 70,
+  "after": 79
+ },
+ "underLoad": true,
+ "note": "The stewards' bay in the tamper state, the left half of the side-by-side. Real: the board on the bay's screen is built from frame-data.json (showcase name, resource, node, hub, rating; leaf 94 of 316, counted from one as the page counts it) with the page's own markup and rules, and the five lamps carry the page's verifier results on the changed copy (01, 02, 05 fail; 03, 04 pass), as captured from the site's preview; the change is the page's tamper rule computed here: arms.C.kw[11] \u2212150,000 to \u2212149,000 kW. Illustrative: the card's rows (the leaf's fields as bars, the changed one red), the ladder's geometry (nine rungs, one a sibling hash) and the bay's architecture. The screen is 30 x 8.4 m here, the board's own aspect (the layout's 10 x 6 m would hold it too small to read beside the page).",
+ "frame": {
+  "id": "venue.stewards",
+  "station": "venue",
+  "width": 960,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 4,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "The stewards' bay in the tamper state, the left half of the side-by-side. Real: the board on the bay's screen is built from frame-data.json (showcase name, resource, node, hub, rating; leaf 94 of 316, counted from one as the page counts it) with the page's own markup and rules, and the five lamps carry the page's verifier results on the changed copy (01, 02, 05 fail; 03, 04 pass), as captured from the site's preview; the change is the page's tamper rule computed here: arms.C.kw[11] \u2212150,000 to \u2212149,000 kW. Illustrative: the card's rows (the leaf's fields as bars, the changed one red), the ladder's geometry (nine rungs, one a sibling hash) and the bay's architecture. The screen is 30 x 8.4 m here, the board's own aspect (the layout's 10 x 6 m would hold it too small to read beside the page).",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 488,
+  "programs": {
+   "state": "ready",
+   "programs": 38
+  },
+  "frameInfo": {
+   "calls": 282,
+   "triangles": 62285,
+   "passes": {
+    "shadow": 11,
+    "ShadowOncePass": 0,
+    "opaque": 153,
+    "aoNormalAndBlend": 48,
+    "copyBack": 1,
+    "overlay": 76,
+    "OutputPass": 1,
+    "opaqueColour": 142
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "fae5d74864f275d3c725dfbbf33a179d4b28b657e942cbd85600cdf9d92ef51f",
+   "wallMs": 564,
+   "renderMs": 488,
+   "gpuLoad": {
+    "before": 70,
+    "after": 79
+   }
+  }
+ ]
+}

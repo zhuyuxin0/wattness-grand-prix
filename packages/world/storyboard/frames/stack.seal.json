@@ -1,0 +1,75 @@
+{
+ "id": "stack.seal",
+ "url": "http://127.0.0.1:15194/lab.html?frame=stack.seal&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/stack.seal.png",
+ "sha256": "7516e8e69cfbac10b6f291cc12a706c547403823ef5735c07dfb7905ac85aa80",
+ "deterministic": null,
+ "renderMs": 429,
+ "wallMs": 493,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 91
+ },
+ "underLoad": false,
+ "note": "S02 at t 3.7 s of its 6 s loop: the root's path lit, the rest dimmed to 0.3. Real: plan time, root, the mainnet receipt (block, time, seconds before the close), the 953 objects downloaded back and matched (all_verified true), leaf 94's check. The Greenfield bucket is on Greenfield testnet; the seal is on BSC mainnet. Comet timing is drawn.",
+ "frame": {
+  "id": "stack.seal",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 3.7,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "S02 at t 3.7 s of its 6 s loop: the root's path lit, the rest dimmed to 0.3. Real: plan time, root, the mainnet receipt (block, time, seconds before the close), the 953 objects downloaded back and matched (all_verified true), leaf 94's check. The Greenfield bucket is on Greenfield testnet; the seal is on BSC mainnet. Comet timing is drawn.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 429,
+  "programs": {
+   "state": "ready",
+   "programs": 29
+  },
+  "frameInfo": {
+   "calls": 251,
+   "triangles": 59073,
+   "passes": {
+    "shadow": 11,
+    "ShadowOncePass": 0,
+    "opaque": 30,
+    "aoNormalAndBlend": 20,
+    "copyBack": 1,
+    "overlay": 194,
+    "OutputPass": 1,
+    "opaqueColour": 19
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "7516e8e69cfbac10b6f291cc12a706c547403823ef5735c07dfb7905ac85aa80",
+   "wallMs": 493,
+   "renderMs": 429,
+   "gpuLoad": {
+    "before": 0,
+    "after": 91
+   }
+  }
+ ]
+}

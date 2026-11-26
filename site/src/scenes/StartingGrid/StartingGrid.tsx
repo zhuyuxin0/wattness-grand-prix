@@ -13,7 +13,7 @@ const load = async (): Promise<GridData> => {
 };
 
 /**
- * The day's sealed plans as a starting grid: qualifying, the parc ferme sweep,
+ * The day's sealed plans as a starting grid: qualifying, the parc fermé sweep,
  * the root's ring and the chain receipt, closing on the Wattness mark and BNB
  * Chain's. The stage keeps its own dark in either theme, as wattness.tech's
  * intro does, wherever it is mounted.
@@ -52,7 +52,7 @@ function GridStill({ data }: { data: GridData | null }) {
         </span>
         <span>BNB Chain</span>
       </div>
-      <div className="sg-lockup__line">Every battery's plan, sealed before the market closes.</div>
+      <div className="sg-lockup__line">A plan for every Texas battery with complete public data, sealed before the market closes.</div>
       <figcaption className="sg-still__caption">
         {data.day.batteries.length} plans sealed under root <span className="sg-still__hash">{shortHash(data.day.root, 4, 5)}</span>. {SOURCE_LINE}
       </figcaption>

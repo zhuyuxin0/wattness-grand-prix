@@ -1,0 +1,75 @@
+{
+ "id": "world.W03-race-day",
+ "url": "http://127.0.0.1:15196/lab.html?frame=world.W03-race-day&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/world.W03-race-day.png",
+ "sha256": "3561be97e24b0e1e21a7aab2d7d043239f62a020f7b78b62359c2a1ff39e06d1",
+ "deterministic": null,
+ "renderMs": 646,
+ "wallMs": 715,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 80
+ },
+ "underLoad": false,
+ "note": "Waiting state: operating day 2026-11-26 runs 26 Nov 00:00 to 24:00 CT and nothing has linked yet (no outcome stage exists), so the gates' stamps and the pylon's 96 rows are hatched, never zero. Real: the 24 hours along the lane are Desert Willow's sealed arm C (showcase.arms.C.kw: discharge teal, charge #7f9cc0, filled to its share of 150 MW) over each hour's price in the plan's own forecast at DSWL_BES1 (showcase.forecast.node_da_cents, day-type persistence), on the kit's price scale (0.14 m a $/MWh): $13.22 at 11 am (the valley it charges in) to $36.12 at 5 pm (the peak it discharges on). These are forecasts, not settled prices; real-time prices arrive as the day runs. The pylon's strip is the same schedule. The submission closes 2026-11-26 20:00:00 CT (2026-11-27 09:00:00 Bangkok), before the day ends, so a submission shows real-time rows up to about 20:00 CT and says the day is still running. Illustrative: the gates, pylon, lights and Parc Ferme's plate, ticks (316, the sealed leaf count) and glow; the comets carry no figure. Render again when stage 1 links.",
+ "frame": {
+  "id": "world.W03-race-day",
+  "station": "world",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Waiting state: operating day 2026-11-26 runs 26 Nov 00:00 to 24:00 CT and nothing has linked yet (no outcome stage exists), so the gates' stamps and the pylon's 96 rows are hatched, never zero. Real: the 24 hours along the lane are Desert Willow's sealed arm C (showcase.arms.C.kw: discharge teal, charge #7f9cc0, filled to its share of 150 MW) over each hour's price in the plan's own forecast at DSWL_BES1 (showcase.forecast.node_da_cents, day-type persistence), on the kit's price scale (0.14 m a $/MWh): $13.22 at 11 am (the valley it charges in) to $36.12 at 5 pm (the peak it discharges on). These are forecasts, not settled prices; real-time prices arrive as the day runs. The pylon's strip is the same schedule. The submission closes 2026-11-26 20:00:00 CT (2026-11-27 09:00:00 Bangkok), before the day ends, so a submission shows real-time rows up to about 20:00 CT and says the day is still running. Illustrative: the gates, pylon, lights and Parc Ferme's plate, ticks (316, the sealed leaf count) and glow; the comets carry no figure. Render again when stage 1 links.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 646,
+  "programs": {
+   "state": "ready",
+   "programs": 21
+  },
+  "frameInfo": {
+   "calls": 128,
+   "triangles": 15572,
+   "passes": {
+    "shadow": 12,
+    "ShadowOncePass": 0,
+    "opaque": 50,
+    "aoNormalAndBlend": 39,
+    "copyBack": 1,
+    "overlay": 37,
+    "OutputPass": 1,
+    "opaqueColour": 38
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "3561be97e24b0e1e21a7aab2d7d043239f62a020f7b78b62359c2a1ff39e06d1",
+   "wallMs": 715,
+   "renderMs": 646,
+   "gpuLoad": {
+    "before": 0,
+    "after": 80
+   }
+  }
+ ]
+}

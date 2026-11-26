@@ -1,0 +1,263 @@
+/* Atlas on the site: the Texas power board and the seal's cost. Tokens only, so
+   both themes follow, but for the logo chip's ground; tabular figures for every
+   value that changes. The board follows the Seal tab's record table: heads on
+   chrome, hairline rows. */
+
+.atlas-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.atlas-link .glyph {
+  flex: none;
+  color: var(--w-muted);
+}
+
+/* A late value's age: the time is always beside it. */
+.atlas-late {
+  color: var(--s-bad);
+}
+
+/* The live read's states, as the Prices tab's own: the shared stamp keeps a
+   step of air above what it stamps; before a first read, one muted line with
+   the stamp's compact Read again. */
+.atlas-section .live-read {
+  margin-bottom: var(--t-space-4);
+}
+.atlas-unread {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  margin: 0 0 var(--t-space-4);
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+}
+.atlas-unread:last-child {
+  margin-bottom: 0;
+}
+
+/* ---------------------------------------------------------------- the board */
+
+.atlas-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: var(--t-space-4);
+  color: var(--w-muted);
+  line-height: var(--t-lh-prose);
+}
+/* On the first line's middle when the note wraps. */
+.atlas-note .glyph {
+  flex: none;
+  margin-top: calc((var(--t-lh-prose) * 1em - 10px) / 2);
+}
+
+/* The board's own width, not the window's, picks its layout: five columns take
+   about 920px with the logos, which a 1,024px window's page does not give. */
+.atlas-board {
+  container-type: inline-size;
+  display: grid;
+  font-size: var(--t-fs-sm);
+}
+.atlas-board__row {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1fr) minmax(0, 1.7fr) 6.5rem minmax(10.5rem, 0.8fr) 7rem;
+  gap: var(--t-space-4);
+  align-items: center;
+  min-height: var(--t-row);
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--t-rule);
+}
+.atlas-board__row > * {
+  min-width: 0;
+}
+/* Heads on chrome, below the pane: 11px, 600, sentence case. */
+.atlas-board__row--head {
+  align-items: center;
+  min-height: var(--t-hdr-h);
+  padding-block: 0;
+  background: var(--t-chrome);
+  border-bottom-color: var(--w-border);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.atlas-board__company {
+  display: flex;
+  align-items: center;
+  gap: var(--t-space-3);
+  font-weight: 600;
+}
+.atlas-board__company .muted {
+  font-weight: 400;
+}
+
+/* Each company's own logo on a light chip in both themes: the logos are drawn
+   for light ground, so the chip, not a token, holds their colors' contrast.
+   One box for all four, the logo fitted inside, so the names line up. */
+.atlas-logo {
+  flex: none;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 86px;
+  height: 22px;
+  padding: 1px 6px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-xs);
+  background: #ffffff;
+}
+:root[data-theme="dark"] .atlas-logo,
+[data-atmosphere="dark"] .atlas-logo {
+  border-color: transparent;
+  background: #eceeea;
+}
+.atlas-logo img {
+  display: block;
+  width: 72px;
+  height: 18px;
+  object-fit: contain;
+}
+.atlas-board__role {
+  color: var(--w-muted);
+}
+.atlas-board__num,
+.atlas-board__price {
+  text-align: right;
+}
+.atlas-board__price {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.atlas-time {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--t-space-3);
+}
+.atlas-time .atlas-late {
+  flex-basis: 100%;
+  font-size: var(--t-fs-xs);
+}
+
+.atlas-read {
+  margin-top: var(--t-space-4);
+  max-width: 96ch;
+  font-size: var(--t-fs-xs);
+  line-height: var(--t-lh-prose);
+  color: var(--w-muted);
+}
+.atlas-read .num {
+  white-space: nowrap;
+}
+
+@container (max-width: 919px) {
+  /* The heads leave the layout but stay with the cells for screen readers. */
+  .atlas-board__row--head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  .atlas-board__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "company price"
+      "role role"
+      "time feed";
+    gap: 2px var(--t-space-4);
+    padding: var(--t-space-3) 0;
+  }
+  .atlas-board__company {
+    grid-area: company;
+  }
+  .atlas-board__price {
+    grid-area: price;
+  }
+  .atlas-board__role {
+    grid-area: role;
+  }
+  .atlas-board__time {
+    grid-area: time;
+    font-size: var(--t-fs-xs);
+  }
+  .atlas-board__feed {
+    grid-area: feed;
+    text-align: right;
+    font-size: var(--t-fs-xs);
+  }
+}
+
+/* ---------------------------------------------------------------- the seal's cost */
+
+.atlas-cost__line {
+  max-width: 72ch;
+  margin-bottom: var(--t-space-5);
+  font-size: var(--t-fs-title);
+  line-height: var(--t-lh-prose);
+  color: var(--w-fg);
+}
+.atlas-cost__line .num {
+  white-space: nowrap;
+}
+.atlas-cost__strong {
+  font-weight: 600;
+}
+
+.atlas-cost__parts {
+  margin: 0;
+  display: grid;
+}
+.atlas-cost__parts > div {
+  display: grid;
+  grid-template-columns: 9rem minmax(11rem, auto) minmax(0, 1fr);
+  gap: var(--t-space-4);
+  align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--t-rule);
+}
+.atlas-cost__parts dt {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+}
+.atlas-cost__parts dd {
+  margin: 0;
+  min-width: 0;
+}
+.atlas-cost__value {
+  font-weight: 600;
+  white-space: nowrap;
+}
+.atlas-cost__how {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  line-height: var(--t-lh-prose);
+}
+.atlas-cost__how .num {
+  white-space: nowrap;
+}
+.atlas-cost__note {
+  margin-top: var(--t-space-4);
+  max-width: 96ch;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  line-height: var(--t-lh-prose);
+}
+.atlas-cost__note .num {
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .atlas-cost__parts > div {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px var(--t-space-4);
+  }
+  .atlas-cost__how {
+    grid-column: 1 / -1;
+  }
+}

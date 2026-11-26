@@ -1,0 +1,75 @@
+{
+ "id": "garage.hangar",
+ "url": "http://127.0.0.1:15195/lab.html?frame=garage.hangar&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/garage.hangar.png",
+ "sha256": "9b974657a61565ac07a07c248fdb578c01d811ad2fc75db59bf539dd056082a5",
+ "deterministic": null,
+ "renderMs": 1642,
+ "wallMs": 1701,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 2,
+  "after": 97
+ },
+ "underLoad": false,
+ "note": "Real, every figure on the six floor screens is read from frame-data.json for Desert Willow's sealed plan (operating day 2026-11-26, plan C): Forecast draws showcase.scenarios.node_bands_cents (p05 to p95 and p25 to p75 of the 301 scenarios) under showcase.forecast.node_da_cents; State of charge draws showcase.arms.C.soc_pct from assumptions.soc_open_ppm inside soc_min and soc_max, colored by C.kw (discharging teal, charging blue); Market inputs draws the sealed leaf's 527 inputs.files (files.json for the tiles, inputs.json for the kinds, both derived from out/od-20261126/leaves/DSWL_ESS_ESR1.json, sha256 08997a73...); Hedge prints showcase.instrument (ElectronX's published terms) over C.contracts by hour, with C's sold and bought counts and collateral, the entry assumed at fair value; Risk draws game.results.C.total_uusd in $250 bins with the worst tenth's 31 members outlined, C's and A's worst-tenth averages (cvar), and Cournot's probability (sponsors.cournot.probability: 1%, observed 09:51:43 CT on Nov 25, after the seal at 09:15:17, so marked \"read after the seal\"); Plan shows the three arms' objective_usd with C selected and sealed. The badges are the roles' ERC-8004 identities on BSC testnet (ids.json: Forecaster 2925, State keeper 2924, Market reader 2923, Hedger 2926, Risk officer 2927, Planner 2928; from contracts/deployments/agents.bsc-testnet.json on core/agents d69fe6e, registered 14:18 to 14:20 CT on Nov 25, after the seal); the evaluator is agent 2922 (ids.json from the Agent Studio project's studio.toml [identity], registered Nov 25, 14:39:31 CT). The sealed leaf's own agent field (erc8004_id) is null: the identities came after the plan. The evaluator's ten lamps are its report's checks (8 pass, 2 skipped, 2026-11-25 10:03:09 CT). Design: the floor as screens, their rims and the spill, the instruments' new places at each bay's north edge, the lights, and the roof lifted for this shot (the camera is diving through it). Camera from the storyboard's corner [-205, 15, 40] to above the garage at [8, 398, 46] looking at [8, 0, -142] on a 31 degree lens, so all six screens read in one frame; the workshop's bench is below the frame, so the evaluator is named in the scope line.",
+ "frame": {
+  "id": "garage.hangar",
+  "station": "garage",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 4.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real, every figure on the six floor screens is read from frame-data.json for Desert Willow's sealed plan (operating day 2026-11-26, plan C): Forecast draws showcase.scenarios.node_bands_cents (p05 to p95 and p25 to p75 of the 301 scenarios) under showcase.forecast.node_da_cents; State of charge draws showcase.arms.C.soc_pct from assumptions.soc_open_ppm inside soc_min and soc_max, colored by C.kw (discharging teal, charging blue); Market inputs draws the sealed leaf's 527 inputs.files (files.json for the tiles, inputs.json for the kinds, both derived from out/od-20261126/leaves/DSWL_ESS_ESR1.json, sha256 08997a73...); Hedge prints showcase.instrument (ElectronX's published terms) over C.contracts by hour, with C's sold and bought counts and collateral, the entry assumed at fair value; Risk draws game.results.C.total_uusd in $250 bins with the worst tenth's 31 members outlined, C's and A's worst-tenth averages (cvar), and Cournot's probability (sponsors.cournot.probability: 1%, observed 09:51:43 CT on Nov 25, after the seal at 09:15:17, so marked \"read after the seal\"); Plan shows the three arms' objective_usd with C selected and sealed. The badges are the roles' ERC-8004 identities on BSC testnet (ids.json: Forecaster 2925, State keeper 2924, Market reader 2923, Hedger 2926, Risk officer 2927, Planner 2928; from contracts/deployments/agents.bsc-testnet.json on core/agents d69fe6e, registered 14:18 to 14:20 CT on Nov 25, after the seal); the evaluator is agent 2922 (ids.json from the Agent Studio project's studio.toml [identity], registered Nov 25, 14:39:31 CT). The sealed leaf's own agent field (erc8004_id) is null: the identities came after the plan. The evaluator's ten lamps are its report's checks (8 pass, 2 skipped, 2026-11-25 10:03:09 CT). Design: the floor as screens, their rims and the spill, the instruments' new places at each bay's north edge, the lights, and the roof lifted for this shot (the camera is diving through it). Camera from the storyboard's corner [-205, 15, 40] to above the garage at [8, 398, 46] looking at [8, 0, -142] on a 31 degree lens, so all six screens read in one frame; the workshop's bench is below the frame, so the evaluator is named in the scope line.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 1642,
+  "programs": {
+   "state": "ready",
+   "programs": 45
+  },
+  "frameInfo": {
+   "calls": 534,
+   "triangles": 187270,
+   "passes": {
+    "shadow": 31,
+    "ShadowOncePass": 0,
+    "opaque": 397,
+    "aoNormalAndBlend": 57,
+    "copyBack": 1,
+    "overlay": 72,
+    "OutputPass": 1,
+    "opaqueColour": 366
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "9b974657a61565ac07a07c248fdb578c01d811ad2fc75db59bf539dd056082a5",
+   "wallMs": 1701,
+   "renderMs": 1642,
+   "gpuLoad": {
+    "before": 2,
+    "after": 97
+   }
+  }
+ ]
+}

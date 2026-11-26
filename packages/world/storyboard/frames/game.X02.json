@@ -1,0 +1,75 @@
+{
+ "id": "game.X02",
+ "url": "http://127.0.0.1:15192/lab.html?frame=game.X02&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/game.X02.png",
+ "sha256": "daa53dae185d118a07c9b337526f4d165abd6c1c12e17711e4715229349452ec",
+ "deterministic": null,
+ "renderMs": 573,
+ "wallMs": 621,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 38
+ },
+ "underLoad": false,
+ "note": "Real: arm B's sealed plan (A's schedule, 5 hedged hours) as game.results.B gives it, every cell and coin; each glass bar's height is its contracts at the hour's assumed entry (game.hedge.entry_cents), its thickness its contract count. No light: B's contracts never exceed A's scheduled MWh (checked). Illustrative: the column order. Motion, not shown in the still: the pour and the coins' hops.",
+ "frame": {
+  "id": "game.X02",
+  "station": "game",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 8,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real: arm B's sealed plan (A's schedule, 5 hedged hours) as game.results.B gives it, every cell and coin; each glass bar's height is its contracts at the hour's assumed entry (game.hedge.entry_cents), its thickness its contract count. No light: B's contracts never exceed A's scheduled MWh (checked). Illustrative: the column order. Motion, not shown in the still: the pour and the coins' hops.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 573,
+  "programs": {
+   "state": "ready",
+   "programs": 36
+  },
+  "frameInfo": {
+   "calls": 160,
+   "triangles": 1943436,
+   "passes": {
+    "shadow": 25,
+    "ShadowOncePass": 0,
+    "opaque": 72,
+    "aoNormalAndBlend": 44,
+    "copyBack": 1,
+    "overlay": 17,
+    "OutputPass": 1,
+    "opaqueColour": 47
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "daa53dae185d118a07c9b337526f4d165abd6c1c12e17711e4715229349452ec",
+   "wallMs": 621,
+   "renderMs": 573,
+   "gpuLoad": {
+    "before": 0,
+    "after": 38
+   }
+  }
+ ]
+}

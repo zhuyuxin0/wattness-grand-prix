@@ -1,0 +1,19 @@
+{
+ "id": "game.play-dial-0",
+ "note": "Dial at 0 (A’s schedule), no glass: the price-chasing day.",
+ "url": "http://127.0.0.1:15192/src/game/play.html?mode=story&dial=0&glass=&still=1&w=1920&h=1080&dpr=2",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "score": {
+  "step": 0,
+  "mean": 3667521236,
+  "cvar": 1749125380,
+  "objective": 2792958546,
+  "losing": 56,
+  "lit": false,
+  "limits": []
+ },
+ "warnings": [],
+ "refused": []
+}

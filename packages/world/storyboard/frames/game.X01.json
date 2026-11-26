@@ -1,0 +1,75 @@
+{
+ "id": "game.X01",
+ "url": "http://127.0.0.1:15192/lab.html?frame=game.X01&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/game.X01.png",
+ "sha256": "67c9d4be1966a529fe0f8bc68d4b84d59000d034e1973191ef2dd4c7a15cd370",
+ "deterministic": null,
+ "renderMs": 626,
+ "wallMs": 703,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 88
+ },
+ "underLoad": false,
+ "note": "Real: every bar is arm A's own accounting for that scenario and hour (game.results.A physical + hedge + wear + fee, frame-data.json), and every coin its day total in its exact $250 bin (game.histogram); the figures (mean, worst tenth, score, 56 losing days) re-derive to the micro-dollar from the parts and from the engine's formula on showcase.scenarios. Illustrative: the column order (sorted by A's day total, worst west), the coins' resting order inside a tube, the bulbs' chase and the visitors. The marquee carries the cabinet's name, ONE PLAN. The attract-mode pour runs in the playable game (src/game); here it is a still.",
+ "frame": {
+  "id": "game.X01",
+  "station": "game",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 8,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Real: every bar is arm A's own accounting for that scenario and hour (game.results.A physical + hedge + wear + fee, frame-data.json), and every coin its day total in its exact $250 bin (game.histogram); the figures (mean, worst tenth, score, 56 losing days) re-derive to the micro-dollar from the parts and from the engine's formula on showcase.scenarios. Illustrative: the column order (sorted by A's day total, worst west), the coins' resting order inside a tube, the bulbs' chase and the visitors. The marquee carries the cabinet's name, ONE PLAN. The attract-mode pour runs in the playable game (src/game); here it is a still.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 626,
+  "programs": {
+   "state": "ready",
+   "programs": 37
+  },
+  "frameInfo": {
+   "calls": 226,
+   "triangles": 2074666,
+   "passes": {
+    "shadow": 52,
+    "ShadowOncePass": 0,
+    "opaque": 125,
+    "aoNormalAndBlend": 70,
+    "copyBack": 1,
+    "overlay": 4,
+    "OutputPass": 1,
+    "opaqueColour": 73
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "67c9d4be1966a529fe0f8bc68d4b84d59000d034e1973191ef2dd4c7a15cd370",
+   "wallMs": 703,
+   "renderMs": 626,
+   "gpuLoad": {
+    "before": 0,
+    "after": 88
+   }
+  }
+ ]
+}

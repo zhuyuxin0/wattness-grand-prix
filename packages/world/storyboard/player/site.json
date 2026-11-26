@@ -1,0 +1,21 @@
+{
+ "site": {
+  "rendersAtRestWithStillPointer": 0,
+  "events": [
+   "one-column",
+   "route:battery",
+   "pit-wall",
+   "no-hedge"
+  ],
+  "now": "08Plan A: no hedgeONE PLAN, the arcadeOpen Risk",
+  "logs": []
+ },
+ "site-reduced": {
+  "rendersAtRestWithStillPointer": 0,
+  "events": [
+   "one-column"
+  ],
+  "now": "02Its plan for tomorrow, as one columnOpen Battery",
+  "logs": []
+ }
+}

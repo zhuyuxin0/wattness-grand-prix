@@ -1,0 +1,75 @@
+{
+ "id": "stack.hover.brain",
+ "url": "http://127.0.0.1:15197/lab.html?frame=stack.hover.brain&w=1920&h=1080&theme=dark",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "theme": "dark",
+ "shot": "3840 x 2160 device px, Lanczos to 1920 x 1080",
+ "ok": true,
+ "error": null,
+ "png": "storyboard/frames/stack.hover.brain.png",
+ "sha256": "13e90d45eaa9beb908ec9d86f64dc7da2ca0dc8ddf49a38a1a2b09d8fdca6864",
+ "deterministic": null,
+ "renderMs": 428,
+ "wallMs": 497,
+ "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+ "gpuOk": true,
+ "gpuLoad": {
+  "before": 0,
+  "after": 76
+ },
+ "underLoad": false,
+ "note": "Hover still: brain, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Memory tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+ "frame": {
+  "id": "stack.hover.brain",
+  "station": "stack",
+  "width": 1920,
+  "height": 1080,
+  "dpr": 2,
+  "theme": "dark",
+  "time": 7.2,
+  "steps": 30,
+  "settle": 3,
+  "skin": "walk",
+  "note": "Hover still: brain, the live mount's hover state at its end (halo, own strands at full, the rest dimmed; its card with the real integration and the button to the site's Memory tab). Figures from frame-data.json, the Greenfield record and integrations.json. The pointer is drawn for the still.",
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "renderMs": 428,
+  "programs": {
+   "state": "ready",
+   "programs": 29
+  },
+  "frameInfo": {
+   "calls": 400,
+   "triangles": 119604,
+   "passes": {
+    "shadow": 23,
+    "ShadowOncePass": 0,
+    "opaque": 60,
+    "aoNormalAndBlend": 38,
+    "copyBack": 1,
+    "overlay": 295,
+    "OutputPass": 1,
+    "opaqueColour": 37
+   }
+  },
+  "data": {
+   "frameData": true,
+   "layout": true
+  }
+ },
+ "warnings": [],
+ "refused": [],
+ "runs": [
+  {
+   "ok": true,
+   "sha256": "13e90d45eaa9beb908ec9d86f64dc7da2ca0dc8ddf49a38a1a2b09d8fdca6864",
+   "wallMs": 497,
+   "renderMs": 428,
+   "gpuLoad": {
+    "before": 0,
+    "after": 76
+   }
+  }
+ ]
+}

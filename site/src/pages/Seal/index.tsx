@@ -1,3 +1,4 @@
+import { SealCost } from "../../components/atlas/SealCost";
 import { SOURCE_LINE } from "../../config";
 import { combine, useDay, useLateSeal, useReceipts, type DayIndex, type LateSeal, type Receipts } from "../../data";
 import { minSec } from "../../lib/clock";
@@ -10,7 +11,8 @@ import "./styles.css";
 
 // Seal: the operating day as BNB Chain holds it. The lead is how long before
 // the gate the root went on chain; then both receipts field by field, and the
-// gate the contract computes for itself, with the late commit it refuses.
+// gate the contract computes for itself, with the late commit it refuses; last,
+// what the mainnet commit paid in gas, in dollars at Atlas's BNB/USD.
 
 const CHAIN_SOURCE = "Commits: GateRecord on BNB Smart Chain, read from each chain's receipt.";
 
@@ -23,6 +25,7 @@ export default function SealPage() {
         lede="The record on BNB Chain: one root over every plan for the operating day, committed to GateRecord before ERCOT's 10:00 CT day-ahead gate."
       />
       <Ready state={all}>{([day, r, late]) => <Record day={day} receipts={r} late={late} />}</Ready>
+      <SealCost />
     </div>
   );
 }

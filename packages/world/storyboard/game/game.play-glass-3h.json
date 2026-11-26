@@ -1,0 +1,19 @@
+{
+ "id": "game.play-glass-3h",
+ "note": "Glass on three hours at dial 1: HE08 sells 50, HE12 buys 100, HE18 sells 95.",
+ "url": "http://127.0.0.1:15192/src/game/play.html?mode=story&dial=20&glass=7:50,11:-100,17:95&select=17&still=1&w=1920&h=1080&dpr=2",
+ "width": 1920,
+ "height": 1080,
+ "scale": 2,
+ "score": {
+  "step": 20,
+  "mean": 3575244237,
+  "cvar": 786562326,
+  "objective": 3181963074,
+  "losing": 26,
+  "lit": false,
+  "limits": []
+ },
+ "warnings": [],
+ "refused": []
+}

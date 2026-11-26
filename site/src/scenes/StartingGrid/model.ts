@@ -729,7 +729,7 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
   );
   const lockLabel = stage.label(
     "scene-tag scene-tag--bnb",
-    `<div class="timing" style="font-size:12px;letter-spacing:0.16em;color:var(--bnb)">Parc ferme</div><div class="mono muted"></div>`,
+    `<div class="timing" style="font-size:12px;letter-spacing:0.16em;color:var(--bnb)">Parc fermé</div><div class="mono muted"></div>`,
     { dx: 12, dy: 0, ax: 0, ay: 1 },
   );
   const lockCount = lockLabel.el.lastElementChild as HTMLElement;
@@ -755,7 +755,7 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
   const lockup = stage.label(
     "sg-lockup",
     `<div class="sg-lockup__names"><span>Wattness</span><span class="sg-lockup__x" aria-hidden="true">×</span><span>BNB Chain</span></div>
-     <div class="sg-lockup__line">Every battery's plan, sealed before the market closes.</div>`,
+     <div class="sg-lockup__line">A plan for every Texas battery with complete public data, sealed before the market closes.</div>`,
     { dx: 0, dy: 0, ax: 0.5, ay: 0 },
   );
   const [lockupNames, lockupLine] = [lockup.el.firstElementChild as HTMLElement, lockup.el.lastElementChild as HTMLElement];
@@ -866,7 +866,7 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
         sealed: false,
       };
     if (t < TL.sweep[0] + TL.sweep[1])
-      return { title: "Parc ferme", sub: "Every plan is sealed before ERCOT's 10:00 CT day-ahead gate. No changes after; a late seal reverts.", sealed: true };
+      return { title: "Parc fermé", sub: "Every plan is sealed before ERCOT's 10:00 CT day-ahead gate. No changes after; a late seal reverts.", sealed: true };
     return {
       title: "Sealed on BNB Chain",
       sub: `One Merkle root over ${slots.length} plans. Anyone can check any battery's plan against the chain once prices settle.`,
