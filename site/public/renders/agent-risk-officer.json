@@ -1,0 +1,53 @@
+{
+ "schema": "grand-prix.render-still.v1",
+ "what": "The Risk officer's instrument as the garage stands it: plan C's 301 scenario totals for Desert Willow on Nov 26 as coins in $250 slots, the worst tenth's 31 rimmed.",
+ "frame": "_objects.agent-risk-officer",
+ "code": {
+  "base": "ab0e8ffb73fe760cc1c382a56f522d495d945859",
+  "rig": {
+   "path": "packages/world/src/stations/_objects/index.ts",
+   "git_blob": "6e33aeb6af724ed0a3c569af8b913d128c08f192"
+  },
+  "world_tree": "2b731b711baf10de572f71227186e94d122eab7f",
+  "note": "packages/world as on main (base), plus the rig named here: the garage's own builders (stations/garage/bays.ts, workshop.ts) from the frame data, with the rig's camera and the stage's dark ground"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.agent-risk-officer --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
+  "lab": "lab.html?frame=_objects.agent-risk-officer&w=1280&h=720&theme=dark&plates=0",
+  "rendered": {
+   "bangkok": "2026-11-27 01:29",
+   "ct": "2026-11-26 12:29"
+  },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max",
+  "deterministic": "2 draws in fresh pages, byte-identical",
+  "master": {
+   "size": "2560 x 1440",
+   "sha256": "f6aa92c275e47f08a4e4fa124337bace9eb04373a33fb1980f0bd7768a2dafcf"
+  },
+  "png_1280": {
+   "size": "1280 x 720, render.mjs's Lanczos from the master",
+   "sha256": "6c2eb1a041a3a56633e627e7d6d716762d8170be1f53ab54a589042d1dc68f9e"
+  },
+  "png_640": {
+   "size": "640 x 360, ffmpeg's Lanczos from the master",
+   "sha256": "75d6358abf86b3dda51fd87ad9f22b77cbdb087b666dc1a33c15177a5870696c"
+  },
+  "webp": "cwebp 1.6.0 -q 88 -m 6 -sharp_yuv -metadata none"
+ },
+ "files": {
+  "agent-risk-officer-640.webp": {
+   "width": 640,
+   "height": 360,
+   "bytes": 26466,
+   "sha256": "5244169b278a4867ab52693f5333ab55b8ee803aa6bc8a13784c2283c0faf43e"
+  },
+  "agent-risk-officer-1280.webp": {
+   "width": 1280,
+   "height": 720,
+   "bytes": 65228,
+   "sha256": "e7be8952488feec4c0107cae4104e141920ac61a8b892f6b5c575b2da561b5e1"
+  }
+ },
+ "rerender_when": "the garage's coin board (stations/garage/bays.ts coinBoard), the rig, or the frame data changes"
+}

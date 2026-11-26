@@ -74,18 +74,29 @@
   align-content: start;
   gap: var(--t-space-3);
   min-width: 0;
-  padding: var(--t-space-4);
+  padding: var(--t-space-3);
   border: 1px solid var(--w-border);
   border-radius: var(--t-radius-md);
 }
 .ids-card--hosted {
   grid-column: 1 / -1;
 }
+/* the agent's instrument leads the card, in its dark glass frame (ui/object-still.css) */
+.ids-card__still {
+  border-radius: calc(var(--t-radius-md) - 2px);
+}
+.ids-card__body {
+  display: grid;
+  align-content: start;
+  gap: var(--t-space-3);
+  min-width: 0;
+  padding: 0 var(--t-space-1) var(--t-space-1);
+}
 .ids-card__head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--t-space-4);
+  gap: var(--t-space-3);
 }
 /* The role's name first, its registry number under it, muted. */
 .ids-card__id {
@@ -96,10 +107,69 @@
   display: grid;
   gap: 3px;
   min-width: 0;
+  margin-right: auto;
 }
 .ids-card__name {
   font-size: var(--t-fs-title);
   font-weight: 600;
+}
+.ids-card__does {
+  font-size: var(--t-fs-sm);
+  line-height: var(--t-lh-prose);
+}
+.ids-card__reg {
+  display: grid;
+  justify-items: start;
+  gap: 3px;
+  font-size: var(--t-fs-sm);
+}
+/* The role's icon: the stack's glyph in its flow's color, on a small chip, as the stack's card repeats it by the name. */
+.ids-icon {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  color: var(--ids-icon-light);
+}
+:root[data-theme="dark"] .ids-icon {
+  color: var(--ids-icon-dark);
+}
+.ids-card__head > .ids-icon {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-chrome);
+}
+.ids-party .ids-icon {
+  margin-right: 4px;
+  vertical-align: -2px;
+}
+.ids-more summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--t-space-2);
+  min-height: var(--t-ctl-h);
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  color: var(--w-muted);
+  list-style: none;
+  cursor: pointer;
+}
+.ids-more summary::-webkit-details-marker {
+  display: none;
+}
+.ids-more summary:hover {
+  color: var(--w-fg);
+}
+.ids-more__caret {
+  transform: rotate(-90deg);
+  transition: transform var(--m-dur-s) ease-out;
+}
+.ids-more[open] .ids-more__caret {
+  transform: none;
+}
+.ids-more[open] summary {
+  margin-bottom: var(--t-space-1);
 }
 .ids-runs {
   justify-self: start;
@@ -144,11 +214,9 @@
 }
 @media (min-width: 1000px) {
   .ids-card--hosted {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     column-gap: var(--gp-space-7);
-  }
-  .ids-card--hosted > .ids-card__head {
-    grid-column: 1 / -1;
+    align-items: start;
   }
   .ids-rows--hosted {
     align-content: start;
