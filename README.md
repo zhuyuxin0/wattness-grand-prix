@@ -20,7 +20,7 @@ A second plan for the same day, simulated 22 seconds after the gate, is refused 
 
 ## How it works
 
-1. **Plan.** The planner reads the [Wattness Terminal](https://wattness.tech)'s public ERCOT data release, and every input is named by its SHA-256.
+1. **Plan.** Six agents, each with an ERC-8004 identity on BSC testnet, run deterministic forecasting and optimization code with no language model in the sealed path, so anyone can re-run a plan from its inputs and get the same bytes. The planner reads the [Wattness Terminal](https://wattness.tech)'s public ERCOT data release, and every input is named by its SHA-256.
    - For each battery it solves the next day's charge and discharge by hour, within the battery's power and energy limits.
    - For the showcase battery, Desert Willow (DSWL_ESS_ESR1), it compares three choices under the same inputs:
      - no hedge;
