@@ -28,9 +28,10 @@ commits 172,171.
 
 ## Scripts
 
-All take `--network bsc-testnet` (default) or `--network localhost`, and
-`--rpc <url>` to try one endpoint before the public list. The key comes from
-`GATE_PRIVATE_KEY` in the file named by `GATE_SECRETS_ENV`.
+All take `--network bsc-testnet` (default), `--network bsc-mainnet` together
+with `--mainnet`, or `--network localhost`, and `--rpc <url>` to try one
+endpoint before the public list. The key comes from `GATE_PRIVATE_KEY` in the
+file named by `GATE_SECRETS_ENV`.
 
 ```sh
 pnpm chain:balance [--address 0x…]      # balance, nonce, deploy and commit cost; exit 2 if unfunded
