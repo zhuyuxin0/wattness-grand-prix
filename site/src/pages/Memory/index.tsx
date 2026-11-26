@@ -5,6 +5,7 @@ import { dualTime } from "../../lib/time";
 import type { MemoryGraph } from "../../scenes/data";
 import { Glyph, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type SortKind, type SortState, type SortValue } from "../../ui";
 import { BrainStage } from "./BrainStage";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { Build } from "./Build";
 import { loadBuild } from "./data";
 import "./styles.css";
@@ -102,6 +103,7 @@ function SortHead<T>({ cols, sort, setSort }: { cols: Col<T>[]; sort: SortState 
 
 function Memory({ ctx }: { ctx: Ctx }) {
   const { brain, parts } = ctx;
+  const registry = useLogoRegistry();
   const [picked, setPicked] = useState<string | null>(null);
   const [strength, setStrength] = useState<string | null>(null);
   const [pageSort, setPageSort] = useState<SortState | null>(null);
@@ -188,6 +190,7 @@ function Memory({ ctx }: { ctx: Ctx }) {
       <Section
         id="mem-pages"
         title="The Terminal's Pages"
+        builtWith={sponsors(registry, "livingbrain")}
         lede="By the part of the Terminal each describes, from its data sources to Ness. Pick a page to see its connections."
         source={SHORT}
       >
