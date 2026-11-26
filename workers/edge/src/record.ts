@@ -45,10 +45,25 @@ export function check(name: string, rule: string, compared: Comparison[], extra:
   };
 }
 
+/**
+ * A value as a reason prints it: as JSON, so a string is quoted and "135677078" is not 135677078, with
+ * anything outside printable ASCII escaped, so a trailing space, a CR or a BOM shows.
+ */
+function shown(v: unknown): string {
+  let json: string | undefined;
+  try {
+    json = JSON.stringify(v);
+  } catch {
+    json = undefined;
+  }
+  if (json === undefined) return String(v);
+  return json.replace(/[^\x20-\x7e]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
+}
+
 const describe = (c: Comparison): string => {
   const values = Object.entries(c)
     .filter(([k]) => k !== "name" && k !== "ok")
-    .map(([k, v]) => `${k} ${typeof v === "string" ? v : JSON.stringify(v)}`);
+    .map(([k, v]) => `${k} ${shown(v)}`);
   return values.length > 0 ? `${c.name}: ${values.join(", ")}` : c.name;
 };
 
@@ -521,7 +536,7 @@ export async function sealedRootFile(day: Day, sealed: readonly SealedIndex[]): 
     check(
       "root file",
       "the file is the committed root and a newline",
-      sealed.map((s) => comparison(s.network, textLine(text, s.record.root), { file: text.trim().slice(0, 80), "on chain": s.record.root })),
+      sealed.map((s) => comparison(s.network, textLine(text, s.record.root), { file: text.slice(0, 80), "on chain": s.record.root })),
     ),
   ];
   refuse(path, checks);
@@ -537,7 +552,7 @@ export async function sealedSalt(day: Day, sealed: readonly SealedIndex[]): Prom
   const text = textOf(object, path);
   const checks = [
     check("salt", "the file is the salt inside the verified leaf, and a newline", [
-      comparison("salt", typeof facts.salt === "string" && textLine(text, facts.salt), { file: text.trim().slice(0, 80), [`${facts.resource}'s leaf`]: facts.salt }),
+      comparison("salt", typeof facts.salt === "string" && textLine(text, facts.salt), { file: text.slice(0, 80), [`${facts.resource}'s leaf`]: facts.salt }),
     ]),
     indexSealed(sealed),
   ];

@@ -109,7 +109,7 @@ describe("a changed byte is refused", () => {
     const res = await call(freshOrigin(), LEAF);
     expect(res.status).toBe(502);
     const body = await res.text();
-    expect(body).toMatch(/^502: leaves\/DSWL_ESS_ESR1\.json is not served: leaf hash \(leaf: computed 0x[0-9a-f]{64}, index, leaf 94 of 316 0x067e4a61/);
+    expect(body).toMatch(/^502: leaves\/DSWL_ESS_ESR1\.json is not served: leaf hash \(leaf: computed "0x[0-9a-f]{64}", index, leaf 94 of 316 "0x067e4a61/);
     expect(body).not.toContain("energy_kwh");
     expect(res.headers.get("x-gate-verified")).toBe("fail");
     expect(res.headers.get("cache-control")).toBe("no-store");
@@ -154,6 +154,24 @@ describe("a changed byte is refused", () => {
     expect(await extra.text()).toContain("receipt fields (fields:");
   });
 
+  it("shows the difference in a refusal's reason: values quoted, and what cannot be seen escaped", async () => {
+    const salt = (JSON.parse(text.dswl) as { salt: string }).salt;
+    const cases: [string, string, string][] = [
+      ["root.hex", `${ROOT} \n`, `root file (bsc-mainnet: file "${ROOT} \\n", on chain "${ROOT}")`],
+      ["root.hex", `﻿${ROOT}\n`, `root file (bsc-mainnet: file "\\ufeff${ROOT}\\n", on chain "${ROOT}")`],
+      ["salt.txt", `${salt}\r\n`, `salt (salt: file "${salt}\\r\\n", DSWL_ESS_ESR1's leaf "${salt}")`],
+      ["record.bsc-mainnet.json", text.receiptMainnet.replace('"blockNumber": 135677078', '"blockNumber": "135677078"'), 'block: receipt "135677078", on chain 135677078'],
+    ];
+    for (const [file, body, reason] of cases) {
+      forgetVerified();
+      const u = upstreams();
+      u.objects.set(`${DAY}/${file}`, body);
+      const res = await call(freshOrigin(), `/day/2026-11-26/${file}`);
+      expect.soft(res.status, file).toBe(502);
+      expect.soft(await res.text(), file).toContain(reason);
+    }
+  });
+
   it("refuses a receipt whose contract address differs from the published one in case alone", async () => {
     // The published receipts give the address in its checksum form; a lower-cased copy is other bytes.
     const u = upstreams();
@@ -162,7 +180,7 @@ describe("a changed byte is refused", () => {
     u.objects.set(`${DAY}/record.bsc-mainnet.json`, lower);
     const res = await call(freshOrigin(), "/day/2026-11-26/record.bsc-mainnet.json");
     expect.soft(res.status).toBe(502);
-    expect.soft((await res.text()).slice(0, 600)).toMatch(/contract: receipt "?0x2922c68ce15eb3e83b7f43b136e981ddc4262876"?, served "?0x2922c68cE15EB3e83B7f43b136e981dDc4262876/);
+    expect.soft((await res.text()).slice(0, 600)).toContain('contract: receipt "0x2922c68ce15eb3e83b7f43b136e981ddc4262876", served "0x2922c68cE15EB3e83B7f43b136e981dDc4262876"');
   });
 });
 
@@ -185,7 +203,7 @@ describe("a wrong root is refused", () => {
     const origin = freshOrigin();
     const index = await call(origin, "/day/2026-11-26/index.json");
     expect(index.status).toBe(502);
-    expect(await index.text()).toContain(`on-chain record (root: on chain ${ROOT}, index ${forged.root}`);
+    expect(await index.text()).toContain(`on-chain record (root: on chain "${ROOT}", index "${forged.root}"`);
     const leaf = await call(origin, "/day/2026-11-26/leaves/CLO_ESR1.json");
     expect(leaf.status).toBe(502);
   });
@@ -206,7 +224,7 @@ describe("a wrong root is refused", () => {
     expect((await call(origin, "/day/2026-11-26/index.json")).status).toBe(200);
     const leaf = await call(origin, `/day/2026-11-26/leaves/${name}.json`);
     expect(leaf.status).toBe(502);
-    expect(await leaf.text()).toContain("resource: document DSWL_ESS_ESR1, index DSWL_ESS_ESR0");
+    expect(await leaf.text()).toContain('resource: document "DSWL_ESS_ESR1", index "DSWL_ESS_ESR0"');
     const v = (await (await call(origin, `/verify/${name}?od=2026-11-26`)).json()) as { verdict: string; checks: { name: string; result: string }[] };
     expect(v.verdict).toBe("fail");
     expect(v.checks.find((c) => c.name === "leaf hash")?.result).toBe("fail");
@@ -218,7 +236,7 @@ describe("a wrong root is refused", () => {
     );
     const res = await call(freshOrigin(), "/day/2026-11-26/index.json");
     expect(res.status).toBe(502);
-    expect(await res.text()).toContain(`root: on chain 0x${"cd".repeat(32)}, index ${ROOT}`);
+    expect(await res.text()).toContain(`root: on chain "0x${"cd".repeat(32)}", index "${ROOT}"`);
   });
 });
 
