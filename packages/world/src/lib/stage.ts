@@ -54,6 +54,9 @@ export interface WorldStage {
   setAOStrength(k: number): void;
   setShadowAuto(on: boolean): void;
   requestShadow(): void;
+  /** Keep the shadow map as last drawn (on) whatever auto and requests say, for a caller that knows nothing that
+   *  lights or casts has changed since; off: redrawn as they say. */
+  holdShadow(on: boolean): void;
   setKey(key: KeyLight): void;
   setCamera(pose: CameraPose): void;
   applyProjection(): void;

@@ -133,10 +133,12 @@ export function installLightLoop() {
 }
 
 /** Redraws the shadow map at the start of a frame: every frame while `auto`, otherwise only when asked (a scene
- *  that knows when its lights or casters changed asks; the camera alone never needs it). */
+ *  that knows when its lights or casters changed asks; the camera alone never needs it). While `hold` is set the map
+ *  is kept as it was last drawn, whatever auto and a request say (the caller knows nothing that lights or casts has
+ *  changed since: the same scene at the same time, seen from another place). */
 class ShadowOncePass extends Pass {
-  constructor() { super(); this.needsSwap = false; this.auto = true; this.pending = true; }
-  render(renderer) { if (this.auto || this.pending) { renderer.shadowMap.needsUpdate = true; this.pending = false; } }
+  constructor() { super(); this.needsSwap = false; this.auto = true; this.pending = true; this.hold = false; }
+  render(renderer) { if (this.hold) return; if (this.auto || this.pending) { renderer.shadowMap.needsUpdate = true; this.pending = false; } }
 }
 
 export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', stage = null, ao = true }) {
@@ -264,6 +266,9 @@ export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', st
   /** Shadow-map refresh: auto (every frame) or on request (requestShadow() before the frame that needs it). */
   function setShadowAuto(on) { shadowPass.auto = !!on; if (!on) shadowPass.pending = true; }
   function requestShadow() { shadowPass.pending = true; }
+  /** Keep the shadow map as last drawn, whatever auto and requests say (on), or redraw it as they say (off). For a
+   *  caller that knows the lights and the casters are as they were when it was drawn: only the camera has moved. */
+  function holdShadow(on) { shadowPass.hold = !!on; }
 
   /** Key light from compass azimuth (deg, from the subject toward the light) and elevation; shadow box fitted. */
   function setKey({ az = 225, el = 50, center = [0, 0, 0], radius = 20, intensity, rimAz, rimEl = 22, rimIntensity }) {
@@ -416,7 +421,7 @@ export function createStage({ canvas, width, height, dpr = 1, theme = 'dark', st
     scene.traverse((o) => { if (o.isMesh || o.isLine || o.isPoints) { o.geometry?.dispose?.(); const ms = Array.isArray(o.material) ? o.material : [o.material]; for (const m of ms) { if (!m) continue; for (const k of Object.keys(m)) { const v = m[k]; if (v && v.isTexture) v.dispose(); } m.dispose?.(); } } });
     renderer.dispose(); renderer.forceContextLoss?.();
   }
-  return { THREE, sky, renderer, scene, camera, composer, gtao, key, rim, fill, ground, catcher, setTheme, setAO, setAOStrength, setShadowAuto, requestShadow, setKey, setCamera, applyProjection, setFade, setGround, setBackdrop, setLight, setSize, render, preparePrograms, dispose, frameInfo, theme: () => themeNow };
+  return { THREE, sky, renderer, scene, camera, composer, gtao, key, rim, fill, ground, catcher, setTheme, setAO, setAOStrength, setShadowAuto, requestShadow, holdShadow, setKey, setCamera, applyProjection, setFade, setGround, setBackdrop, setLight, setSize, render, preparePrograms, dispose, frameInfo, theme: () => themeNow };
 }
 
 /** Put every object flagged userData.overlay (and its subtree) on the overlay layer only. */
