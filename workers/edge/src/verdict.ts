@@ -10,7 +10,7 @@ import { MIN_CONFIRMATIONS, NETWORKS, PLAN_SCOPE_LABEL, type NetworkName } from 
 import { EdgeError, cut } from "./errors.ts";
 import { isPlainPath } from "./greenfield.ts";
 import { leafHash, rootAndProof, rootFromProof } from "./merkle.ts";
-import { INDEX_OBJECT, check, checkIndexFile, checkedRendering, comparison, parseJson, sealedIndex, type Check, type Day, type FleetLeaf, type Rendering } from "./record.ts";
+import { INDEX_OBJECT, check, checkIndexFile, checkedRendering, comparison, lowered, parseJson, sealedIndex, type Check, type Day, type FleetLeaf, type Rendering } from "./record.ts";
 
 export interface Verdict {
   schema: "gate-record.edge-verdict.v1";
@@ -153,7 +153,7 @@ export async function verdictFor(day: Day, network: NetworkName, battery: string
           same("chain id", ["RPC", chain.chainId], [network, NETWORKS[network]]),
           same("root", ["on chain", rec.root], ["walked from the leaf", walked]),
           same("leaf count", ["on chain", rec.leafCount], ["index", size]),
-          same("committer", ["on chain", rec.committer.toLowerCase()], ["leaf agent.wallet", String(wallet).toLowerCase()]),
+          same("committer", ["on chain", rec.committer.toLowerCase()], ["leaf agent.wallet", lowered(wallet)]),
           same("operating day", ["on chain", rec.od], ["leaf", leafOd]),
           same("scope", ["on chain", rec.scope], [PLAN_SCOPE_LABEL, chain.scope]),
           same("code hash", ["on chain", rec.codeHash], ["leaf engine.tree", code]),

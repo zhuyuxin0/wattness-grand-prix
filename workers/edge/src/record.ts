@@ -197,6 +197,11 @@ export function checkedRendering(p: Parsed, what: string): Rendering {
 // long for its paths to be plain would pass the shape check, and each request that reads those paths would
 // answer 400, as if the request were wrong.
 const RESOURCE = /^[A-Z0-9_]{1,64}$/;
+/**
+ * A string in lower case, and any other value as it is. String() of a parsed object can throw (JSON.parse
+ * makes {"toString": 0} an object with no usable toString), and String() of an array is its elements' text.
+ */
+export const lowered = (v: unknown): unknown => (typeof v === "string" ? v.toLowerCase() : v);
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const get = (v: unknown, ...path: string[]): unknown => path.reduce<unknown>((o, k) => (isRecord(o) ? o[k] : undefined), v);
 /** A battery name as a reason prints it: bare when it has a resource name's form, else as any value; bounded either way. */
@@ -232,14 +237,20 @@ export function indexShapeErrors(doc: unknown, day: string): { problems: string[
   const entries = leaves as Partial<FleetLeaf>[];
   leaves.forEach((l, i) => out.push(...fieldProblems(`leaves: ${typeof l.resource === "string" ? label(l.resource) : `entry ${i + 1}`}`, l, LEAF_FIELDS)));
   const names = entries.map((l) => l.resource);
+  // A name that is not a string is a bad name, and has no order and no paths: the checks of order and paths
+  // read the names that are strings. A < comparison or String() on a parsed object can throw.
   if (names.some((n) => typeof n !== "string" || !RESOURCE.test(n))) out.push("leaves: bad resource name");
-  for (let i = 1; i < names.length; i++) {
-    if (!((names[i - 1] as string) < (names[i] as string))) out.push(`leaves: ${label(names[i])} is out of order or repeated`);
+  let previous: string | null = null;
+  for (const n of names) {
+    if (typeof n !== "string") continue;
+    if (previous !== null && !(previous < n)) out.push(`leaves: ${label(n)} is out of order or repeated`);
+    previous = n;
   }
   // No hash covers the paths, so they are fixed by the battery's name: a request for leaves/<R>.json can
   // then only reach R's entry, and the leaf's own battery.resource, checked when it is served, must be R.
   for (const l of entries) {
-    const r = String(l.resource);
+    if (typeof l.resource !== "string") continue;
+    const r = l.resource;
     if (l.manifest !== `leaves/${r}.json`) out.push(`leaves: ${label(l.resource)} names ${shown(l.manifest)} as its manifest, not leaves/${cut(r, 200)}.json`);
     if (l.scenarios !== `leaves/${r}.scenarios.json`) out.push(`leaves: ${label(l.resource)} names ${shown(l.scenarios)} as its scenario set, not leaves/${cut(r, 200)}.scenarios.json`);
   }
@@ -250,7 +261,7 @@ export function indexShapeErrors(doc: unknown, day: string): { problems: string[
     if (d.root !== root) out.push(`root ${shown(d.root)}, leaves give ${root}`);
   } else out.push("leaves: a leaf hash is not 32 bytes of lowercase hex");
   if (d.showcase !== null && d.showcase !== undefined && !names.includes(d.showcase)) out.push(`showcase ${shown(d.showcase)} is not a leaf`);
-  if (!/^[0-9a-f]{40}$/.test(d.code_tree ?? "")) out.push("code_tree: expected 40 lowercase hex digits");
+  if (typeof d.code_tree !== "string" || !/^[0-9a-f]{40}$/.test(d.code_tree)) out.push("code_tree: expected 40 lowercase hex digits");
   if (d.scope_label !== PLAN_SCOPE_LABEL) out.push(`scope_label: expected ${PLAN_SCOPE_LABEL}, got ${shown(d.scope_label)}`);
   if (d.operating_day !== day) out.push(`operating_day ${shown(d.operating_day)}, this is the record of ${day}`);
   else {
@@ -514,7 +525,7 @@ export async function sealedLeaf(day: Day, sealed: readonly SealedIndex[], posit
       same("schema", ["document", get(doc, "schema")], ["expected", MANIFEST_SCHEMA]),
       same("resource", ["document", get(doc, "battery", "resource")], ["index", entry.resource]),
       same("operating day", ["document", get(doc, "operating_day")], ["asked", day.day]),
-      same("agent wallet", ["document", String(get(doc, "agent", "wallet")).toLowerCase()], ["served", day.cfg.committer.toLowerCase()]),
+      same("agent wallet", ["document", lowered(get(doc, "agent", "wallet"))], ["served", day.cfg.committer.toLowerCase()]),
     ]),
     indexSealed(sealed),
   ];

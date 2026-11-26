@@ -532,6 +532,80 @@ describe("a document nested past 64 levels is refused", () => {
   });
 });
 
+describe("a value String() cannot convert is refused with a 502, not a 500", () => {
+  // JSON.parse gives {"toString": 0} as an object whose toString is not a function, so String(), a template
+  // literal, a < comparison and a RegExp's test() each throw on it ("Cannot convert object to primitive
+  // value"). In the bucket such a value is a check that fails: a 502 with the reason, never a 500.
+  type Loose = Record<string, any>;
+  type Verdict = { verdict: string; checks: { name: string; compared: { name: string; ok: boolean }[] }[] };
+  const NO_STRING = { toString: 0 };
+  const WALLET = "0xfa22C29C4c3d975FCC617D899B1B695eFF2d94b8";
+  const VERIFY = "/verify/DSWL_ESS_ESR1?od=2026-11-26";
+  const DAY_PATHS = ["/day/2026-11-26/index.json", LEAF, "/day/2026-11-26/leaves/DSWL_ESS_ESR1.scenarios.json", "/day/2026-11-26/salt.txt", "/day/2026-11-26/root.hex"];
+  const source: Record<string, string> = { "manifest.json": text.index, "leaves/DSWL_ESS_ESR1.json": text.dswl };
+  const changed = (object: string, change: (d: Loose) => void) => {
+    const u = upstreams();
+    const d = JSON.parse(source[object] as string) as Loose;
+    change(d);
+    u.objects.set(`${DAY}/${object}`, pretty(d));
+  };
+  // The reason, from a plain-text refusal or from /verify's JSON one.
+  const reason = async (res: Response) => {
+    const body = await res.text();
+    return res.headers.get("content-type")?.startsWith("application/json") ? String((JSON.parse(body) as { error?: string }).error) : body;
+  };
+  const refusedEverywhere = async (object: string, change: (d: Loose) => void, paths: string[], why: string) => {
+    for (const path of paths) {
+      forgetVerified();
+      changed(object, change);
+      const res = await call(freshOrigin(), path);
+      expect.soft(res.status, path).toBe(502);
+      expect.soft(res.headers.get("x-gate-verified"), path).toBe("fail");
+      expect.soft(res.headers.get("cache-control"), path).toBe("no-store");
+      expect.soft((await reason(res)).slice(0, 600), path).toContain(why);
+    }
+  };
+  const committer = (v: Verdict) => v.checks?.find((c) => c.name === "on-chain record")?.compared.find((c) => c.name === "committer");
+
+  it("refuses an index whose entry for Desert Willow, or whose first entry, gives a battery name String() cannot convert", async () => {
+    for (const at of [93, 0]) {
+      await refusedEverywhere("manifest.json", (d) => (d.leaves[at].resource = NO_STRING), [...DAY_PATHS, VERIFY], "index shape (leaves: bad resource name");
+    }
+  });
+
+  it("refuses an index whose code_tree String() cannot convert", async () => {
+    await refusedEverywhere("manifest.json", (d) => (d.code_tree = NO_STRING), [...DAY_PATHS, VERIFY], "index shape (code_tree: expected 40 lowercase hex digits)");
+  });
+
+  it("refuses a leaf whose agent.wallet String() cannot convert, and everything read on its word, and gives it a failing verdict", async () => {
+    const why = `agent wallet: document {"toString":0}, served "${WALLET.toLowerCase()}"`;
+    await refusedEverywhere("leaves/DSWL_ESS_ESR1.json", (d) => (d.agent.wallet = NO_STRING), DAY_PATHS.slice(1, 4), why);
+    forgetVerified();
+    changed("leaves/DSWL_ESS_ESR1.json", (d) => (d.agent.wallet = NO_STRING));
+    const res = await call(freshOrigin(), VERIFY);
+    expect.soft(res.status).toBe(200);
+    expect.soft(res.headers.get("x-gate-verified")).toBe("fail");
+    expect.soft(res.headers.get("cache-control")).toBe("no-store");
+    const v = (await res.json()) as Verdict;
+    expect.soft(v.verdict).toBe("fail");
+    expect.soft(committer(v)).toMatchObject({ "leaf agent.wallet": NO_STRING, ok: false });
+  });
+
+  it("compares a wallet wrapped in an array as the array, not as its text", async () => {
+    // String(["0xfa22..."]) is the address itself, so the comparison used to pass; the leaf hash refused it.
+    forgetVerified();
+    changed("leaves/DSWL_ESS_ESR1.json", (d) => (d.agent.wallet = [WALLET]));
+    const leaf = await call(freshOrigin(), LEAF);
+    expect.soft(leaf.status).toBe(502);
+    expect.soft((await leaf.text()).slice(0, 600)).toContain(`agent wallet: document ["${WALLET}"], served "${WALLET.toLowerCase()}"`);
+    forgetVerified();
+    changed("leaves/DSWL_ESS_ESR1.json", (d) => (d.agent.wallet = [WALLET]));
+    const v = (await (await call(freshOrigin(), VERIFY)).json()) as Verdict;
+    expect.soft(v.verdict).toBe("fail");
+    expect.soft(committer(v)).toMatchObject({ "leaf agent.wallet": [WALLET], ok: false });
+  });
+});
+
 describe("an unknown day is a 404", () => {
   it("answers 404 for a day Greenfield holds no index for", async () => {
     const u = upstreams();
