@@ -258,6 +258,7 @@ export const ANSWERS: Answer[] = [
     sources: [
       { label: "Desert Willow's Nov 27 plan at the edge", href: `${EDGE}/verify/DSWL_ESS_ESR1?od=2026-11-27&network=bsc-mainnet` },
       { label: "Desert Willow's Nov 26 plan at the edge", href: `${EDGE}/verify/DSWL_ESS_ESR1?od=2026-11-26&network=bsc-mainnet` },
+      { label: "The Worker's code (workers/edge)", href: tree("workers/edge") },
       S.verify,
     ],
     brainPage: "grand-prix:browser-plan-verification",
