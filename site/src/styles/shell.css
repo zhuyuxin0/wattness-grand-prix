@@ -303,6 +303,38 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* A sponsor's mark at the row's right end (shell/sponsor-marks.ts): the registry's own file as a mask, in the muted
+   ink at rest and the label's own on the open tab and under the pointer, like the icon. The label gives way first. */
+.sidenav-marks {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  padding-left: 10px;
+  color: var(--w-muted);
+}
+.sidenav-mark {
+  display: block;
+  flex: none;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.sidenav-item[aria-current="page"] .sidenav-marks {
+  color: var(--w-fg);
+}
+@media (hover: hover) {
+  .sidenav-item:hover .sidenav-marks {
+    color: var(--w-fg);
+  }
+}
+@media (forced-colors: active) {
+  .sidenav-mark {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
+}
 
 @media (max-width: 767px) {
   .sidenav--rail {

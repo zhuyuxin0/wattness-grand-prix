@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import { Glyph } from "../ui/Glyph";
 import { TabIcon } from "../ui/TabIcon";
 import { batteryPath, useSelectedBattery } from "./battery";
 import { Brand } from "./Brand";
-import { panelSections, tabAt } from "./tabs";
+import { markStyle, marksOf } from "./sponsor-marks";
+import { panelSections, tabAt, type PanelTab } from "./tabs";
 
 const COLLAPSED_KEY = "gp.panel.collapsed";
 
@@ -15,6 +16,27 @@ function readCollapsed(): boolean {
   } catch {
     return false;
   }
+}
+
+/** The marks of the sponsors a tab is built with, at its row's right end. A click on one is the row's. */
+function SponsorMarks({ tab }: { tab: PanelTab }) {
+  const marks = marksOf(tab);
+  if (marks.length === 0) return null;
+  return (
+    <span className="sidenav-marks">
+      {marks.map((m) => (
+        <span
+          key={m.id}
+          className="sidenav-mark"
+          data-logo={m.id}
+          role="img"
+          aria-label={`Built with ${m.name}`}
+          title={`Built with ${m.name}`}
+          style={markStyle(m) as CSSProperties}
+        />
+      ))}
+    </span>
+  );
 }
 
 /** The groups and their tabs, the Terminal's side-nav rows. */
@@ -39,6 +61,7 @@ function TabList({ onPick }: { onPick?: () => void }) {
             >
               <TabIcon name={t.icon} className="sidenav-icon" />
               <span className="sidenav-label">{t.label}</span>
+              <SponsorMarks tab={t} />
             </Link>
           ))}
         </div>

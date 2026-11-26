@@ -1,4 +1,5 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from "react";
+import type { LogoId } from "@world/kit/logos";
 import type { TabIconName } from "../ui/tab-icons";
 
 // The side panel, the routes and the overview's paths all read this one list,
@@ -20,6 +21,9 @@ export interface PanelTab {
   label: string;
   /** The drawing beside the label in the side panel and the phone menu (src/ui/tab-icons.ts), never instead of it. */
   icon: TabIconName;
+  /** The sponsor the tab is built with, from the logo registry: a small mark at the right end of its row in the side
+   * panel and the phone menu (sponsor-marks.ts). Two for a tab built on both. */
+  sponsor?: LogoId | LogoId[];
   /** The route, from the root. */
   path: string;
   /** The page owns the paths under its own: /battery/<resource>, one per battery (scripts/spa-routes.mjs writes each). */
@@ -96,6 +100,7 @@ export const PANEL: PanelEntry[] = [
     id: "agent-ids",
     label: "Agent IDs",
     icon: "id-card",
+    sponsor: "agentstudio",
     path: "/agents/ids",
     summary: "The agents' ERC-8004 identities on BSC testnet, the evaluator hosted on Amazon Bedrock AgentCore through BNB Agent Studio, and their paid ERC-8183 jobs.",
     page: page(() => import("../pages/AgentIds")),
@@ -105,6 +110,7 @@ export const PANEL: PanelEntry[] = [
     id: "forecast",
     label: "Forecast",
     icon: "cloud-sun",
+    sponsor: "cournot",
     path: "/agents/forecast",
     battery: true,
     summary: "The price scenarios a plan used, at the battery's node and its hub.",
@@ -125,6 +131,7 @@ export const PANEL: PanelEntry[] = [
     id: "hedge",
     label: "Hedge",
     icon: "shield",
+    sponsor: "electronx",
     path: "/agents/hedge",
     battery: true,
     summary: "ElectronX's published terms and the contracts each plan holds, by hour.",
@@ -145,6 +152,7 @@ export const PANEL: PanelEntry[] = [
     id: "memory",
     label: "Memory",
     icon: "brain",
+    sponsor: "livingbrain",
     path: "/agents/memory",
     summary: "What Living Brain keeps on the build and on the Wattness Terminal: its pages, their connections and the reasoning behind each.",
     term: "team data",
@@ -157,6 +165,7 @@ export const PANEL: PanelEntry[] = [
     id: "seal",
     label: "Seal",
     icon: "stamp",
+    sponsor: "bnbchain",
     path: "/seal",
     summary: "The record on BNB Chain: the root, both receipts, and the gate the contract computes.",
     term: "parc fermé",
@@ -167,6 +176,7 @@ export const PANEL: PanelEntry[] = [
     id: "verify",
     label: "Verify",
     icon: "check-badge",
+    sponsor: "cloudflare",
     path: "/verify",
     subpaths: true,
     summary: "Check any plan against the chain, in your browser.",
@@ -178,6 +188,7 @@ export const PANEL: PanelEntry[] = [
     id: "files",
     label: "Files",
     icon: "folder",
+    sponsor: "greenfield",
     path: "/files",
     summary: "The sealed day's files on BNB Greenfield, each with its SHA-256 and its public address.",
     page: page(() => import("../pages/Files")),
@@ -189,6 +200,7 @@ export const PANEL: PanelEntry[] = [
     id: "season",
     label: "Season",
     icon: "trophy",
+    sponsor: "flap",
     path: "/markets/season",
     summary: "The Flap season: its token launches only on a plan sealed before the gate, and its vault pays contributors for the days their agent sealed in time.",
     term: "the season purse",
@@ -199,6 +211,7 @@ export const PANEL: PanelEntry[] = [
     id: "launchpad",
     label: "Launchpad",
     icon: "rocket",
+    sponsor: "openfour",
     path: "/markets/launchpad",
     summary: "Agent launches on OpenFour that graduate into a PancakeSwap V2 pool only with a sealed record bound to them, and are refused without one.",
     term: "license to launch",
@@ -209,6 +222,7 @@ export const PANEL: PanelEntry[] = [
     id: "prices",
     label: "Prices",
     icon: "candles",
+    sponsor: ["atlas", "cmc"],
     path: "/markets/prices",
     summary: "BNB and USDT in US dollars from Atlas's signed reports and from CoinMarketCap, side by side, and the evaluation budget they price.",
     term: "the timing screens",
