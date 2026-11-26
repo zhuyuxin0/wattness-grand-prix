@@ -3,11 +3,7 @@
    system face for everything read; mono only for codes; tabular figures. The values are the site's dark tokens
    (site/src/styles/tokens.css) and the bay's lamp colors, pass #2ec7a6 and fail #e5534b, so the board, the lamps and
    their plates agree. The board is a fixed box (board.ts BOARD): the rows share its height, and --k (its height over
-   the venue's 250 px) scales the score and the rows. The towers' timing face is declared here until it goes (heroes.ts
-   draws with it). */
-@font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 500; src: url("./fonts/barlow-condensed-500-latin.woff2") format("woff2"); }
-@font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 600; src: url("./fonts/barlow-condensed-600-latin.woff2") format("woff2"); }
-@font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; src: url("./fonts/barlow-condensed-700-latin.woff2") format("woff2"); }
+   the venue's 250 px) scales the score and the rows. */
 
 .v-board {
   --chrome: #101315; --rule: #2b3036;
