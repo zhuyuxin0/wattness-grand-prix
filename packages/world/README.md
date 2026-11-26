@@ -81,7 +81,8 @@ The handle:
 - `dispose()`.
 
 In site mode the story plays the site's own stops (`beats.ts` SITE_KEYS: the master's keys from before Living Brain's
-beat, X05 "Your turn" kept, with Living Brain's one stop after the pit wall; never Living Brain's own interface, whose
+beat, X05 "Your turn" kept, with Living Brain's one stop after the weather odds, since the brains were written after
+the seal and no plan reads them; never Living Brain's own interface, whose
 recording a site's checkout does not hold; less SITE_LEFT_OUT, the late seal's second stop on Parc fermé and the
 season and launch towers, which the Season and Launchpad tabs read live). The wheel or trackpad scrubs through a move
 and snaps to the nearest rest. A click, the arrow keys, Page Up and Page Down, Space, Home and End, a swipe and the

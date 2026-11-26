@@ -201,28 +201,33 @@ export const SITE_LEFT_OUT: ReadonlySet<KeyId> = new Set<KeyId>(['late-seal', 's
 
 /** The site's stops (mountStory's site mode): a list of its own, not the master film's. The master's keys as they were
  *  before Living Brain's beat, X05 "Your turn" kept (the cabinet plays on the site), with Living Brain's one stop after
- *  the pit wall (brain/film.ts brainSite); never Living Brain's own interface, a recording kept out of git that a site's
- *  checkout does not hold; and less SITE_LEFT_OUT. The site rests at each key's local time and leaves the holds out, so
- *  only the keys and their legs count: the keys after the brain's stop are the master's, moved on by its legs, and the
- *  key after a run left out keeps its own leg's length, every key from it on coming forward by the time the run took,
- *  so a step never plays a long leg. A key met twice, as Parc fermé is, is two stops only where its words differ
- *  ('sealed' and 'late-seal' are two keys on one frame). */
+ *  the weather odds (brain/film.ts brainSite): the brains were written after the seal, by the build and Desert Willow's
+ *  review, and no plan reads them, so the stop stands with what the day read after the seal, never among the plans.
+ *  Never Living Brain's own interface, a recording kept out of git that a site's checkout does not hold; and less
+ *  SITE_LEFT_OUT. The site rests at each key's local time and leaves the holds out, so only the keys and their legs
+ *  count: the keys after the brain's stop are the master's, moved on by its legs, and the key after a run left out keeps
+ *  its own leg's length, every key from it on coming forward by the time the run took, so a step never plays a long
+ *  leg. A key met twice, as Parc fermé is, is two stops only where its words differ ('sealed' and 'late-seal' are two
+ *  keys on one frame). */
 export const SITE_KEYS: FilmKey[] = (() => {
   const at = (key: KeyId) => MASTER.findIndex((k) => k.key === key);
   const before = MASTER.slice(0, at('pit-wall') + 1);
-  const from = before[before.length - 1]!.until;
-  const brain = brainSite(from);
-  // the arcade as the master ran it before the beat; its hop backs out of the brain in full (the pit wall's hall did not)
+  // the arcade as the master ran it before the beat, out of the pit wall's hall (its side backs off a little, so the
+  // camera never leaves through the roof)
   const arcade: FilmKey[] = [
-    { key: 'no-hedge', at: 43.6, until: 47, leg: { cam: 'hop' } },
+    { key: 'no-hedge', at: 43.6, until: 47, leg: { cam: 'hop', back: [0.12, 1] } },
     { key: 'fixed-hedge', at: 50, until: 54, leg: { fade: [0.15, 0.85] } },
     { key: 'meet', at: 57, until: 61, leg: { fade: [0.15, 0.85] } },
     { key: 'chosen-together', at: 64, until: 70, leg: { fade: [0.15, 0.85] } },
     { key: 'your-turn', at: 72.6, until: 75, leg: { fade: [0.3, 0.7] } },
   ];
+  // the seal and the weather odds read after it, then Living Brain's stop
+  const sealed = MASTER.slice(at('sealed'), at('odds') + 1);
+  const from = sealed[sealed.length - 1]!.until;
+  const brain = brainSite(from);
   const d = brain[brain.length - 1]!.until - from;
   const later = (k: FilmKey): FilmKey => ({ ...k, at: k.at + d, until: k.until + d });
-  const all = [...before, ...brain, ...arcade.map(later), ...MASTER.slice(at('sealed')).map(later)];
+  const all = [...before, ...arcade, ...sealed, ...brain, ...MASTER.slice(at('odds') + 1).map(later)];
   const out: FilmKey[] = [];
   let shift = 0;
   all.forEach((k, i) => {

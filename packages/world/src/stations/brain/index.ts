@@ -266,7 +266,9 @@ export const frames: StationModule['frames'] = {
   'brain.across': moment(T.lb6, 'LB6', 'Across brains'),
   'brain.review': moment(T.lb7, 'LB7', 'Remember and retrieve'),
   // the master's and the 90-second cut's beat: the combined brain on a short clock of its own (moments.ts T_SHARED)
-  'brain.shared': async (ctx) => { readReview(ctx); return brainFrame(ctx, T_SHARED.lb3, { caption: 'Memory', moments: T_SHARED, line: `Living Brain holds three of our brains: ${fmt(COUNTS.pages)} pages, linked by ${COUNTS.across} connections across them.` }); },
+  // its line says when the brains were written and who wrote them: after the seal, by the build and the review; no plan
+  // reads them (the site's stop stands after the weather odds; the films' rows say it too)
+  'brain.shared': async (ctx) => { readReview(ctx); return brainFrame(ctx, T_SHARED.lb3, { caption: 'Memory', moments: T_SHARED, line: `Living Brain holds our three brains: ${fmt(COUNTS.pages)} pages, ${COUNTS.across} connections across them, written after the seal by the build and Desert Willow's review. No plan reads them.` }); },
   'brain.calibrate': async (ctx) => brainFrame(ctx, 31.0, { calibrate: true }),
   // the silhouette checks (SPEC 7.3): the same brain from its left side and from the front, level
   'brain.calibrate-side': async (ctx) => brainFrame(ctx, 31.0, { calibrate: true, view: { az: 270, el: 0 } }),

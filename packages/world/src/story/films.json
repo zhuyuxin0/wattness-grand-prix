@@ -96,7 +96,7 @@
    "frames": [
     "brain.review"
    ],
-   "line": "Retrieve: a new session's answer cites Desert Willow's review.",
+   "line": "After the seal, retrieve: a new session's answer cites Desert Willow's review. No plan reads it.",
    "lb": "LB7"
   },
   {
@@ -106,7 +106,7 @@
    "frames": [
     "brain.shared"
    ],
-   "line": "Connect: 55 links across our three brains, one conflict flagged.",
+   "line": "Connect: 55 links across our three brains, made after the seal, one conflict flagged.",
    "lb": "LB-M"
   },
   {
@@ -377,7 +377,7 @@
    "frames": [
     "brain.shared"
    ],
-   "line": "Living Brain: our three brains, 55 connections across them.",
+   "line": "After the seal, Living Brain links our three brains: 55 connections across them.",
    "lb": "LB-M"
   },
   {
@@ -472,5 +472,5 @@
    "line": "Wattness Grand Prix. Every ERCOT battery with complete public data (316 on Nov 26), planned for tomorrow and sealed on BNB Chain before the gate. Anyone can check any plan. gp.wattness.tech · wattness.tech"
   }
  ],
- "edited": "Living Brain beats (stations/brain/film.ts; the combined brain on its short clock, frame brain.shared), Nov 26: the master's rows 41-49 (retrieve, 41-44; connect, 44-47; its own interface, 47-49) take X05's row and a second each from X01, X02 and X03 (49-54, 54-60, 60-66), X04 at 66-75, Parc Ferme still at 75; the 90-second cut's rows 25-31 take X02 and X03 from the arcade's row (31-40, X01 and X04). The figures in the new lines are brain-scene.json's: 55 combined.across. Every other row is the source's."
+ "edited": "Living Brain beats (stations/brain/film.ts; the combined brain on its short clock, frame brain.shared), Nov 26: the master's rows 41-49 (retrieve, 41-44; connect, 44-47; its own interface, 47-49) take X05's row and a second each from X01, X02 and X03 (49-54, 54-60, 60-66), X04 at 66-75, Parc Ferme still at 75; the 90-second cut's rows 25-31 take X02 and X03 from the arcade's row (31-40, X01 and X04). The figures in the new lines are brain-scene.json's: 55 combined.across. The lines say when the brains were written and linked, after the seal, and that no plan reads them (the site's stop stands after the weather odds). Every other row is the source's."
 }

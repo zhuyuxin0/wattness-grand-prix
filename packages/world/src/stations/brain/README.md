@@ -84,12 +84,13 @@ Neutral curve at exposure 1 where Living Brain uses ACES at 1.05, so its shader 
 
 `film.ts` gives the story its keys and four segments. The master's Living Brain beat after the pit wall shows the
 track's verbs in turn: remember and retrieve (0:41 to 0:44: Desert Willow's review at the center, its remember plate up
-and the retrieval landing, "Retrieve: a new session's answer cites Desert Willow's review."), connect (0:44 to 0:47: the
-combined brain on its short clock, the 55 links across brains drawing and the conflict flagged), then Living Brain's own
-interface (0:47 to 0:49). The 90-second cut's (0:25 to 0:31) is connect, then its own interface. The site's one stop
-(`brainSite`, in `story/beats.ts` SITE_KEYS) is the combined brain at the short clock's rest; the site has its own list
-of stops, the master's from before this beat with X05 "Your turn" kept, and never shows Living Brain's own interface (its
-recording is not in a site's checkout). The Living Brain cut is LB1 to LB8 in 69 s on the sequence's clock at real time
+and the retrieval landing, "After the seal, retrieve: a new session's answer cites Desert Willow's review. No plan reads
+it."), connect (0:44 to 0:47: the combined brain on its short clock, the 55 links across brains drawing and the
+conflict flagged), then Living Brain's own interface (0:47 to 0:49). The 90-second cut's (0:25 to 0:31) is connect,
+then its own interface. Their lines say when: the brains were written and linked after the seal, and no plan reads them.
+The site's one stop (`brainSite`, in `story/beats.ts` SITE_KEYS) stands after the weather odds, with what the day read
+after the seal: the combined brain at the short clock's rest; the site has its own list of stops, the master's from before this beat with X05 "Your turn" kept, and never shows Living
+Brain's own interface (its recording is not in a site's checkout). The Living Brain cut is LB1 to LB8 in 69 s on the sequence's clock at real time
 (`capture-story.mjs --cut brain`). One world on one clock: the holds run the clock and the legs carry it on, so the
 dive, the turn and the flight are the clock running, never a cross-fade.
 
