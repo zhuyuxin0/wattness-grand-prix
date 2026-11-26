@@ -21,6 +21,13 @@
   position: relative;
   height: clamp(480px, 70vh, 820px);
 }
+/* On a phone the stage is about as tall as it is wide (448 px at 390): the brains draw larger in it, with less empty
+   black above and below them, and more of the page shows under it. */
+@media (max-width: 767px) {
+  .mem-stage__space {
+    height: clamp(360px, 115vw, 70vh);
+  }
+}
 
 .mem-lead {
   display: grid;
