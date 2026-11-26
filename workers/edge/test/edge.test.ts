@@ -115,6 +115,19 @@ describe("a changed byte is refused", () => {
     expect(res.headers.get("cache-control")).toBe("no-store");
   });
 
+  it("refuses a leaf that cannot be hashed with a 502 and the reason, not a 500", async () => {
+    // 338307.5 is not a safe integer, so the leaf has no RFC 8785 form; the bytes are its own rendering.
+    const u = upstreams();
+    const doc = JSON.parse(text.dswl) as { battery: { energy_kwh: number } };
+    doc.battery.energy_kwh = 338307.5;
+    u.objects.set(`${DAY}/leaves/DSWL_ESS_ESR1.json`, `${JSON.stringify(doc, null, 2)}\n`);
+    const res = await call(freshOrigin(), LEAF);
+    expect.soft(res.status).toBe(502);
+    expect.soft(res.headers.get("x-gate-verified")).toBe("fail");
+    expect.soft(res.headers.get("cache-control")).toBe("no-store");
+    expect.soft(await res.text()).toContain('leaf hash (leaf: computed "none: $.battery.energy_kwh: 338307.5 is not a safe integer", index, leaf 94 of 316 "0x067e4a61');
+  });
+
   it("refuses a copy that parses to the same document but is not its rendering", async () => {
     const u = upstreams();
     const origin = freshOrigin();

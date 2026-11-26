@@ -435,7 +435,14 @@ export async function sealedLeaf(day: Day, sealed: readonly SealedIndex[], posit
   const object = await day.object(entry.manifest);
   if (!object) throw new EdgeError(502, `the index of ${day.day} names ${entry.manifest}, and Greenfield has no such object`);
   const parsed = parseJson(object, entry.manifest);
-  const computed = leafHash(parsed.doc);
+  // A document with no RFC 8785 form (a number that is not a safe integer, say) has no leaf hash: the
+  // check fails with the reason, as any other changed leaf does.
+  let computed: string;
+  try {
+    computed = leafHash(parsed.doc);
+  } catch (err) {
+    computed = `none: ${(err as Error).message}`;
+  }
   const doc = parsed.doc;
   const checks: Check[] = [
     byteForm(parsed),
