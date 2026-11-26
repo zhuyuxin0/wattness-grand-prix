@@ -304,6 +304,101 @@
           "sponsored": true
         }
       ]
+    },
+    {
+      "jobId": 1907,
+      "task": "price-scenarios",
+      "operatingDay": "2026-11-27",
+      "resource": "DSWL_ESS_ESR1",
+      "timing": "before-seal",
+      "client": {
+        "role": "planner",
+        "agentId": 2928,
+        "address": "0x648608Ab27e7C1a024c45082E3094721FF11E67a"
+      },
+      "provider": {
+        "role": "forecaster",
+        "agentId": 2925,
+        "address": "0x0cBB05162596b58686AB50C76d86CAeFd9b7EF76"
+      },
+      "token": "0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565",
+      "budget": "100000000000000000",
+      "expiredAt": 1795712904,
+      "deliverable": "0x3c8bf772e378a77b7f1cf2a0a455e72e21f16abf17f17cfad351058a2065c998",
+      "deliverableUrl": "https://gnfd-testnet-sp3.nodereal.io/view/wattness-grand-prix-records/od-20261127/leaves/DSWL_ESS_ESR1.scenarios.json",
+      "status": "Completed",
+      "transactions": [
+        {
+          "step": "createJob",
+          "hash": "0xaf764d055561f75e34865b54f73f4998fcd97a8f810ad5d9a59ababdd86bf326",
+          "blockNumber": 144992991,
+          "blockTime": 1795702107,
+          "from": "0x648608Ab27e7C1a024c45082E3094721FF11E67a",
+          "to": "0xa206c0517B6371C6638CD9e4a42Cc9f02A33B0DE",
+          "gasPriceWei": "0",
+          "sponsored": true
+        },
+        {
+          "step": "registerJob",
+          "hash": "0x803cac46106290bc1e15c23010e9e14114fb14743af103d16e926b3a3178bd71",
+          "blockNumber": 144992997,
+          "blockTime": 1795702110,
+          "from": "0x648608Ab27e7C1a024c45082E3094721FF11E67a",
+          "to": "0xD7d36D66d2F1B608A0F943f722D27e3744f66F25",
+          "gasPriceWei": "0",
+          "sponsored": true
+        },
+        {
+          "step": "setBudget",
+          "hash": "0x7357628ba394bafc0c23fd2816469998fe5ac3fe383bc609431d773dda680e9a",
+          "blockNumber": 144993048,
+          "blockTime": 1795702133,
+          "from": "0x648608Ab27e7C1a024c45082E3094721FF11E67a",
+          "to": "0xa206c0517B6371C6638CD9e4a42Cc9f02A33B0DE",
+          "gasPriceWei": "0",
+          "sponsored": true
+        },
+        {
+          "step": "approve",
+          "hash": "0xd303d31abd40c813ec466cc6406c03b675096d3b9ab88883fbbced1a4fac543e",
+          "blockNumber": 144993056,
+          "blockTime": 1795702136,
+          "from": "0x648608Ab27e7C1a024c45082E3094721FF11E67a",
+          "to": "0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565",
+          "gasPriceWei": "1000000000",
+          "sponsored": false
+        },
+        {
+          "step": "fund",
+          "hash": "0x2bc8aef94d3c9acbc2ccecdd811c9d17824efdbfb38eb11b3acad638d7e80ed5",
+          "blockNumber": 144993062,
+          "blockTime": 1795702139,
+          "from": "0x648608Ab27e7C1a024c45082E3094721FF11E67a",
+          "to": "0xa206c0517B6371C6638CD9e4a42Cc9f02A33B0DE",
+          "gasPriceWei": "0",
+          "sponsored": true
+        },
+        {
+          "step": "submit",
+          "hash": "0xfa4279148a7d6a4843828ece1339161a1dd172c112deb9173c96bcb77f6bb583",
+          "blockNumber": 144993104,
+          "blockTime": 1795702158,
+          "from": "0x0cBB05162596b58686AB50C76d86CAeFd9b7EF76",
+          "to": "0xa206c0517B6371C6638CD9e4a42Cc9f02A33B0DE",
+          "gasPriceWei": "0",
+          "sponsored": true
+        },
+        {
+          "step": "settle",
+          "hash": "0x4d5ccb587d13df4db19f9d84d61ccf5920dd8339b25df9c527df395fbaf67ab7",
+          "blockNumber": 144995216,
+          "blockTime": 1795703111,
+          "from": "0x648608Ab27e7C1a024c45082E3094721FF11E67a",
+          "to": "0xD7d36D66d2F1B608A0F943f722D27e3744f66F25",
+          "gasPriceWei": "0",
+          "sponsored": true
+        }
+      ]
     }
   ]
 }
