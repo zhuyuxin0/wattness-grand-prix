@@ -1,8 +1,9 @@
 // The tabs' 3D stills (public/renders/): each pair of WebPs, at 640 and 1280 across, is named byte for byte by its
 // receipt (<name>.json: the frame, the code it was rendered from, the command, every file's SHA-256), as the Intro's
 // hero still is (intro-hero.test.mjs), and so is a still's loop (<name>-loop.mp4) where it has one. Every still a page
-// names has its receipt and files, every file in the folder belongs to a receipt, each still stays under 150 KB and
-// each loop under 300 KB, each receipt's frame is one the 3D package defines, and every Agent IDs card has its loop.
+// names (a face's still, a lead's still=, a still's name=) has its receipt and files and every receipt's still is named
+// on a page, every file in the folder belongs to a receipt, each still stays under 150 KB and each loop under 300 KB,
+// each receipt's frame is one the 3D package defines, and every Agent IDs card has its loop.
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -85,17 +86,19 @@ test("each receipt's frame is one the 3D package defines", () => {
   }
 });
 
-test("every still a page names has its receipt", () => {
+test("every still a page names has its receipt, and every receipt's still is named on a page", () => {
   const pages = walk(join(site, "src")).filter((p) => /\.(ts|tsx)$/.test(p));
   const names = new Set();
   for (const p of pages) {
     const src = read(p);
-    for (const m of src.matchAll(/\bstill:\s*"([a-z0-9-]+)"/g)) names.add(m[1]);
+    // a face's still: "<name>" (AgentIds/roles.ts), a lead's still="<name>" (ObjectLead), a still's name="<name>"
+    for (const m of src.matchAll(/\bstill(?::\s*|=)"([a-z0-9-]+)"/g)) names.add(m[1]);
     for (const m of src.matchAll(/<ObjectStill\b[^>]*?\bname="([a-z0-9-]+)"/g)) names.add(m[1]);
   }
-  assert.ok(names.size > 0, "the pages name stills");
   const have = new Set(receipts.map((x) => x.name));
   for (const n of names) assert.ok(have.has(n), `${n} is named on a page but has no receipt in public/renders/`);
+  // and nothing ships that no page shows
+  for (const n of have) assert.ok(names.has(n), `${n} is in public/renders/ but no page names it`);
 });
 
 test("every Agent IDs card's instrument has its loop", () => {
