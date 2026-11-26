@@ -10,8 +10,8 @@
  "frame": "grid.R03-pass",
  "local": null,
  "code": {
-  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
-  "world": "packages/world as the commit holds it"
+  "commit": "8f6e5de2c8e1eac3b02a5ad2a3695e70777ac0ba",
+  "world": "packages/world as the commit holds it (its last change before the render)"
  },
  "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
  "render": {
@@ -35,8 +35,8 @@
    }
   },
   "rendered": {
-   "bangkok": "2026-11-27 01:36",
-   "ct": "2026-11-26 12:36"
+   "bangkok": "2026-11-27 01:56",
+   "ct": "2026-11-26 12:56"
   },
   "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
   "tools": [
@@ -44,16 +44,16 @@
    "1.6.0\nlibsharpyuv: 0.4.2"
   ],
   "timing": {
-   "wall_ms": 34278,
+   "wall_ms": 27748,
    "per_frame_ms": {
-    "mean": 225,
-    "p95": 287
+    "mean": 182,
+    "p95": 201
    },
    "gpu_load_pct": {
-    "before": 79,
-    "after": 98
+    "before": 44,
+    "after": 95
    },
-   "load_average": "{ 38.67 45.06 52.72 }",
+   "load_average": "{ 37.20 28.15 32.77 }",
    "under_load": true
   }
  },
@@ -63,8 +63,8 @@
    "width": 960,
    "height": 540,
    "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
-   "bytes": 15986,
-   "sha256": "ded680f374a206d02bfa02b7eb5660dfc6f74c37889bf98db6a9e1a6bcb83bc3"
+   "bytes": 17320,
+   "sha256": "59068f4d538bb75920c4206e116acb0b7f7559ff3dfc876f5c4888cb44257d40"
   },
   "check-960.webm": {
    "kind": "webm",
@@ -72,8 +72,8 @@
    "height": 540,
    "codec": "VP9",
    "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
-   "bytes": 214480,
-   "sha256": "a4048b9f6adb5095e19f102851faacd19e81c162a4585e6f412a5d642d818518"
+   "bytes": 236708,
+   "sha256": "b893b815bf56580aa7a2f39fb9ef5eaaf9b3c9d7a4c603bb7b8a68a805bbe805"
   },
   "check-960.mp4": {
    "kind": "mp4",
@@ -81,8 +81,8 @@
    "height": 540,
    "codec": "H.264 High",
    "encoder": "libx264 -preset slow -crf 24",
-   "bytes": 226389,
-   "sha256": "aec33dd55cdb9e0526fe7b4b9097cf9ed2d93a4ab3c1dfb25e83271f4f9d25d9"
+   "bytes": 241731,
+   "sha256": "3f7b51df322b0fd51467f863a95585b22848f7bdd4645bcae88c4b8863279e55"
   },
   "check-640.webm": {
    "kind": "webm",
@@ -90,8 +90,8 @@
    "height": 360,
    "codec": "VP9",
    "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
-   "bytes": 92547,
-   "sha256": "2d087026c96373f3478c3ae3d052df0e34b5e859f9a49f1a2015bc5518e5f17b"
+   "bytes": 102074,
+   "sha256": "66e143f728fb5d4dd0905bd9d7da3a40193677ced0269a7bc2799a0eac808b28"
   },
   "check-640.mp4": {
    "kind": "mp4",
@@ -99,8 +99,8 @@
    "height": 360,
    "codec": "H.264 High",
    "encoder": "libx264 -preset slow -crf 24",
-   "bytes": 114450,
-   "sha256": "7c951d1bf08c8e34e25aaada5affe31b68b24186f7a52749408bd097e8310283"
+   "bytes": 118999,
+   "sha256": "4a0e83e26f1d902442c5c7c758e604ca5e4765d6de85fa73778782797c34b5f1"
   }
  },
  "rerender_when": "the beat's frame changes (packages/world/src/stations/grid/**, its kit parts or the frame data), or its place in the site's story"

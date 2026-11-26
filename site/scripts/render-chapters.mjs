@@ -117,8 +117,9 @@ function run(cmd, args, input) {
   });
 }
 
-// The code the pictures come from: this checkout's commit, and packages/world as that commit has it.
-const commit = execFileSync("git", ["-C", repo, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+// The code the pictures come from: the last commit that changed packages/world (a commit of the main line, which
+// stays put when a branch on it is rebased), and packages/world as that commit has it.
+const commit = execFileSync("git", ["-C", repo, "log", "-1", "--format=%H", "HEAD", "--", "packages/world"], { encoding: "utf8" }).trim();
 const worldDirty = execFileSync("git", ["-C", repo, "status", "--porcelain", "--", "packages/world"], { encoding: "utf8" }).trim();
 if (worldDirty && !has("probe")) {
   console.error(`packages/world has changes the commit does not hold; commit or set them aside first:\n${worldDirty}`);
@@ -312,7 +313,7 @@ try {
       tab: stop.tab,
       frame: stop.frame,
       local: stop.local,
-      code: { commit, world: "packages/world as the commit holds it" },
+      code: { commit, world: "packages/world as the commit holds it (its last change before the render)" },
       frame_data_sha256: frameDataSha,
       render: {
         command: `packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops ${loop} --seconds ${seconds} --fps ${fps}`,
