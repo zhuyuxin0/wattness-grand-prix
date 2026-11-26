@@ -52,7 +52,7 @@ there, in the pipeline's order. Each tab is one folder under `src/pages/`, owned
 
 | Group | Tab | Route | Folder |
 |---|---|---|---|
-| | Intro | `#/` | `pages/Intro` (the starting grid; the 3D story opens over it from the stage bar) |
+| | Intro | `#/` | `pages/Intro` (chapter 01's still, `public/hero/` with its receipt; the introduction opens over it from Play; the starting grid's close ends the page) |
 | Today | Overview | `#/overview` | `pages/Overview` |
 | Plans | Fleet | `#/fleet`, `#/fleet/<resource>` | `pages/Fleet` |
 | Plans | Battery | `#/battery`, `#/battery/<resource>` | `pages/Battery` |

@@ -21,6 +21,23 @@
         r.dataset.themePreference = p;
       })();
     </script>
+    <!-- The Intro opens on chapter 01's still (src/pages/Intro/Hero.tsx): fetched first, and only when the Intro is
+         the page asked for. The candidates and sizes match the img's, so it takes this fetch. -->
+    <script>
+      (function () {
+        var h = location.hash;
+        if (h && h !== "#" && h !== "#/" && h.indexOf("#/?") !== 0) return;
+        var l = document.createElement("link");
+        l.rel = "preload";
+        l.as = "image";
+        l.type = "image/webp";
+        l.href = "hero/desert-willow-night-1920.webp";
+        l.setAttribute("imagesrcset", "hero/desert-willow-night-1920.webp 1920w, hero/desert-willow-night-2880.webp 2880w");
+        l.setAttribute("imagesizes", "(max-width: 767px) 100vw, calc(100vw - 190px)");
+        l.setAttribute("fetchpriority", "high");
+        document.head.appendChild(l);
+      })();
+    </script>
     <title>Wattness Grand Prix</title>
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

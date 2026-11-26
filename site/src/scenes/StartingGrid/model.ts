@@ -32,7 +32,7 @@ import { font, stageColor as color } from "../../design/tokens";
 import { formatDay, shortHash } from "../../lib/format";
 import { formatInZone, READER_TZ } from "../../lib/time";
 import { clamp01, easeInOut, easeOut, hashString, lerp, resolveText, smooth, span } from "../clock";
-import { GRID_DURATION } from "../durations";
+import { GRID_CLOSE, GRID_DURATION } from "../durations";
 import { Polyline, segments } from "../engine/lines";
 import type { SceneModel } from "../engine/SceneHost";
 import type { Stage } from "../engine/stage";
@@ -73,7 +73,7 @@ export const GRID_TIMELINE = {
   // the camera rises, the plans settle into the ink, the pole runs the trace,
   // the ring seals, the words come.
   /** The receipt (fully drawn from 18.8 s), the corner notes and the grid's paint step aside. */
-  close: 21,
+  close: GRID_CLOSE,
   /** The ring slides off the plans to the symbol's place, ahead of the bend, so it crosses the track once and early. */
   slide: [21.1, 1.7],
   /** The ellipse relaxes into the circle; its leaf ticks fold into it. */

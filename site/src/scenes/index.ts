@@ -7,4 +7,4 @@ export const BrainMap = lazy(() => import("./BrainMap/BrainMap"));
 
 export type { SceneProps } from "./engine/SceneHost";
 export type { Quality } from "./engine/stage";
-export { GRID_DURATION, BRAIN_DURATION } from "./durations";
+export { GRID_DURATION, GRID_CLOSE, BRAIN_DURATION } from "./durations";

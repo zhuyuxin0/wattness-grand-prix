@@ -17,8 +17,16 @@ export interface SceneProps {
   /** Scene time in seconds. When set, the scene draws exactly this frame and never runs its own clock. */
   clock?: number;
   quality?: Quality;
-  /** "once" plays the choreography and holds; "loop" restarts after a short rest. */
+  /** "once" plays the choreography and holds (the loop stops on the last frame); "loop" restarts after a short rest. */
   playback?: "once" | "loop";
+  /** Scene time the page's own playback starts from, in seconds: a scene trimmed to its close. Default 0. */
+  from?: number;
+  /**
+   * While true the scene draws `from` and waits; once false its clock runs from
+   * `from`, in its own time. True again puts it back on `from`, to play again
+   * (the Intro's closing band: the scroll triggers it, it never scrubs it).
+   */
+  hold?: boolean;
   /** Device pixels per CSS pixel, overriding the quality's. */
   pixelRatio?: number;
   /** Corner annotations (phase, legend, source line). */
@@ -47,10 +55,11 @@ function reducedMotion(): boolean {
 }
 
 export function SceneHost<D>(props: HostProps<D>) {
-  const { clock, quality = "high", pixelRatio, hud = true, className, label } = props;
+  const { clock, quality = "high", pixelRatio, hud = true, className, label, hold = false } = props;
   const box = useRef<HTMLDivElement>(null);
   const draw = useRef<((t: number) => void) | null>(null);
   const resume = useRef<(() => void) | null>(null);
+  const rewind = useRef<(() => void) | null>(null);
   const clockRef = useRef(clock);
   clockRef.current = clock;
   const [failed, setFailed] = useState<{ data: D | null } | null>(null);
@@ -105,10 +114,20 @@ export function SceneHost<D>(props: HostProps<D>) {
         frame(model.still);
         return;
       } else {
+        const from = live.current.from ?? 0;
+        if (live.current.hold) {
+          // Waiting on the first frame: drawn once, no loop until the hold lifts.
+          start = null;
+          elapsedAtPause = 0;
+          frame(from);
+          return;
+        }
         if (start === null) start = ts - elapsedAtPause * 1000;
-        let t = (ts - start) / 1000;
-        if (live.current.playback === "loop") t %= model.duration + 3;
+        let t = from + (ts - start) / 1000;
+        if (live.current.playback === "loop") t = from + ((t - from) % (model.duration - from + 3));
         frame(t);
+        // Played once to its end: the last frame holds, with nothing more to draw until a resize.
+        if (live.current.playback !== "loop" && t >= model.duration) return;
       }
       if (visible) raf = requestAnimationFrame(tick);
     };
@@ -128,6 +147,14 @@ export function SceneHost<D>(props: HostProps<D>) {
     });
     io.observe(el);
     resume.current = kick;
+    // Back on the first frame, to play again from it when the hold lifts.
+    rewind.current = () => {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      start = null;
+      elapsedAtPause = 0;
+      kick();
+    };
     stage.onResize = () => {
       if (!raf) frame(clockRef.current ?? lastT);
     };
@@ -176,6 +203,7 @@ export function SceneHost<D>(props: HostProps<D>) {
       unregister();
       draw.current = null;
       resume.current = null;
+      rewind.current = null;
       model?.dispose();
       stage.dispose();
       delete el.dataset.ready;
@@ -187,6 +215,11 @@ export function SceneHost<D>(props: HostProps<D>) {
     if (clock !== undefined) draw.current?.(clock);
     else resume.current?.();
   }, [clock]);
+
+  // The hold: lifting it starts the clock from `from`; setting it again rewinds to `from`.
+  useEffect(() => {
+    if (clock === undefined) rewind.current?.();
+  }, [hold]);
 
   return (
     <div ref={box} className={`scene${className ? ` ${className}` : ""}`} role="img" aria-label={label}>

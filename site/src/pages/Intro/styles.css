@@ -1,5 +1,6 @@
-/* Intro: a dark stage across the main column, then the page in the visitor's
-   theme: one hero line, the way in, and the story beside the plain steps. */
+/* Intro: chapter 01's still across the main column, dark, with the hero line
+   and the ways in; then the page in the visitor's theme, the plain steps beside
+   the racing words; then the dark closing band, the starting grid's close. */
 
 .app__page:has(.page--intro) {
   max-width: none;
@@ -9,99 +10,233 @@
   gap: 0;
 }
 
-/* ---------------------------------------------------------------- the stage */
+/* ---------------------------------------------------------------- the hero */
 
-.intro-stage {
-  border-bottom: 1px solid var(--w-border);
-}
-.intro-scene {
+/* Chapter 01 at night, full bleed and dark in either theme (the section holds
+   data-atmosphere="dark"), no taller than the first view. From 1024px the words
+   sit over the still on the introduction's glass and the lockup takes the top
+   right; below it the still comes first at 16:9 and the words follow. */
+.intro-hero {
   position: relative;
-  height: clamp(320px, 58vh, 640px);
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--w-border);
+  background: #101315;
   overflow: hidden;
-  background: var(--t-chrome);
 }
-.intro-scene > * {
+.intro-hero__frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: #13171a;
+}
+.intro-hero__still {
+  position: absolute;
+  inset: 0;
+  display: block;
   width: 100%;
   height: 100%;
-}
-.intro-scene__hold {
-  background: var(--t-chrome);
-}
-/* While the story is open the scene is hidden inside its box, which keeps its
-   height so nothing below moves: out of view, its loop stops, and it resumes
-   where it was when the story closes. */
-.intro-scene[data-paused] > * {
-  display: none;
+  object-fit: cover;
+  /* a narrow frame crops the still's empty left, never the battery; a short one crops top and bottom */
+  object-position: 100% 42%;
 }
 
-/* The stage's own bar: what the scene shows, the replay, and the story. */
-.intro-stagebar {
+/* The introduction's closing lockup (chapter 23): the Wattness mark and word, a
+   rule, BNB Chain's logo, and the line under them. */
+.intro-lockup {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.intro-lockup__row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.intro-lockup__word {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font: 600 28px/1 var(--t-font-display);
+  letter-spacing: -0.02em;
+  color: #f6f7f8;
+}
+.intro-lockup__mark {
+  display: block;
+  width: auto;
+  height: 25px;
+}
+.intro-lockup__rule {
+  width: 1px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.4);
+}
+.intro-lockup__bnb {
+  display: block;
+  width: auto;
+  height: 28px;
+}
+.intro-lockup__line {
+  font: 500 11px/14px var(--w-font-sans);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #c9ced3;
+}
+
+.intro-hero__card {
+  display: grid;
+  gap: var(--t-space-4);
+  justify-items: start;
+}
+/* The one hero line: wattness.tech's "Watt + Witness." voice. */
+.intro-hero__line {
+  max-width: 30ch;
+  text-wrap: balance;
+  font-family: var(--t-font-display);
+  font-size: clamp(26px, 2.3vw, 36px);
+  font-weight: 650;
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  color: #eef0ee;
+}
+.intro-hero__facts {
+  max-width: 56ch;
+  font-size: var(--t-fs-title);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--w-fg) 88%, transparent);
+}
+.intro-hero__facts .num {
+  white-space: nowrap;
+}
+.intro-hero__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--t-space-3) var(--t-space-5);
-  min-height: 40px;
-  padding: 6px var(--gp-gutter);
-  border-top: 1px solid var(--w-border);
-  background: var(--t-chrome);
+  gap: var(--t-space-4) var(--t-space-5);
+  margin-top: var(--t-space-2);
 }
-.intro-stagebar__caption {
-  flex: 1 1 24rem;
-  min-width: 0;
-  font-size: var(--t-fs-xs);
-  color: var(--w-muted);
-}
-.intro-stagebar__actions {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: var(--t-space-4);
-  margin-left: auto;
-}
-.intro-stagebar__replay {
-  flex: none;
-  height: 24px;
-  padding: 0 8px;
-  font-size: var(--t-fs-xs);
-}
-.intro-stagebar__length {
-  font-size: var(--t-fs-xs);
-  color: var(--w-muted);
-  white-space: nowrap;
-}
-.intro-stagebar__play {
-  flex: none;
+.intro-hero__actions .btn {
+  height: 38px;
+  padding: 0 16px;
+  font-size: 14px;
   border-radius: var(--t-radius-paper);
 }
-@media (max-width: 767px) {
-  .intro-scene {
-    height: clamp(260px, 74vw, 380px);
-  }
+.intro-hero__len {
+  font-weight: 500;
+  opacity: 0.7;
 }
-@media (max-width: 599px) {
-  .intro-stagebar {
-    padding-top: 8px;
-    padding-bottom: 10px;
+.intro-hero__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-fs);
+  font-weight: 600;
+  color: var(--w-fg);
+  text-decoration: underline;
+  text-decoration-color: var(--t-accent-mark);
+  text-underline-offset: 3px;
+}
+.intro-hero__link:hover {
+  color: #f6f7f8;
+}
+.intro-hero__scope {
+  font-size: var(--t-fs-xs);
+  line-height: 1.45;
+  color: var(--w-muted);
+}
+
+@media (min-width: 1024px) {
+  .intro-hero__frame {
+    min-height: 560px;
+    max-height: calc(100svh - var(--gp-masthead-h));
   }
-  /* The actions take their own row under the caption: the replay at the
-     start, the story's length and its button at the end; the length wraps
-     onto two lines before the row overflows. */
-  .intro-stagebar__actions {
-    flex: 1 1 100%;
-    margin-left: 0;
+  /* Shade under the words and the lockup, so they read on the night ground and over the line to the grid. */
+  .intro-hero__frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(42% 34% at 100% 0%, rgba(16, 19, 21, 0.86), rgba(16, 19, 21, 0) 100%),
+      linear-gradient(to top, rgba(16, 19, 21, 0.7), rgba(16, 19, 21, 0) 26%);
   }
-  .intro-stagebar__length {
-    flex: 0 1 auto;
-    min-width: 0;
-    margin-left: auto;
-    white-space: normal;
+  .intro-hero__lockup {
+    position: absolute;
+    top: clamp(24px, 4%, 44px);
+    right: clamp(24px, 3.5%, 56px);
+  }
+  /* The introduction's caption glass (its kit's dark material), lower left. */
+  .intro-hero__card {
+    position: absolute;
+    left: clamp(24px, 4%, 64px);
+    bottom: clamp(48px, 8%, 88px);
+    max-width: min(620px, 50%);
+    padding: 26px 30px 28px;
+    border-radius: 16px;
+    background:
+      linear-gradient(145deg, color-mix(in srgb, white 12%, transparent), transparent 48%, color-mix(in srgb, var(--w-accent) 3%, transparent)),
+      color-mix(in srgb, var(--t-raised) 78%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow:
+      0 0 0 1px rgb(0 0 0 / 0.55),
+      inset 0 1.5px 1px -0.5px rgb(255 255 255 / 0.34),
+      inset 0 -1.5px 1px -0.5px rgb(0 0 0 / 0.5),
+      inset 0 0 4px -2px rgb(255 255 255 / 0.14),
+      inset 0 0 0 1px rgb(255 255 255 / 0.08),
+      0 14px 32px -12px rgb(0 0 0 / 0.6);
+  }
+  .intro-hero__scope {
+    position: absolute;
+    right: clamp(24px, 3.5%, 56px);
+    bottom: 14px;
+    max-width: 40%;
     text-align: right;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  .intro-stagebar__replay {
-    display: none;
+
+/* The still on top, then the lockup and the words on the same dark ground. */
+@media (max-width: 1023px) {
+  .intro-lockup {
+    justify-items: start;
+    gap: 8px;
+    padding: var(--t-space-6) var(--gp-gutter) 0;
+  }
+  .intro-lockup__row {
+    gap: 14px;
+  }
+  .intro-lockup__word {
+    gap: 8px;
+    font-size: 21px;
+  }
+  .intro-lockup__mark {
+    height: 19px;
+  }
+  .intro-lockup__rule {
+    height: 26px;
+  }
+  .intro-lockup__bnb {
+    height: 21px;
+  }
+  .intro-lockup__line {
+    font-size: 10px;
+    line-height: 13px;
+  }
+  .intro-hero__card {
+    padding: var(--t-space-5) var(--gp-gutter) var(--t-space-4);
+  }
+  .intro-hero__scope {
+    padding: 0 var(--gp-gutter) var(--t-space-5);
+  }
+}
+@media (max-width: 600px) {
+  .intro-hero__line {
+    font-size: 26px;
+    line-height: 1.2;
+  }
+  .intro-hero__facts {
+    font-size: var(--t-fs);
   }
 }
 
@@ -122,56 +257,82 @@
   }
 }
 
-.intro-head {
-  display: grid;
-  gap: var(--t-space-4);
-  justify-items: start;
-}
-/* The one hero line: wattness.tech's "Watt + Witness." voice. */
-.intro__line {
-  max-width: 30ch;
-  text-wrap: balance;
-  font-family: var(--t-font-display);
-  font-size: var(--gp-fs-hero);
-  font-weight: 650;
-  line-height: 40px;
-  letter-spacing: -0.025em;
-  color: var(--w-fg);
-}
-.intro__sub .num {
-  white-space: nowrap;
-}
-.intro__sub {
-  max-width: 64ch;
-  font-size: var(--t-fs-title);
-  line-height: 1.5;
-  color: var(--w-muted);
-}
-.intro__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--t-space-4);
-  margin-top: var(--t-space-2);
-}
-.intro__actions .btn {
-  height: 32px;
-}
-.intro__actions .btn--primary {
-  border-radius: var(--t-radius-paper);
-}
 .intro__source {
   max-width: 96ch;
   font-size: var(--t-fs-xs);
   color: var(--w-muted);
 }
-@media (max-width: 600px) {
-  .intro__line {
-    font-size: 28px;
-    line-height: 34px;
-  }
-  .intro__sub {
-    font-size: var(--t-fs);
-  }
+
+/* ---------------------------------------------------------------- the close */
+
+/* The page's last band: the starting grid's close, then the ways on. Dark in
+   either theme, as the hero is; the scene fills the stage and keeps its own
+   label layer for the lockup's words. */
+.intro-close {
+  border-top: 1px solid var(--w-border);
+  background: var(--t-chrome);
+}
+.intro-close__stage {
+  position: relative;
+  height: clamp(320px, 36vw, 520px);
+  background: var(--t-chrome);
+}
+.intro-close__stage > * {
+  width: 100%;
+  height: 100%;
+}
+/* While the introduction is open the scene hides inside its box, which keeps its
+   height so nothing moves: out of view its loop stops, and it resumes where it was. */
+.intro-close__stage[data-paused] > * {
+  display: none;
+}
+.intro-close__foot {
+  display: grid;
+  justify-items: center;
+  gap: var(--t-space-5);
+  padding: var(--t-space-2) var(--gp-gutter) var(--gp-space-7);
+  text-align: center;
+}
+.intro-close__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--t-space-4) var(--t-space-6);
+}
+.intro-close__links .btn {
+  height: 36px;
+  padding: 0 16px;
+  font-size: var(--t-fs);
+  border-radius: var(--t-radius-paper);
+}
+.intro-close__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-fs);
+  font-weight: 600;
+  color: var(--w-fg);
+  text-decoration: none;
+}
+.intro-close__link:hover {
+  color: #f6f7f8;
+  text-decoration: underline;
+  text-decoration-color: var(--t-accent-mark);
+  text-underline-offset: 3px;
+}
+.intro-close__caption {
+  max-width: 72ch;
+  font-size: var(--t-fs-xs);
+  line-height: 1.5;
+  color: var(--w-muted);
+}
+.intro-close__caption .num {
+  white-space: nowrap;
+}
+/* The memory line under the page sits clear of the band (it otherwise pulls up into the page's foot). */
+.page--intro + .memory-cue--bleed {
+  margin-top: var(--t-space-4);
 }
 
 /* ---------------------------------------------------------------- the story */

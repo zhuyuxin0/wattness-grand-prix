@@ -1,0 +1,29 @@
+{
+ "schema": "grand-prix.hero-still.v1",
+ "what": "The Intro's first view: chapter 01 of the introduction, Desert Willow's battery site at night, drawn without its caption, scope line or leader plates. Positions are schematic, as in the story.",
+ "story_key": "desert-willow",
+ "chapter": "01",
+ "frame": "opening.pad",
+ "code": {
+  "commit": "5e6821498c598d5b78f4b8e187532a4a413e1313",
+  "base": "main 1162857",
+  "note": "packages/world at 5e68214 is main's, plus the lab's plates=0 option and render.mjs's --plates and --raw"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh 15192, then node scripts/render.mjs --port 15192 --frames opening.pad --out <dir> --scale 2 --plates 0 --raw --repeat 2",
+  "lab": "lab.html?frame=opening.pad&w=1920&h=1080&theme=dark&plates=0",
+  "rendered": { "bangkok": "2026-11-26 21:54", "ct": "2026-11-26 08:54" },
+  "gpu": "ANGLE Metal Renderer: Apple M1 Max",
+  "deterministic": "4 draws in fresh pages (two runs of --repeat 2), byte-identical",
+  "master": { "size": "3840 x 2160", "sha256": "ae65b69cad4e5ab1c8cc588fb981ef7c4cca702db1ec563ad96d99158d4e9b9c" },
+  "png_1920": { "size": "1920 x 1080, render.mjs's Lanczos from the master", "sha256": "87c96fa8d0f33e75886d453c7ecde53fc0871d0f4cb1bcc23e26ea6defdadc3a" },
+  "png_2880": { "size": "2880 x 1620, ffmpeg's Lanczos from the master", "sha256": "00ce81b7240060fa03a73c34cf560d407daf154ae375e48a01fa8e385c19afcf" },
+  "webp": "cwebp 1.6.0 -q 86 -m 6 -sharp_yuv"
+ },
+ "files": {
+  "desert-willow-night-1920.webp": { "width": 1920, "height": 1080, "bytes": 76214, "sha256": "1b42f2df80ccf79e44ecee0ee2ab18031fdd945adc33d7c5b7139b6a91e9c75f" },
+  "desert-willow-night-2880.webp": { "width": 2880, "height": 1620, "bytes": 141010, "sha256": "12b1251b0c29a4c120e494a6908dc43e9703496c2f2b05ce30de11f69a19949c" }
+ },
+ "rerender_when": "chapter 01 changes: packages/world/src/stations/opening/**, its kit parts, or the frame data"
+}
