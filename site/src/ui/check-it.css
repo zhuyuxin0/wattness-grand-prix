@@ -1,0 +1,125 @@
+/* Check it: a section's hashes, addresses and transactions behind one compact line. Closed, one muted line in the
+   interface size; open, the full list on the section's own ground, each value whole, wrapping by character. The ok
+   color only on Verified, the bad color only on a mismatch. */
+
+.checkit {
+  min-width: 0;
+  border-top: 1px solid var(--t-rule);
+}
+.checkit > summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-1) var(--t-space-3);
+  min-height: var(--t-ctl-h);
+  padding: var(--t-space-1) 0;
+  font-size: var(--t-fs-sm);
+  color: var(--w-muted);
+  cursor: pointer;
+  list-style: none;
+}
+.checkit > summary::-webkit-details-marker {
+  display: none;
+}
+.checkit > summary:hover {
+  color: var(--w-fg);
+}
+.checkit > summary:focus-visible {
+  outline: 2px solid var(--w-accent);
+  outline-offset: 2px;
+  border-radius: var(--t-radius-xs);
+}
+.checkit__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.checkit--verified .checkit__status {
+  color: var(--s-ok);
+}
+.checkit--failed .checkit__status {
+  color: var(--s-bad);
+}
+.checkit__status + .checkit__count::before {
+  content: "· ";
+}
+.checkit__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.checkit .checkit__opened,
+.checkit[open] .checkit__closed {
+  display: none;
+}
+.checkit[open] .checkit__opened {
+  display: inline-block;
+}
+
+.checkit__body {
+  display: grid;
+  gap: var(--t-space-3);
+  padding: var(--t-space-2) 0 var(--t-space-3);
+}
+.checkit__how {
+  max-width: 96ch;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  line-height: var(--t-lh-prose);
+}
+.checkit__list {
+  display: grid;
+  margin: 0;
+  min-width: 0;
+}
+.checkit__row {
+  display: grid;
+  grid-template-columns: minmax(10em, 16em) minmax(0, 1fr);
+  gap: var(--t-space-1) var(--t-space-4);
+  align-items: baseline;
+  padding: 6px 0;
+  border-top: 1px solid var(--t-rule);
+}
+.checkit__row dt {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  font-size: var(--t-fs-sm);
+}
+.checkit__kind {
+  font-size: var(--t-fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.checkit__label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.checkit__row dd {
+  margin: 0;
+  min-width: 0;
+}
+.checkit__row .hash {
+  align-items: flex-start;
+}
+.checkit__row .hash__text {
+  word-break: break-all;
+}
+.checkit__note {
+  margin-top: 2px;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  line-height: var(--t-lh-prose);
+}
+@media (max-width: 599px) {
+  .checkit__row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
