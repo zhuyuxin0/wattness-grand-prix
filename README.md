@@ -96,14 +96,27 @@ GateRecord is `0x2922c68cE15EB3e83B7f43b136e981dDc4262876`, one address on BSC m
 
 <!-- VIDEO-TODO(table): once the films are up, add a Film column, one YouTube link per row. -->
 
-|  | Track | What it does here | Proof | One page |
-|---|---|---|---|---|
-| <a href="https://gp.wattness.tech/verify"><img src="docs/media/thumb-bnb-chain.jpg" alt="Verify: Desert Willow's Nov 27 plan, 5 of 5 checks against BSC mainnet" width="180"></a> | BNB Chain (Developer Track) | The record on BSC mainnet and testnet, the files on BNB Greenfield, seven agent identities and their paid jobs | [Nov 27 seal](https://bscscan.com/tx/0xd6ce6ebdd4f70dfe3aafae5fb76f014152f10a9f3a6c83d52362954cf853dbef) | [bnb-chain.md](docs/sponsors/bnb-chain.md) |
-| <a href="https://gp.wattness.tech/markets/season"><img src="docs/media/thumb-flap.jpg" alt="Season Token: round 3 launched on Flap, BSC testnet" width="180"></a> | Flap | A season token that launches only once a named agent's plan is sealed before its gate | [Round 3 launch](https://testnet.bscscan.com/tx/0x4881264736e39903dd28eadd23602d8d710c558055be4f2f74db9d5eeb872429) | [flap.md](docs/sponsors/flap.md) |
-| <a href="https://gp.wattness.tech/markets/launchpad"><img src="docs/media/thumb-openfour.jpg" alt="Launchpad: PLNR27 graduated to PancakeSwap, BSC testnet" width="180"></a> | OpenFour (Four.meme) | A launch that graduates only once the agent's sealed record is bound to it | [Graduation](https://testnet.bscscan.com/tx/0xc549f6e5a6598ba308e6ecb837cf0da2a6fa23c1d72a6e40065df4c585af5330) | [openfour.md](docs/sponsors/openfour.md) |
-| <a href="https://gp.wattness.tech/markets/prices"><img src="docs/media/thumb-coinmarketcap-atlas.jpg" alt="Prices: Texas power companies' tokenized stocks, read from Atlas's feeds on BNB Smart Chain" width="180"></a> | CoinMarketCap × Atlas | Signed prices that decide what checking the plans costs | [Signed Atlas report](site/public/data/prices.json) | [coinmarketcap-atlas.md](docs/sponsors/coinmarketcap-atlas.md) |
-| <a href="https://gp.wattness.tech/agents/memory"><img src="docs/media/thumb-living-brain.jpg" alt="Memory: three brains in Living Brain" width="180"></a> | Living Brain (ChatAndBuild) | A battery's reviewed lessons, read back only as of a decision's cutoff | [Memory tab](https://gp.wattness.tech/agents/memory) | [living-brain.md](docs/sponsors/living-brain.md) |
-| <a href="https://gp.wattness.tech/agents/forecast"><img src="docs/media/thumb-cournot.jpg" alt="Forecast: Weather Odds from Cournot, the reading sealed into the Nov 27 plans" width="180"></a> | Cournot | Weather odds read before the gate that set every Nov 27 plan's stress weight and hedge cap | [Response hash, sealed](#cournot-integration) | [cournot.md](docs/sponsors/cournot.md) |
+<table>
+<tr>
+<td align="center" width="33%"><a href="#bnb-chain-developer-track"><img src="docs/media/thumb-bnb-chain.jpg" alt="Verify: Desert Willow's Nov 27 plan, 5 of 5 checks against BSC mainnet"></a><br><sub><b>BNB Chain</b> · Verify on BSC mainnet</sub></td>
+<td align="center" width="33%"><a href="#flap"><img src="docs/media/thumb-flap.jpg" alt="Season Token: round 3 launched on Flap, BSC testnet"></a><br><sub><b>Flap</b> · the Season Token</sub></td>
+<td align="center" width="33%"><a href="#openfour-fourmeme"><img src="docs/media/thumb-openfour.jpg" alt="Launchpad: PLNR27 graduated to PancakeSwap V2, BSC testnet"></a><br><sub><b>OpenFour</b> · the Launchpad</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%"><a href="#coinmarketcap--atlas"><img src="docs/media/thumb-coinmarketcap-atlas.jpg" alt="Prices: four Texas power companies' tokenized stocks, read from Atlas's feeds on BNB Smart Chain"></a><br><sub><b>CoinMarketCap × Atlas</b> · Prices</sub></td>
+<td align="center" width="33%"><a href="#living-brain-chatandbuild"><img src="docs/media/thumb-living-brain.jpg" alt="Memory: three brains in Living Brain"></a><br><sub><b>Living Brain</b> · Memory</sub></td>
+<td align="center" width="33%"><a href="#cournot"><img src="docs/media/thumb-cournot.jpg" alt="The weather radar of chapter 14: weather odds for Nov 26, read through Cournot"></a><br><sub><b>Cournot</b> · weather odds</sub></td>
+</tr>
+</table>
+
+| Track | What it does here | Proof | One page |
+|---|---|---|---|
+| BNB Chain (Developer Track) | The record on BSC mainnet and testnet, the files on BNB Greenfield, seven agent identities and their paid jobs | [Nov 27 seal](https://bscscan.com/tx/0xd6ce6ebdd4f70dfe3aafae5fb76f014152f10a9f3a6c83d52362954cf853dbef) | [bnb-chain.md](docs/sponsors/bnb-chain.md) |
+| Flap | A season token that launches only once a named agent's plan is sealed before its gate | [Round 3 launch](https://testnet.bscscan.com/tx/0x4881264736e39903dd28eadd23602d8d710c558055be4f2f74db9d5eeb872429) | [flap.md](docs/sponsors/flap.md) |
+| OpenFour (Four.meme) | A launch that graduates only once the agent's sealed record is bound to it | [Graduation](https://testnet.bscscan.com/tx/0xc549f6e5a6598ba308e6ecb837cf0da2a6fa23c1d72a6e40065df4c585af5330) | [openfour.md](docs/sponsors/openfour.md) |
+| CoinMarketCap × Atlas | Signed prices that decide what checking the plans costs | [Signed Atlas report](site/public/data/prices.json) | [coinmarketcap-atlas.md](docs/sponsors/coinmarketcap-atlas.md) |
+| Living Brain (ChatAndBuild) | A battery's reviewed lessons, read back only as of a decision's cutoff | [Memory tab](https://gp.wattness.tech/agents/memory) | [living-brain.md](docs/sponsors/living-brain.md) |
+| Cournot | Weather odds read before the gate that set every Nov 27 plan's stress weight and hedge cap | [Response hash, sealed](#cournot-integration) | [cournot.md](docs/sponsors/cournot.md) |
 
 ### BNB Chain (Developer Track)
 
