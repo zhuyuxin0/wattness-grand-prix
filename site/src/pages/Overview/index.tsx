@@ -7,13 +7,16 @@ import { dualTime, formatCountdown, formatOperatingDay, nextGate } from "../../l
 import { batteryPath, useSelectedBattery } from "../../shell/battery";
 import { useSecondClock } from "../../shell/MarketClock";
 import { panelSections, type PanelGroup } from "../../shell/tabs";
-import { Glyph, PageHeader, Ready, Section, Stat, StatRow } from "../../ui";
+import { Glyph, Ready, Section, Stat, StatRow } from "../../ui";
+import { ControlRoom } from "./ControlRoom";
 import { Timeline } from "./Timeline";
 import "./styles.css";
 
-// Overview: where the day stands. The lead is ERCOT's next gate; then the
-// latest sealed record at a glance, the day in order with a line at now, and a
-// path into every tab.
+// Overview: the Terminal's home, then where the day stands. It opens on the
+// control room (ControlRoom.tsx): the Tech Stack's 3D in motion behind glass
+// panes that open the tabs. Under it ERCOT's next gate leads; then the latest
+// sealed record at a glance, the day in order with a line at now, and a path
+// into every tab.
 
 const CHAIN_SOURCE = "Commits: GateRecord on BNB Smart Chain, read from each chain's receipt.";
 
@@ -30,10 +33,7 @@ export default function OverviewPage() {
 
   return (
     <div className="page page--overview">
-      <PageHeader
-        title="Overview"
-        lede="Where the day stands: ERCOT's next day-ahead gate, the latest sealed record and what happens next."
-      />
+      <ControlRoom />
 
       <NextGate nowMs={nowMs} />
 
