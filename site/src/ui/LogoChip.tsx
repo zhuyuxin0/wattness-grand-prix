@@ -4,14 +4,18 @@
 //
 // The site loads the world package only by dynamic import from a page (test/world-tabs.test.mjs), so a page that
 // shows logos imports @world/kit/logos that way (which also brings the chip's stylesheet) and passes its entries
-// here, as in <LogoChip logo={[LOGOS.atlas, LOGOS.cmc]} />.
+// here, as in <LogoChip logo={[LOGOS.atlas, LOGOS.cmc]} />. A logo the registry does not hold (the Prices board's
+// companies, whose files are public/logos') passes the same fields with its own id.
 import { Fragment, type CSSProperties } from "react";
 import type { LogoSpec } from "@world/kit/logos";
 
 type Vars = CSSProperties & Record<`--${string}`, string>;
 
+/** A logo for the chip: a registry entry, or another owner's file with the same fields. */
+export type ChipLogo = Omit<LogoSpec, "id"> & { id: string };
+
 /** One logo: the image on its own ground, then its caption after a hairline; a link unless link is false. */
-function Part({ spec, caption, link, href, className, style }: { spec: LogoSpec; caption?: string; link: boolean; href: string; className: string; style?: Vars }) {
+function Part({ spec, caption, link, href, className, style }: { spec: ChipLogo; caption?: string; link: boolean; href: string; className: string; style?: Vars }) {
   const body = (
     <>
       <span className="lg-mark" data-ground={spec.ground} style={{ "--lg-o": String(spec.optical) } as Vars}>
@@ -53,8 +57,8 @@ export function LogoChip({
   href,
   className,
 }: {
-  /** The registry's entries (LOGOS.<id>). */
-  logo: LogoSpec | LogoSpec[];
+  /** The registry's entries (LOGOS.<id>), or another owner's logo with the same fields. */
+  logo: ChipLogo | ChipLogo[];
   /** Words beside the logo; replaces the registry's caption ("" for none). Ignored for a group. */
   caption?: string;
   /** The logo's height in px before its optical factor (default 20). */

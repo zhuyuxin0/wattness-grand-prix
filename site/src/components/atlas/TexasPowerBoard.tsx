@@ -1,6 +1,7 @@
 import { formatUsd, shortHash } from "../../lib/format";
 import { dualTime } from "../../lib/time";
 import { Glyph, Loading, Section } from "../../ui";
+import { LogoChip, type ChipLogo } from "../../ui/LogoChip";
 import { LATE_MARGIN_S, STOCK_MULTIFEED, TEXAS_FEEDS, feedPage, fixedToNumber, formatAge, freshness, marketNote, type StockFeed } from "./atlas";
 import type { FeedSnapshot, MultiFeedRead, NodeRead } from "./chain";
 import { Stamp, Unread } from "./ReadState";
@@ -16,7 +17,22 @@ const ids = TEXAS_FEEDS.map((f) => f.id);
 const idList = `${ids.slice(0, -1).join(", ")} and ${ids.at(-1)}`;
 const logoUrl = (file: string) => `${import.meta.env.BASE_URL}logos/${file}`;
 
-export function TexasPowerBoard({ id = "texas-power" }: { id?: string }) {
+/** Each company's own page (where its logo was taken: public/logos/SOURCES.md), its file's size and a height factor, so
+ *  four different marks read at one weight in the same white glass chip as the site's other logos. */
+const COMPANY: Record<string, { href: string; w: number; h: number; optical: number }> = {
+  "vistra.png": { href: "https://vistracorp.com/", w: 252, h: 54, optical: 1.1 },
+  "fluence.svg": { href: "https://fluenceenergy.com/", w: 172, h: 26.6, optical: 0.85 },
+  "ge-vernova.svg": { href: "https://www.gevernova.com/", w: 1274, h: 281.3, optical: 1.4 },
+  "iren.svg": { href: "https://iren.com/", w: 153, h: 80, optical: 1.35 },
+};
+const chipOf = (feed: StockFeed): ChipLogo | null => {
+  const c = COMPANY[feed.logo];
+  return c ? { id: feed.symbol.toLowerCase(), name: feed.company, href: c.href, src: logoUrl(feed.logo), w: c.w, h: c.h, ground: "light", optical: c.optical } : null;
+};
+
+/** chips: the page has loaded the logo chip's stylesheet (with @world/kit/logos), so each company's logo stands in the
+ *  site's white glass chip, a link to the company in a new tab; until then, in a plain light box. */
+export function TexasPowerBoard({ id = "texas-power", chips = false }: { id?: string; chips?: boolean }) {
   const feeds = useStockFeeds();
   return (
     <Section
@@ -36,12 +52,12 @@ export function TexasPowerBoard({ id = "texas-power" }: { id?: string }) {
         </>
       }
     >
-      <Board feeds={feeds} />
+      <Board feeds={feeds} chips={chips} />
     </Section>
   );
 }
 
-function Board({ feeds }: { feeds: Polled<NodeRead<MultiFeedRead>> }) {
+function Board({ feeds, chips }: { feeds: Polled<NodeRead<MultiFeedRead>>; chips: boolean }) {
   if (!feeds.data) {
     if (!feeds.error) return <Loading label="Reading BNB Smart Chain" />;
     return <Unread polled={feeds}>Atlas's feeds could not be read from BNB Smart Chain just now, so the board is not shown.</Unread>;
@@ -68,7 +84,7 @@ function Board({ feeds }: { feeds: Polled<NodeRead<MultiFeedRead>> }) {
           <span role="columnheader">Feed</span>
         </div>
         {TEXAS_FEEDS.map((feed, i) => (
-          <Row key={feed.id} feed={feed} snap={read.snapshots[i]} read={read} />
+          <Row key={feed.id} feed={feed} snap={read.snapshots[i]} read={read} chips={chips} />
         ))}
       </div>
       <p className="atlas-read">
@@ -79,15 +95,20 @@ function Board({ feeds }: { feeds: Polled<NodeRead<MultiFeedRead>> }) {
   );
 }
 
-function Row({ feed, snap, read }: { feed: StockFeed; snap: FeedSnapshot | undefined; read: MultiFeedRead }) {
+function Row({ feed, snap, read, chips }: { feed: StockFeed; snap: FeedSnapshot | undefined; read: MultiFeedRead; chips: boolean }) {
   const fresh = snap ? freshness(snap.onchainTs, read.block.timestamp, HEARTBEAT) : null;
   const written = snap && fresh && fresh.state !== "empty";
+  const chip = chips ? chipOf(feed) : null;
   return (
     <div className="atlas-board__row" role="row">
       <span role="rowheader" className="atlas-board__company">
-        <span className="atlas-logo" aria-hidden="true">
-          <img src={logoUrl(feed.logo)} alt="" width={72} height={18} />
-        </span>
+        {chip ? (
+          <LogoChip logo={chip} size={13} className="atlas-chip" />
+        ) : (
+          <span className="atlas-logo" aria-hidden="true">
+            <img src={logoUrl(feed.logo)} alt="" width={72} height={18} />
+          </span>
+        )}
         <span>
           {feed.company} <span className="muted">({feed.symbol})</span>
         </span>

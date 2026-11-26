@@ -1,10 +1,12 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import type { LogoSpec } from "@world/kit/logos";
 import { TexasPowerBoard } from "../../components/atlas/TexasPowerBoard";
 import { dualTime } from "../../lib/time";
 import { Glyph, Hash, Loading, PageHeader, Ready, Section } from "../../ui";
 import { LiveRead as LiveStamp } from "../../ui/LiveRead";
 import { age, addressUrl } from "../AgentIds/rpc";
 import { Fact, Facts, Flow, TabLink } from "../Battery/kit";
+import { LogoChip } from "../../ui/LogoChip";
 import { useLiveFeeds, usePrices, useSigner, type FeedRead, type LiveRead, type LiveState, type PricesFile } from "./data";
 import { baseBudget, chainReadProblems } from "./rule";
 import "./styles.css";
@@ -31,6 +33,24 @@ function big(n: number | null): string {
   return usd(n, 0);
 }
 
+/** The owners' logos for this page: the world package's registry, loaded by dynamic import (the site loads the package
+ *  only so), which also brings the logo chip's stylesheet; null until then, and on a failure the page keeps its words. */
+type Logos = { atlas: LogoSpec; cmc: LogoSpec; note: string };
+function useLogos(): Logos | null {
+  const [logos, setLogos] = useState<Logos | null>(null);
+  useEffect(() => {
+    let live = true;
+    import("@world/kit/logos").then(
+      (m) => live && setLogos({ atlas: m.LOGOS.atlas, cmc: m.LOGOS.cmc, note: m.LOGO_NOTE }),
+      (error: unknown) => console.warn("The logos could not be loaded:", error),
+    );
+    return () => {
+      live = false;
+    };
+  }, []);
+  return logos;
+}
+
 function When({ unix, seconds = true }: { unix: number; seconds?: boolean }) {
   const t = dualTime(unix, { seconds });
   return (
@@ -43,6 +63,7 @@ function When({ unix, seconds = true }: { unix: number; seconds?: boolean }) {
 
 export default function PricesPage() {
   const state = usePrices();
+  const logos = useLogos();
   return (
     <div className="page page--prices">
       <PageHeader
@@ -59,19 +80,19 @@ export default function PricesPage() {
         }
       />
       <Ready state={state} label="Loading the prices">
-        {(p) => <Prices p={p} />}
+        {(p) => <Prices p={p} logos={logos} />}
       </Ready>
-      <TexasPowerBoard />
+      <TexasPowerBoard chips={logos !== null} />
     </div>
   );
 }
 
-function Prices({ p }: { p: PricesFile }) {
+function Prices({ p, logos }: { p: PricesFile; logos: Logos | null }) {
   const live = useLiveFeeds(p.onChain);
   return (
     <>
       <Live p={p} state={live.state} busy={live.busy} failed={live.failed} again={live.again} />
-      <SideBySide p={p} />
+      <SideBySide p={p} logos={logos} />
       <Budget p={p} state={live.state} />
     </>
   );
@@ -209,7 +230,7 @@ function FeedCard({
 
 // ---------------------------------------------------------------- recorded, side by side
 
-function SideBySide({ p }: { p: PricesFile }) {
+function SideBySide({ p, logos }: { p: PricesFile; logos: Logos | null }) {
   const signer = useSigner(p.atlas.report, p.atlas.publishedSigner);
   const a = (asset: "BNB" | "USDT") => p.atlas.prices.find((x) => x.asset === asset)!;
   const c = (asset: "BNB" | "USDT") => p.cmc.quotes.find((x) => x.asset === asset)!;
@@ -246,7 +267,7 @@ function SideBySide({ p }: { p: PricesFile }) {
           time.
         </>
       }
-      source={`${SOURCE} Atlas: signed Pull report for feeds 633 and 649, payload and signature as recorded by packages/adapters/atlas-cmc. CoinMarketCap: Pro v3 quotes for ids 1839 and 825 in USD, and its security detail for BSC-USDT, recorded by the same run.`}
+      source={`${SOURCE} Atlas: signed Pull report for feeds 633 and 649, payload and signature as recorded by packages/adapters/atlas-cmc. CoinMarketCap: Pro v3 quotes for ids 1839 and 825 in USD, and its security detail for BSC-USDT, recorded by the same run.${logos ? ` ${logos.note}` : ""}`}
     >
       <div className="px-pairs">
         {rows.map(({ asset, dp, agreement }) => {
@@ -257,12 +278,16 @@ function SideBySide({ p }: { p: PricesFile }) {
               <h3 className="px-pair__name">{asset}/USD</h3>
               <div className="px-pair__cols">
                 <div className="px-src">
-                  <div className="px-src__who">Atlas · signed report, feed {ax.feedId}</div>
+                  <div className="px-src__who">
+                    {logos ? <LogoChip logo={logos.atlas} size={13} /> : "Atlas ·"} signed report, feed {ax.feedId}
+                  </div>
                   <div className="px-src__price num">{usd(ax.priceUsd, dp)}</div>
                   <When unix={ax.observedAtSeconds} />
                 </div>
                 <div className="px-src">
-                  <div className="px-src__who">CoinMarketCap Pro · id {cx.cmcId}</div>
+                  <div className="px-src__who">
+                    {logos ? <LogoChip logo={logos.cmc} size={13} /> : "CoinMarketCap"} Pro · id {cx.cmcId}
+                  </div>
                   <div className="px-src__price num">{usd(cx.priceUsd, dp)}</div>
                   <When unix={cx.observedAtSeconds} />
                   <span className="px-src__more num">
