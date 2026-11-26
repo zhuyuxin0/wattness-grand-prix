@@ -7,7 +7,10 @@
 // its out/od-YYYYMMDD-bsc-testnet sibling) unless --day names one, and falls
 // back to fixtures/od-20261126 (the index, two leaves, both receipts). Earlier
 // sealed days under out/ give the Seal tab their roots and commits. Every
-// published file is listed with its SHA-256 in public/data/files.json.
+// published file is listed with its SHA-256 in public/data/files.json. The one
+// read from the network is the late commit (scripts/late-seal.mjs), an eth_call
+// to each chain's public nodes; offline, the call already published for the
+// same day is kept.
 //
 // Page owners add their own data without editing this file: every module in
 // scripts/data/*.mjs is imported in name order and its default export is called
@@ -18,6 +21,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync
 import { homedir } from "node:os";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { LATE_SEAL_SOURCE, lateCalls, lateSealFile } from "./late-seal.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const site = resolve(here, "..");
@@ -86,6 +90,21 @@ for (const rel of ["terminal-structure.json", "brain.json"]) {
   const p = join(outDir, rel);
   if (existsSync(p)) kept.set(rel, readFileSync(p));
 }
+
+// The late commit's calls (scripts/late-seal.mjs) are the one network read,
+// made before public/data is cleared: a chain out of reach with no call
+// published for the same day stops the build here, with the data as it was.
+const showcaseFile = day.leaves.find((l) => l.resource === day.showcase)?.manifest;
+const committer = showcaseFile && existsSync(join(dayDir, showcaseFile)) ? readJson(join(dayDir, showcaseFile)).agent?.wallet : null;
+if (!committer) throw new Error(`build-data: the showcase plan ${day.showcase} names no committer (agent.wallet)`);
+const lateSealPath = join(outDir, "late-seal.json");
+const lateCallsMade = await lateCalls({
+  operatingDay: day.operating_day,
+  gateUnix: day.gate_unix,
+  records: receiptSources.filter(existsSync).map(readJson),
+  committer,
+  previous: existsSync(lateSealPath) ? readJson(lateSealPath) : null,
+});
 
 rmSync(outDir, { recursive: true, force: true });
 mkdirSync(outDir, { recursive: true });
@@ -300,25 +319,15 @@ const earlier = useFull
 
 writeJson("receipts.json", { schema: "grand-prix.receipts.v1", operatingDay: day.operating_day, receipts, earlier }, "record.json");
 
-// A second commit for the same day, simulated 22 s after the gate against both
-// deployments (a call, never a transaction). GateRecord.sol reverts with
-// AfterGate(od, gate) when block.timestamp >= gate.
+// A second commit for the same day, tried 22 s after the gate on both
+// deployments: an eth_call from the day's committer with the block's time set
+// to gate + 22 s, never a transaction, and its control 1 s before the gate,
+// made above (scripts/late-seal.mjs). Each revert is recorded as the node
+// returned it.
 writeJson(
   "late-seal.json",
-  {
-    schema: "grand-prix.late-seal.v1",
-    operatingDay: day.operating_day,
-    gateUnix: day.gate_unix,
-    attemptUnix: day.gate_unix + 22,
-    secondsAfterGate: 22,
-    simulated: true,
-    chains: receipts.map((r) => ({ chainId: r.chainId, chainName: r.chainName, contract: r.contract, contractUrl: r.contractUrl })),
-    error: { name: "AfterGate", signature: "AfterGate(uint32 od, uint256 gate)", args: [Number(day.operating_day.replaceAll("-", "")), day.gate_unix] },
-    errorText: `AfterGate(${day.operating_day.replaceAll("-", "")}, ${day.gate_unix})`,
-    rule: "if (block.timestamp >= gate) revert AfterGate(od, gate);",
-    source: "contracts/contracts/GateRecord.sol",
-  },
-  "README.md",
+  lateSealFile({ operatingDay: day.operating_day, gateUnix: day.gate_unix, receipts, calls: lateCallsMade }),
+  LATE_SEAL_SOURCE,
 );
 
 // ---------------------------------------------------------------- Terminal graph
