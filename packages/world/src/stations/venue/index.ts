@@ -13,20 +13,15 @@ import { halo, pool, radialTex, HEX } from './look';
 import { fromSvg } from './layout';
 import type { FrameContext, FrameHandle, StationModule } from '../types';
 import { inFilm, yours } from '../../lib/yours';
+import { chipsReady, logoChip, type LogoId } from '../../kit/logos';
 
 const NIGHT = { key: { color: '#93a8d4', intensity: 0.32 }, rim: { color: '#7f95c0', intensity: 0.22 }, fill: { sky: '#46597d', ground: '#15130f', intensity: 0.42 }, env: 0.06, shadow: 0.16 };
 const BACKDROP = { top: '#101315', horizon: '#1f2429', bottom: '#14171a', glow: '#2b3036', ground: '#14171a' };
 
 const fmt = (n: number) => n.toLocaleString('en-US');
 
-/** A word or a pill over the canvas at a stage point; anchor 'tl' puts its top-left there, 'c' its center. */
-function place(ctx: FrameContext, cls: string, parts: (string | [string, string])[], at: { x: number; y: number } | null, anchor: 'tl' | 'c' | 'bl' = 'tl') {
-  const e = document.createElement('div');
-  e.className = `intro-tick ${cls}`;
-  for (const p of parts) {
-    if (typeof p === 'string') e.appendChild(document.createTextNode(p));
-    else { const s = document.createElement('span'); s.className = p[0]; s.textContent = p[1]; e.appendChild(s); }
-  }
+/** An element over the canvas at a stage point; anchor 'tl' puts its top-left there, 'c' its center. */
+function placeEl(ctx: FrameContext, e: HTMLElement, at: { x: number; y: number } | null, anchor: 'tl' | 'c' | 'bl' = 'tl') {
   e.style.position = 'absolute'; e.style.left = '0'; e.style.top = '0';
   ctx.plates.root.appendChild(e);
   if (!at) { e.remove(); return null; }
@@ -34,6 +29,17 @@ function place(ctx: FrameContext, cls: string, parts: (string | [string, string]
   const x = anchor === 'c' ? at.x - w / 2 : at.x, y = anchor === 'c' ? at.y - h / 2 : anchor === 'bl' ? at.y - h : at.y;
   e.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
   return { x, y, w, h, el: e };
+}
+
+/** A word or a pill over the canvas at a stage point (placeEl's anchors). */
+function place(ctx: FrameContext, cls: string, parts: (string | [string, string])[], at: { x: number; y: number } | null, anchor: 'tl' | 'c' | 'bl' = 'tl') {
+  const e = document.createElement('div');
+  e.className = `intro-tick ${cls}`;
+  for (const p of parts) {
+    if (typeof p === 'string') e.appendChild(document.createTextNode(p));
+    else { const s = document.createElement('span'); s.className = p[0]; s.textContent = p[1]; e.appendChild(s); }
+  }
+  return placeEl(ctx, e, at, anchor);
 }
 
 /** The next 10:00 CT gate after the frame data was built: the sealed day's gate a day on, while that is after it. */
@@ -58,10 +64,13 @@ const STATION_WORDS: Record<string, [string, string]> = {
   'parc-ferme': ['Seal', '(GateRecord)'], 'race-day': ['Operating day', '(Settlement witness)'], 'stewards': ['Verify', '(Verifier)'],
   'timing-screens': ['Prices', '(Atlas + CMC)'], 'arena': ['Game and rankings', ''], 'season-purse': ['Season', '(Flap)'], 'license-to-launch': ['Launchpad', '(OpenFour)'],
 };
-// the diagram's pills, centered where section 01 draws them (rect x, y, w, h in its viewBox)
-const TAGS: [string, number, number, number, number][] = [
-  ['COURNOT', 150, 262, 88, 18], ['LIVING BRAIN', 586, 238, 112, 18], ['AGENT STUDIO', 306, 322, 146, 18], ['BNB MAINNET', 868, 134, 100, 18],
-  ['ATLAS + CMC', 846, 396, 122, 18], ['FLAP', 560, 552, 56, 18], ['OPENFOUR', 880, 552, 90, 18],
+// the diagram's pills as the owners' logo chips (Jo, Nov 26: one official set, white glass, each a link to its owner
+// in a new tab), centered where section 01 draws its pills (rect x, y, w, h in its viewBox); a caption names the
+// product where it wears its owner's logo
+const TAGS: [LogoId | LogoId[], string | undefined, number, number, number, number][] = [
+  ['cournot', undefined, 150, 262, 88, 18], ['livingbrain', undefined, 586, 238, 112, 18], ['agentstudio', undefined, 306, 322, 146, 18],
+  ['bnbchain', 'Mainnet', 868, 134, 100, 18], [['atlas', 'cmc'], undefined, 846, 396, 122, 18], ['flap', undefined, 560, 552, 56, 18],
+  ['openfour', undefined, 880, 552, 90, 18],
 ];
 
 async function hub(ctx: FrameContext): Promise<FrameHandle> {
@@ -84,7 +93,7 @@ async function hub(ctx: FrameContext): Promise<FrameHandle> {
       v.detail();
       v.tick(t);
     },
-    decorate() {
+    async decorate() {
       const root = ctx.plates.root.parentElement!;
       root.classList.add('v-hub');
       const P = (x: number, z: number, y = PLINTH_H) => ctx.plates.project([x, y, z]);
@@ -99,11 +108,21 @@ async function hub(ctx: FrameContext): Promise<FrameHandle> {
         place(ctx, `v-station${state === 'live' ? ' is-live' : state === 'gold' ? ' is-gold' : ''}`, code ? [name + ' ', ['v-code', code]] : [name],
           P(f.x0 + inset, f.z0 + inset, s.id === 'garage' ? 18 : PLINTH_H), 'tl');
       }
-      for (const [text, x, y, w, h] of TAGS) {
+      // the chips' logos 16 px tall in the 1920 cut, smaller with the stage, never under 12 px
+      const logoPx = Math.round(Math.max(12, Math.min(16, 19 * (ctx.width / 1920))));
+      for (const [ids, caption, x, y, w, h] of TAGS) {
         const [wx, wz] = fromSvg(x + w / 2, y + h / 2);
-        // the brain's pages now glow where the diagram puts this pill: it rides the box's bottom rim instead
-        if (text === 'LIVING BRAIN') { place(ctx, 'v-tag', [text], P(wx, -41.5, PLINTH_H), 'c'); continue; }
-        place(ctx, 'v-tag', [text], P(wx, wz, text === 'AGENT STUDIO' ? 18 : PLINTH_H), 'c');
+        const chip = logoChip(ids, { caption, size: logoPx, className: 'v-logo' });
+        // the brain's pages now glow where the diagram puts this pill: it rides the box's bottom rim instead. Agent
+        // Studio's pill sat where the site's caption covers it: its chip rides the workshop's top edge, at the right
+        const at = ids === 'livingbrain' ? P(wx, -41.5, PLINTH_H) : ids === 'agentstudio' ? P(160, -256, 18) : P(wx, wz, PLINTH_H);
+        const r = placeEl(ctx, chip, at, 'c');
+        // a narrow stage crops the venue: a chip cut by the edge moves in, one whose middle is off the stage goes
+        if (!r) continue;
+        const m = 6, cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+        if (cx < 0 || cx > ctx.width || cy < 0 || cy > ctx.height) { chip.remove(); continue; }
+        const nx = Math.max(m, Math.min(ctx.width - m - r.w, r.x));
+        if (nx !== r.x) chip.style.transform = `translate3d(${nx.toFixed(1)}px, ${r.y.toFixed(1)}px, 0)`;
       }
       // the caption in the diagram's open ground left of the agents, under the real world's boxes. A film lays the hub
       // out again at a move's poses too, where these points can sit behind the camera (no plates show there): skip them
@@ -140,6 +159,8 @@ async function hub(ctx: FrameContext): Promise<FrameHandle> {
         ctx.plates.root.appendChild(hint);
         hint.style.left = `${Math.round(corner.x - hint.offsetWidth)}px`; hint.style.top = `${Math.round(corner.y - hint.offsetHeight / 2)}px`;
       }
+      // a still or a film's frame is taken with the logos drawn (a file that never comes holds it 1.5 s at most)
+      await chipsReady(ctx.plates.root);
     },
   };
 }
