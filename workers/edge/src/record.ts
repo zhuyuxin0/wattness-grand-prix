@@ -475,9 +475,14 @@ export async function sealedLeaf(day: Day, sealed: readonly SealedIndex[], posit
   };
 }
 
+/**
+ * The facts of the entry's leaf: remembered, when this isolate verified that leaf under the same name, or
+ * read and checked now. The memo is keyed by hash, and the root fixes the hash, not the name beside it.
+ */
 async function leafFacts(day: Day, sealed: readonly SealedIndex[], position: number): Promise<LeafFacts> {
   const entry = (sealed[0] as SealedIndex).index.leaves[position] as FleetLeaf;
-  return leafMemo.get(entry.leaf) ?? (await sealedLeaf(day, sealed, position)).facts;
+  const known = leafMemo.get(entry.leaf);
+  return known && known.resource === entry.resource ? known : (await sealedLeaf(day, sealed, position)).facts;
 }
 
 export async function sealedScenarios(day: Day, sealed: readonly SealedIndex[], position: number): Promise<Served> {

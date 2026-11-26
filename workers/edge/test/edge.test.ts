@@ -253,6 +253,26 @@ describe("a wrong root is refused", () => {
     expect(v.checks.find((c) => c.name === "leaf hash")?.result).toBe("fail");
   });
 
+  it("lets a leaf the isolate verified vouch only for an entry of its own name", async () => {
+    // Desert Willow's leaf, verified on BSC testnet under the published index: the isolate remembers it
+    // by its hash. The bucket then holds the relabeled index, which BSC mainnet's check has not yet
+    // seen in this isolate and which verifies, since the root covers the hash and not the name.
+    const u = upstreams();
+    expect((await call(freshOrigin(), `${LEAF}?network=bsc-testnet`)).status).toBe(200);
+    const relabeled = JSON.parse(text.index) as { showcase: string; leaves: { resource: string; manifest: string; scenarios: string }[] };
+    const name = "DSWL_ESS_ESR0";
+    Object.assign(relabeled.leaves.find((l) => l.resource === "DSWL_ESS_ESR1")!, { resource: name, manifest: `leaves/${name}.json`, scenarios: `leaves/${name}.scenarios.json` });
+    relabeled.showcase = name;
+    u.objects.set(`${DAY}/manifest.json`, `${JSON.stringify(relabeled, null, 2)}\n`);
+    u.objects.set(`${DAY}/leaves/${name}.json`, text.dswl);
+    u.objects.set(`${DAY}/leaves/${name}.scenarios.json`, text.dswlScenarios);
+    const res = await call(freshOrigin(), `/day/2026-11-26/leaves/${name}.scenarios.json?network=bsc-mainnet`);
+    expect.soft(res.status).toBe(502);
+    expect.soft(res.headers.get("x-gate-verified")).toBe("fail");
+    expect.soft(res.headers.get("cache-control")).toBe("no-store");
+    expect.soft((await res.text()).slice(0, 400)).toContain(`resource: document "DSWL_ESS_ESR1", index "${name}"`);
+  });
+
   it("refuses the index when the chain answers with another root", async () => {
     upstreams((network, c, recorded) =>
       c.method === "eth_call" && String((c.params[0] as { data: string }).data).startsWith("0x8eaa6ac0") ? `0x${"cd".repeat(32)}${String(recorded).slice(66)}` : undefined,
