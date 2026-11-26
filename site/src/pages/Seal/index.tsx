@@ -4,8 +4,9 @@ import { combine, useDay, useLateSeal, useReceipts, type DayIndex, type EarlierD
 import { minSec } from "../../lib/clock";
 import { formatInt } from "../../lib/format";
 import { dualTime, formatOperatingDay } from "../../lib/time";
-import { Glyph, Hash, PageHeader, Ready, Section } from "../../ui";
-import { RecordTable } from "./RecordTable";
+import { Glyph, Hash, PageHeader, Ready, Section, type CheckItem } from "../../ui";
+import { sponsors, useLogoRegistry, type LogoRegistry } from "../TechStack/sponsors";
+import { RecordTable, recordItems } from "./RecordTable";
 import { SealClock } from "./SealClock";
 import "./styles.css";
 
@@ -19,19 +20,20 @@ const CHAIN_SOURCE = "Commits: GateRecord on BNB Smart Chain, read from each cha
 
 export default function SealPage() {
   const all = combine(useDay(), useReceipts(), useLateSeal());
+  const registry = useLogoRegistry();
   return (
     <div className="page page--seal">
       <PageHeader
         title="Seal"
         lede="The record on BNB Chain: one root over every plan for the operating day, committed to GateRecord before ERCOT's 10:00 CT day-ahead gate."
       />
-      <Ready state={all}>{([day, r, late]) => <Record day={day} receipts={r} late={late} />}</Ready>
+      <Ready state={all}>{([day, r, late]) => <Record day={day} receipts={r} late={late} registry={registry} />}</Ready>
       <SealCost />
     </div>
   );
 }
 
-function Record({ day, receipts, late }: { day: DayIndex; receipts: Receipts; late: LateSeal }) {
+function Record({ day, receipts, late, registry }: { day: DayIndex; receipts: Receipts; late: LateSeal; registry: LogoRegistry | null }) {
   const list = receipts.receipts;
   const main = list.find((x) => x.mainnet) ?? list[0];
   if (!main) return null;
@@ -43,7 +45,7 @@ function Record({ day, receipts, late }: { day: DayIndex; receipts: Receipts; la
 
   return (
     <>
-      <Section title="Sealed Before the Gate" source={`${SOURCE_LINE} ${CHAIN_SOURCE}`}>
+      <Section title="Sealed Before the Gate" builtWith={sponsors(registry, "bnbchain")} source={`${SOURCE_LINE} ${CHAIN_SOURCE}${registry ? ` ${registry.note}` : ""}`}>
         <div className="seal-lead">
           <p className="seal-lead__figure">
             <span className="seal-lead__value">{minSec(main.secondsBeforeGate)}</span>
@@ -69,11 +71,17 @@ function Record({ day, receipts, late }: { day: DayIndex; receipts: Receipts; la
       <Section
         title="Both Chains, One Record"
         lede="What each chain's receipt records, field by field. The commits differ only in where and when they landed."
+        builtWith={sponsors(registry, "bnbchain")}
+        check={{
+          items: recordItems(list),
+          status: "verified",
+          how: "Each value as both chains' receipts hold it; every transaction and contract opens on its chain's explorer, and Verify recomputes the root from the plans.",
+        }}
         source={CHAIN_SOURCE}
       >
         <div className="seal-root">
           <span className="seal-root__label">Root</span>
-          <Hash value={day.root} full label="root" className="seal-root__hash" />
+          <Hash value={day.root} copy={false} head={10} tail={8} label="root" className="seal-root__hash" />
           <span className="seal-root__note">
             RFC 6962 Merkle root over <span className="num">{formatInt(day.leafCount)}</span> RFC 8785 leaves, one per battery, under the scope{" "}
             <code>{day.scopeLabel}</code>.
@@ -126,13 +134,25 @@ function Record({ day, receipts, late }: { day: DayIndex; receipts: Receipts; la
   );
 }
 
-/** Earlier sealed days, newest first: each day's root and its commits, linked to the explorers. */
+/** Earlier sealed days, newest first: each day's commits in words, their roots and transactions in Check it. */
 function Earlier({ days }: { days: EarlierDay[] }) {
+  const items: CheckItem[] = days.flatMap((d) => [
+    { kind: "root" as const, label: `${formatOperatingDay(d.operatingDay)}: the root`, value: d.root, note: `${formatInt(d.leafCount)} plans` },
+    ...d.receipts.map((r) => ({
+      kind: "transaction" as const,
+      label: `${formatOperatingDay(d.operatingDay)}: the commit on ${r.chainName}`,
+      value: r.txHash,
+      href: r.txUrl,
+      copy: `${r.chainName} commit for ${d.operatingDay}`,
+      note: `Block ${formatInt(r.blockNumber)}`,
+    })),
+  ]);
   return (
     <Section
       id="seal-earlier"
       title="Earlier Sealed Days"
-      lede="Every day's record stays on chain under its own key. Each earlier day's root and its two commits, from that day's own receipts."
+      lede="Every day's record stays on chain under its own key. Each earlier day's two commits, from that day's own receipts."
+      check={{ items, status: "verified", how: "From each day's own receipts; each commit opens on its chain's explorer." }}
       source={CHAIN_SOURCE}
     >
       <ul className="seal-earlier">
@@ -140,15 +160,19 @@ function Earlier({ days }: { days: EarlierDay[] }) {
           <li key={d.operatingDay} className="seal-earlier__day">
             <span className="seal-earlier__name">{formatOperatingDay(d.operatingDay)}</span>
             <span className="seal-earlier__root">
-              Root <Hash value={d.root} head={6} tail={4} label={`root for ${d.operatingDay}`} /> over <span className="num">{formatInt(d.leafCount)}</span> plans
+              One root over <span className="num">{formatInt(d.leafCount)}</span> plans
             </span>
             {d.receipts.map((r) => {
               const at = dualTime(r.blockTime);
               return (
                 <span key={r.chainId} className="seal-earlier__commit">
-                  {r.chainName}: <Hash value={r.txHash} head={6} tail={4} href={r.txUrl} label={`${r.chainName} commit for ${d.operatingDay}`} />{" "}
-                  <span className="num">{at.ct}</span>
+                  {r.chainName}: <span className="num">{at.ct}</span>
                   {at.yours && <span className="muted num"> · {at.yours}</span>}, <span className="num">{minSec(r.secondsBeforeGate)}</span> before its gate
+                  {r.txUrl ? (
+                    <a href={r.txUrl} target="_blank" rel="noreferrer" className="seal-earlier__tx" aria-label={`The ${r.chainName} commit for ${d.operatingDay} on its explorer (opens in a new tab)`}>
+                      <Glyph name="popout" />
+                    </a>
+                  ) : null}
                 </span>
               );
             })}
