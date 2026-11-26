@@ -409,3 +409,158 @@
 .page--prices .live-read {
   margin-bottom: var(--t-space-4);
 }
+.px-tk + .live-read {
+  margin-top: var(--t-space-3);
+}
+
+/* ---------------------------------------------------------------- the tickers */
+
+/* A board a trader reads at a glance: one row per pair, Atlas live in one column and CoinMarketCap recorded in the
+   other, each column under its owner's chip. On a phone each pair is a block with both sources, each under its chip. */
+.px-tk {
+  display: grid;
+  grid-template-columns: minmax(7em, 0.55fr) minmax(0, 1fr) minmax(0, 1fr);
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  overflow: hidden;
+  background: var(--w-panel);
+}
+.px-tk__row {
+  display: contents;
+}
+.px-tk__head > * {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  min-width: 0;
+  padding: 10px var(--t-space-5);
+  border-bottom: 1px solid var(--w-border);
+  background: var(--t-chrome);
+}
+.px-tk__corner {
+  font-size: var(--t-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.px-tk__name {
+  font-weight: 600;
+}
+.px-tk__what {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.px-live-dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--s-ok);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--s-ok) 22%, transparent);
+}
+.px-tk__pair,
+.px-tk__cell {
+  min-width: 0;
+  padding: var(--t-space-4) var(--t-space-5);
+  border-bottom: 1px solid var(--t-rule);
+}
+.px-tk__row:last-child > * {
+  border-bottom: 0;
+}
+.px-tk__src + .px-tk__src,
+.px-tk__cell + .px-tk__cell {
+  border-left: 1px solid var(--t-rule);
+}
+.px-tk__pair {
+  display: grid;
+  gap: 2px;
+  align-content: center;
+  font-size: var(--t-fs-title);
+  font-weight: 600;
+}
+.px-tk__asset {
+  font-size: var(--t-fs-xs);
+  font-weight: 400;
+  color: var(--w-muted);
+}
+.px-tk__cell {
+  display: grid;
+  gap: 4px;
+  align-content: center;
+}
+.px-tk__chip {
+  display: none;
+}
+.px-tk__price {
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.px-tk__sub {
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+  line-height: var(--t-lh);
+}
+.px-tk__sub .px-when {
+  display: inline;
+}
+.px-tk__sub .px-when .muted::before {
+  content: " · ";
+}
+.px-tk__up,
+.px-tk__down {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-weight: 600;
+}
+.px-tk__up {
+  color: var(--s-ok);
+}
+.px-tk__down {
+  color: var(--s-bad);
+}
+@media (max-width: 699px) {
+  .px-tk {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .px-tk__head > * {
+    display: none;
+  }
+  .px-tk__pair {
+    padding-top: var(--t-space-3);
+    padding-bottom: var(--t-space-3);
+    background: var(--t-chrome);
+  }
+  .px-tk__cell + .px-tk__cell {
+    border-left: 0;
+  }
+  .px-tk__chip {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px var(--t-space-3);
+    margin-bottom: 2px;
+  }
+  .px-tk__row:last-child > .px-tk__cell:not(:last-child) {
+    border-bottom: 1px solid var(--t-rule);
+  }
+}
+
+/* the folded parts: each feed's answer, the budget's before and after */
+.px-more {
+  margin-top: var(--t-space-4);
+}
+.px-more > .px-feeds,
+.px-more > .px-ba {
+  margin-top: var(--t-space-3);
+}
+.px-budget-stats {
+  margin-bottom: var(--t-space-2);
+}
