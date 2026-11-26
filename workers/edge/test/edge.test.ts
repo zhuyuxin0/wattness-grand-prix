@@ -420,6 +420,34 @@ describe("the index holds the fields the planner writes, and no others", () => {
     await refusedFor((d) => (d.leaves[93].label = "anything"), 'leaves: DSWL_ESS_ESR1: unknown field "label"');
   });
 
+  it("refuses an index naming a battery in more than 64 characters, with its paths and the showcase to match", async () => {
+    // DSWL_ESS_ESR1 followed by Zs keeps the order. At 100 kB its paths are longer than a plain path may be,
+    // so under that index salt.txt and every path outside it would answer 400, as if the request were wrong.
+    for (const [length, served] of [
+      [64, true],
+      [65, false],
+      [100_013, false],
+    ] as const) {
+      forgetVerified();
+      const u = upstreams();
+      const name = `DSWL_ESS_ESR1${"Z".repeat(length - 13)}`;
+      const doc = JSON.parse(text.index) as Record<string, any>;
+      Object.assign(doc.leaves[93], { resource: name, manifest: `leaves/${name}.json`, scenarios: `leaves/${name}.scenarios.json` });
+      doc.showcase = name;
+      u.objects.set(`${DAY}/manifest.json`, pretty(doc));
+      const origin = freshOrigin();
+      const index = await call(origin, "/day/2026-11-26/index.json");
+      expect.soft(index.status, `${length} characters`).toBe(served ? 200 : 502);
+      if (served) continue;
+      expect.soft((await index.text()).slice(0, 600), `${length} characters`).toContain("index shape (leaves: bad resource name");
+      for (const path of ["salt.txt", "sync/DSWL_ESS_ESR1.json", "leaves/CLO_ESR1.json"]) {
+        const res = await call(origin, `/day/2026-11-26/${path}`);
+        expect.soft(res.status, `${length} characters, ${path}`).toBe(502);
+        expect.soft(res.headers.get("x-gate-verified"), `${length} characters, ${path}`).toBe("fail");
+      }
+    }
+  });
+
   it("refuses an index with an extra field in an exclusion, or a reason that is not text", async () => {
     await refusedFor((d) => (d.exclusions[0].note = "anything"), 'exclusions: AMAD_ESS_ESR1: unknown field "note"');
     await refusedFor((d) => (d.exclusions[0].reason = 7), "exclusions: AMAD_ESS_ESR1: reason 7 is not a string");

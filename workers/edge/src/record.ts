@@ -193,7 +193,10 @@ export function checkedRendering(p: Parsed, what: string): Rendering {
   return found as Rendering;
 }
 
-const RESOURCE = /^[A-Z0-9_]+$/;
+// A resource name in the form /verify accepts; the longest on 26 Nov has 13 characters. Unbounded, a name too
+// long for its paths to be plain would pass the shape check, and each request that reads those paths would
+// answer 400, as if the request were wrong.
+const RESOURCE = /^[A-Z0-9_]{1,64}$/;
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const get = (v: unknown, ...path: string[]): unknown => path.reduce<unknown>((o, k) => (isRecord(o) ? o[k] : undefined), v);
 /** A battery name as a reason prints it: bare when it has a resource name's form, else as any value; bounded either way. */
