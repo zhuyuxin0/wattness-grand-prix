@@ -1,57 +1,65 @@
-/* The Stewards page's report board, as the site draws it (gatelock site/src/pages/Stewards/styles.css and the base
-   rules it relies on, at the build the side-by-side pairs with), scoped under .v-board so it sets nothing else in the
-   lab. The tokens are the site's (site/src/styles/tokens.css). Barlow Condensed is the site's timing face (SIL OFL 1.1,
-   fonts/OFL.txt); Libre Franklin Brand is the kit's. */
+/* The Verify page's board on the stewards' wall (board.ts), in the site's type and colors, scoped under .v-board so it
+   sets nothing else in the frame. One display face, Libre Franklin Brand (the kit's), for the name and the score; the
+   system face for everything read; mono only for codes; tabular figures. The values are the site's dark tokens
+   (site/src/styles/tokens.css) and the bay's lamp colors, pass #2ec7a6 and fail #e5534b, so the board, the lamps and
+   their plates agree. The board is a fixed box (board.ts BOARD): the rows share its height, and --k (its height over
+   the venue's 250 px) scales the score and the rows. The towers' timing face is declared here until it goes (heroes.ts
+   draws with it). */
 @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 500; src: url("./fonts/barlow-condensed-500-latin.woff2") format("woff2"); }
 @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 600; src: url("./fonts/barlow-condensed-600-latin.woff2") format("woff2"); }
 @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; src: url("./fonts/barlow-condensed-700-latin.woff2") format("woff2"); }
 
 .v-board {
-  --chrome: #101315; --bg: #14171a; --raised: #1f2429; --raised-2: #252b31; --border: #2b3036; --border-strong: #3a4148;
-  --text: #e6e8ea; --text-strong: #f6f7f8; --muted: #969ca3; --faint: #6b7178;
-  --teal: #2ec7a6; --teal-dim: rgba(46, 199, 166, 0.14); --bnb: #f0b90b; --on-bnb: #14171a; --refused: #e5534b; --refused-dim: rgba(229, 83, 75, 0.12);
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  --font-timing: "Barlow Condensed", "Libre Franklin", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --chrome: #101315; --rule: #2b3036;
+  --text: #e6e8ea; --strong: #f6f7f8; --muted: #969ca3; --faint: #6b7178;
+  --pass: #2ec7a6; --pass-dim: rgba(46, 199, 166, 0.15); --fail: #e5534b; --fail-dim: rgba(229, 83, 75, 0.15); --bnb: #f0b90b;
   --font-display: "Libre Franklin Brand", "Franklin Gothic Medium", "Helvetica Neue", Arial, sans-serif;
-  --text-2xs: 0.6875rem; --text-sm: 0.8125rem; --tracking-caps: 0.12em; --tracking-display: -0.02em; --leading-tight: 1.1;
-  --space-2: 8px; --space-3: 12px; --space-5: 20px; --space-6: 24px; --space-8: 32px; --radius-lg: 10px;
-  position: absolute; left: 0; top: 0; transform-origin: 0 0; box-sizing: border-box;
-  font-family: var(--font-sans); font-size: 0.9375rem; line-height: 1.55; color: var(--text);
+  --font-sans: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --k: 1;
+  position: absolute; left: 0; top: 0; transform-origin: 0 0; box-sizing: border-box; pointer-events: none;
+  font-family: var(--font-sans); font-size: 15px; line-height: 1.3; color: var(--text);
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
 .v-board *, .v-board *::before, .v-board *::after { box-sizing: border-box; }
+.v-board p, .v-board h2, .v-board ol { margin: 0; padding: 0; }
 .v-board .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
-.v-board .muted { color: var(--muted); }
-.v-board .eyebrow { font-family: var(--font-sans); font-size: var(--text-2xs); font-weight: 600; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--muted); }
-.v-board h2 { font-family: var(--font-display); color: var(--text-strong); line-height: var(--leading-tight); letter-spacing: var(--tracking-display); margin: 0; font-weight: 600; }
-.v-board dl, .v-board dd, .v-board ol { margin: 0; }
 
-.v-board .st-board { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "battery score" "strip strip";
-  gap: var(--space-6); padding: var(--space-8); background: var(--chrome); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
-.v-board .st-board::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, var(--teal) 0 72%, var(--border) 72% 92%, var(--bnb) 92% 100%); }
-.v-board .st-board.is-tampered::before { background: var(--refused); }
-.v-board .st-board__battery { grid-area: battery; }
-.v-board .st-board__score { grid-area: score; display: grid; justify-items: end; align-content: end; gap: var(--space-2); }
-.v-board .st-board__strip { grid-area: strip; }
-.v-board .st-board.is-tampered .st-board__battery .eyebrow { color: var(--refused); }
-.v-board .st-board__name { margin-top: var(--space-2); font-family: var(--font-timing); font-weight: 600; font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: 0.01em; line-height: 1; overflow-wrap: anywhere; }
-.v-board .st-board__facts { margin: var(--space-5) 0 0; display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-8); }
-.v-board .st-board__facts div { display: grid; gap: 2px; }
-.v-board .st-board__facts dt { font-size: var(--text-2xs); font-weight: 600; letter-spacing: var(--tracking-caps); text-transform: uppercase; color: var(--faint); }
-.v-board .st-board__facts dd { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text-strong); }
-.v-board .st-board__digits { font-family: var(--font-timing); font-weight: 500; font-size: clamp(3.5rem, 8vw, 5.5rem); line-height: 0.9; color: var(--text-strong); letter-spacing: 0.01em; }
-.v-board .st-board__digits .is-ok { color: var(--teal); }
-.v-board .st-board__digits .is-bad { color: var(--refused); }
+/* the battery and its score on the left, the five checks on the right, at the page's state colors */
+.v-board .st-board { position: relative; height: 100%; display: grid; grid-template-columns: 276px minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "who rows" "score rows"; column-gap: 26px;
+  padding: 20px 26px 18px 24px; background: var(--chrome); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+.v-board .st-board::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
+  background: linear-gradient(90deg, var(--pass) 0 72%, var(--rule) 72% 92%, var(--bnb) 92% 100%); }
+.v-board .st-board.is-tampered::before { background: var(--fail); }
+
+.v-board .st-board__who { grid-area: who; min-width: 0; }
+.v-board .st-board__eyebrow { font-size: 14px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+.v-board .st-board__name { margin-top: 5px; font-family: var(--font-display); font-weight: 600; font-size: 34px; line-height: 1.05;
+  letter-spacing: -0.015em; color: var(--strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.v-board .st-board__codes { margin-top: 9px; font-family: var(--font-mono); font-size: 15px; color: var(--muted); white-space: nowrap; overflow: hidden; }
+.v-board .st-board__sep { font-family: var(--font-sans); }
+.v-board .st-board__copy { margin-top: 4px; font-size: 15px; color: var(--muted); white-space: nowrap; }
+.v-board .st-board__state { font-weight: 600; color: var(--pass); }
+.v-board .is-tampered .st-board__state { color: var(--fail); }
+
+.v-board .st-board__score { grid-area: score; display: flex; align-items: baseline; gap: 12px; white-space: nowrap; }
+.v-board .st-board__digits { font-family: var(--font-display); font-weight: 600; font-size: calc(62px * var(--k)); line-height: 0.92;
+  letter-spacing: -0.02em; color: var(--strong); }
+.v-board .st-board__digits .is-ok { color: var(--pass); }
+.v-board .st-board__digits .is-bad { color: var(--fail); }
 .v-board .st-board__of { color: var(--faint); }
-.v-board .st-board__verdict { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); }
-.v-board .st-board__strip { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 0; list-style: none; }
-.v-board .st-board__strip li { position: relative; height: 28px; display: flex; align-items: center; padding-left: 10px; background: var(--raised);
-  font-family: var(--font-timing); font-weight: 600; font-size: 0.875rem; letter-spacing: 0.06em; color: var(--faint);
-  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%); }
-.v-board .st-board__strip li.is-pass { background: var(--teal-dim); color: var(--teal); }
-.v-board .st-board__strip li.is-fail { background: var(--refused-dim); color: var(--refused); }
-.v-board .st-verdict { display: inline-flex; align-items: center; gap: 5px; height: 24px; padding: 0 11px 0 9px; font-family: var(--font-timing); font-weight: 700;
-  font-size: 0.875rem; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%); }
-.v-board .st-verdict--pass { background: var(--teal); color: var(--on-bnb); }
-.v-board .st-verdict--fail { background: var(--refused); color: var(--text-strong); }
+.v-board .st-board__verdict { font-size: 17px; font-weight: 500; color: var(--muted); }
+
+/* the page's rows: number, title, state; ruled like the page's list */
+.v-board .st-board__rows { grid-area: rows; display: grid; grid-template-rows: repeat(5, minmax(0, 1fr)); list-style: none;
+  border-top: 1px solid var(--rule); min-height: 0; }
+.v-board .st-board__rows li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; column-gap: 14px;
+  min-height: 0; border-bottom: 1px solid var(--rule); }
+.v-board .st-row__n { font-size: calc(18px * var(--k)); font-weight: 600; color: var(--muted); }
+.v-board .st-row__t { font-size: calc(20px * var(--k)); font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.v-board .st-pill { display: inline-flex; align-items: center; gap: 7px; height: calc(27px * var(--k)); padding: 0 13px 0 11px;
+  border-radius: 999px; font-size: calc(15px * var(--k)); font-weight: 600; white-space: nowrap; }
+.v-board .st-pill i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.v-board .st-pill--pass { color: var(--pass); background: var(--pass-dim); }
+.v-board .st-pill--fail { color: var(--fail); background: var(--fail-dim); }

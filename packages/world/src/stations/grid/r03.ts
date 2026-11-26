@@ -1,20 +1,22 @@
 // R03 · Stewards: one changed number, three red lamps. Desert Willow's leaf as a glass card, its audit path as a
-// nine-rung ladder up to the day's root (the real RFC 6962 path from the index's leaf hashes), the five check lamps
-// and the Stewards board, in the changed-copy state: arms.C.kw[11] one MW up, the ladder broken at its first rung.
-// grid.R03-pass is the same bay checking the sealed copy, as the page shows it before the change: all five lamps teal
-// and the climb lit from the leaf to the root (the story's "All five checks pass", before the tamper).
+// nine-rung ladder up to the day's root (the real RFC 6962 path from the index's leaf hashes), the five check lamps on
+// their numbered plates and the Verify page's board over them, in the changed-copy state: arms.C.kw[11] one MW up, the
+// ladder broken at its first rung. grid.R03-pass is the same bay checking the sealed copy, as the page shows it before
+// the change: all five lamps teal and the climb lit from the leaf to the root (the story's "All five checks pass",
+// before the tamper). The board is the venue's (venue/board.ts), the one the films' split screen carries.
 import * as THREE from 'three';
 import { createMaterials } from '../../kit/materials';
+import { chamferBox } from '../../kit/geo';
 import { exactColor } from '../../kit/tone';
 import type { Vec3 } from '../../lib/stage';
 import type { FrameContext, FrameHandle } from '../types';
 import { HEX, apron, plinth, track, poleLights, glow, emissive, screen, glassKit, finish, pulse, detail, counted, nightRig, poseFrom, livery, rectOf, boxCorners, fmt, type Footprint } from './venue';
 import { line } from './lines';
 import { auditPath } from './merkle';
-import { keyCard } from './dom';
+import { BOARD, buildBoard, quadMatrix } from '../venue/board';
 import { caption, litType } from '../../words';
 
-/** The page's tamper rule (site/src/pages/Stewards/useStewards.ts tamperPlan): one more MW in the selected arm's
+/** The page's tamper rule (site/src/pages/Verify/useStewards.ts tamperPlan): one more MW in the selected arm's
  *  busiest hour, the first such hour on a tie. */
 export function tamper(kw: readonly number[]) {
   let hour = 0;
@@ -22,7 +24,7 @@ export function tamper(kw: readonly number[]) {
   return { hour, sealed: kw[hour]!, changed: kw[hour]! + 1000 };
 }
 
-/** The page's five checks (site/src/pages/Stewards/verify/run.ts TITLES) and how each reads the changed copy. */
+/** The page's five checks (site/src/pages/Verify/verify/run.ts TITLES) and how each reads the changed copy. */
 const CHANGED_CHECKS = [
   { id: '01', title: 'The leaf recomputes from the plan', pass: false },
   { id: '02', title: "The proof reaches the day's root", pass: false },
@@ -153,17 +155,19 @@ export async function r03(ctx: FrameContext, state: CopyState = 'changed'): Prom
   rootGrp.add(line(Array.from({ length: 65 }, (_, k) => { const a = (k / 64) * Math.PI * 2; return [Math.cos(a) * 1.85, Math.sin(a) * 1.85, -0.06] as Vec3; }), { color: HEX.bnb, width: 2, glow: 8, glowA: 0.45, closed: true, reveal: false, renderOrder: 7 }));
   const rootHalo = glow(HEX.bnb, 5.2, 0.09, { flat: false }); rootHalo.rotation.y = Math.PI; rootHalo.position.z = -0.1; rootGrp.add(rootHalo);
 
-  // ── the lamp wall at the bay's east side, facing west: five check lamps and the Stewards board above them ─────
-  const WALL = { x: 456, z0: -16, z1: 24 }; // the lamps sit from z -4 to 24, clear of the card from the bay
-  // lowered from 16.5 m to 13 m with the board brought down to it: the wall was a black mass over the bay
+  // ── the lamp wall at the bay's east side, facing west: five check lamps on their numbered plates, and the Verify
+  // page's board over them ───────────────────────────────────────────────────────────────────────────────────────
+  // the lamps sit from z -4 to 24, clear of the card from the bay. The wall was lowered from 16.5 m to 13 m when it read
+  // as a black mass over the bay; it stands 16 m now to carry the page's board, lit, over the lamps
+  const WALL = { x: 456, z0: -16, z1: 24, h: 16 };
   const wallPaint = new THREE.MeshPhysicalMaterial({ color: '#3a4148', roughness: 0.42, metalness: 0.25, clearcoat: 0.7, clearcoatRoughness: 0.2 });
-  const wall = new THREE.Mesh(new THREE.BoxGeometry(1.4, 13, WALL.z1 - WALL.z0 + 6).translate(0, 6.5, 0), wallPaint);
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(1.4, WALL.h, WALL.z1 - WALL.z0 + 6).translate(0, WALL.h / 2, 0), wallPaint);
   wall.position.set(WALL.x + 0.7, 0.12, (WALL.z0 + WALL.z1) / 2); wall.castShadow = true; wall.receiveShadow = true; root.add(wall);
-  const wallTop = line([[WALL.x - 0.02, 13.1, WALL.z0 - 3], [WALL.x - 0.02, 13.1, WALL.z1 + 3]] as Vec3[], { color: HEX.teal, width: 1.4, glow: 6, glowA: 0.25, opacity: 0.7, reveal: false, renderOrder: 5 });
+  const wallTop = line([[WALL.x - 0.02, WALL.h + 0.1, WALL.z0 - 3], [WALL.x - 0.02, WALL.h + 0.1, WALL.z1 + 3]] as Vec3[], { color: HEX.teal, width: 1.4, glow: 6, glowA: 0.25, opacity: 0.7, reveal: false, renderOrder: 5 });
   wallTop.userData.noAO = true; root.add(wallTop);
-  const lampZ = [-4, 3, 10, 17, 24];
+  const lampZ = [-4, 3, 10, 17, 24], lampY = 3.6;
   CHECKS.forEach((c, i) => {
-    const hex = c.pass ? HEX.teal : HEX.refused, z = lampZ[i]!, y = 3.6;
+    const hex = c.pass ? HEX.teal : HEX.refused, z = lampZ[i]!, y = lampY;
     const g = new THREE.Group(); g.position.set(WALL.x - 0.02, y, z); g.rotation.y = Math.PI / 2; root.add(g);
     const ring = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.5, 64).rotateX(Math.PI / 2), paint); ring.position.z = 0.25; g.add(ring);
     const face = new THREE.Mesh(new THREE.CircleGeometry(1.2, 64), emissive(hex)); face.rotation.y = Math.PI; face.position.z = -0.02; g.add(face);
@@ -172,31 +176,42 @@ export async function r03(ctx: FrameContext, state: CopyState = 'changed'): Prom
     const pool = glow(hex, 5, 0.08); pool.position.set(WALL.x - 3, 0.14, z); root.add(pool);
     const lamp = counted(new THREE.PointLight(exactColor(THREE, hex), 3, 8, 2)); lamp.position.set(WALL.x - 1.6, y, z); root.add(lamp);
   });
-  const board = screen(10, 6, 110, (g, W, H) => {
-    g.fillStyle = '#0d1117'; g.fillRect(0, 0, W, H);
-    g.textBaseline = 'middle';
-    // the header whole, at one size in both states: fitted to the rows' width by the changed copy's, the longer
-    const head = (copy: string) => `STEWARDS · ${show.resource} · BSC MAINNET · ${copy} COPY`;
-    const headFont = (px: number) => `600 ${px}px "Libre Franklin Brand", sans-serif`;
-    let headPx = Math.round(H * 0.055);
-    g.font = headFont(headPx);
-    const headW = g.measureText(head('CHANGED')).width;
-    if (headW > W * 0.9) { headPx = Math.floor((headPx * W * 0.9) / headW); g.font = headFont(headPx); }
-    g.fillStyle = '#969ca3';
-    g.fillText(head(changed ? 'CHANGED' : 'SEALED'), W * 0.05, H * 0.09);
-    CHECKS.forEach((c, i) => {
-      const y = H * (0.22 + i * 0.13);
-      g.fillStyle = '#1f2429'; g.fillRect(W * 0.05, y - H * 0.05, W * 0.9, H * 0.1);
-      g.fillStyle = c.pass ? '#2ec7a6' : '#e5534b'; g.fillRect(W * 0.05, y - H * 0.05, 8, H * 0.1);
-      g.fillStyle = '#e6e8ea'; g.font = `500 ${Math.round(H * 0.052)}px "Libre Franklin Brand", sans-serif`; g.fillText(`${c.id}  ${c.title}`, W * 0.08, y);
-      g.fillStyle = c.pass ? '#2ec7a6' : '#e5534b'; g.font = `600 ${Math.round(H * 0.05)}px SFMono-Regular, Menlo, monospace`; g.textAlign = 'right';
-      g.fillText(c.pass ? 'PASS' : 'FAIL', W * 0.93, y); g.textAlign = 'left';
+  // each lamp's number on a plate on the wall under it, drawn into the plate (the display face at 600, its figures
+  // tabular), rimmed in the check's color: the numbers belong to the wall, stay through a move, and read as the
+  // board's rows do. The face is in before the plates are drawn.
+  try { await document.fonts.load('600 120px "Libre Franklin Brand"'); } catch { /* the system face draws them */ }
+  const PLATE = { y: 1.3, w: 2.4, h: 1.1 };
+  CHECKS.forEach((c, i) => {
+    const hex = c.pass ? HEX.teal : HEX.refused, z = lampZ[i]!;
+    const body = new THREE.Mesh(chamferBox(THREE, 0.2, PLATE.h, PLATE.w, 0.06), paint);
+    body.position.set(WALL.x - 0.06, PLATE.y, z); body.castShadow = true; root.add(body);
+    const face = screen(PLATE.w - 0.12, PLATE.h - 0.12, 240, (g, W, H) => {
+      const lw = Math.max(4, Math.round(H * 0.045)), inset = lw * 1.5, r = H * 0.18;
+      g.fillStyle = '#14171a'; g.fillRect(0, 0, W, H);
+      g.strokeStyle = hex; g.lineWidth = lw; g.beginPath(); g.roundRect(inset, inset, W - 2 * inset, H - 2 * inset, r); g.stroke();
+      // tabular figures: each digit set on its own cell of one advance, so 01 to 05 share one width and center
+      g.font = `600 ${Math.round(H * 0.6)}px "Libre Franklin Brand", "Helvetica Neue", Arial, sans-serif`;
+      g.fillStyle = '#e6e8ea'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+      const m = g.measureText(c.id), cap = m.actualBoundingBoxAscent - m.actualBoundingBoxDescent;
+      const cell = Math.max(...'0123456789'.split('').map((ch) => g.measureText(ch).width));
+      [...c.id].forEach((ch, k) => g.fillText(ch, W / 2 + (k - (c.id.length - 1) / 2) * cell, H / 2 + cap / 2));
     });
-    g.fillStyle = changed ? '#e5534b' : '#2ec7a6'; g.font = `600 ${Math.round(H * 0.06)}px "Libre Franklin Brand", sans-serif`;
-    g.fillText(changed ? `${CHECKS.filter((c) => !c.pass).length} of 5 fail` : `${CHECKS.filter((c) => c.pass).length} of 5 pass`, W * 0.05, H * 0.9);
+    face.position.set(WALL.x - 0.18, PLATE.y, z); face.rotation.y = -Math.PI / 2; root.add(face);
   });
-  board.position.set(WALL.x - 0.03, 9.1, 4); board.rotation.y = -Math.PI / 2; root.add(board);
-  const boardGlass = G.pane(10.4, 6.4, { r: 0.3, rimW: 0.3, tintA: 0.06, refract: 0.02, frost: 0.04 }); boardGlass.position.set(WALL.x - 0.25, 9.1, 4); boardGlass.rotation.y = -Math.PI / 2; root.add(boardGlass);
+  // the screen: dark glass in a bezel over the five lamps, from the first lamp's center to the last's, 28 x 9.6 m;
+  // decorate sets the page's board on its face at the screen's aspect (venue/board.ts: the rows share its height)
+  const SCR = { x: WALL.x - 0.28, y: 10.8, z: 10, w: 28, h: 9.6 };
+  const boardH = Math.round((BOARD.width * SCR.h) / SCR.w);
+  const bezel = new THREE.Mesh(chamferBox(THREE, 0.3, SCR.h + 0.7, SCR.w + 0.7, 0.1), paint);
+  bezel.position.set(WALL.x - 0.1, SCR.y, SCR.z); bezel.castShadow = true; root.add(bezel);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(SCR.w, SCR.h), emissive('#101315'));
+  scr.position.set(SCR.x, SCR.y, SCR.z); scr.rotation.y = -Math.PI / 2; root.add(scr);
+  const scrGlass = G.pane(SCR.w + 0.2, SCR.h + 0.2, { r: 0.3, rimW: 0.3, tintA: 0.06, refract: 0.02, frost: 0.04 }); scrGlass.position.set(SCR.x - 0.2, SCR.y, SCR.z); scrGlass.rotation.y = -Math.PI / 2; root.add(scrGlass);
+  // the face's corners as seen from the bay (top left, top right, bottom right, bottom left): west of the wall, north is left
+  const screenCorners = (): Vec3[] => {
+    const y0 = SCR.y - SCR.h / 2, y1 = SCR.y + SCR.h / 2, zl = SCR.z - SCR.w / 2, zr = SCR.z + SCR.w / 2;
+    return [[SCR.x, y1, zl], [SCR.x, y1, zr], [SCR.x, y0, zr], [SCR.x, y0, zl]];
+  };
 
   finish(ctx, root, M);
   nightRig(stage, [120, 420]);
@@ -204,44 +219,58 @@ export async function r03(ctx: FrameContext, state: CopyState = 'changed'): Prom
   stage.setAO({ radius: 0.55, scale: 1.1, thickness: 1.0, samples: 16 });
   stage.setKey({ az: 200, el: 38, center: [425, 6, 10], radius: 45, rimAz: 20 });
   stage.setShadowAuto(true);
-  const cam = poseFrom([373.7, 6.1, 45.7], [422, 10.5, 2], 36, [0, 0]);
+  // the camera: from the bay's southwest, 14 m up and looking down, so the climb to the root, the card at its foot
+  // (clear of the caption) and the board over the lamps share the picture at a size the board reads at. A portrait screen cannot hold the ladder and the wall side by side: it frames the wall, the board over
+  // the five lamps across its width, from the same place
+  const cam = ctx.width / ctx.height < 1
+    ? poseFrom([376, 14, 47], [456.3, 7, 11], 44, [0, 0])
+    : poseFrom([376, 14, 47], [441, 5, 5], 39, [0.03, 0]);
 
   const path = `the audit path is RFC 6962 over the ${leaves.length} leaf hashes of frame-data.json fleet.batteries in index order, for Desert Willow at index ${m} (position ${m + 1} of ${leaves.length}): ${proof.steps.length} steps, sides ${proof.steps.map((s) => s.side[0]).join('')}, folding to ${proof.root}, the sealed root.`;
   return {
     time: 2.0,
     note: changed
-      ? `Real: ${path} The changed value is the page's tamper rule on showcase.arms.${show.selected_arm}.kw: hour ${tp.hour} (${tp.hour}:00 to ${tp.hour + 1}:00 CT), ${tp.sealed} to ${tp.changed} kW. The lamps' states follow the Stewards page's own words for a changed copy ("checks 03 and 04 still pass; the leaf, the proof and the energy balance do not": 01, 02 and 05 fail); this still does not run the verifier. Illustrative: the bay's architecture, the rails and lights.`
-      : `Real: ${path} The card is the sealed plan as sealed (showcase.arms.${show.selected_arm}.kw, leaf ${show.leaf}). The five lamps show the page's checks on the sealed copy, all passing, as the page reads it before any change ("${CHECKS.length} of ${CHECKS.length} checks pass"); this still does not run the verifier. Illustrative: the bay's architecture, the rails and lights.`,
+      ? `Real: ${path} The changed value is the page's tamper rule on showcase.arms.${show.selected_arm}.kw: hour ${tp.hour} (${tp.hour}:00 to ${tp.hour + 1}:00 CT), ${tp.sealed} to ${tp.changed} kW. The lamps' states follow the Verify page's own words for a changed copy ("checks 3 and 4 still pass; the leaf, the proof and the energy balance in check 5 do not": 01, 02 and 05 fail); this still does not run the verifier. The board over the lamps is the page's own board for the changed copy (venue/board.ts, the one the films' split screen carries), with those five states. Illustrative: the bay's architecture, the rails and lights.`
+      : `Real: ${path} The card is the sealed plan as sealed (showcase.arms.${show.selected_arm}.kw, leaf ${show.leaf}). The five lamps show the page's checks on the sealed copy, all passing, as the page reads it before any change ("${CHECKS.length} of ${CHECKS.length} checks pass"); this still does not run the verifier. The board over the lamps is the page's own board for the sealed plan (venue/board.ts, the one the films' split screen carries). Illustrative: the bay's architecture, the rails and lights.`,
     update(t) { stage.setCamera(cam); detail(ctx, M); pulse(root, t); },
     decorate() {
       const p = ctx.plates;
       litType(ctx);
+      // the Verify page's board on the screen's face, exact: its markup in the frame's DOM, set on the face's corners
+      // (a film lays it out again through a leg, so it rides with the wall)
+      const board = buildBoard(d, CHECKS.map((c) => (c.pass ? 'pass' : 'fail')), changed, BOARD.width, boardH);
+      const corners = screenCorners().map((q) => p.project(q));
+      if (corners.every((q) => q)) {
+        ctx.overlay.appendChild(board);
+        board.style.transform = quadMatrix(BOARD.width, boardH, corners as { x: number; y: number }[]);
+      }
       const cap = caption(ctx, { head: 'Anyone can check any plan', flavor: 'stewards', line: changed ? 'In a browser, against the chain: one changed number fails three checks.' : 'In a browser, against the chain: the sealed copy passes all five checks.' });
       const scope = p.scope(changed ? 'The record on chain is untouched, so 03 and 04 still pass.' : `The sealed copy: its ${proof.steps.length} hashes climb from the leaf to the root on chain.`);
-      const fails = CHECKS.filter((c) => !c.pass).length;
-      const k = keyCard(ctx, CHECKS.map((c) => ({ swatches: [c.pass ? HEX.teal : HEX.refused], text: `${c.id} ${c.title}` })), { title: changed ? `${fails} of 5 fail: the changed copy is not the sealed plan` : `${CHECKS.length - fails} of 5 pass: this is the sealed plan` });
-      p.ticks('lamps', CHECKS.map((c, i) => ({ at: [WALL.x - 0.2, 1.35, lampZ[i]!] as Vec3, text: c.id, align: 'below' as const })), 'hwalk-tick');
-      p.ticks('rungs', proof.steps.map((s, i) => ({ at: local(3.95, levelY(i)), text: changed && i === 0 ? `L1 · sibling ${fmt.short(s.sibling, 4, 4)} · breaks here` : `L${i + 1} · ${fmt.short(s.sibling, 4, 4)}`, align: 'left' as const })), 'hwalk-tick');
-      const boardBox = rectOf(ctx, boxCorners([WALL.x, 9.1, 4], [0.3, 3.2, 5.2], 0), 8);
-      const lampsBox = rectOf(ctx, boxCorners([WALL.x, 3.2, 4], [0.3, 2.6, 18], 0), 10);
+      // the board and the lamps with their plates carry the five checks: the plates keep off them (no key card: it
+      // said what the board's rows say)
+      const boardBox = rectOf(ctx, screenCorners(), 10);
+      const wallLow = PLATE.y - PLATE.h / 2, wallHigh = lampY + 1.6;
+      const lampsBox = rectOf(ctx, boxCorners([WALL.x, (wallLow + wallHigh) / 2, 10], [0.3, (wallHigh - wallLow) / 2, 15.6], 0), 8);
       const ladderBox = rectOf(ctx, [local(-3.8, 4.6), local(3.8, 4.6), local(-3.8, topY + 4.0), local(3.8, topY + 4.0)], 6);
       const cardBox = rectOf(ctx, boxCorners([CARD[0], 2.87, CARD[2]], [3.3, 2.3, 0.3], -cardFace), 8);
-      // the rung ticks are a separate layer: keep the leaders' plates off their column (the ticks end at the rail)
-      const tickTop = p.project(local(3.95, levelY(proof.steps.length - 1))), tickFoot = p.project(local(3.95, levelY(0)));
       // the card's plate hangs off its left edge as seen, into the open ground beside it, not over its header
       const cardEdge = boxCorners([CARD[0], 2.6, CARD[2]], [3.2, 0, 0.2], -cardFace).reduce((a, c) => ((p.project(c)?.x ?? Infinity) < (p.project(a)?.x ?? Infinity) ? c : a));
-      const ticksBox = tickTop && tickFoot ? { x: tickFoot.x - 300, y: tickTop.y - 14, w: 300, h: tickFoot.y - tickTop.y + 28 } : null;
+      // one leader for the climb (the nine rungs' own ticks crowded the ladder): at the middle rung's sibling hash, or
+      // at the first rung where the changed copy breaks
+      const mid = rungs[Math.floor(rungs.length / 2)]!;
       const texts = {
         card: `${show.name} · leaf ${m + 1} of ${leaves.length} · ${fmt.short(show.leaf, 4, 4)}`,
         tamper: `Changed copy: arms.${show.selected_arm}.kw[${tp.hour}] ${fmt.int(tp.sealed).replace('-', '−')} → ${fmt.int(tp.changed).replace('-', '−')} kW`,
+        ladder: changed ? `Breaks at hash 1 of ${proof.steps.length}` : `${proof.steps.length} hashes, leaf to root`,
         rootp: changed ? `Root ${fmt.short(sd.root)} · on chain, unchanged` : `Root ${fmt.short(sd.root)} · recomputed: match`,
       };
       p.leaders([
         { id: 'card', text: texts.card, at: cardEdge, priority: 0 },
         ...(changed ? [{ id: 'tamper', text: texts.tamper, at: [CARD[0] - 1.0, 2.4, CARD[2] + 0.4] as Vec3, priority: 1 }] : []),
-        { id: 'root', text: texts.rootp, at: [E[0], E[1] + 1.9, E[2]], priority: 2 },
-      ], { keepOut: [k, lampsBox, ...(ticksBox ? [ticksBox] : []), ...(scope ? [scope] : []), ...(cap ? [cap] : [])], avoid: [cardBox, boardBox, ladderBox], max: 4 });
-      livery(ctx, changed ? { [texts.card]: 'live', [texts.tamper]: 'refused', [texts.rootp]: 'sealed' } : { [texts.card]: 'live', [texts.rootp]: 'sealed' });
+        { id: 'ladder', text: texts.ladder, at: changed ? local(0, levelY(0)) : mid.c, priority: 2 },
+        { id: 'root', text: texts.rootp, at: [E[0], E[1] + 1.9, E[2]], priority: 3 },
+      ], { keepOut: [boardBox, lampsBox, ...(scope ? [scope] : []), ...(cap ? [cap] : [])], avoid: [cardBox, ladderBox], max: 4 });
+      livery(ctx, changed ? { [texts.card]: 'live', [texts.tamper]: 'refused', [texts.ladder]: 'refused', [texts.rootp]: 'sealed' } : { [texts.card]: 'live', [texts.ladder]: 'live', [texts.rootp]: 'sealed' });
     },
   };
 }
