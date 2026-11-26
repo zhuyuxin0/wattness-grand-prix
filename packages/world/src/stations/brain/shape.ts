@@ -139,6 +139,9 @@ export interface SurfacePool {
 }
 
 let pool: SurfacePool | null = null;
+/** Takes a pool made elsewhere by this same code (prepare.ts: the module worker's), so surfacePool() returns it. */
+export function primePool(p: SurfacePool) { pool ??= p; }
+export const hasPool = () => !!pool;
 export const POOL_SIZE = 90_000;
 /** The share of the medial faces' samples kept. */
 const MEDIAL = 0.45;
@@ -216,6 +219,10 @@ export interface BrainPoints {
 }
 
 const points = new Map<string, BrainPoints>();
+const pointsKey = (seed: number, count: number, shellShare: number) => `${seed}:${count}:${shellShare}`;
+/** Takes a brain's particles made elsewhere by this same code (prepare.ts), so brainPoints() returns them. */
+export function primePoints(seed: number, count: number, shellShare: number, p: BrainPoints) { const k = pointsKey(seed, count, shellShare); if (!points.has(k)) points.set(k, p); }
+export const hasPoints = (seed: number, count: number, shellShare = 0.7) => points.has(pointsKey(seed, count, shellShare));
 /** The shell's clumps: points per clump (one plus an exponential of this mean, at most max) and their radius. */
 export const CLUMP = { mean: 3.2, max: 10, radius: 0.02 };
 /** The inside's share placed deep round the core, the radius they reach (the pool's units), how they thin outward (a
@@ -224,7 +231,7 @@ export const DEEP = { share: 0.1, radius: 0.32, falloff: 0.8, bright: [0.65, 0.4
 
 /** The particles of one brain, by its seed (the same seed gives the same cloud on every load and machine). */
 export function brainPoints(seed: number, count = 60_000, shellShare = 0.7): BrainPoints {
-  const key = `${seed}:${count}:${shellShare}`;
+  const key = pointsKey(seed, count, shellShare);
   const hit = points.get(key);
   if (hit) return hit;
   const S = surfacePool(), r = rng(seed);
@@ -307,7 +314,18 @@ export const PAGE_MEDIAL = 0.03;
  *  has a place, each lifted 0.018 outward from the center. Positions in page order (the heaviest page takes the first).
  *  Only the outer surface takes pages, as Living Brain keeps its busiest node on it: none on the stem or under the
  *  cerebellum and the base (y under -0.30), none on the medial faces in the fissure (|x| under 0.03). */
+const spotsMade = new Map<string, { pos: Float32Array; nrm: Float32Array }>();
+/** Takes a brain's page places made elsewhere by this same code (prepare.ts), so pageSpots() returns them. */
+export function primeSpots(seed: number, n: number, s: { pos: Float32Array; nrm: Float32Array }) { const k = `${seed}:${n}`; if (!spotsMade.has(k)) spotsMade.set(k, s); }
+export const hasSpots = (seed: number, n: number) => spotsMade.has(`${seed}:${n}`);
 export function pageSpots(seed: number, n: number): { pos: Float32Array; nrm: Float32Array } {
+  const hit = spotsMade.get(`${seed}:${n}`);
+  if (hit) return hit;
+  const made = placeSpots(seed, n);
+  spotsMade.set(`${seed}:${n}`, made);
+  return made;
+}
+function placeSpots(seed: number, n: number): { pos: Float32Array; nrm: Float32Array } {
   const S = surfacePool(), r = rng(seed ^ 0x5bd1e995);
   const cand = subset(r, S.count, Math.min(4000, S.count));
   const cx = new Float32Array(cand.length * 3);

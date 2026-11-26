@@ -5,7 +5,8 @@
 // brain.interface is Living Brain's own interface, a recording played on the overlay; brain.calibrate is the
 // calibration pose (SPEC 3.4) with no words.
 import type { FrameContext, FrameHandle, StationModule } from '../types';
-import { BrainWorld, restPose, REST, ORBIT, VFOV, type WorldPose } from './world';
+import { BrainWorld, restPose, REST, ORBIT, VFOV, worldPoints, type WorldPose } from './world';
+import { preparePoints } from './prepare';
 import { FilmClock, T, T_SHARED, acrossLanded, COUNTS, type Moments } from './clock';
 import { BrainBloomPass } from './bloom';
 import { Chrome, memberScreen, memberScreenAt, projectorFor, projectorNow, restCamera, type TagSpec } from './tags';
@@ -55,6 +56,8 @@ async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string
   st.scene.fog = null;
   st.setAOStrength(0);
   st.setShadowAuto(false);
+  // the particles made off the main thread first (prepare.ts), so building the world takes no long task
+  await preparePoints(worldPoints());
   const world = new BrainWorld();
   world.setAspect(W / H);
   assignLayers(world.root);

@@ -9,6 +9,7 @@ import { Cloud, type CloudEdge, type CloudPage, type CloudState } from './cloud'
 import { makeRibbons, type Ribbons } from './ribbons';
 import { BRAINS, BRAIN_IDS, SCENE, brainOf, connectionsOf, keyOf, pagesOf, seedFor, type BrainId, type Page } from './data';
 import { rng } from '../../lib/random';
+import type { PointsJob } from './prepare';
 
 export const VFOV = 37;
 /** Living Brain's start: azimuth 40 degrees from the front toward its right, 7.1 degrees up (the kit's azimuth runs
@@ -58,6 +59,17 @@ export interface PageRef { cloud: 'center' | BrainId; index: number; page: Page 
 export interface WorldOptions {
   /** Particles: the center and the main brains 60,000, the members 60,000 (Living Brain draws every member full). */
   counts?: Partial<Record<'center' | BrainId, number>>;
+}
+
+const DEFAULT_COUNT = 60000;
+/** What a world with these counts draws from shape.ts: each cloud's particles (seed and count) and its page places (seed
+ *  and number), for prepare.ts to make off the main thread before the world is built. */
+export function worldPoints(o: WorldOptions = {}): PointsJob {
+  const counts = { center: DEFAULT_COUNT, 'grand-prix': DEFAULT_COUNT, 'battery-review': DEFAULT_COUNT, terminal: DEFAULT_COUNT, ...(o.counts ?? {}) };
+  return {
+    points: [...BRAIN_IDS.map((b) => ({ seed: seedFor(b), count: counts[b], shellShare: 0.7 })), { seed: seedFor('combined'), count: counts.center, shellShare: 0.7 }],
+    spots: [...BRAIN_IDS.map((b) => ({ seed: seedFor(b) ^ 0x1b873593, n: pagesOf(b).length })), { seed: seedFor('combined') ^ 0x1b873593, n: SCENE.pages.length }],
+  };
 }
 
 const col = (hex: string) => new THREE.Color(hex);
@@ -116,7 +128,7 @@ export class BrainWorld {
 
   constructor(o: WorldOptions = {}) {
     this.root.name = 'brainWorld';
-    const counts = { center: 60000, 'grand-prix': 60000, 'battery-review': 60000, terminal: 60000, ...(o.counts ?? {}) };
+    const counts = { center: DEFAULT_COUNT, 'grand-prix': DEFAULT_COUNT, 'battery-review': DEFAULT_COUNT, terminal: DEFAULT_COUNT, ...(o.counts ?? {}) };
     const dot = col('#4c8fff');
     // ── the members ───────────────────────────────────────────────────────────────────────────────────────────────
     this.memberPages = Object.fromEntries(BRAIN_IDS.map((b) => [b, pagesOf(b)])) as Record<BrainId, Page[]>;

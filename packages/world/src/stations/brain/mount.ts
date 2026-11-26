@@ -16,7 +16,8 @@ import './mount.css';
 import '../../kit/css/fonts.css';
 import * as THREE from 'three';
 import { createWorldStage, assignLayers } from '../../lib/stage';
-import { BrainWorld, restPose, REST, ORBIT, VFOV } from './world';
+import { BrainWorld, restPose, REST, ORBIT, VFOV, worldPoints } from './world';
+import { preparePoints } from './prepare';
 import { BrainBloomPass } from './bloom';
 import { makeRibbons } from './ribbons';
 import { Chrome, memberScreen, projectorNow } from './tags';
@@ -79,6 +80,22 @@ const calm = (x: number) => { const t = clamp01(x); return t * t * t * (t * (6 *
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 let visited = false;
 
+/** The clouds' particle counts for a mount on this element: full on desktop, lighter under 720 px or on a coarse
+ *  pointer (opts.quality: 'auto', 'high' or 'low'). */
+function countsFor(el: HTMLElement, opts: Pick<BrainOptions, 'quality'>) {
+  const width = Math.max(320, el.clientWidth || 960);
+  const narrow = width < 720 || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
+  const lite = opts.quality === 'low' || (opts.quality !== 'high' && narrow);
+  return { lite, counts: lite ? { center: 30000, 'grand-prix': 30000, 'battery-review': 30000, terminal: 30000 } : {} };
+}
+
+/** Makes the brains' particles off the main thread (a module worker, prepare.ts) for a mount on this element with these
+ *  options: a host that awaits it before mountBrain opens the stage without a long task. Without it the mount makes
+ *  them itself, on the main thread. Never rejects. */
+export function prepareBrain(el: HTMLElement, opts: Pick<BrainOptions, 'quality'> = {}): Promise<void> {
+  return preparePoints(worldPoints({ counts: countsFor(el, opts).counts }));
+}
+
 export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandle {
   const reduced = opts.reducedMotion ?? (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches);
   const tabs = new Map((opts.tabs ?? []).map((t) => [t.id, t.label]));
@@ -111,7 +128,9 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     shift: { x: 0, y: 0 }, shiftTo: { x: 0, y: 0 }, acrossFor: '',
   };
   visited = true;
-  const t0 = performance.now();
+  // the mount's clock; moved on once the stage's programs are compiled (ready below), so the entrance, the orbits and
+  // the turn start at the first frame that moves
+  let t0 = performance.now();
   const now = () => (performance.now() - t0) / 1000;
   const state = (): BrainState => ({ brain: S.focus, page: S.sel && S.sel.brain === S.focus ? S.sel.slug : null });
 
@@ -121,8 +140,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   root.tabIndex = 0; root.setAttribute('role', 'region'); root.setAttribute('aria-label', 'Living Brain: our three brains');
   el.appendChild(root);
   const size = { width: Math.max(320, el.clientWidth || 960), height: Math.max(320, el.clientHeight || 600) };
-  const narrow = () => size.width < 720 || (typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches);
-  const lite = opts.quality === 'low' || (opts.quality !== 'high' && narrow());
+  const { lite, counts } = countsFor(el, opts);
 
   // WebGL, or the list
   let stage = null, canvas = null;
@@ -145,7 +163,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   stage.ground.visible = false; stage.catcher.visible = false; stage.scene.fog = null;
   stage.setAOStrength(0); stage.setShadowAuto(false);
   stage.setCamera(restPose());
-  const world = new BrainWorld({ counts: lite ? { center: 30000, 'grand-prix': 30000, 'battery-review': 30000, terminal: 30000 } : {} });
+  const world = new BrainWorld({ counts });
   world.setAspect(size.width / size.height);
   assignLayers(world.root);
   stage.scene.add(world.root);
@@ -523,7 +541,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
       world.memberPages[b].forEach((p, i) => {
         const on = p.n <= 28 || isT(p) || isS(p) || (target && target.brain === b && lit.has(keyOf(p.brain, p.slug)));
         if (!on) return;
-        specs.push({ id: `m:${b}/${p.slug}`, cloud: b, index: i, page: p, color: '#b59aff', k: w * (S.ft0 < 0 ? 1 : smooth((P._w.t - S.ft0 - (reduced ? 0 : 0.5)) / (reduced ? 0.2 : 0.8))) * reveal(p.n), order: isS(p) ? -9 : isT(p) ? -8 : p.n,
+        specs.push({ id: `m:${b}/${p.slug}`, cloud: b, index: i, page: p, color: '#b59aff', k: w * (S.ft0 <= -1e8 ? 1 : smooth((P._w.t - S.ft0 - (reduced ? 0 : 0.5)) / (reduced ? 0.2 : 0.8))) * reveal(p.n), order: isS(p) ? -9 : isT(p) ? -8 : p.n,
           hot: isT(p) || (target && lit.has(keyOf(p.brain, p.slug))), sel: !!isS(p) });
       });
     }
@@ -804,6 +822,12 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   const ready = (async () => {
     draw();
     await stage.preparePrograms([() => draw()], () => !disposed);
+    // the clocks start at the first frame that moves: what passed while the programs compiled is taken off every time
+    // the view keeps, so the formation's 3.2 s, the orbits and the turn are seen from their start
+    const dt = now();
+    t0 += dt * 1000;
+    S.ft0 -= dt; S.ct0 -= dt; S.hlT0 -= dt; S.pauseUntil -= dt; S.lastT -= dt;
+    if (bridges) bridges.t0 -= dt;
     kick();
     emit('ready');
   })().catch((e) => { emit('error', e); throw e; });

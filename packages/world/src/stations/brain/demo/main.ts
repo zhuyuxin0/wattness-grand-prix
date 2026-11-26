@@ -2,7 +2,7 @@
 // site embeds, standing in for its host. The page's query holds the view (brain, page), as the site's hash route does
 // (#/agents/memory?brain=&page=): onState writes it (a brain focused pushes a history entry, a page selected replaces
 // it) and the browser's back and forward go back through it. onRoute is shown as a note and kept in window.__routes.
-import { mountBrain, type BrainState } from '../mount';
+import { mountBrain, prepareBrain, type BrainState } from '../mount';
 
 declare global { interface Window { __routes: string[]; __states: BrainState[]; __brain: ReturnType<typeof mountBrain>; __brainReady?: boolean; __brainError?: string } }
 
@@ -24,19 +24,22 @@ const sync = (s: BrainState, push: boolean) => {
   history[push ? 'pushState' : 'replaceState'](null, '', `?${p}`);
 };
 const el = document.getElementById('brain')!;
-window.__brain = mountBrain(el, {
-  theme,
-  tabs: TABS,
-  initial: { brain: (q.get('brain') as BrainState['brain']) ?? 'all', page: q.get('page') },
-  onRoute: (tab) => {
-    window.__routes.push(tab);
-    note.textContent = `onRoute("${tab}")`; note.classList.add('on');
-    setTimeout(() => note.classList.remove('on'), 1600);
-  },
-  onState: (s, how) => { window.__states.push(s); sync(s, how.history === 'push'); },
+// as the site's Memory tab does: the brains' particles made in a worker first, then the mount
+prepareBrain(el).then(() => {
+  window.__brain = mountBrain(el, {
+    theme,
+    tabs: TABS,
+    initial: { brain: (q.get('brain') as BrainState['brain']) ?? 'all', page: q.get('page') },
+    onRoute: (tab) => {
+      window.__routes.push(tab);
+      note.textContent = `onRoute("${tab}")`; note.classList.add('on');
+      setTimeout(() => note.classList.remove('on'), 1600);
+    },
+    onState: (s, how) => { window.__states.push(s); sync(s, how.history === 'push'); },
+  });
+  window.__brain.ready.then(() => { window.__brainReady = true; }, (e) => { window.__brainError = String(e?.stack ?? e); console.error(e); });
 });
 addEventListener('popstate', () => {
   const p = new URLSearchParams(location.search);
-  window.__brain.goTo({ brain: (p.get('brain') as BrainState['brain']) ?? 'all', page: p.get('page') });
+  window.__brain?.goTo({ brain: (p.get('brain') as BrainState['brain']) ?? 'all', page: p.get('page') });
 });
-window.__brain.ready.then(() => { window.__brainReady = true; }, (e) => { window.__brainError = String(e?.stack ?? e); console.error(e); });
