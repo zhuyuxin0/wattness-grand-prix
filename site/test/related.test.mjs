@@ -67,7 +67,9 @@ test("every page draws the strip: the shared page head, and the Intro under its 
   const read = (p) => readFileSync(p, "utf8");
   assert.match(read(resolve(here, "..", "src", "ui", "PageHeader.tsx")), /<RelatedStrip tabId=\{tab\?\.id\} \/>/);
   assert.match(read(join(pages, "Intro", "index.tsx")), /<RelatedStrip tabId="intro" \/>/);
-  // Every other tab's page uses the shared head (SceneLab renders bare and is no tab).
-  const folders = readdirSync(pages).filter((d) => !["Intro", "SceneLab", "NotFound"].includes(d));
+  // Every other tab's page uses the shared head (SceneLab renders bare and is no tab). The Overview opens on the
+  // Terminal home (ControlRoom.tsx), whose panes and role entries already lead to every tab, so it has no strip.
+  const folders = readdirSync(pages).filter((d) => !["Intro", "Overview", "SceneLab", "NotFound"].includes(d));
+  assert.match(read(join(pages, "Overview", "index.tsx")), /<ControlRoom\b/, "the Overview opens on the Terminal home");
   for (const d of folders) assert.match(read(join(pages, d, "index.tsx")), /<PageHeader\b/, `${d} has no PageHeader`);
 });

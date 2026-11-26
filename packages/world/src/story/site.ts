@@ -119,8 +119,6 @@ export class SiteController {
     root.addEventListener('touchmove', this.onTouchMove, { passive: false });
     root.addEventListener('touchend', this.onTouchEnd);
     window.addEventListener('keydown', this.onKey);
-    // the camera's travel is drawn lighter here (player.ts aoThroughLeg): a visitor's legs play live, the films' do not
-    P.motionLight = true;
     // the chrome's rects stay clear of the frames' plates
     P.keepOut = () => [bar].map((el) => {
       const a = el.getBoundingClientRect(), b = this.root.getBoundingClientRect();
