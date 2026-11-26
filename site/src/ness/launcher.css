@@ -1,0 +1,114 @@
+/* Ask Ness's launcher: a glass pill at the bottom right of every page, over
+   the page and under the market day's popover and sheet (50) and the phone's
+   menu drawer (60). It changes color under the pointer, never size or place. */
+
+/* The Terminal's glass (wattness.tech's floating surfaces): a frosted fill, a hairline, a rim of light on the top
+   edge and a soft lift, in light and dark. The launcher and the panel (ness.css) both wear it. */
+:root {
+  --ness-frost: color-mix(in srgb, var(--t-raised) 80%, transparent);
+  --ness-hairline: color-mix(in srgb, white 40%, transparent);
+  --ness-graze: rgb(0 0 0 / 0.3);
+  --ness-rim: inset 0 1.5px 1px -0.5px rgb(255 255 255 / 0.96), inset 0 -1.5px 1px -0.5px rgb(0 0 0 / 0.34),
+    inset 0 0 4px -2px rgb(255 255 255 / 0.35), inset 0 0 0 1px rgb(255 255 255 / 0.16);
+  --ness-lift: 0 3px 10px -7px rgb(0 0 0 / 0.4), 0 12px 30px -14px rgb(0 0 0 / 0.38), 0 24px 60px -20px rgb(0 0 0 / 0.28);
+}
+:root[data-theme="dark"] {
+  --ness-frost: color-mix(in srgb, var(--t-raised) 88%, transparent);
+  --ness-hairline: color-mix(in srgb, white 22%, transparent);
+  --ness-graze: rgb(0 0 0 / 0.55);
+  --ness-rim: inset 0 1.5px 1px -0.5px rgb(255 255 255 / 0.34), inset 0 -1.5px 1px -0.5px rgb(0 0 0 / 0.5),
+    inset 0 0 4px -2px rgb(255 255 255 / 0.14), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  --ness-lift: 0 3px 10px -7px rgb(0 0 0 / 0.6), 0 14px 32px -12px rgb(0 0 0 / 0.6), 0 24px 60px -20px rgb(0 0 0 / 0.5);
+}
+
+.ness-launch {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px 0 9px;
+  border: 1px solid var(--ness-hairline);
+  border-radius: var(--t-radius-pill);
+  background: var(--ness-frost);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--ness-graze), var(--ness-rim), var(--ness-lift);
+  color: var(--w-fg);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs);
+  font-weight: var(--t-fw-strong);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background var(--m-dur-s) ease-out,
+    border-color var(--m-dur-s) ease-out;
+}
+.ness-launch:hover {
+  background: color-mix(in srgb, var(--t-raised) 94%, transparent);
+  border-color: color-mix(in srgb, var(--t-accent-mark) 60%, transparent);
+}
+.ness-launch:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+}
+/* Under the open panel it would show through the glass: it steps away, and back when the panel closes. */
+.ness-launch[aria-expanded="true"] {
+  opacity: 0;
+  pointer-events: none;
+}
+.ness-launch__label {
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .ness-launch {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    height: 40px;
+    padding: 0 14px 0 8px;
+  }
+}
+
+@media print {
+  .ness-launch {
+    display: none;
+  }
+}
+
+/* The mark: the body inside the glass drifts, slowly. */
+.ness-mark {
+  flex: none;
+  display: block;
+  overflow: visible;
+}
+.ness-mark__body {
+  transform-box: view-box;
+  transform-origin: 16px 16px;
+  animation: ness-drift 7.5s ease-in-out infinite;
+}
+@keyframes ness-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  34% {
+    transform: translate(0.9px, -0.7px) scale(1.05);
+  }
+  67% {
+    transform: translate(-0.7px, 0.8px) scale(0.97);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ness-mark__body {
+    animation: none;
+  }
+}
+[data-capture="1"] .ness-mark__body {
+  animation: none;
+}

@@ -89,6 +89,7 @@ test("the 3D package loads only by dynamic import from a page folder", () => {
       ...src.matchAll(/^\s*export\s[^;]*?\bfrom\s*["']@world\/[^"']*["']/gm),
     ];
     assert.deepEqual(statics.map((m) => m[0].trim()), [], `${rel} imports the 3D package statically`);
-    if (/\bimport\(\s*["']@world\//.test(src)) assert.ok(rel.startsWith(join("src", "pages")), `${rel} loads the 3D package outside a page folder`);
+    // A page folder, or Ask Ness's panel (src/ness), itself loaded only when it opens.
+    if (/\bimport\(\s*["']@world\//.test(src)) assert.ok(rel.startsWith(join("src", "pages")) || rel.startsWith(join("src", "ness")), `${rel} loads the 3D package outside a page folder`);
   }
 });

@@ -1,0 +1,593 @@
+/* Ask Ness's panel: a glass panel at the right over a dimmed page on a
+   desktop, 420px and wider on request; a sheet from the bottom on a phone.
+   The header holds our three brains in Living Brain, dark in either theme.
+   Corners no rounder than 7px; hovers change color only. */
+
+html[data-ness-open] {
+  overflow: hidden;
+}
+
+/* The dialog is the whole viewport; the panel sits inside it, and a press on the rest closes it. */
+.ness {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--w-fg);
+  overflow: hidden;
+}
+.ness::backdrop {
+  background: rgba(10, 12, 14, 0.32);
+}
+.ness:not([open]) {
+  display: none;
+}
+
+.ness__panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  bottom: 12px;
+  width: min(420px, calc(100vw - 24px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--ness-hairline);
+  border-radius: var(--t-radius-paper);
+  background: var(--ness-frost);
+  -webkit-backdrop-filter: blur(22px) saturate(1.4);
+  backdrop-filter: blur(22px) saturate(1.4);
+  box-shadow: 0 0 0 1px var(--ness-graze), var(--ness-rim), var(--ness-lift);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs);
+  line-height: var(--t-lh);
+  animation: ness-in var(--m-dur-m) var(--m-ease-out);
+}
+.ness__panel[data-wide] {
+  width: min(760px, calc(100vw - 24px));
+}
+@keyframes ness-in {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+/* ---------------------------------------------------------------- the header */
+
+.ness__head {
+  position: relative;
+  flex: none;
+  height: 168px;
+  overflow: hidden;
+  /* the Memory stage's own ground, so the still and the live stage meet the header without an edge */
+  background: #000102;
+  color: var(--w-fg);
+}
+
+.ness-brains {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+/* The still keeps its own proportions, centered, so a lit spot stays on its brain at any width. */
+.ness-brains__frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: max(100%, 420px);
+  aspect-ratio: 840 / 323;
+  transform: translate(-50%, -50%);
+}
+.ness__panel[data-wide] .ness-brains__frame {
+  width: 560px;
+}
+.ness-brains__still {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+/* The live stage: a picture, not a control (the Memory tab is where it is explored), so only its canvas shows. It is
+   taller than the header, as the stage's least height, and centered in it. */
+.ness-brains__live {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 320px;
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: opacity var(--m-dur-l) var(--m-ease-out);
+}
+.ness-brains__live .lbm-root > :not(.lbm-canvas):not(.lbm-cardbox) {
+  display: none !important;
+}
+/* A pinned page's card stays measurable, just past the stage's corner, so the stage composes as if no card stood
+   beside it: the selected brain stays in the middle of the header. */
+.ness-brains__live .lbm-cardbox {
+  left: 100% !important;
+  top: 100% !important;
+  right: auto !important;
+  bottom: auto !important;
+  visibility: hidden !important;
+}
+.ness-brains[data-live] .ness-brains__live {
+  opacity: 1;
+}
+.ness-brains[data-live] .ness-brains__frame {
+  opacity: 0;
+  transition: opacity var(--m-dur-l) var(--m-ease-out);
+}
+.ness-brains__lit {
+  position: absolute;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1.5px solid rgba(79, 227, 184, 0.85);
+  background: radial-gradient(circle, rgba(79, 227, 184, 0.22) 0%, rgba(79, 227, 184, 0.08) 55%, transparent 72%);
+  box-shadow:
+    0 0 18px rgba(79, 227, 184, 0.45),
+    inset 0 0 12px rgba(79, 227, 184, 0.25);
+  animation: ness-lit var(--m-dur-l) var(--m-ease-out);
+}
+@keyframes ness-lit {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.25);
+  }
+}
+
+/* The title row over the picture, and a shade under it so the words keep their contrast. */
+.ness__head::before,
+.ness__head::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+.ness__head::before {
+  top: 0;
+  height: 56px;
+  background: linear-gradient(rgba(0, 1, 2, 0.78), rgba(0, 1, 2, 0));
+}
+.ness__head::after {
+  bottom: 0;
+  height: 52px;
+  background: linear-gradient(rgba(0, 1, 2, 0), rgba(0, 1, 2, 0.86));
+}
+.ness__bar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 8px 0 12px;
+}
+.ness__title {
+  flex: 1;
+  margin: 0;
+  font-family: var(--t-font-display);
+  font-size: var(--t-fs-title);
+  font-weight: var(--t-fw-strong);
+  letter-spacing: -0.005em;
+  color: #f2f3f0;
+}
+.ness__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--t-radius);
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6e8e3;
+  cursor: pointer;
+  transition: background var(--m-dur-s) ease-out;
+}
+.ness__icon:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+.ness__icon:focus-visible {
+  outline: 2px solid var(--w-accent);
+  outline-offset: 1px;
+}
+.ness__caption {
+  position: absolute;
+  z-index: 1;
+  left: 12px;
+  right: 12px;
+  bottom: 9px;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 12px;
+  row-gap: 2px;
+  font-size: var(--t-fs-sm);
+  line-height: 1.35;
+  color: #c9ccc6;
+}
+.ness__caption-text {
+  min-width: 0;
+}
+.ness__caption b {
+  font-weight: var(--t-fw-strong);
+  color: #f2f3f0;
+}
+.ness__caption-brain {
+  color: #a9aea8;
+}
+.ness__caption-link {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--w-accent);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.ness__caption-link:hover {
+  color: var(--w-accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------- what it is, and the search */
+
+.ness__creed {
+  flex: none;
+  margin: 0;
+  padding: 10px 14px 9px;
+  border-bottom: 1px solid var(--t-rule);
+  font-size: var(--t-fs-sm);
+  font-weight: 500;
+  color: var(--w-fg);
+}
+.ness__find {
+  flex: none;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--t-rule);
+}
+.ness__find input {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: color-mix(in srgb, var(--t-pane) 90%, transparent);
+  color: var(--w-fg);
+  font-size: var(--t-fs);
+}
+.ness__find input:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+
+.ness__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 14px 20px;
+}
+
+/* ---------------------------------------------------------------- the questions */
+
+.ness__group {
+  padding-top: 12px;
+}
+.ness__group + .ness__group {
+  margin-top: 6px;
+  border-top: 1px solid var(--t-rule);
+}
+.ness__group-head {
+  margin: 0 0 6px;
+  font-size: var(--t-fs-xs);
+  font-weight: var(--t-fw-strong);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.ness__sponsor {
+  margin-top: 8px;
+}
+.ness__sponsor-head {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 2px;
+}
+.ness__sponsor-name {
+  margin: 0;
+  font-family: var(--t-font-display);
+  font-size: var(--t-fs);
+  font-weight: var(--t-fw-strong);
+}
+.ness__qs {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ness__q {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 34px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: var(--t-radius);
+  background: transparent;
+  color: var(--w-fg);
+  font-size: var(--t-fs);
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--m-dur-s) ease-out;
+}
+.ness__q:hover {
+  background: var(--t-hover);
+}
+.ness__q:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: -2px;
+}
+.ness__q .glyph {
+  flex: none;
+  color: var(--w-muted);
+}
+.ness__q:hover .glyph {
+  color: var(--t-accent-text);
+}
+.ness__none,
+.ness__missing {
+  margin: 14px 0 0;
+  color: var(--w-muted);
+}
+.ness__none p {
+  margin: 0 0 10px;
+}
+
+/* ---------------------------------------------------------------- an answer */
+
+.ness__answer {
+  padding-top: 10px;
+}
+.ness__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  margin-left: -6px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--t-radius);
+  background: transparent;
+  color: var(--t-accent-text);
+  font-size: var(--t-fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+.ness__back:hover {
+  background: var(--t-hover);
+}
+.ness__where {
+  margin: 12px 0 4px;
+}
+.ness__question {
+  margin: 0 0 10px;
+  font-family: var(--t-font-display);
+  font-size: 18px;
+  font-weight: var(--t-fw-strong);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.ness__p {
+  margin: 0 0 10px;
+  line-height: var(--t-lh-prose);
+  max-width: 64ch;
+}
+.ness__yours {
+  color: var(--w-muted);
+}
+.ness__list {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  line-height: var(--t-lh-prose);
+  max-width: 64ch;
+}
+.ness__list li + li {
+  margin-top: 5px;
+}
+.ness__list li::marker {
+  color: var(--w-muted);
+}
+.ness__code {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  overflow-x: auto;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-chrome);
+  font-size: var(--t-fs-sm);
+  line-height: 1.5;
+  white-space: pre;
+}
+.ness__code code {
+  font-size: inherit;
+}
+.ness__rests {
+  margin: 16px 0 6px;
+  font-size: var(--t-fs-xs);
+  font-weight: var(--t-fw-strong);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.ness__sources {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--t-rule);
+}
+.ness__sources li {
+  border-bottom: 1px solid var(--t-rule);
+}
+.ness__src {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 36px;
+  padding: 7px 4px;
+  color: var(--w-fg);
+  text-decoration: none;
+  transition: background var(--m-dur-s) ease-out;
+}
+.ness__src:hover {
+  background: var(--t-hover);
+}
+.ness__src:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: -2px;
+}
+.ness__src-label {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.35;
+}
+.ness__src-where {
+  flex: none;
+  font-size: var(--t-fs-xs);
+  color: var(--w-muted);
+}
+.ness__src .glyph {
+  flex: none;
+  color: var(--w-muted);
+}
+.ness__src:hover .glyph {
+  color: var(--t-accent-text);
+}
+.ness__share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.ness__share-url {
+  flex: 1;
+  min-width: 180px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius);
+  background: var(--t-pane);
+  font-size: var(--t-fs-sm);
+}
+
+/* ---------------------------------------------------------------- a phone: the sheet */
+
+@media (max-width: 767px) {
+  .ness__panel,
+  .ness__panel[data-wide] {
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: min(86dvh, calc(100dvh - 48px));
+    border-bottom: 0;
+    border-radius: var(--t-radius-paper) var(--t-radius-paper) 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    /* a sheet covers the page's own text, so it takes the Terminal's matte glass, not the frost */
+    background: color-mix(in srgb, var(--t-raised) 95%, transparent);
+    animation-name: ness-up;
+  }
+  .ness__panel[data-wide] {
+    height: 100dvh;
+    border-radius: 0;
+  }
+  .ness__head {
+    height: 150px;
+  }
+  .ness__caption-brain {
+    display: none;
+  }
+  .ness-brains__frame,
+  .ness__panel[data-wide] .ness-brains__frame {
+    width: max(100%, 380px);
+  }
+  .ness__wide {
+    display: none;
+  }
+  .ness__body {
+    padding-bottom: 28px;
+  }
+  .ness__q {
+    min-height: 40px;
+  }
+}
+@keyframes ness-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ness__panel,
+  .ness-brains__lit {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- the sponsors, at a glance */
+
+.ness__jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 2px 0 6px;
+}
+.ness__jump {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+}
+.ness__jump .lg-chip {
+  cursor: pointer;
+}
+.ness__jump:hover .lg-chip {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 1px color-mix(in srgb, var(--t-accent-mark) 70%, transparent),
+    0 8px 18px -10px rgba(0, 0, 0, 0.55);
+}
+.ness__jump:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+}
+.ness__sponsor {
+  scroll-margin-top: 8px;
+}
+.ness__group--start .ness__q {
+  font-weight: 500;
+}
