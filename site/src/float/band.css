@@ -1,0 +1,217 @@
+/*
+ * A band of dock panes (band.tsx): the page's head in its top left corner, the panes menu in its top right, the area
+ * the panes float in, and the panes as still frames while the dock loads. The dock's own panels are drawn in
+ * band-dock.css, loaded with rc-dock, in the same glass.
+ *
+ * Stacking: the band is its own stacking context, so rc-dock's float box (z 200 in its sheet) and the panes' stack stay
+ * inside it, under the masthead (20) and the float layer (25). Inside it the head is lowest, so a pane dragged over it
+ * covers it; the panes' area passes the pointer through to the head where no pane is; the menu is on top, always in
+ * reach.
+ */
+
+/* The host: a block the page places; docked, the page gives it its height (the band fills it). */
+.gp-band-host {
+  min-width: 0;
+}
+.gp-band-host--docked {
+  position: relative;
+  height: 640px;
+}
+
+.gp-band {
+  /* The glass the panes are made of, which a page may retune: the raised plane, nearly opaque, so a pane reads over any
+     frame of the picture behind; a hairline; the Terminal's lift. */
+  --gp-band-glass: color-mix(in srgb, var(--t-raised) 86%, transparent);
+  --gp-band-blur: blur(14px) saturate(1.3);
+  --gp-band-line: color-mix(in srgb, var(--w-fg) 13%, transparent);
+  --gp-band-shadow: var(--t-shadow-2);
+  --gp-band-radius: 10px;
+  --gp-band-head: 34px;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* The page's head over the left column, as wide as it (band.tsx sets the width); the column starts under it. */
+.gp-band__head {
+  position: absolute;
+  z-index: 1;
+  top: 16px;
+  left: 16px;
+  max-width: calc(100% - 32px);
+}
+.gp-band__corner {
+  position: absolute;
+  z-index: 3;
+  top: 16px;
+  right: 16px;
+}
+.gp-band__area {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- the panes menu */
+
+.gp-band__menu {
+  position: relative;
+  flex: none;
+}
+.gp-band__menu-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: var(--t-ctl-h);
+  padding: 0 10px;
+  border: 1px solid var(--gp-band-line);
+  border-radius: var(--t-radius-md);
+  background: var(--gp-band-glass);
+  -webkit-backdrop-filter: var(--gp-band-blur);
+  backdrop-filter: var(--gp-band-blur);
+  box-shadow: var(--t-shadow-1);
+  color: var(--w-fg);
+  font-size: var(--t-fs-sm);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--m-dur-s) ease-out;
+}
+.gp-band__menu-btn:hover {
+  background: color-mix(in srgb, var(--w-fg) 5%, var(--t-raised));
+}
+.gp-band__menu-btn:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+}
+.gp-band__count {
+  color: var(--w-muted);
+}
+.gp-band__menu-btn .glyph {
+  transition: transform var(--m-dur-s) ease-out;
+}
+.gp-band__caret--open {
+  transform: rotate(180deg);
+}
+
+.gp-band__menu-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 224px;
+  padding: 4px;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  background: var(--t-raised);
+  box-shadow: var(--t-shadow-2);
+  animation: gp-band-menu-in var(--m-dur-s) var(--m-ease-out);
+}
+.gp-band__menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 30px;
+  padding: 0 10px 0 6px;
+  border: 0;
+  border-radius: var(--t-radius);
+  background: transparent;
+  color: var(--w-fg);
+  font-size: var(--t-fs);
+  text-align: left;
+  cursor: pointer;
+}
+.gp-band__menu-item:hover,
+.gp-band__menu-item:focus-visible {
+  background: color-mix(in srgb, var(--w-fg) 7%, transparent);
+  outline: none;
+}
+.gp-band__menu-item:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--t-focus);
+}
+.gp-band__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 16px;
+  color: var(--w-fg);
+}
+.gp-band__menu-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gp-band__menu-sep {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--w-border);
+}
+@keyframes gp-band-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------- a pane's name and body, docked or still */
+
+.gp-band__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--t-fs);
+  font-weight: 600;
+  color: var(--w-fg);
+}
+.gp-band__body {
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+/* The panes in their places while the dock loads: the same glass and header, without the controls. */
+.gp-band-still {
+  position: absolute;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--gp-band-line);
+  border-radius: var(--gp-band-radius);
+  background: var(--gp-band-glass);
+  -webkit-backdrop-filter: var(--gp-band-blur);
+  backdrop-filter: var(--gp-band-blur);
+  box-shadow: var(--gp-band-shadow);
+  color: var(--w-fg);
+}
+.gp-band-still__bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  height: var(--gp-band-head);
+  padding: 0 var(--t-space-4);
+  border-bottom: 1px solid var(--gp-band-line);
+}
+.gp-band-still .gp-band__body {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gp-band__menu-list {
+    animation: none;
+  }
+}

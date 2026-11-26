@@ -1,0 +1,149 @@
+/*
+ * The band's dock (band-dock.tsx): rc-dock's float panels in the band's glass (band.css sets the values), after the
+ * float layer's skin (float.css) and wattness.tech's Terminal. Loaded after rc-dock's own sheet, so these win over it:
+ * its grey glow and baked-in grip are redrawn, and its empty dock is hidden.
+ */
+
+.gp-band__dock {
+  position: absolute;
+  inset: 0;
+  /* The band's area is glass the pointer passes through to the picture; only a pane takes it. */
+  pointer-events: none;
+}
+.gp-band__dock .dock-layout {
+  background: transparent;
+  pointer-events: none;
+}
+.gp-band__dock .dock-layout > .dock-box:not(.dock-fbox) {
+  display: none;
+}
+
+.gp-band__dock .dock-fbox > .dock-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--gp-band-line);
+  border-radius: var(--gp-band-radius);
+  background: var(--gp-band-glass);
+  -webkit-backdrop-filter: var(--gp-band-blur);
+  backdrop-filter: var(--gp-band-blur);
+  box-shadow: var(--gp-band-shadow);
+  color: var(--w-fg);
+  font-family: var(--w-font-sans);
+  font-size: var(--t-fs);
+  line-height: var(--t-lh);
+}
+.gp-band__dock .dock-fbox > .dock-panel.dragging {
+  opacity: 0.94;
+}
+
+/* The header carries the pane: its name, and the close button at the end. */
+.gp-band__dock .dock-bar {
+  height: var(--gp-band-head);
+  min-height: var(--gp-band-head);
+  padding: 0;
+  background: transparent;
+  border-bottom: 1px solid var(--gp-band-line);
+  cursor: move;
+}
+.gp-band__dock .dock-nav,
+.gp-band__dock .dock-nav-wrap,
+.gp-band__dock .dock-nav-list {
+  height: 100%;
+}
+.gp-band__dock .dock-nav-wrap {
+  min-width: 0;
+}
+.gp-band__dock .dock-tab {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 var(--t-space-4);
+  background: transparent;
+  border: 0;
+  color: var(--w-fg);
+  cursor: move;
+}
+.gp-band__dock .dock-tab:hover,
+.gp-band__dock .dock-tab-active,
+.gp-band__dock .dock-tab-active:hover {
+  color: var(--w-fg);
+  background: transparent;
+}
+.gp-band__dock .dock-tab > div {
+  padding: 0;
+  outline-color: var(--t-focus);
+}
+.gp-band__dock .dock-ink-bar,
+.gp-band__dock .dock-nav-more,
+.gp-band__dock .dock-nav-operations {
+  display: none;
+}
+.gp-band__dock .dock-extra-content {
+  height: 100%;
+  align-items: center;
+  padding-right: 5px;
+}
+
+.gp-band__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--t-radius);
+  background: transparent;
+  color: var(--w-muted);
+  cursor: pointer;
+  transition:
+    background var(--m-dur-s) ease-out,
+    color var(--m-dur-s) ease-out;
+}
+.gp-band__close:hover {
+  background: color-mix(in srgb, var(--w-fg) 8%, transparent);
+  color: var(--w-fg);
+}
+.gp-band__close:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: -2px;
+}
+
+.gp-band__dock .dock-content-holder {
+  min-height: 0;
+}
+.gp-band__dock .dock-tabpane {
+  background: transparent;
+}
+
+/* The edges resize; the corner carries the grip, two strokes in the muted ink. */
+.gp-band__dock .dock-panel-drag-size {
+  z-index: 3;
+}
+.gp-band__dock .dock-panel-drag-size-b-r {
+  right: 0;
+  bottom: 0;
+  width: 16px;
+  height: 16px;
+  background-image: none;
+}
+.gp-band__dock .dock-panel-drag-size-b-r::before {
+  content: "";
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  width: 8px;
+  height: 8px;
+  background:
+    linear-gradient(135deg, transparent 0 calc(50% - 0.75px), var(--w-muted) calc(50% - 0.75px) calc(50% + 0.75px), transparent calc(50% + 0.75px)) no-repeat,
+    linear-gradient(135deg, transparent 0 calc(50% - 0.75px), var(--w-muted) calc(50% - 0.75px) calc(50% + 0.75px), transparent calc(50% + 0.75px)) no-repeat;
+  background-size: 8px 8px, 4px 4px;
+  background-position: right bottom, right bottom;
+  opacity: 0.75;
+}
+.gp-band__dock .dock-panel-drag-size-b-r:hover::before {
+  opacity: 1;
+}
