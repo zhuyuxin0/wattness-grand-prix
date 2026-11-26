@@ -281,10 +281,11 @@ export class Chrome {
       this.hudEl.replaceChildren(...rows.map((line) => {
         const d = document.createElement('div');
         line.forEach((r, i) => {
-          if (i) d.append(document.createTextNode(' · '));
-          // a number and its words never part at a wrap
+          // a number and its words never part at a wrap, and the dot before them wraps with them, so no line ends on one
+          if (i) d.append(document.createTextNode(' '));
           const pair = document.createElement('span'); pair.className = 'lb-pair';
           const b = document.createElement('b'); b.textContent = r.n; if (r.tone) b.className = r.tone;
+          if (i) pair.append(document.createTextNode('· '));
           pair.append(b, document.createTextNode(` ${r.label}`));
           d.append(pair);
         });
