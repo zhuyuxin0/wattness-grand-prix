@@ -30,9 +30,9 @@ export const PAL = {
     column: '#5f6c79', columnTop: '#b9c4cf', dswl: '#eef2f6', ink: '#969ca3', deckTop: '#1f252b', dash: '#969ca3', outline: '#8fa3b8',
     price: '#b481f0', files: '#c6cfd9', memory: '#6f8fe0', teal: '#2ec7a6', orange: '#eb6834', bnb: '#F0B90B', refused: '#e5534b',
     gold: { top: '#F0B90B', left: '#c4960a', right: '#9c7808', topLit: '#ffd24a', leftLit: '#f0b90b', rightLit: '#cf9d09' },
-    tile: '#4f5a66', tileLit: '#97a3b0', ghostA: 0.3, brain: '#FF4D20', violet: '#9b87f5', cournotDisc: '#282826', white: '#f4f6f8',
+    tile: '#4f5a66', tileLit: '#97a3b0', ghostA: 0.3, brain: '#FF4D20', violet: '#9b87f5', white: '#f4f6f8',
     podTop: '#262e36', podSide: '#1b2126', podEdge: '#56626e', spineTop: '#1f2a3a', spineSide: '#18202c', node: '#c9d5ff', trayTop: '#2a333c', traySide: '#20272e',
-    trayEdge: '#5d6a77', railTop: '#1f262d', dais: '#2a3139', vault: '#262c33', vaultTop: '#2d343c', xRod: '#f4f6f8', bnbLine: '#F0B90B', sat: '#d9d0ff',
+    trayEdge: '#5d6a77', railTop: '#1f262d', dais: '#2a3139', vault: '#262c33', vaultTop: '#2d343c', bnbLine: '#F0B90B', sat: '#d9d0ff',
     // Living Brain's shell: the glass's own fill, a blue tint toward its rim, a memory-blue outline
     sphereFill: '#1f2429', sphereFillA: 0.34, sphereHair: '#a9b3bd', sphereTintA: 0.26, sphereLine: '#6f8fe0', sphereLineA: 0.75,
     halo: '#2ec7a6', shadeA: 0.42, lime: '#D0FF00',
@@ -42,9 +42,9 @@ export const PAL = {
     column: '#7d8794', columnTop: '#9aa3ad', dswl: '#1a1f24', ink: '#636a75', deckTop: '#eef0f2', dash: '#636a75', outline: '#6b7380',
     price: '#6345b1', files: '#8b939c', memory: '#4f6fc4', teal: '#1fae8f', orange: '#e35f2a', bnb: '#F0B90B', refused: '#9f1d35',
     gold: { top: '#F0B90B', left: '#d4a30a', right: '#b48a08', topLit: '#ffcf33', leftLit: '#f0b90b', rightLit: '#d9a50a' },
-    tile: '#c9cfd6', tileLit: '#7d8794', ghostA: 0.35, brain: '#FF4D20', violet: '#6345b1', cournotDisc: '#282826', white: '#ffffff',
+    tile: '#c9cfd6', tileLit: '#7d8794', ghostA: 0.35, brain: '#FF4D20', violet: '#6345b1', white: '#ffffff',
     podTop: '#ffffff', podSide: '#dfe3e8', podEdge: '#8b939c', spineTop: '#dfe6f5', spineSide: '#c5cfe3', node: '#4f6fc4', trayTop: '#f7f8fa', traySide: '#d9dee4',
-    trayEdge: '#8b939c', railTop: '#eef0f2', dais: '#e1e5e9', vault: '#e9ecef', vaultTop: '#f4f5f7', xRod: '#1a1f24', bnbLine: '#b08405', sat: '#6345b1',
+    trayEdge: '#8b939c', railTop: '#eef0f2', dais: '#e1e5e9', vault: '#e9ecef', vaultTop: '#f4f5f7', bnbLine: '#b08405', sat: '#6345b1',
     // on the light ground a clear shell vanishes: a pale blue body, a stronger tint, the memory blue as its hairline
     sphereFill: '#dfe6f5', sphereFillA: 0.5, sphereHair: '#4f6fc4', sphereTintA: 0.42, sphereLine: '#4f6fc4', sphereLineA: 0.9,
     halo: '#1fae8f', shadeA: 0.18, lime: '#8fb300',
@@ -71,11 +71,11 @@ export const POS = {
   lens: { x: 370, y: 30, z: 9, r: 24 },
   // the hosted agents on AgentCore: a small pad in the stewards' box, east of the lens and of the strands from the cube
   // (E11 at x 428, E18 at x 446), two third-size pods across its north part, the evaluator's (agent 2922) behind the
-  // Forecaster's (agent 2925), AWS's smile on its south strip
+  // Forecaster's (agent 2925); the owner's logo is the chip in its label (pieces.ts LOGO_OF)
   evaluator: { x: 455, z: 9, w: 38, d: 38, h: 3, r: 4, pod: { z: -10, w: 34, d: 10, h: 7, r: 2 }, pod2: { z: 2 }, wire: 446 },
   // the edge Worker on Cloudflare: a pad north-east of the cube, past its day blocks and clear of the strands that run
-  // down its east side (at site widths a name beside the trays sat on them), a gate in Cloudflare's orange on it (files
-  // pass once checked)
+  // down its east side (at site widths a name beside the trays sat on them), a steel gate on it (files pass once
+  // checked)
   edge: { x: 466, z: -240, w: 28, d: 22, h: 3, r: 4 },
   rail: { x0: -150, x1: 480, z: 105, d: 8 },
   atlas: { x: 40, y: 36, z: 105, r: 25 },
@@ -380,7 +380,7 @@ export async function buildSpace(ctx, o) {
   // ── GateRecord on BNB Chain: the mark formed as a solid ───────────────────────────────────────────────────────
   const CB = POS.cube, cubeC = new THREE.Vector3(CB.x, CB.base + CB.edge / 2, CB.z);
   // its name over the cube's top corner (the lanes and the bead come in at its west face)
-  piece('gate', [CB.x - 27, CB.base + CB.edge, CB.z - CB.edge / Math.SQRT2 - 4], { center: cubeC });
+  piece('gate', [CB.x - 40, CB.base + CB.edge, CB.z - CB.edge / Math.SQRT2 - 4], { center: cubeC });
   solid('gate', (b) => b.cyl({ x: CB.x, y: 0, z: CB.z, r0: CB.pad, h: CB.base, seg: 72, fill: P.side, top: P.top }));
   shadeAt(Array.from({ length: 48 }, (_, i) => { const a = (i / 48) * Math.PI * 2; return [CB.x + Math.cos(a) * CB.pad, CB.z + Math.sin(a) * CB.pad]; }));
   haloRing('gate', new THREE.Vector3(CB.x, 1.4, CB.z), CB.pad + 6);
@@ -540,10 +540,9 @@ export async function buildSpace(ctx, o) {
   // which checks a sealed record against GateRecord and sells the report as a paid job, and agent 2925, the
   // Forecaster, which sells a battery's sealed price scenarios. A pad in the slab's recipe, two pods in the pods'
   // recipe at a third of their size, each with its teal lamp, lit while it is hosted (the Forecaster's wearing its
-  // role's glyph, as its pod on the deck does), AWS's smile on the pad's south strip ─────────────────────────────
+  // role's glyph, as its pod on the deck does). AWS's own logo is the chip in its label (no smile drawn here) ──────
   const EV = POS.evaluator, EP = EV.pod, padTop = EV.h, evPodTop = padTop + EP.h, evPodZ = EV.z + EP.z, fcPodZ = EV.z + EV.pod2.z;
   const HF = hosting(TN, o.now ?? null, 'hosted_forecaster');
-  const awsLit = H.hosted || HF.hosted, awsRan = H.ran || HF.ran;
   piece('aws', [EV.x, 0, EV.z + EV.d / 2 + 2], { center: new THREE.Vector3(EV.x, padTop + EP.h / 2, (evPodZ + fcPodZ) / 2) });
   solid('aws', (b) => b.prism(roundRect(EV.x, EV.z, EV.w, EV.d, EV.r, 6), 0, padTop, { top: P.top, side: P.side, edge: P.edge, verticals: false }));
   for (const z of [evPodZ, fcPodZ]) solid('aws', (b) => b.prism(roundRect(EV.x, z, EP.w, EP.d, EP.r, 4), padTop, evPodTop, { top: P.podTop, side: P.podSide, edge: P.podEdge, verticals: false }));
@@ -563,24 +562,18 @@ export async function buildSpace(ctx, o) {
     const gm = new THREE.Mesh(new THREE.PlaneGeometry(gs, gs).rotateX(-Math.PI / 2), basic('#ffffff', { map: glyphTexture('forecaster', gc, { theme, px: 256 }), transparent: true, opacity: 1 }));
     gm.material.toneMapped = false; gm.scale.z = 1 / Math.sin(35.26 * D2R); gm.userData.iso = true;
     gm.position.set(EV.x - EP.w / 2 + 6.5, evPodTop + 0.45, fcPodZ); overlay(gm, 12); marks.add(gm); dimmable('aws', gm.material);
-    // AWS's smile on the south strip, its own orange, pre-stretched in z like the deck's BNB symbol
-    const t = smileTexture('#FF6200'), sw = 30, stripZ = (fcPodZ + EP.d / 2 + EV.z + EV.d / 2) / 2;
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(sw, sw / t.aspect).rotateX(-Math.PI / 2),
-      basic('#ffffff', { map: t.texture, transparent: true, opacity: awsLit ? 1 : awsRan ? 0.55 : 0.3 }));
-    mesh.material.toneMapped = false; mesh.scale.z = 1 / Math.sin(35.26 * D2R); mesh.userData.iso = true;
-    mesh.position.set(EV.x, padTop + 0.06, stripZ); overlay(mesh, 12); marks.add(mesh); dimmable('aws', mesh.material);
-    pieces.aws.smile = mesh;
   }
 
   // ── the edge Worker on Cloudflare: it serves the sealed day's files from Greenfield, each only after checking it
-  // against the root GateRecord holds. A pad in the slab's recipe, a gate on it in Cloudflare's orange, a file tile
-  // under the lintel and the teal lamp of a check passed on top; the root reaches it as E19 ────────────────────────
-  const EG = POS.edge, egTop = EG.h, ORANGE = '#F38020', gateH = 15, gateW = 22;
+  // against the root GateRecord holds. A pad in the slab's recipe, a steel gate on it (Cloudflare's own logo is the
+  // chip in its label), a file tile under the lintel and the teal lamp of a check passed on top; the root reaches it as
+  // E19 ────────────────────────────────────────────────────────────────────────────────────────────────────────
+  const EG = POS.edge, egTop = EG.h, gateH = 15, gateW = 22;
   piece('cloudflare', [EG.x, egTop + gateH + 7, EG.z], { center: new THREE.Vector3(EG.x, egTop + gateH / 2, EG.z) });
   solid('cloudflare', (b) => b.prism(roundRect(EG.x, EG.z, EG.w, EG.d, EG.r, 6), 0, egTop, { top: P.top, side: P.side, edge: P.edge, verticals: false }));
   solid('cloudflare', (b) => {
-    for (const sx of [-1, 1]) b.box({ x: EG.x + sx * gateW / 2, z: EG.z, y: egTop, w: 2.6, h: gateH, d: 2.8, fill: ORANGE });
-    b.box({ x: EG.x, z: EG.z, y: egTop + gateH, w: gateW + 2.6, h: 2.6, d: 2.8, fill: ORANGE });
+    for (const sx of [-1, 1]) b.box({ x: EG.x + sx * gateW / 2, z: EG.z, y: egTop, w: 2.6, h: gateH, d: 2.8, fill: P.steel, top: P.steelEdge, edge: P.steelEdge });
+    b.box({ x: EG.x, z: EG.z, y: egTop + gateH, w: gateW + 2.6, h: 2.6, d: 2.8, fill: P.steel, top: P.steelEdge, edge: P.steelEdge });
   });
   shadeAt(rectPoly(EG.x, EG.z, EG.w, EG.d, EG.r), 0.05, 'cloudflare');
   haloPoly('cloudflare', rectPoly(EG.x, EG.z, EG.w, EG.d, EG.r, 6), 0.3);
@@ -592,10 +585,10 @@ export async function buildSpace(ctx, o) {
     const lamp = new THREE.Mesh(new THREE.SphereGeometry(1.4, 12, 8), basic(P.teal));
     lamp.position.set(EG.x, egTop + gateH + 3.4, EG.z); overlay(lamp, 12); marks.add(lamp); dimmable('cloudflare', lamp.material);
     const lg = glow(P.teal, 14, 0.6, theme); lg.position.copy(lamp.position); marks.add(lg); dimmable('cloudflare', lg.material);
-    lightPool('cloudflare', ORANGE, 26, theme === 'light' ? 0.12 : 0.1, EG.x, 0.1, EG.z);
+    lightPool('cloudflare', P.teal, 26, theme === 'light' ? 0.12 : 0.1, EG.x, 0.1, EG.z);
   }
 
-  // ── Cournot: a lattice mast and a dish whose face is their mark (nine white dots on the dark disc) ────────────
+  // ── Cournot: a lattice mast and a plain dish (its owner's logo is the chip in its label, pieces.ts LOGO_OF) ─────
   const CO = POS.cournot;
   piece('cournot', [CO.x - 18, CO.mast * 0.66, CO.z + 2]);
   haloRing('cournot', new THREE.Vector3(CO.x, 0.3, CO.z), 24);
@@ -616,24 +609,19 @@ export async function buildSpace(ctx, o) {
   {
     const R0 = CO.dish / 2, prof = [];
     for (let i = 0; i <= 16; i++) { const r = (i / 16) * R0; prof.push(new THREE.Vector2(r, (r * r) / (R0 * R0) * 4.2)); }
-    const dish = flatMesh(new THREE.LatheGeometry(prof, 72), P.cournotDisc, { side: THREE.DoubleSide }); dish.castShadow = false; dishG.add(dish); dimmable('cournot', dish.material);
+    const dish = flatMesh(new THREE.LatheGeometry(prof, 72), P.top, { side: THREE.DoubleSide }); dish.castShadow = false; dishG.add(dish); dimmable('cournot', dish.material);
     const rimL = ring(new THREE.Vector3(0, 4.25, 0), R0, RIGHT, new THREE.Vector3(0, 0, 1), { color: P.steelEdge, width: 1, opacity: 0.8, renderOrder: 13 }); dishG.add(rimL); dimmable('cournot', rimL.material);
-    const dotGeo = new THREE.SphereGeometry(1.45, 14, 10);
-    for (const c of cournotDots()) {
-      const x = ((c.cx - 50) / 50) * R0, z = ((c.cy - 50) / 50) * R0, y = (x * x + z * z) / (R0 * R0) * 4.2 + 0.5;
-      const dot = new THREE.Mesh(dotGeo, basic(P.white)); dot.position.set(x, y, z); overlay(dot, 13); dishG.add(dot); dimmable('cournot', dot.material);
-    }
-    // the dish looks toward the south-west sky, 35 degrees up (its face toward the camera's side); the mark's top
-    // (its row of two dots) up
+    // the dish looks toward the south-west sky, 35 degrees up (its face toward the camera's side)
     const az = 205 * D2R, el = 40 * D2R, axis = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el)).normalize();
     dishG.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), axis);
     dishG.rotateY(Math.PI);
   }
 
-  // ── ElectronX: a bounded bar, $0 to $100, the 24 assumed entries as rings, its X on top ──────────────────────
+  // ── ElectronX: a bounded bar, $0 to $100, the 24 assumed entries as rings (its owner's logo is the label's chip) ─
   const EX = POS.electronx, inst = dsw.instrument;
-  piece('electronx', [EX.x, 0, EX.z + 9]);
   const capM = EX.m, top$ = inst.range_cents[1] / 100 * capM;  // meters a dollar
+  // its label right of the bar, half way up: under it, the label's logo chip ran into the markets' zone title
+  piece('electronx', [EX.x + 10, top$ * 0.5, EX.z]);
   solid('electronx', (b) => { b.cyl({ x: EX.x, y: 0, z: EX.z, r0: 8, h: 0.9, seg: 40, fill: P.side, top: P.top, edge: P.edge, az: 180 }); b.cyl({ x: EX.x, y: top$, z: EX.z, r0: 8, h: 0.9, seg: 40, fill: P.side, top: P.top, edge: P.edge, az: 180 }); });
   const tube = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 3.5, top$, 40, 1, true), shellMaterial({ blur: o.blur, res: o.res, theme, tint: P.orange, tintA: 0.16, side: THREE.DoubleSide }));
   tube.position.set(EX.x, top$ / 2 + 0.45, EX.z); overlay(tube, 10); marks.add(tube); dimmable('electronx', tube.material);
@@ -642,16 +630,9 @@ export async function buildSpace(ctx, o) {
     const rr = ring(new THREE.Vector3(EX.x, y, EX.z), 3.4, RIGHT, new THREE.Vector3(0, 0, 1), { color: P.orange, width: 0.9, glow: 4, glowA: 0.2, opacity: 0.85, renderOrder: 13 });
     flows.add(rr); dimmable('electronx', rr.material);
   }
-  {
-    const xg = new THREE.Group(); xg.position.set(EX.x, top$ + 15, EX.z); marks.add(xg);
-    for (const s of [-1, 1]) {
-      // no shadow: from above the X's shadow lands on the ground as a stray "x"
-      const rod = flatMesh(new THREE.CylinderGeometry(1.0, 1.0, 26, 14), P.xRod); rod.rotation.z = s * 30 * D2R; rod.castShadow = false; xg.add(rod); dimmable('electronx', rod.material);
-    }
-  }
   shadeAt(Array.from({ length: 32 }, (_, i) => { const a = (i / 32) * Math.PI * 2; return [EX.x + Math.cos(a) * 8, EX.z + Math.sin(a) * 8]; }));
   haloRing('electronx', new THREE.Vector3(EX.x, 0.3, EX.z), 15);
-  pickCyl('electronx', EX.x, EX.z, 11, 0, top$ + 28);
+  pickCyl('electronx', EX.x, EX.z, 11, 0, top$ + 14);
   lightPool('electronx', P.orange, 20, theme === 'light' ? 0.1 : 0.07, EX.x, 0.1, EX.z);
 
   // ── the money rail, Atlas's globe and CoinMarketCap's arch ───────────────────────────────────────────────────
@@ -659,7 +640,8 @@ export async function buildSpace(ctx, o) {
   // no solid rail: chapter 05's strands float on the ground; a gray bar under them read as a pipe
   piece('rail', null);
   const AT = POS.atlas, atC = new THREE.Vector3(AT.x, AT.y, AT.z);
-  piece('atlas', [AT.x, 0, AT.z + 4], { center: atC });
+  // its label right of the globe: under it, it sat on the season's vault and Flap's label
+  piece('atlas', [AT.x + AT.r + 13, AT.y - 4, AT.z], { center: atC });
   const orbR = AT.r + 11;
   const globe = new THREE.Mesh(new THREE.SphereGeometry(AT.r, 64, 40), shellMaterial({ blur: o.blur, res: o.res, theme, tint: P.violet, tintA: theme === 'light' ? 0.42 : 0.32,
     fill: theme === 'light' ? '#ebe6f7' : null, fillA: theme === 'light' ? 0.45 : null, hair: theme === 'light' ? P.violet : null }));
@@ -685,12 +667,6 @@ export async function buildSpace(ctx, o) {
   }
   haloFace('atlas', atC, orbR + 6);
   pickBall('atlas', atC, orbR);
-  const atlasA = await atlasTexture();
-  {
-    const w = 16, mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, w / atlasA.aspect), basic('#ffffff', { map: atlasA.texture, transparent: true }));
-    mesh.material.toneMapped = false; mesh.position.set(AT.x, AT.y + AT.r + 6, AT.z); overlay(mesh, 14); marks.add(mesh); dimmable('atlas', mesh.material);
-    pieces.atlas.billboards = [mesh];
-  }
   const CM = POS.cmc, cmH = CM.h, cmW = CM.w;
   piece('cmc', [CM.x, 0, CM.z + 6]);
   solid('cmc', (b) => {
@@ -736,7 +712,8 @@ export async function buildSpace(ctx, o) {
   lightPool('arena', P.bnb, 24, theme === 'light' ? 0.16 : 0.15, AR.x, 1.3, AR.z);
 
   const CO2 = POS.coin, flapLive = st.flap === 'live';
-  piece('flap', [CO2.x + 27, 0, CO2.z + 22]);
+  // its label right of the vault: under the coin it sat where the site's caption covers the stage
+  piece('flap', [POS.vault.x + POS.vault.s / 2 + 3, POS.vault.s * 0.55, POS.vault.z]);
   const coinG = new THREE.Group(); coinG.position.set(CO2.x, CO2.y, CO2.z); marks.add(coinG);
   {
     const body = flatMesh(new THREE.CylinderGeometry(CO2.r, CO2.r, 6.5, 72).rotateX(Math.PI / 2), '#2b3138', { transparent: !flapLive, opacity: flapLive ? 1 : 0.55 });
@@ -761,7 +738,8 @@ export async function buildSpace(ctx, o) {
   pickBox('flap', CO2.x - CO2.r - 2, 0, CO2.z - VA.s / 2 - 2, VA.x + VA.s / 2 + 2, CO2.y + CO2.r + 2, CO2.z + VA.s / 2 + 2);
 
   const TW = POS.tower, fourLive = st.openfour === 'live';
-  piece('openfour', [TW.x, 0, TW.z + 12]);
+  // its label beside the tower, right of it: under the tower it sat where the stills' key card stands
+  piece('openfour', [TW.x + 12, TW.h * 0.35, TW.z]);
   solid('openfour', (b) => { b.box({ x: TW.x, y: 0, z: TW.z, w: 3.2, h: TW.h, d: 3.2, fill: P.steel, edge: P.steelEdge }); b.box({ x: TW.x + 4.5, y: 0, z: TW.z, w: 0.8, h: TW.h - 4, d: 0.8, fill: P.steel }); b.cyl({ x: TW.x, y: 0, z: TW.z, r0: 9, h: 1.2, seg: 32, fill: P.side, top: P.top, edge: P.edge, az: 180 }); }, { ghost: !fourLive });
   shadeAt(Array.from({ length: 32 }, (_, i) => { const a = (i / 32) * Math.PI * 2; return [TW.x + Math.cos(a) * 9, TW.z + Math.sin(a) * 9]; }), 0.05, 'openfour');
   haloRing('openfour', new THREE.Vector3(TW.x, 0.3, TW.z), 16);
@@ -811,7 +789,7 @@ export async function buildSpace(ctx, o) {
   E('E3', 'cournot', 'risk', [[CO.x + 22, 40, CO.z], [-50, 40, CO.z], [-50, 40, -139], [-50, 13, -139], [podW('risk') - 2, 13, -139]], R.strand, { color: P.files, round: 9, state: st.cournot === 'designed' ? 'designed' : 'live', after: st.cournot === 'after', arrows: [0.2] });
   edges.E3.after = st.cournot === 'after';
   // E4: ElectronX's published terms into the Hedger (financial: dashed)
-  E('E4', 'electronx', 'hedger', [[EX.x + 6, top$ + 13, EX.z], [-230, top$ + 13, EX.z], [-230, top$ + 13, -139], [-230, 15, -139], [podW('hedger') - 2, 15, -139]], R.financial, { color: P.orange, round: 9, arrows: [0.25] });
+  E('E4', 'electronx', 'hedger', [[EX.x, top$ + 1.2, EX.z], [EX.x, top$ + 13, EX.z], [-230, top$ + 13, EX.z], [-230, top$ + 13, -139], [-230, 15, -139], [podW('hedger') - 2, 15, -139]], R.financial, { color: P.orange, round: 9, arrows: [0.25] });
   // E5: Living Brain and the spine: captures up, cited pages down
   E('E5u', 'memory', 'brain', [[BR.x - 3.3, SP.y + 1.5, SP.z], [BR.x - 3.3, BR.y - BR.r - 1, SP.z]], R.strand, { color: P.memory, arrows: [0.55], side: RIGHT });
   E('E5d', 'brain', 'memory', [[BR.x + 3.3, BR.y - BR.r - 1, SP.z], [BR.x + 3.3, SP.y + 1.5, SP.z]], R.strand, { color: P.memory, arrows: [0.5], side: RIGHT, phase: 20 * m });

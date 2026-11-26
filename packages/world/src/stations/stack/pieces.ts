@@ -34,6 +34,27 @@ export const TICKERS = { season: 'PRIX', agent: 'PLNR' };
 export const PIECE_IDS = Object.keys(ROUTES) as PieceId[];
 export const POD_IDS = ['forecaster', 'state', 'market', 'hedger', 'risk', 'planner'] as const;
 
+/** Each sponsor piece's owner, as the logo registry's chip (kit/logos; Jo, Nov 26: one official set, white glass, each a
+ *  link to its owner in a new tab): at rest it stands where the label's name line was, and from above (the plan view)
+ *  over the piece. caption: words beside the logo, for a piece of ours or a product that wears its owner's logo. The
+ *  Terminal, the verifier, the arena and the pods keep their words; ERCOT keeps its name (the market, which the
+ *  registry has no file for). */
+export const LOGO_OF: Partial<Record<PieceId, { logo: string | string[]; caption?: string }>> = {
+  cournot: { logo: ['cournot', 'kalshi'] },
+  // ElectronX's logo is its name over a large X, in white: at a label's size the X reads and the word does not
+  electronx: { logo: 'electronx', caption: 'ElectronX' },
+  studio: { logo: 'agentstudio' },
+  aws: { logo: 'aws' },
+  brain: { logo: 'livingbrain' },
+  gate: { logo: 'bnbchain' },
+  greenfield: { logo: 'greenfield' },
+  cloudflare: { logo: 'cloudflare', caption: 'Worker' },
+  atlas: { logo: 'atlas' },
+  cmc: { logo: 'cmc' },
+  flap: { logo: 'flap' },
+  openfour: { logo: 'openfour' },
+};
+
 /** The labels: plain first, the name second (none where the plain word is the name). */
 export function labels(d) {
   return {
@@ -119,14 +140,13 @@ export interface Card {
   link?: { text: string; href: string };
   route: TabId;
   routeLabel: string;
-  chip?: { src: string; caption: string; dark?: boolean } | { tag: string; caption: string };
 }
 
 const T = (t: string): Part => ({ t });
 const M = (t: string, href?: string): Part => ({ t, mono: true, href });
 
-/** Every piece's card. marks: the chip images' URLs (marks.ts MARK_URLS). now: the live mount's clock in unix seconds
- *  (null for the stills: the record as rendered). */
+/** Every piece's card. marks: no longer read (the owners' logos stand in the labels, LOGO_OF); kept so callers keep their
+ *  shape. now: the live mount's clock in unix seconds (null for the stills: the record as rendered). */
 export function cards(d, GF, TN, marks, now: number | null = null): Record<PieceId, Card> {
   const ex = TN.explorer, tx = (h: string) => `${ex}/tx/${h}`, ad = (a: string) => `${ex}/address/${a}`;
   const rc = d.sealed_day.receipts[0], late = d.sealed_day.late_seal.attempts.find((a) => a.chain_id === 56) ?? d.sealed_day.late_seal.attempts[0];
@@ -158,7 +178,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
 
   return {
     ercot: make('ercot', {
-      caps: 'The market · ERCOT', name: 'ERCOT', chip: { src: marks.ercot, caption: 'ERCOT' },
+      caps: 'The market · ERCOT', name: 'ERCOT',
       role: `Texas's grid operator: the real batteries, their node prices, and the day-ahead market that closes at ${ct(d.sealed_day.gate.ct).slice(0, 5)} CT.`,
       rows: [
         ['Batteries', [T(`${n0(d.fleet.count)} planned · ${n0(d.fleet.totals.power_mw)} MW · ${n0(d.fleet.totals.energy_mwh)} MWh`)]],
@@ -177,7 +197,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       link: { text: 'wattness.tech', href: 'https://wattness.tech' },
     }),
     cournot: make('cournot', {
-      caps: 'Weather odds · Cournot', name: 'Cournot', chip: { src: marks.cournotInk, caption: 'COURNOT' },
+      caps: 'Weather odds · Cournot', name: 'Cournot',
       role: "Verifiable odds on Kalshi's Texas weather markets, for the Risk officer.",
       rows: [
         ['Endpoint', [M(co.probability.endpoint.replace(/^https:\/\//, ''))]],
@@ -187,7 +207,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     electronx: make('electronx', {
-      caps: 'Hedge terms · ElectronX', name: 'ElectronX', chip: { src: marks.electronx, caption: 'ELECTRONX' },
+      caps: 'Hedge terms · ElectronX', name: 'ElectronX',
       role: `Hourly bounded futures at ${ins.location}: the hedge's published terms.`,
       rows: [
         ['Terms', [T(`${usd(ins.range_cents[0] / 100, 0)} to ${usd(ins.range_cents[1] / 100, 0)}, tick ${usd(ins.tick_cents / 100)}, ${n0(ins.size_kwh / 1000)} MWh, ${usd(ins.fee_cents_per_contract / 100)} a contract`)]],
@@ -197,7 +217,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       link: ins.source_urls?.[0] ? { text: 'Their published terms', href: ins.source_urls[0] } : undefined,
     }),
     studio: make('studio', {
-      caps: 'Agent identities and jobs · BNB Chain', name: 'BNB Agent Studio', chip: { src: marks.bnbLogoYellow, caption: 'AGENT STUDIO' },
+      caps: 'Agent identities and jobs · BNB Chain', name: 'BNB Agent Studio',
       role: `Gives each agent an on-chain identity and lets one agent pay another for a job. Its managed hosting ${H.hosted || HF.hosted ? 'runs' : 'ran'} the evaluator and the Forecaster.`,
       rows: [
         ['Identities', [T(`ERC-8004 agents ${roleIds[0]} to ${roleIds[roleIds.length - 1]} (the six roles) and ${S.agent_id} (the evaluator), BSC testnet`)]],
@@ -207,7 +227,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     aws: make('aws', {
-      caps: 'Agent hosting · AWS', name: 'Amazon Bedrock AgentCore', chip: { src: marks.awsInk, caption: 'AGENTCORE' },
+      caps: 'Agent hosting · AWS', name: 'Amazon Bedrock AgentCore',
       role: `${H.hosted || HF.hosted ? 'Runs' : 'Ran'} two agents that BNB Agent Studio's managed hosting deployed here, each selling its work as an ERC-8183 job: the evaluator, agent ${S.agent_id}, which checks a sealed record against GateRecord on BSC testnet, and the Forecaster, agent ${hf.agent_id}, which delivers a battery's sealed price scenarios.`,
       rows: [
         // after the trial the runtimes and their cards are gone: the cards' links would 404, so the rows keep the span
@@ -276,7 +296,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     brain: make('brain', {
-      caps: 'Memory · Living Brain', name: 'Living Brain', chip: { src: marks.brainInk, caption: 'LIVING BRAIN' },
+      caps: 'Memory · Living Brain', name: 'Living Brain',
       role: 'Pages on the build and on the Wattness Terminal: captures in, cited pages out.',
       rows: [
         ['Endpoint', [M(TN.living_brain.api.replace(/^https:\/\//, ''))]],
@@ -285,7 +305,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     gate: make('gate', {
-      caps: 'The seal · BNB Chain', name: 'GateRecord', chip: { src: marks.bnbLogoYellow, caption: 'GATERECORD' },
+      caps: 'The seal · BNB Chain', name: 'GateRecord',
       role: `One Merkle root per operating day. The contract computes ERCOT's ${ct(d.sealed_day.gate.ct).slice(0, 5)} CT close itself and refuses any seal at or after it.`,
       rows: [
         ['Contract', [{ t: rc.contract, mono: true, block: true, href: `https://bscscan.com/address/${rc.contract}` }, T('BNB Smart Chain and its testnet, source verified')]],
@@ -298,7 +318,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       link: { text: 'View the transaction', href: rc.tx_url },
     }),
     greenfield: make('greenfield', {
-      caps: 'Public files · BNB Greenfield', name: 'BNB Greenfield', chip: { src: marks.greenfield, caption: 'GREENFIELD', dark: true },
+      caps: 'Public files · BNB Greenfield', name: 'BNB Greenfield',
       role: "The sealed day's files in a public bucket, byte for byte.",
       rows: [
         ['Bucket', [M(GF.bucket.name), T(`, Greenfield testnet, ${GF.bucket.visibility === 'public-read' ? 'public read' : GF.bucket.visibility}`)]],
@@ -307,7 +327,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     verifier: make('verifier', {
-      caps: 'Check · anyone', name: 'Verifier', chip: { tag: "Anyone's", caption: 'Verifier' },
+      caps: 'Check · anyone', name: 'Verifier',
       role: 'Anyone checks a plan against the chain, in the browser or with one command.',
       rows: [
         ['Leaf', [T(`Desert Willow's, ${sh.leaf_position + 1} of ${d.sealed_day.leaf_count}: its ${WORDS[pathLen(sh.leaf_position, d.sealed_day.leaf_count)]}-hash audit path recomputes the root`)]],
@@ -318,7 +338,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
     // the edge Worker (integrations.json cloudflare): only what its / and /verify answer, read at read_ct; Turnstile as
     // the Wattness site's code uses it (the question to Ness opens the check; the server confirms the token)
     cloudflare: make('cloudflare', {
-      caps: 'Files at the edge · Cloudflare', name: 'Cloudflare Worker', chip: { tag: 'At the edge', caption: 'Cloudflare' },
+      caps: 'Files at the edge · Cloudflare', name: 'Cloudflare Worker',
       role: "Serves each sealed day's files from BNB Greenfield, each only after checking it against the root committed on GateRecord; a file that fails a check gets 502 and the reason instead.",
       rows: [
         ['Endpoint', [M(edgeHost, `${EG.worker}/`)]],
@@ -329,7 +349,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       link: { text: 'The Worker', href: `${EG.worker}/` },
     }),
     atlas: make('atlas', {
-      caps: 'Signed prices · Atlas', name: 'Atlas', chip: { src: marks.atlas, caption: 'ATLAS' },
+      caps: 'Signed prices · Atlas', name: 'Atlas',
       role: 'Signed BNB and USDT prices that size the evaluation budget.',
       rows: [
         ['Endpoint', [M(at.endpoint.replace(/^https:\/\//, ''))]],
@@ -338,7 +358,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     cmc: make('cmc', {
-      caps: 'Quotes and security fields · CoinMarketCap', name: 'CoinMarketCap', chip: { src: marks.cmcInk, caption: 'COINMARKETCAP' },
+      caps: 'Quotes and security fields · CoinMarketCap', name: 'CoinMarketCap',
       role: "Quotes, and the vendor's security fields for BSC-USDT.",
       rows: [
         ['Quotes', [T(cm.quotes.assets.slice().sort((a, b) => b.price_usd - a.price_usd).map((a) => `${a.symbol} ${a.price_usd > 10 ? usd(a.price_usd) : `$${a.price_usd.toFixed(5)}`}`).join(', ')), T(` at ${ct(cm.quotes.assets[0].quote_time.ct)}`)]],
@@ -347,7 +367,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     arena: make('arena', {
-      caps: 'Open records · any wallet', name: 'Arena', chip: { tag: 'Any wallet', caption: 'Arena' },
+      caps: 'Open records · any wallet', name: 'Arena',
       role: 'Any wallet seals a plan before the market closes; one verifier checks every record.',
       rows: [
         ['Records', [T('GateRecord keys each record by its committer')]],
@@ -355,7 +375,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     flap: make('flap', {
-      caps: 'Season · Flap', name: 'Flap', chip: { src: marks.flapPixel, caption: 'FLAP' },
+      caps: 'Season · Flap', name: 'Flap',
       role: "Contributors get the reserve pro rata; a 20% earned share and the vault's tax pay by days sealed before the gate.",
       rows: [
         [SHOW_TICKERS ? `${TICKERS.season}` : 'Season token', [M(short(F.token), ad(F.token)), T(', BSC testnet')]],
@@ -366,7 +386,7 @@ export function cards(d, GF, TN, marks, now: number | null = null): Record<Piece
       ],
     }),
     openfour: make('openfour', {
-      caps: 'Agent launches · OpenFour', name: 'OpenFour', chip: { src: marks.four, caption: 'OPENFOUR', dark: true },
+      caps: 'Agent launches · OpenFour', name: 'OpenFour',
       role: "Launches only agents with a sealed record: graduation waits for the record's evidence.",
       rows: [
         [SHOW_TICKERS ? `${TICKERS.agent}` : 'Agent token', [M(short(O.token), ad(O.token)), T(', BSC testnet')]],

@@ -1,11 +1,12 @@
 // @ts-nocheck
 // The hover state (S03, STACK.md): the hovered piece's halo (a teal ring at its pad, radius + 6 m, 1.6 px, glowA 0.3,
-// static), its own strands at full, every other strand at 0.25 and every other object at 0.55; its chip and card come
-// in over 160 ms with a 6 px rise, beside the piece and never under the pointer, and leaving restores everything in
-// 200 ms. While its chip shows, the piece's own label is hidden: the chip names it (at 1440 x 900 a chip set half over
-// the label ran the two together, and the card cut the label's edge). Comets keep running throughout. One controller
-// for the stills (set with still: the end state at once) and the live mount (stepped each frame).
-import { pieceCard, chip, placeCard } from './dom';
+// static), its own strands at full, every other strand at 0.25 and every other object at 0.55; its card comes in over
+// 160 ms with a 6 px rise, beside the piece and never under the pointer, and leaving restores everything in 200 ms.
+// The piece's owner is already named at rest by the logo chip in its label (pieces.ts LOGO_OF), so a hover adds only the
+// card; the cards are made before the first hover (prepare), so the first one opens at once. Comets keep running
+// throughout. One controller for the stills (set with still: the end state at once) and the live mount (stepped each
+// frame).
+import { pieceCard, placeCard } from './dom';
 import { screenBox } from './common';
 
 const IN = 0.16, OUT = 0.2;          // seconds: the hover's entry and its exit
@@ -50,7 +51,7 @@ export function hoverController(space, { theme, host, cards, project, size, onRo
   const edgeP = Object.fromEntries(Object.keys(E).map((id) => [id, 0]));
   const haloP = Object.fromEntries(ids.map((id) => [id, 0]));
   let target = null, own = new Set(), pointer = null, dirty = true;
-  const cardEls = new Map(), chipEls = new Map();
+  const cardEls = new Map();
 
   const goal = {
     obj: (id) => (target == null || id === target || (target === 'brain' && id === 'memory') ? 0 : 1),
@@ -66,71 +67,38 @@ export function hoverController(space, { theme, host, cards, project, size, onRo
     for (const id of ids) if (P[id].halo) P[id].halo.material.opacity = haloP[id];
   }
 
-  // ── the DOM: one card and one chip per piece, made when first wanted ──────────────────────────────────────────
+  // ── the DOM: one card per piece, made when first wanted, or all at once ahead of the first hover (prepare) ────────
   function cardFor(id) {
     if (!cardEls.has(id)) {
       const c = cards[id]; if (!c) return null;
       cardEls.set(id, pieceCard(host, c, { glyphColor: glyphColor[id] ?? null, onRoute }));
-      if (c.chip) chipEls.set(id, chip(host, c.chip));
     }
     return cardEls.get(id);
-  }
-  /** The piece's own label, hidden while its chip names it (on: true) and shown again after. The stills draw no label
-   *  for a piece whose chip shows (index.ts); a piece with no chip (the Terminal, the pods) keeps its label. */
-  function cover(id, on) {
-    for (const e of host.querySelectorAll('.stk-lab')) if (e.dataset.piece === id) e.style.visibility = on ? 'hidden' : '';
   }
   function placeDom(id, still) {
     const el = cardFor(id); if (!el) return;
     const bx = screenBox(space, id, project) ?? { x0: size.W / 2, y0: size.H / 2, x1: size.W / 2, y1: size.H / 2 };
-    let ch = chipEls.get(id);
     // the move to the new place happens hidden and at once (only the entry's fade and 6 px rise animate; without this
     // a card would slide in from wherever it last stood, or from the stage's corner the first time)
-    el.classList.add('is-still'); ch?.el.classList.add('is-still');
+    el.classList.add('is-still');
     // Agent Studio's deck holds the pods: as a box it covers the middle, so the card weighs the pieces on it
     const others = ids.filter((o) => o !== id && o !== 'studio').map((o) => screenBox(space, o, project));
     // GateRecord's cube is the space's anchor: a card covers it last (its box counted three times)
     const weighed = id === 'gate' ? others : [...others, ...Array(2).fill(screenBox(space, 'gate', project))];
-    const cr = placeCard(el, bx, size.W, size.H, pointer?.x ?? null, pointer?.y ?? null, weighed);
-    const cardBox = { x0: cr.x, y0: cr.y, x1: cr.x + cr.w, y1: cr.y + cr.h };
-    // on a phone the card alone names the piece; elsewhere the chip comes with it, placed again once its mark has
-    // loaded (its width is only known then)
-    if (ch && size.W < 720) { ch.el.classList.remove('is-in'); ch = null; }
-    cover(id, !!ch);
-    if (ch) {
-      placeChip(ch, bx, cardBox, others, id);
-      ch.ready.then(() => { if (target === id) placeChip(ch, bx, cardBox, others, id); });
+    // and the piece's own label, which names it with its owner's logo chip, stays in view beside its card
+    const lab = host.querySelector(`.stk-lab[data-piece="${id}"]`);
+    if (lab) {
+      const r = lab.getBoundingClientRect(), hr = host.getBoundingClientRect();
+      weighed.push(...Array(6).fill({ x0: r.left - hr.left, y0: r.top - hr.top, x1: r.right - hr.left, y1: r.bottom - hr.top }));
     }
+    placeCard(el, bx, size.W, size.H, pointer?.x ?? null, pointer?.y ?? null, weighed);
     // the entry: in on the next frame, so the transition runs from the hidden state at the new place
-    if (still) { el.classList.add('is-in'); ch?.el.classList.add('is-in'); return; }
-    void el.offsetWidth; void ch?.el.offsetWidth;
-    el.classList.remove('is-still'); ch?.el.classList.remove('is-still');
-    requestAnimationFrame(() => { if (target === id) { el.classList.add('is-in'); ch?.el.classList.add('is-in'); } });
+    if (still) { el.classList.add('is-in'); return; }
+    void el.offsetWidth;
+    el.classList.remove('is-still');
+    requestAnimationFrame(() => { if (target === id) el.classList.add('is-in'); });
   }
-  /** The chip beside its piece, where it covers least: never the card, then as little of the other pieces and the
-   *  labels as it can, near the piece's top. */
-  function placeChip(ch, bx, card, others, id) {
-    const w = ch.el.offsetWidth, h = ch.el.offsetHeight, m = 8, gap = 10;
-    const hostR = host.getBoundingClientRect();
-    const labs = [...host.querySelectorAll('.stk-lab, .stk-zone, .intro-tick')].filter((e) => e.dataset.piece !== id).map((e) => {
-      const r = e.getBoundingClientRect(); return { x0: r.left - hostR.left, y0: r.top - hostR.top, x1: r.right - hostR.left, y1: r.bottom - hostR.top };
-    });
-    const area = (a, b) => Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0)) * Math.max(0, Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0));
-    const cx = (bx.x0 + bx.x1) / 2, cy = (bx.y0 + bx.y1) / 2;
-    // foot points (the chip's bottom center): over the box at its middle, start and end; beside it, level with its top
-    const cand = [[cx, bx.y0 - gap], [bx.x0 + w / 2, bx.y0 - gap], [bx.x1 - w / 2, bx.y0 - gap], [bx.x0 - gap - w / 2, bx.y0 + h], [bx.x1 + gap + w / 2, bx.y0 + h],
-      [cx, bx.y1 + gap + h]];
-    let best = null;
-    for (const [fx, fy] of cand) {
-      const x = Math.max(m + w / 2, Math.min(size.W - m - w / 2, fx)), y = Math.max(m + h, Math.min(size.H - m, fy));
-      const r = { x0: x - w / 2, y0: y - h, x1: x + w / 2, y1: y };
-      const score = area(r, card) * 100 + others.reduce((a, o) => a + (o ? area(r, o) : 0), 0) * 0.5 + labs.reduce((a, o) => a + area(r, o), 0) * 2
-        + area(r, bx) * 0.25 + Math.hypot(x - cx, y - bx.y0) * 2;
-      if (!best || score < best.score) best = { x, y, score };
-    }
-    ch.place(best.x, best.y);
-  }
-  function hideDom(id) { cardEls.get(id)?.classList.remove('is-in', 'is-still'); chipEls.get(id)?.el.classList.remove('is-in', 'is-still'); cover(id, false); }
+  function hideDom(id) { cardEls.get(id)?.classList.remove('is-in', 'is-still'); }
 
   return {
     get target() { return target; },
@@ -162,8 +130,10 @@ export function hoverController(space, { theme, host, cards, project, size, onRo
       dirty = false;
       return changed;
     },
-    /** After a resize: the card and chip beside the piece again. */
+    /** Every piece's card made now, hidden, so no hover waits on building one. */
+    prepare() { for (const id of ids) cardFor(id); },
+    /** After a resize: the card beside the piece again. */
     relayout() { if (target) placeDom(target, true); },
-    dispose() { if (target) cover(target, false); for (const el of cardEls.values()) el.remove(); for (const c of chipEls.values()) c.el.remove(); cardEls.clear(); chipEls.clear(); },
+    dispose() { for (const el of cardEls.values()) el.remove(); cardEls.clear(); },
   };
 }
