@@ -28,7 +28,7 @@ export default function SealPage() {
         lede="The record on BNB Chain: one root over every plan for the operating day, committed to GateRecord before ERCOT's 10:00 CT day-ahead gate."
       />
       <Ready state={all}>{([day, r, late]) => <Record day={day} receipts={r} late={late} registry={registry} />}</Ready>
-      <SealCost />
+      <SealCost builtWith={sponsors(registry, "atlas")} />
     </div>
   );
 }

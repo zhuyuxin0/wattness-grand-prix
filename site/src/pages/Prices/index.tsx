@@ -77,7 +77,7 @@ export default function PricesPage() {
       <Ready state={state} label="Loading the prices">
         {(p) => <Prices p={p} logos={logos} />}
       </Ready>
-      <TexasPowerBoard chips={logos !== null} />
+      <TexasPowerBoard chips={logos !== null} builtWith={logos ? [logos.atlas] : null} />
     </div>
   );
 }
