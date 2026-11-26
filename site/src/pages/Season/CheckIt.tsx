@@ -1,18 +1,7 @@
 import type { ReactNode } from "react";
-import { Glyph } from "../../ui";
+import { CheckIt as Shared } from "../../ui";
 
-/** A section's hashes and addresses, folded: every item one click away, in ONE PLAN's folded panel. */
+/** A section's hashes and addresses, folded: the site's one Check it (ui/CheckIt), its closed line saying what it holds. */
 export function CheckIt({ what, children }: { what: string; children: ReactNode }) {
-  return (
-    <details className="season-check">
-      <summary className="season-check__summary">
-        <span>
-          <b>Check it</b>
-          <span className="muted">: {what}</span>
-        </span>
-        <Glyph name="caret" className="season-check__caret" />
-      </summary>
-      <div className="season-check__body">{children}</div>
-    </details>
-  );
+  return <Shared summary={what.charAt(0).toUpperCase() + what.slice(1)}>{children}</Shared>;
 }
