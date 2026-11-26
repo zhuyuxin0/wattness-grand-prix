@@ -21,7 +21,7 @@ import { BrainBloomPass } from './bloom';
 import { makeRibbons } from './ribbons';
 import { Chrome, memberScreen, projectorNow } from './tags';
 import { SCENE, BRAINS, BRAIN_IDS, brainOf, page, pagesOf, linksOf, acrossOf, keyOf, fmt, PLAIN, scopeLine } from './data';
-import { pageCard, hoverCard, pageRows, brainChips, setChips, fixOf } from './card';
+import { pageCard, hoverCard, pageRows, brainChips, setChips, fixOf, glyph } from './card';
 import { T_SHARED } from './moments';
 
 export type BrainFocus = 'all' | 'grand-prix' | 'battery-review' | 'terminal';
@@ -196,7 +196,19 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   };
   const pagesBtn = document.createElement('button'); pagesBtn.type = 'button'; pagesBtn.className = 'lbm-pagesbtn'; root.appendChild(pagesBtn);
   const drawer = document.createElement('div'); drawer.className = 'lbm-drawer'; drawer.hidden = true; root.appendChild(drawer);
-  pagesBtn.addEventListener('click', () => { drawer.hidden = !drawer.hidden; if (!drawer.hidden) fillDrawer(); });
+  pagesBtn.setAttribute('aria-expanded', 'false');
+  /** The pages drawer (the narrow layout's list): its own close, Escape, or a press outside it closes it. */
+  const setDrawer = (open: boolean) => {
+    if (drawer.hidden === !open) return;
+    const had = drawer.contains(document.activeElement);
+    drawer.hidden = !open; pagesBtn.setAttribute('aria-expanded', String(open));
+    if (open) { fillDrawer(); drawer.querySelector<HTMLElement>('.lbm-close')?.focus({ preventScroll: true }); }
+    else if (had) pagesBtn.focus({ preventScroll: true });
+  };
+  pagesBtn.addEventListener('click', () => setDrawer(drawer.hidden));
+  const onDocDown = (e) => { if (!drawer.hidden && !drawer.contains(e.target) && !pagesBtn.contains(e.target)) setDrawer(false); };
+  document.addEventListener('pointerdown', onDocDown, true);
+  cleanups.push(() => document.removeEventListener('pointerdown', onDocDown, true));
   // CT, with the reader's own clock beside it (data.ts scopeLine)
   chrome.scope(scopeLine(false));
 
@@ -249,10 +261,22 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   const dMax = () => Math.max(7, frame(VIEW.all).dist * 1.2);
   const fillDrawer = () => {
     drawer.replaceChildren();
+    // its head: what it lists, and its close (the site's close glyph)
+    const head = document.createElement('div'); head.className = 'lbm-drawerhead';
+    const title = document.createElement('p'); title.textContent = 'Pages';
+    const x = document.createElement('button'); x.type = 'button'; x.className = 'lbm-close'; x.setAttribute('aria-label', 'Close the page list');
+    x.appendChild(glyph('close', 12));
+    x.addEventListener('click', () => setDrawer(false));
+    head.append(title, x);
+    drawer.append(head);
     const ids = S.focus === 'all' ? BRAIN_IDS : [S.focus];
     for (const b of ids) {
       const h = document.createElement('h4'); h.textContent = `${PLAIN[b]} · ${brainOf(b).pages}`;
-      drawer.append(h, pageRows(b, (p) => keepFocus(() => { drawer.hidden = true; select(p.brain, p.slug, 'user'); })));
+      // a page picked: the drawer closes and its card takes the focus; the card's close gives it to the Pages button
+      drawer.append(h, pageRows(b, (p) => {
+        keepFocus(() => { setDrawer(false); select(p.brain, p.slug, 'user'); });
+        if (S.sel && S.sel.brain === p.brain && S.sel.slug === p.slug) { returnTo = pagesBtn; focusCard(); }
+      }));
     }
   };
   const renderCard = () => {
@@ -728,8 +752,10 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   cleanups.push(() => root.removeEventListener('pointermove', onPtr));
   const onKey = (e) => {
     if (e.key === 'Escape') {
-      // the control that had focus may go with the card or the brain's page list: focus comes back to the stage
-      if (S.sel) closeCard(); else if (S.focus !== 'all') keepFocus(() => focusBrain('all', 'user'));
+      // the pages drawer first; then the card, then the brain. The control that had focus may go with the card or the
+      // brain's page list: focus comes back to the stage
+      if (!drawer.hidden) setDrawer(false);
+      else if (S.sel) closeCard(); else if (S.focus !== 'all') keepFocus(() => focusBrain('all', 'user'));
       e.preventDefault(); return;
     }
     if (e.target !== root) return;

@@ -50,7 +50,7 @@ const SVG = 'http://www.w3.org/2000/svg';
 /** The site's drawn glyphs (the Terminal's close, next and caret, as site/src/ui/glyph.css publishes them), in the text's
  *  color: never a typed character or the browser's own disclosure triangle. */
 const GLYPH = { close: 'M2 2l6 6M8 2l-6 6', next: 'M4.5 3l3 3-3 3', caret: 'M3 4.5l3 3 3-3' } as const;
-function glyph(kind: keyof typeof GLYPH, px: number): SVGSVGElement {
+export function glyph(kind: keyof typeof GLYPH, px: number): SVGSVGElement {
   const svg = document.createElementNS(SVG, 'svg');
   const box = kind === 'close' ? 10 : 12;
   svg.setAttribute('viewBox', `0 0 ${box} ${box}`); svg.setAttribute('width', String(px)); svg.setAttribute('height', String(px));

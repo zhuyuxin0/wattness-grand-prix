@@ -108,10 +108,13 @@
 .lbm-root.is-narrow .lbm-card { border-radius: 16px 16px 0 0; }
 .lbm-root.is-narrow .lbm-pagesbtn { display: inline-flex; position: absolute; z-index: 5; right: 12px; top: 12px; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 999px;
   font: 500 12px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: #e6e8ea; background: rgba(8, 11, 25, 0.8); border: 1px solid rgba(255, 255, 255, 0.18); cursor: pointer; }
-.lbm-drawer { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; max-height: 58%; overflow: auto; background: rgba(9, 13, 33, 0.96); border-top: 1px solid rgba(51, 185, 205, 0.3);
+.lbm-drawer { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; max-height: 58%; overflow: auto; background: rgba(9, 13, 33, 0.985); border-top: 1px solid rgba(51, 185, 205, 0.3);
   border-radius: 16px 16px 0 0; overscroll-behavior: contain; }
 .lbm-drawer[hidden] { display: none; }
 .lbm-drawer h4 { margin: 0; padding: 12px 14px 6px; font: 600 14px/1.3 var(--t-font-display, "Libre Franklin Brand", system-ui, sans-serif); }
+.lbm-drawerhead { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 8px 4px 14px; background: rgba(9, 13, 33, 0.98); }
+.lbm-drawerhead p { margin: 0; font: 500 10px/1.4 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); }
+.lbm-drawerhead .lbm-close { width: 32px; height: 32px; }
 
 /* without WebGL: the list is the view, in the page's theme, scrolling inside the host's box */
 .lbm-root.is-flat { height: 100%; overflow: auto; overscroll-behavior: contain; background: var(--lbm-bg, #0d1117); }
