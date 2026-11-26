@@ -8,6 +8,7 @@ import { Glyph, Hash, Loading, PageHeader, Section } from "../../ui";
 import { LiveRead } from "../../ui/LiveRead";
 import { readSeason, type RoundView, type SeasonRead } from "./chain";
 import { AppPane } from "./AppPane";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { CheckIt } from "./CheckIt";
 import { LaunchedRound, RoundThree } from "./Rounds";
 import { SCOPE, SEASON } from "./addresses";
@@ -200,6 +201,7 @@ function roundThreeLede(s: SeasonRead | undefined): string {
 
 export default function SeasonPage() {
   const live = useTestnet("season", readSeason);
+  const registry = useLogoRegistry();
   const now = usePageClock(30_000);
   const s = live.read?.data;
 
@@ -225,6 +227,7 @@ export default function SeasonPage() {
       <Section
         id="season-how"
         title="A New Way to Launch"
+        builtWith={sponsors(registry, "flap")}
         lede="A launch on Flap usually waits only for money. A season round also waits for proof of work done in the physical world, read on chain, and pays its backers by the days that proof arrives on time."
         source={<>What the contracts do, in four steps. {CONTRACTS}</>}
       >
@@ -248,7 +251,7 @@ export default function SeasonPage() {
         </div>
       </Section>
 
-      <Section id="season-round-3" title="Round 3" lede={roundThreeLede(s)} source={SOURCE}>
+      <Section id="season-round-3" title="Round 3" lede={roundThreeLede(s)} builtWith={sponsors(registry, "flap")} source={SOURCE}>
         {s ? (
           <div className="season-stack">
             <Stamp live={live} first />

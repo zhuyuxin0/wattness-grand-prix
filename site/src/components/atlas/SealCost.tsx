@@ -1,7 +1,7 @@
 import { useReceipts, type ChainReceipt } from "../../data";
 import { formatInt, formatUsd, shortHash } from "../../lib/format";
 import { dualTime, formatOperatingDay } from "../../lib/time";
-import { ErrorNote, Glyph, Loading, Ready, Section } from "../../ui";
+import { ErrorNote, Glyph, Loading, Ready, Section, type BuiltWithEntry } from "../../ui";
 import { BNB_USD_FEED, fixedToNumber, formatAge, formatBnb, formatGwei, formatSmallUsd, freshness, receiptMismatch, sealCost } from "./atlas";
 import type { GasReceipt, NodeRead, SingleFeedRead } from "./chain";
 import { Stamp, Unread } from "./ReadState";
@@ -12,13 +12,15 @@ import "./atlas.css";
 // receipt on chain, valued at Atlas's BNB/USD on BNB Smart Chain and divided
 // over the plans under its root.
 
-export function SealCost({ id = "seal-cost" }: { id?: string }) {
+/** builtWith: the page's Atlas chip for the section's head, once it has the logo registry. */
+export function SealCost({ id = "seal-cost", builtWith = null }: { id?: string; builtWith?: readonly BuiltWithEntry[] | null }) {
   const receipts = useReceipts();
   return (
     <Section
       id={id}
       className="atlas-section"
       title="What the Seal Cost"
+      builtWith={builtWith}
       source={
         <>
           Gas: the commit's receipt, read from BNB Smart Chain by its transaction hash. BNB/USD: Atlas feed {BNB_USD_FEED.id}, the SingleFeed{" "}

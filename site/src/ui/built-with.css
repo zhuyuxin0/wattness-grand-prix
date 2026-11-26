@@ -1,0 +1,25 @@
+/* Built with: a small-caps label and the sponsors' chips, the first row of a section's head. The chips keep the
+   registry's own look (chip.css); this only sets the row. */
+
+.built-with {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2) var(--t-space-3);
+  min-width: 0;
+  margin-bottom: var(--t-space-1);
+}
+.built-with__label {
+  font-size: var(--t-fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.built-with__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--t-space-2);
+  min-width: 0;
+}

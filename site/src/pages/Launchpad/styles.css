@@ -63,27 +63,8 @@
   color: var(--w-muted);
   line-height: var(--t-lh-prose);
 }
-.launch-dl--contracts {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--gp-space-7);
-}
-.launch-dl--contracts > div {
-  grid-template-columns: 12em minmax(0, 1fr);
-}
-.launch-agent {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--t-space-1) var(--t-space-3);
-}
-@media (max-width: 899px) {
-  .launch-dl--contracts {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
 @media (max-width: 599px) {
-  .launch-dl > div,
-  .launch-dl--contracts > div {
+  .launch-dl > div {
     grid-template-columns: minmax(0, 1fr);
     gap: 2px;
   }
@@ -208,6 +189,25 @@
 }
 .launch-step__tx a {
   color: inherit;
+}
+.launch-step__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+.launch-step__open .glyph {
+  color: var(--w-muted);
+}
+
+/* ---------------------------------------------------------------- the card's check */
+
+.launch-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: var(--s-ok);
 }
 
 /* ---------------------------------------------------------------- today */

@@ -2,7 +2,7 @@ import type { SealReceipt } from "@world/game";
 import { minSec } from "../../lib/clock";
 import { formatInt, formatLead, formatUusd } from "../../lib/format";
 import { dualTime, formatOperatingDay } from "../../lib/time";
-import { Glyph, Hash, ParcFerme, Section } from "../../ui";
+import { Glyph, ParcFerme, Section } from "../../ui";
 
 // The visitor's seal, as onSeal hands it over once the commit is mined and its
 // Committed event read back: the receipt in the site's own receipt face, the
@@ -42,6 +42,17 @@ export function SealedPlan({ receipt: r }: { receipt: SealReceipt }) {
           document: its hash is the root on chain, so anyone can check the plan against it.
         </>
       }
+      check={{
+        items: [
+          { kind: "transaction", label: "Your commit", value: r.txHash, href: r.txUrl, copy: "transaction hash", note: `Block ${formatInt(r.blockNumber)}` },
+          { kind: "root", label: "The root over your plan's document", value: r.record.root, copy: "root", note: `${formatInt(r.record.leafCount)} ${r.record.leafCount === 1 ? "leaf" : "leaves"}` },
+          { kind: "key", label: "The record key in GateRecord", value: r.key, copy: "record key" },
+          { kind: "address", label: "Your wallet", value: r.committer, href: `${TESTNET_EXPLORER}/address/${r.committer}`, copy: "wallet address" },
+          { kind: "address", label: "GateRecord on BSC testnet", value: r.contract, href: `${TESTNET_EXPLORER}/address/${r.contract}`, copy: "contract address" },
+        ],
+        status: "verified",
+        how: "Read back by your wallet from the transaction's receipt and its Committed event.",
+      }}
       source="Read back by your wallet from the transaction's receipt and its Committed event, on BNB Smart Chain Testnet (chain 97)."
     >
       <div className="arcade-seal__grid" aria-live="polite">
@@ -54,12 +65,6 @@ export function SealedPlan({ receipt: r }: { receipt: SealReceipt }) {
             <ParcFerme state="sealed" size="sm" />
           </header>
           <dl className="receipt__rows">
-            <div>
-              <dt>Transaction</dt>
-              <dd>
-                <Hash value={r.txHash} href={r.txUrl} label="transaction hash" />
-              </dd>
-            </div>
             <div>
               <dt>Block</dt>
               <dd className="num">{formatInt(r.blockNumber)}</dd>
@@ -76,32 +81,8 @@ export function SealedPlan({ receipt: r }: { receipt: SealReceipt }) {
               <dd className="num">{lead(r.secondsBeforeGate)} before the gate</dd>
             </div>
             <div>
-              <dt>Your wallet</dt>
-              <dd>
-                <Hash value={r.committer} href={`${TESTNET_EXPLORER}/address/${r.committer}`} label="wallet address" />
-              </dd>
-            </div>
-            <div>
-              <dt>Root</dt>
-              <dd>
-                <Hash value={r.record.root} label="root" />
-              </dd>
-            </div>
-            <div>
               <dt>Leaves</dt>
               <dd className="num">{formatInt(r.record.leafCount)}</dd>
-            </div>
-            <div>
-              <dt>Contract</dt>
-              <dd>
-                <Hash value={r.contract} href={`${TESTNET_EXPLORER}/address/${r.contract}`} label="contract address" />
-              </dd>
-            </div>
-            <div>
-              <dt>Key</dt>
-              <dd>
-                <Hash value={r.key} label="record key" />
-              </dd>
             </div>
             <div>
               <dt>Scope</dt>

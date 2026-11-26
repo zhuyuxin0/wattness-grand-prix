@@ -260,3 +260,13 @@
     background: none;
   }
 }
+
+/* The read-back mark that stands where each SHA-256 stood; the values are in the section's Check it. */
+.fs-same {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--s-ok);
+  font-weight: 600;
+  white-space: nowrap;
+}

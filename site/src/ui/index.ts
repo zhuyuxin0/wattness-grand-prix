@@ -1,5 +1,7 @@
 export { BATTERY_NAMES, BatteryBar, useBatteryChoice, type BatteryChoice } from "./BatteryBar";
 export { BatteryPicker } from "./BatteryPicker";
+export { BuiltWith, type BuiltWithEntry } from "./BuiltWith";
+export { CheckIt, countLine, type CheckItem, type CheckItProps, type CheckKind, type CheckStatus } from "./CheckIt";
 export { Countdown } from "./Countdown";
 export { Glyph, type GlyphName } from "./Glyph";
 export { Hash, middle } from "./Hash";

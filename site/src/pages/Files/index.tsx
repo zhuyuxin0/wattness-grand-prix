@@ -3,7 +3,8 @@ import { formatInt } from "../../lib/format";
 import { EDGE_HOST, edgeVerifyUrl } from "../../lib/edge";
 import { dualTime, formatOperatingDay } from "../../lib/time";
 import { useSelectedBattery } from "../../shell/battery";
-import { BATTERY_NAMES, Glyph, Hash, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type SortKind, type SortState, type SortValue } from "../../ui";
+import { BATTERY_NAMES, Glyph, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type CheckItem, type SortKind, type SortState, type SortValue } from "../../ui";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { useGreenfield, type GreenfieldIndex } from "./data";
 import "./styles.css";
 
@@ -89,6 +90,20 @@ function Files({ g }: { g: GreenfieldIndex }) {
     return col ? sortRows(list, col.value, sort.desc) : list;
   }, [g.files, kind, query, sort]);
   const shown = all ? rows : rows.slice(0, SHOWN);
+  const registry = useLogoRegistry();
+  // every file the filter shows, by its SHA-256 and its public address: the list behind the table's Same marks
+  const items: CheckItem[] = useMemo(
+    () =>
+      rows.map((f) => ({
+        kind: "file" as const,
+        label: f.path,
+        value: f.sha256,
+        href: `${g.baseUrl}${f.path}`,
+        copy: `SHA-256 of ${f.path}`,
+        note: f.verified ? "Read back after upload: the same SHA-256" : "Not read back after upload",
+      })),
+    [rows, g.baseUrl],
+  );
 
   return (
     <>
@@ -135,6 +150,11 @@ function Files({ g }: { g: GreenfieldIndex }) {
       <Section
         id="fs-files"
         title="Every File"
+        builtWith={sponsors(registry, "greenfield")}
+        check={{
+          items,
+          how: `Each SHA-256 is of the file as uploaded to ${where}, read back and compared after upload; each address serves the same bytes, so anyone can fetch a file and compare.`,
+        }}
         actions={
           <div className="fs-controls">
             <label className="fs-search">
@@ -161,7 +181,7 @@ function Files({ g }: { g: GreenfieldIndex }) {
         source={
           <>
             Files: the sealed record for operating day {opDay}, uploaded and read back by the publisher. Storage: {where}, bucket <code>{g.bucket.name}</code>. Each
-            SHA-256 is of the file as uploaded; its address serves the same bytes. Display: Wattness.
+            SHA-256, in Check it, is of the file as uploaded; its address serves the same bytes. Display: Wattness.{registry ? ` ${registry.note}` : ""}
           </>
         }
       >
@@ -182,7 +202,7 @@ function Files({ g }: { g: GreenfieldIndex }) {
                   );
                 })}
                 <th scope="col" className="fs-c-hash">
-                  <span>SHA-256</span>
+                  <span>Read back</span>
                 </th>
               </tr>
             </thead>
@@ -205,7 +225,14 @@ function Files({ g }: { g: GreenfieldIndex }) {
                   <td className="fs-c-kind">{KIND_LABEL[f.kind] ?? f.kind}</td>
                   <td className="r num fs-c-size">{size(f.bytes)}</td>
                   <td className="fs-c-hash">
-                    <Hash value={f.sha256} head={8} tail={6} label={`SHA-256 of ${f.path}`} />
+                    {f.verified ? (
+                      <span className="fs-same">
+                        <Glyph name="check" />
+                        Same SHA-256
+                      </span>
+                    ) : (
+                      <span className="muted">Not read back</span>
+                    )}
                   </td>
                 </tr>
               ))}

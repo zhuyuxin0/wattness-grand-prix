@@ -1,6 +1,7 @@
 import { getAddress, parseAbi, parseEventLogs, zeroAddress, type Address, type Hex, type Log, type PublicClient } from "viem";
 import { readMined, type ReadAt } from "../../lib/testnet";
 import { OPENFOUR, type StepId } from "./addresses";
+import { LAUNCHES, ZERO, type LaunchReplay } from "./replay";
 
 // Reads the PLNR launch at one block, as the launch tower in
 // modules/openfour/src/launch-tower.ts does: Core's record of the token, the
@@ -40,6 +41,8 @@ const ERC20_ABI = parseAbi([
   "function totalSupply() view returns (uint256)",
   "function balanceOf(address) view returns (uint256)",
 ]);
+
+const TRANSFER_ABI = parseAbi(["event Transfer(address indexed from, address indexed to, uint256 value)"]);
 
 const PAIR_ABI = parseAbi([
   "function token0() view returns (address)",
@@ -107,6 +110,42 @@ export interface LaunchRead {
   pool: { pair: Address; name: string; symbol: string; factory: Address; reserveToken: bigint; reserveQuote: bigint; lpTotal: bigint; lpAtSink: bigint; lpAtZero: bigint } | null;
   graduated: boolean;
   steps: StepView[];
+  /** Each replayed launch, its frames held to their receipts. */
+  replays: ReplayCheck[];
+}
+
+/** One replayed launch held to the chain: every frame's receipt read again, its status, block, time and token moves. */
+export interface ReplayCheck {
+  id: string;
+  /** Receipts read: the frames and the setup transactions. */
+  checked: number;
+  /** What did not match, in words; empty when every frame matches. */
+  mismatches: string[];
+}
+
+const key = (from: string, to: string, amount: bigint | string) => `${from.toLowerCase()}>${to.toLowerCase()}:${String(amount)}`;
+
+/** Reads every frame's receipt again (once per page: readMined keeps them) and compares it with the replay. */
+export async function checkReplay(client: PublicClient, l: LaunchReplay): Promise<ReplayCheck> {
+  const mismatches: string[] = [];
+  const frames = await Promise.all(l.frames.map((f) => readMined(client, f.hash)));
+  frames.forEach((m, i) => {
+    const f = l.frames[i]!;
+    const what = `${l.symbol} ${f.kind}`;
+    if (m.ok !== f.ok) mismatches.push(`${what}: status ${m.ok ? "success" : "reverted"}`);
+    if (Number(m.blockNumber) !== f.block) mismatches.push(`${what}: block ${m.blockNumber}`);
+    if (m.time !== f.time) mismatches.push(`${what}: time ${m.time}`);
+    const logs = m.logs.filter((x) => getAddress(x.address) === getAddress(l.token)) as Log[];
+    const moves = parseEventLogs({ abi: TRANSFER_ABI, logs, eventName: "Transfer" }).map((e) => key(e.args.from, e.args.to, e.args.value));
+    const want = f.moves.map((x) => key(x.from === ZERO ? zeroAddress : x.from, x.to, x.amount));
+    if (moves.sort().join() !== want.sort().join()) mismatches.push(`${what}: ${l.symbol} moves differ`);
+  });
+  const setup = await Promise.all(l.setup.map((s) => readMined(client, s.hash)));
+  setup.forEach((m, i) => {
+    const s = l.setup[i]!;
+    if (!m.ok || Number(m.blockNumber) !== s.block) mismatches.push(`${s.label}: block ${m.blockNumber}, ${m.ok ? "success" : "reverted"}`);
+  });
+  return { id: l.id, checked: frames.length + setup.length, mismatches };
 }
 
 async function readStep(client: PublicClient, s: { id: StepId; hash: string }): Promise<StepView> {
@@ -176,7 +215,7 @@ export async function readLaunch(client: PublicClient, at: ReadAt): Promise<Laun
   const bound = status.evidenceBound;
   const pairAddress = status.pair.toLowerCase() === zeroAddress ? null : status.pair;
 
-  const [record, pool, steps] = await Promise.all([
+  const [record, pool, steps, replays] = await Promise.all([
     bound
       ? Promise.all([
           r<{ root: Hex; codeHash: Hex; committer: Address; od: number; leafCount: number; committedAt: bigint; blockNumber: bigint }>(gateRecord, GATE_RECORD_ABI, "get", [status.evidence.key]),
@@ -222,6 +261,7 @@ export async function readLaunch(client: PublicClient, at: ReadAt): Promise<Laun
         })
       : Promise.resolve(null),
     Promise.all(OPENFOUR.steps.map((s) => readStep(client, s))),
+    Promise.all(LAUNCHES.map((l) => checkReplay(client, l))),
   ]);
 
   const phase = PHASES[status.phase] ?? "Terminal";
@@ -253,5 +293,6 @@ export async function readLaunch(client: PublicClient, at: ReadAt): Promise<Laun
     pool,
     graduated: phase === "Migrated" && pairAddress !== null,
     steps,
+    replays,
   };
 }

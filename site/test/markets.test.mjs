@@ -12,6 +12,7 @@ import { fileURLToPath } from "node:url";
 import { keccak256, stringToBytes } from "viem";
 import { formatAmount, formatPrice, ratio } from "../src/lib/amounts.ts";
 import { OPENFOUR } from "../src/pages/Launchpad/addresses.ts";
+import { LAUNCHES, PLNR, PLNR27, stateAt } from "../src/pages/Launchpad/replay.ts";
 import { SCOPE, SEASON, WATTNESS_AGENT } from "../src/pages/Season/addresses.ts";
 import { sellInto, workedExample } from "../src/pages/Season/payouts.ts";
 import { predictToken } from "../src/pages/Season/token.ts";
@@ -27,6 +28,9 @@ const flapReadme = read("modules", "flap", "README.md");
 const integrations = readJson("packages", "world", "src", "stations", "stack", "integrations.json");
 const deployment = readJson("modules", "openfour", "deployments", "bsc-testnet.json");
 const agents = readJson("contracts", "deployments", "agents.bsc-testnet.json");
+const sealedNov26 = readJson("fixtures", "od-20261126", "record.bsc-testnet.json");
+const tokensJson = readJson("modules", "openfour", "submission", "tokens.json");
+const siteReceipts = readJson("site", "public", "data", "receipts.json");
 
 /** A quoted address after `name:` in the adapter's SEASON_TESTNET. */
 function adapterValue(name) {
@@ -117,6 +121,186 @@ test("OpenFour's addresses and transactions are the deployment record's", () => 
 });
 
 const E18 = 10n ** 18n;
+
+test("the launch card replays PLNR's recorded transactions", () => {
+  const launch = deployment.launches[0];
+  const o = integrations.openfour;
+  assert.deepEqual(LAUNCHES.map((x) => x.symbol), ["PLNR27", "PLNR"], "the newest launch opens the card");
+  for (const k of ["token", "vault", "migrateModule", "agent", "pair"]) same(PLNR[k], OPENFOUR.launch[k], k);
+  for (const k of ["name", "symbol"]) assert.equal(PLNR[k], OPENFOUR.launch[k]);
+  same(PLNR.creator, deployment.openFour.owner, "the creator is the deployment's own wallet");
+  same(PLNR.quote.address, OPENFOUR.wbnb, "quoted in WBNB");
+  same(keccak256(stringToBytes(PLNR.scopeLabel)), launch.scope, "scope");
+  assert.equal(PLNR.minOd, launch.minOd);
+
+  const f = Object.fromEntries(PLNR.frames.map((x) => [x.kind, x]));
+  assert.deepEqual(PLNR.frames.map((x) => x.kind), ["create", "buy", "refused", "bind", "graduated"]);
+  same(f.create.hash, launch.txHash, "create");
+  assert.equal(f.create.block, Number(launch.blockNumber));
+  same(f.refused.hash, o.refused.tx, "refused graduation");
+  assert.equal(f.refused.block, o.refused.block);
+  assert.equal(f.refused.ok, false);
+  assert.equal(f.refused.refused.error, o.refused.error);
+  same(f.bind.hash, o.evidence.tx, "binding");
+  assert.equal(f.bind.block, o.evidence.block);
+  same(f.graduated.hash, o.graduated.tx, "graduation");
+  assert.equal(f.graduated.block, o.graduated.block);
+  same(f.graduated.graduated.pair, o.graduated.pair, "pair");
+  // the frames run in block order, each later than the one before
+  for (let i = 1; i < PLNR.frames.length; i++) assert.ok(PLNR.frames[i].block > PLNR.frames[i - 1].block && PLNR.frames[i].time >= PLNR.frames[i - 1].time);
+
+  // the refusal names the agent and the scope; its revert data is EvidenceMissing(agent, scope)
+  same(f.refused.refused.agent, PLNR.agent, "refused for the agent");
+  same(f.refused.refused.scope, launch.scope, "refused for the scope");
+  assert.equal(f.refused.refused.data.slice(0, 10), keccak256(stringToBytes("EvidenceMissing(address,bytes32)")).slice(0, 10));
+  assert.ok(f.refused.refused.data.toLowerCase().endsWith(PLNR.agent.slice(2).toLowerCase() + launch.scope.slice(2).toLowerCase()));
+
+  // the bound record is the sealed plan for Nov 26 as GateRecord holds it
+  const b = f.bind.bound;
+  same(b.key, o.evidence.record_key, "record key");
+  assert.equal(b.od, o.evidence.operating_day);
+  same(b.key, sealedNov26.key, "the fixture's key");
+  same(b.root, sealedNov26.root, "root");
+  same(b.codeHash, sealedNov26.codeHash, "code hash");
+  assert.equal(b.leafCount, sealedNov26.leafCount);
+  assert.equal(b.committedAt, sealedNov26.committedAt);
+  assert.equal(b.recordBlock, sealedNov26.blockNumber);
+  assert.equal(b.gate, Date.UTC(2026, 10, 25, 16, 0, 0) / 1000, "10:00 CT on Nov 25, the gate for Nov 26");
+  assert.ok(b.committedAt < b.gate);
+});
+
+test("the launch card replays PLNR27 from tokens.json, every create, buy, sell and migrate", () => {
+  const t = tokensJson.tokens.find((x) => x.symbol === "PLNR27");
+  const launch = deployment.launches.find((x) => x.symbol === "PLNR27");
+  assert.ok(t && launch, "tokens.json and the deployment record hold PLNR27");
+  same(PLNR27.token, t.tokenAddress, "token");
+  for (const k of ["vault", "migrateModule", "creator"]) same(PLNR27[k], t[k], k);
+  for (const k of ["token", "vault", "migrateModule", "agent", "pair"]) same(PLNR27[k], launch[k], k);
+  assert.equal(PLNR27.name, t.name);
+  for (const k of ["maxSupply", "saleAmount", "raiseAmount"]) assert.equal(PLNR27[k], t[k], k);
+  assert.equal(PLNR27.minOd, t.gate.minOd);
+  assert.equal(PLNR27.minLeafCount, t.gate.minLeafCount);
+  assert.equal(PLNR27.scopeLabel, t.gate.scopeLabel);
+  same(PLNR27.pair, t.pool.pair, "pair");
+
+  // the frames are the records that move the token or the gate, in order; the rest are the setup
+  const kinds = { create: "create", buy: "buy", sell: "sell", bind: "bind" };
+  const frameRecords = t.records.filter((r) => r.action in kinds || r.action === "migrate");
+  assert.deepEqual(
+    PLNR27.frames.map((f) => f.hash.toLowerCase()),
+    frameRecords.map((r) => r.txHash.toLowerCase()),
+  );
+  assert.deepEqual(
+    PLNR27.setup.map((x) => x.hash.toLowerCase()),
+    t.records.filter((r) => !(r.action in kinds) && r.action !== "migrate").map((r) => r.txHash.toLowerCase()),
+  );
+  PLNR27.frames.forEach((f, i) => {
+    const r = frameRecords[i];
+    assert.equal(f.block, Number(r.blockNumber), `${f.kind} block`);
+    assert.equal(f.time, r.time.unix, `${f.kind} time`);
+    assert.equal(f.ok, r.status === "success", `${f.kind} status`);
+    if (f.kind === "buy" || f.kind === "sell") {
+      assert.equal(f.trade.tokens, r.tokenAmount);
+      assert.equal(f.trade.curve, r.curveQuoteAmount);
+      assert.equal(f.trade.traderQuote, r.traderQuoteAmount);
+      assert.equal(BigInt(f.trade.fees), BigInt(r.protocolFee) + BigInt(r.devFee) + BigInt(r.taxFee) + BigInt(r.antiSniperFee));
+      assert.equal(f.raised, r.totalRaisedAfter);
+      assert.equal(BigInt(f.sold), BigInt(t.saleAmount) - BigInt(r.remainingForSaleAfter));
+      same(f.trade.trader, r.from, "trader");
+    }
+    if (f.kind === "refused") {
+      assert.equal(r.result, "refused");
+      const replay = r.replayAtParentBlock.find((x) => x.reverted);
+      assert.equal(f.refused.data, replay.data);
+      assert.equal(f.refused.error, replay.error.name);
+    }
+    if (f.kind === "bind") {
+      same(f.bound.key, r.evidenceKey, "key");
+      assert.equal(f.bound.od, r.od);
+      same(f.bound.root, r.root, "root");
+    }
+    if (f.kind === "graduated") {
+      assert.equal(r.result, "migrated");
+      same(f.graduated.pair, r.pair, "pair");
+      assert.equal(f.graduated.tokens, r.tokenToPool);
+      assert.equal(f.graduated.quote, r.quoteToPool);
+      assert.equal(f.graduated.lpBurned, r.liquidityToDead);
+      assert.equal(BigInt(f.graduated.lpBurned) + BigInt(f.graduated.lpMinimum), BigInt(t.pool.lpTotalSupply));
+    }
+  });
+
+  // the bound record is the Nov 27 seal on BSC testnet, as the site's receipts hold it
+  const b = PLNR27.frames.find((f) => f.bound).bound;
+  same(b.key, t.evidence.key, "evidence key");
+  const sealed = siteReceipts.receipts.find((r) => r.chainId === 97 && r.key.toLowerCase() === b.key.toLowerCase());
+  assert.ok(sealed, "the site's receipts hold the Nov 27 testnet record");
+  same(b.root, sealed.root, "root");
+  same(b.codeHash, sealed.codeHash, "code hash");
+  same(b.codeHash, t.gate.codeHash, "the code hash the launch requires");
+  assert.equal(b.leafCount, sealed.leafCount);
+  assert.equal(b.recordBlock, sealed.blockNumber);
+  assert.equal(b.committedAt, sealed.blockTime);
+  assert.equal(b.gate - b.committedAt, sealed.secondsBeforeGate);
+  assert.equal(b.gate, Date.UTC(2026, 10, 26, 16, 0, 0) / 1000, "10:00 CT on Nov 26, the gate for Nov 27");
+});
+
+test("every replay's curve, holders and pool add up", () => {
+  for (const l of LAUNCHES) {
+    const max = BigInt(l.maxSupply);
+    l.frames.forEach((f, i) => {
+      const s = stateAt(l, i);
+      assert.equal(s.holders.reduce((a, h) => a + h.amount, 0n), max, `${l.symbol} frame ${i}: every token is held`);
+      // the curve holds what it has not sold, and the sale's share of the supply until graduation
+      const curve = s.holders.find((h) => h.role === "curve")?.amount ?? 0n;
+      if (!s.graduated) assert.equal(curve, max - s.sold, `${l.symbol} frame ${i}: the vault holds the unsold tokens`);
+      if (f.trade) assert.equal(BigInt(f.trade.traderQuote) - BigInt(f.trade.curve), (f.kind === "buy" ? 1n : -1n) * BigInt(f.trade.fees), `${l.symbol} ${f.kind}: fees`);
+    });
+    const end = stateAt(l, l.frames.length - 1);
+    assert.equal(end.phase, "Graduated");
+    const k = BigInt(end.graduated.quote) * BigInt(end.graduated.tokens);
+    const lp = BigInt(end.graduated.lpBurned) + BigInt(end.graduated.lpMinimum);
+    assert.ok(lp * lp <= k && (lp + 1n) * (lp + 1n) > k, `${l.symbol}: the pair's first mint`);
+  }
+  const p = (i) => stateAt(PLNR27, i).progress;
+  assert.deepEqual([0, 1, 2, 3].map(p), [0, 0.125, 0.0125, 1], "PLNR27's curve fills, gives back on the sale, then sells out");
+});
+
+test("the replay's curve, holders and pool add up", () => {
+  const max = BigInt(PLNR.maxSupply);
+  const sale = BigInt(PLNR.saleAmount);
+  PLNR.frames.forEach((_, i) => {
+    const s = stateAt(PLNR, i);
+    assert.equal(s.holders.reduce((a, h) => a + h.amount, 0n), max, `frame ${i}: every token is held`);
+    assert.ok(s.sold <= sale && s.progress >= 0 && s.progress <= 1);
+  });
+  const start = stateAt(PLNR, 0);
+  assert.equal(start.progress, 0);
+  assert.deepEqual(start.holders.map((h) => h.role), ["curve"]);
+  const buy = PLNR.frames[1].trade;
+  assert.equal(BigInt(buy.traderQuote) - BigInt(buy.curve), BigInt(buy.fees), "the trader paid the curve and the fees");
+  const sold = stateAt(PLNR, 1);
+  assert.equal(sold.progress, 1);
+  assert.equal(sold.raised, BigInt(buy.curve));
+  const refused = stateAt(PLNR, 2);
+  assert.equal(refused.phase, "Sold out");
+  assert.equal(refused.bound, null);
+  assert.ok(refused.refusedBefore);
+  assert.ok(stateAt(PLNR, 3).bound);
+  const end = stateAt(PLNR, PLNR.frames.length - 1);
+  assert.equal(end.phase, "Graduated");
+  assert.deepEqual(end.holders.map((h) => [h.role, h.amount]), [
+    ["creator", 8_000_000_000n * E18],
+    ["pair", 2_000_000_000n * E18],
+  ]);
+  // what went into the pair is what the curve raised and the tokens the vault kept
+  assert.equal(BigInt(end.graduated.quote), end.raised);
+  assert.equal(BigInt(end.graduated.tokens), max - sale);
+  // the burned LP tokens and the minimum liquidity are the square root of the reserves' product (Uniswap V2's first mint)
+  const k = BigInt(end.graduated.quote) * BigInt(end.graduated.tokens);
+  const lp = BigInt(end.graduated.lpBurned) + BigInt(end.graduated.lpMinimum);
+  assert.ok(lp * lp <= k && (lp + 1n) * (lp + 1n) > k);
+});
+
 // A round set up as round 3 is: SeasonLauncher's supply halves, a 2,000 USD cap,
 // a 20% earned share, a 100 USD tax cap and two season days. The page takes the
 // same numbers from the round's Launcher at the block it reads.

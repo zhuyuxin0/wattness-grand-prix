@@ -37,6 +37,7 @@ import {
   usdMwh,
   type HubsDoc,
 } from "../Battery/kit";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import "./styles.css";
 
 // Hedge: the contracts each plan holds by hour, the entry price the comparison
@@ -109,6 +110,7 @@ export default function HedgePage() {
   const hourState = useHourState();
   const narrow = useNarrow();
   const all = combine(useDesk(choice.resource), useDeskCommon(), useHubs());
+  const registry = useLogoRegistry();
 
   return (
     <HourContext.Provider value={hourState}>
@@ -196,6 +198,7 @@ export default function HedgePage() {
                 <Section
                   className="hg-hours-section"
                   title="Contracts by Hour"
+                  builtWith={sponsors(registry, "electronx")}
                   lede={`Contracts held each hour, sold above zero and bought below, on one scale.${unhedged.length ? ` ${unhedged.map((p) => `Plan ${p}`).join(" and ")} ${unhedged.length === 1 ? "holds" : "hold"} none.` : ""}`}
                   source={`${SOURCE_LINE} Operating day ${day0}, hours in CT. Entry: ${ins.entry_rule.replace(/^assumed at fair value: /, "assumed at fair value, ")}. A comparison at that entry, not executed trades.`}
                 >
@@ -241,6 +244,7 @@ export default function HedgePage() {
                 <div className="pk-two">
                   <Section
                     title="Published Terms"
+                    builtWith={sponsors(registry, "electronx")}
                     lede={`${ins.venue}'s ${ins.product}, as ${ins.venue} publishes it.`}
                     source={
                       src ? (

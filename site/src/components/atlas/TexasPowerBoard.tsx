@@ -1,6 +1,6 @@
 import { formatUsd, shortHash } from "../../lib/format";
 import { dualTime } from "../../lib/time";
-import { Glyph, Loading, Section } from "../../ui";
+import { Glyph, Loading, Section, type BuiltWithEntry } from "../../ui";
 import { LogoChip, type ChipLogo } from "../../ui/LogoChip";
 import { LATE_MARGIN_S, STOCK_MULTIFEED, TEXAS_BOARD, TEXAS_FEEDS, boardRowId, feedPage, fixedToNumber, formatAge, freshness, marketNote, type StockFeed } from "./atlas";
 import type { FeedSnapshot, MultiFeedRead, NodeRead } from "./chain";
@@ -33,13 +33,15 @@ export const companyChip = (feed: StockFeed): ChipLogo | null => {
 
 /** chips: the page has loaded the logo chip's stylesheet (with @world/kit/logos), so each company's logo stands in the
  *  site's white glass chip, a link to the company in a new tab; until then, in a plain light box. */
-export function TexasPowerBoard({ id = TEXAS_BOARD, chips = false }: { id?: string; chips?: boolean }) {
+/** builtWith: the page's Atlas chip for the section's head, once it has the logo registry. */
+export function TexasPowerBoard({ id = TEXAS_BOARD, chips = false, builtWith = null }: { id?: string; chips?: boolean; builtWith?: readonly BuiltWithEntry[] | null }) {
   const feeds = useStockFeeds();
   return (
     <Section
       id={id}
       className="atlas-section"
       title="Texas Power on BNB Chain"
+      builtWith={builtWith}
       lede="Tokenized stocks of four companies in Texas's power market, priced by Atlas's feeds on BNB Smart Chain and read in your browser: no key, no wallet, no transaction. They are market context: they never enter a plan, and a token's price says nothing about an agent's plans."
       source={
         <>

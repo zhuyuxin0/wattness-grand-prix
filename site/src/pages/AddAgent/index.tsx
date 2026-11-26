@@ -4,7 +4,8 @@ import { REPO_URL } from "../../config";
 import { fetchJson, useLoad, useReceipts, type ChainReceipt } from "../../data";
 import { formatInt } from "../../lib/format";
 import { dualTime, formatOperatingDay } from "../../lib/time";
-import { Glyph, Hash, PageHeader, Ready, Section } from "../../ui";
+import { Glyph, PageHeader, Ready, Section, type CheckItem } from "../../ui";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 import { Code } from "./Code";
 import { Stack } from "./Stack";
 import "./styles.css";
@@ -49,6 +50,7 @@ const CHAIN_SOURCE = "Deployment records: contracts/deployments in the repositor
 const chainName = (id: number) => (id === 56 ? "BNB Smart Chain" : id === 97 ? "BNB Smart Chain Testnet" : `Chain ${id}`);
 
 export default function AddAgentPage() {
+  const registry = useLogoRegistry();
   const garage = useLoad(loadGarage, "garage");
   const receipts = useReceipts();
 
@@ -111,18 +113,34 @@ const hash = await wallet.writeContract({
                 </p>
               </Section>
 
-              <Section title="GateRecord on Both Chains" lede="One address on both networks. The contract computes the gate itself and keeps one write-once record per committer, scope and day." source={CHAIN_SOURCE}>
+              <Section
+                title="GateRecord on Both Chains"
+                lede="One address on both networks. The contract computes the gate itself and keeps one write-once record per committer, scope and day."
+                builtWith={sponsors(registry, "bnbchain")}
+                check={{ items: deploymentItems(g.deployments), how: "Each address and transaction opens on its chain's explorer; each source is an exact match on Sourcify." }}
+                source={CHAIN_SOURCE}
+              >
                 <Deployments list={g.deployments} />
               </Section>
 
               <Section
                 title={`The Agent That Sealed the ${formatOperatingDay(g.operatingDay).replace(/^\w+, /, "").replace(/, \d{4}$/, "")} Plans`}
                 lede="The reference entry: the wallet that committed the published day, and what it signs."
+                check={{
+                  items: g.deployments.map((d): CheckItem => ({
+                    kind: "address",
+                    label: `The agent's wallet on ${chainName(d.chainId)}`,
+                    value: wallet,
+                    href: `${d.explorer}/address/${wallet}`,
+                    copy: "agent wallet",
+                  })),
+                  how: "One wallet on both chains: GateRecord's committer for the published day.",
+                }}
               >
                 <div className="ag-agent">
                   <div className="ag-agent__id">
                     <span className="ag-label">Agent wallet</span>
-                    <Hash value={wallet} full label="agent wallet" className="ag-agent__wallet" />
+                    <span className="ag-agent__wallet">The planner's wallet, one on both chains; its address is in Check it</span>
                     <span className="ag-agent__links">
                       {g.deployments.map((d) => (
                         <a key={d.chainId} href={`${d.explorer}/address/${wallet}`} target="_blank" rel="noreferrer" className="ag-out">
@@ -244,9 +262,17 @@ function Row({ k, v }: { k: string; v: ReactNode }) {
   );
 }
 
+/** The deployments' Check it: each chain's address, deploy transaction and runtime code hash. */
+function deploymentItems(list: Deployment[]): CheckItem[] {
+  return list.flatMap((d): CheckItem[] => [
+    { kind: "address", label: `GateRecord on ${chainName(d.chainId)}`, value: d.address, href: `${d.explorer}/address/${d.address}`, copy: "contract address" },
+    { kind: "transaction", label: `Its deploy transaction on ${chainName(d.chainId)}`, value: d.txHash, href: `${d.explorer}/tx/${d.txHash}`, copy: "deploy transaction", note: `Block ${formatInt(d.blockNumber)}` },
+    { kind: "hash", label: `Its runtime code hash on ${chainName(d.chainId)}`, value: d.runtimeCodeHash, copy: "runtime code hash" },
+  ]);
+}
+
 function Deployments({ list }: { list: Deployment[] }) {
   const rows: { name: string; cell: (d: Deployment) => ReactNode }[] = [
-    { name: "Address", cell: (d) => <Hash value={d.address} href={`${d.explorer}/address/${d.address}`} label="contract address" /> },
     {
       name: "Deployed",
       cell: (d) => {
@@ -259,10 +285,8 @@ function Deployments({ list }: { list: Deployment[] }) {
         );
       },
     },
-    { name: "Deploy transaction", cell: (d) => <Hash value={d.txHash} href={`${d.explorer}/tx/${d.txHash}`} label="deploy transaction" /> },
     { name: "Block", cell: (d) => <span className="num">{formatInt(d.blockNumber)}</span> },
     { name: "Compiler", cell: (d) => <code>solc {d.compiler}</code> },
-    { name: "Runtime code", cell: (d) => <Hash value={d.runtimeCodeHash} head={10} tail={6} label="runtime code hash" /> },
     {
       name: "Source",
       cell: (d) => (

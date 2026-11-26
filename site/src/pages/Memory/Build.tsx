@@ -6,6 +6,7 @@ import { panelSections } from "../../shell/tabs";
 import { Section, Stat, StatRow } from "../../ui";
 import { pageKey, type BuildBrain, type BuildConnection, type BuildPage } from "./data";
 import { readSelection, selectedKey, selectionOf, writeSelection } from "./select";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 
 // The build's own brain: every tab of this site and the page Living Brain keeps
 // on it (or the nearest page it has, or the page the tab is a section of), and
@@ -50,6 +51,7 @@ function Said({ text, correction, className }: { text: string; correction?: stri
 }
 
 export function Build({ b }: { b: BuildBrain }) {
+  const registry = useLogoRegistry();
   const [params, setParams] = useSearchParams();
   const pages = useMemo(() => new Map(b.pages.map((p) => [pageKey(p.brain, p.slug), p])), [b]);
   const brainName = useMemo(() => new Map(b.brains.map((x) => [x.id, x.name])), [b]);
@@ -90,7 +92,13 @@ export function Build({ b }: { b: BuildBrain }) {
         </p>
       </section>
 
-      <Section id="mem-tabs" title="Every Tab's Page" lede="Each tab of this site and the page Living Brain keeps on it, or the nearest page it has. Pick one to open the page and its connections." source={SHORT}>
+      <Section
+        id="mem-tabs"
+        title="Every Tab's Page"
+        lede="Each tab of this site and the page Living Brain keeps on it, or the nearest page it has. Pick one to open the page and its connections."
+        builtWith={sponsors(registry, "livingbrain")}
+        source={registry ? `${SHORT} ${registry.note}` : SHORT}
+      >
         <div className="mem-tabs">
           {sections.map((sec) => (
             <div key={sec.group?.id ?? "start"} className="mem-tabs__group">

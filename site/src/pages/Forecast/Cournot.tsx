@@ -4,8 +4,9 @@ import { dataUrl } from "../../data/load";
 import type { CournotReading, Desk, DeskCommon } from "../../data/plan";
 import { minSec } from "../../lib/clock";
 import { dualTime } from "../../lib/time";
-import { Glyph, Hash, Section } from "../../ui";
+import { Glyph, Section, type CheckItem } from "../../ui";
 import { count, Fact, Facts, shortDay, type HubsDoc } from "../Battery/kit";
+import { sponsors, useLogoRegistry } from "../TechStack/sponsors";
 
 // The Cournot card: the risk officer's weather rule, gate-record.weather-stress.v1
 // (packages/core/src/weather.ts), and the reading the day's plans sealed: the
@@ -94,11 +95,36 @@ export function CournotCard({
   const place = (claim && PLACES[claim.station]) ?? "Dallas–Fort Worth";
   const ticker = tickerOf(reading?.basis[0]?.url);
   const day = shortDay(common.operatingDay);
+  const registry = useLogoRegistry();
+  // the saved response's SHA-256, computed here (the reading below shares this load)
+  const response = reading?.response ?? null;
+  const hash = useLoad(() => (response ? fileSha256(response.route) : Promise.resolve(null)), `cournot-sha256:${response?.route ?? ""}`);
+  const items: CheckItem[] = response
+    ? [
+        {
+          kind: "file",
+          label: response.route,
+          value: response.sha256,
+          href: dataUrl(response.route),
+          copy: "response SHA-256",
+          note: `Cournot's response as the ${day} plans saved it, by its SHA-256, the one every plan commits`,
+        },
+      ]
+    : [];
+  const checkIt = items.length
+    ? {
+        items,
+        status: hash.status === "ready" && hash.data ? (hash.data === response!.sha256 ? ("verified" as const) : ("failed" as const)) : hash.status === "error" ? null : ("checking" as const),
+        how: "The file's SHA-256 is computed here, in your browser, from its published bytes.",
+      }
+    : null;
 
   return (
     <Section
       id="fc-cournot"
       title="Weather Odds from Cournot"
+      builtWith={sponsors(registry, "cournot", "kalshi")}
+      check={checkIt}
       lede={`Before the gate the planner may read one probability from Cournot: the odds, on Kalshi's market, that a ${place} dawn turns cold. The risk officer's rule, ${WEATHER_RULE_ID}, turns that one number into two plan settings, in exact integers.`}
       source={
         <>
@@ -148,6 +174,7 @@ export function CournotCard({
             common={common}
             desk={desk}
             reading={reading}
+            hash={hash}
             claim={claim}
             place={place}
             ticker={ticker}
@@ -178,10 +205,13 @@ function SealedReading({
   bucket,
   historyDays,
   sealedUnix,
+  hash,
 }: {
   common: DeskCommon;
   desk: Desk;
   reading: CournotReading;
+  /** The saved response's SHA-256 as computed here, loaded once by the card. */
+  hash: ReturnType<typeof useLoad<string | null>>;
   claim: NonNullable<CournotReading["claim"]>;
   place: string;
   ticker: string | null;
@@ -210,7 +240,6 @@ function SealedReading({
   const quoteAt = quote ? dualTime(Math.floor(Date.parse(quote.time) / 1000), { date: false }) : null;
   const sealedAt = sealedUnix != null ? dualTime(sealedUnix, { date: false }) : null;
   const response = reading.response;
-  const hash = useLoad(() => (response ? fileSha256(response.route) : Promise.resolve(null)), `cournot-sha256:${response?.route ?? ""}`);
   const bucketSame = bucket && sealedBucket ? bucket.days.join() === sealedBucket.days.join() && bucket.scenarios === sealedBucket.scenarios : null;
   const all = reading.appliedTo === common.batteries;
 
@@ -276,7 +305,6 @@ function SealedReading({
               <span className="mono">{response.route}</span>
               <Glyph name="popout" />
             </a>
-            <Hash value={response.sha256} head={8} tail={6} label="response SHA-256" />
           </Fact>
         )}
       </Facts>
