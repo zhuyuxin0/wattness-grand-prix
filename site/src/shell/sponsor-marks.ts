@@ -46,9 +46,8 @@ export const MARKS: Partial<Record<LogoId, SponsorMark>> = {
   cournot: mark({ id: "cournot", name: "Cournot", src: COURNOT, w: 251, h: 73, crop: [0, 15, 33, 43], px: 13 }),
   // the brain, left of the words
   livingbrain: mark({ id: "livingbrain", name: "Living Brain", src: LIVINGBRAIN, w: 1415, h: 240, crop: [0, 0, 237, 240], px: 14 }),
-  // ElectronX's logo is its name with a star for the X, whose hairline arms vanish at this size: the name and the
-  // star's heart, on the line of the words
-  electronx: mark({ id: "electronx", name: "ElectronX", src: ELECTRONX, w: 473, h: 260, crop: [0, 60, 410, 84], px: 10 }),
+  // ElectronX's logo whole: its name and the X whose long legs reach past the words, as ElectronX draws it
+  electronx: mark({ id: "electronx", name: "ElectronX", src: ELECTRONX, w: 473, h: 260, crop: [0, 0, 473, 260], px: 20 }),
   // the wings, left of the words
   flap: mark({ id: "flap", name: "Flap", src: FLAP, w: 255, h: 43.7143, crop: [0, 0, 52.4, 43.7143], px: 12 }),
   // Four.meme's square mark, whole

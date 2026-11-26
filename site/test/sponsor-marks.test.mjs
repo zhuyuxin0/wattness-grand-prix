@@ -39,7 +39,8 @@ test("each mark's crop lies inside its file, and draws about 14 px tall", () => 
   for (const [id, m] of Object.entries(MARKS)) {
     const [x, y, w, h] = m.crop;
     assert.ok(x >= 0 && y >= 0 && w > 0 && h > 0 && x + w <= m.w + 1e-9 && y + h <= m.h + 1e-9, `${id}: crop outside the file`);
-    assert.ok(m.px >= 9 && m.px <= 16, `${id}: ${m.px} px tall`);
+    // ElectronX draws whole (its X's long legs reach far past the words), so it may stand up to 20 px
+    assert.ok(m.px >= 9 && m.px <= (id === "electronx" ? 20 : 16), `${id}: ${m.px} px tall`);
     const s = markStyle(m);
     assert.equal(s.height, `${m.px}px`);
     assert.match(s.maskImage, /^url\(".+"\)$/);
