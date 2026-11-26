@@ -132,6 +132,17 @@ carries to the rest; a link may name one with `/battery/<resource>` or `?battery
   The Overview's control room is the first band (`pages/Overview/RoomBand.tsx`, `room-band.ts`): from 1000px of room
   its parts are dock panes in the room's own arrangement and column width (`gp.room`), and below that the room's own
   column. `test/room-band.test.mjs` holds it.
+- Ask Ness (`src/ness/`): the launcher on every page, and the panel fetched on first open; the address holds it
+  (`?ask=`, `?ask=<id>`). Its frame is wattness.tech's Ness window (`src/ness/frame.ts`): beside the page (a column
+  under the masthead that the page narrows for where it keeps 960 px, and covers elsewhere; its left edge sets the
+  width), floating (dragged by the header, sized at the corner, docked again when let go at the right edge) or full
+  screen (the questions at the left, the page inert). The header's buttons change the mode and Esc steps down one;
+  phones keep the sheet. Beside or floating, it stays open as the reader follows links. This browser keeps the mode,
+  width and window (`gp.ness.frame`, try/catch); full screen is never reopened into. Living Brain's stage
+  (`BrainLive.tsx`, packages/world's `mountBrain`) stands in the chat: large over the questions, held above an answer
+  (beside it in full screen) with the answer's pages ringed and named; it loads with the panel and gives up its WebGL
+  context when the panel closes. Stacking: beside and floating 45, full screen and the sheet 70.
+  `test/ness-frame.test.mjs` holds the frame.
 - Related (`src/shell/related.ts`, one set per tab; drawn by `PageHeader` and under the Intro's hero by
   `src/shell/RelatedStrip.tsx`): the two to four tabs each page leads to. A click previews the tab as a floating pane
   over the page; a link held with ⌘, Ctrl or Shift, or a middle click, opens it in a new browser tab; the pane's Open
