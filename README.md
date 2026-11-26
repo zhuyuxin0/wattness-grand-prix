@@ -51,7 +51,7 @@ pnpm test
 pnpm verify fixtures/od-20261126/manifest.json --network bsc-mainnet --scope gate-record/ercot-da-energy --battery DSWL_ESS_ESR1
 ```
 
-To plan a day yourself, with no key and no chain, for any operating day whose gate (10:00 CT the day before) is still ahead:
+To plan an operating day in the coming week yourself, with no key and no chain, while its gate (10:00 CT the day before) is still ahead:
 
 ```sh
 pnpm plan --od YYYY-MM-DD --network local
