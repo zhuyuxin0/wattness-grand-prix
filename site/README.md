@@ -111,6 +111,13 @@ carries to the rest; a link may name one with `/battery/<resource>` or `?battery
   board's company logos are in `public/logos/`, each with its source in `SOURCES.md`.
 - Each tab's foot links to the tab's own page in the build's memory, opened on Memory (`src/shell/MemoryCue.tsx`,
   drawn by `Pager`).
+- Floating panes (`src/float/`): `openPane(path)` opens any tab's page in a pane over the current page, on rc-dock
+  3.3.2 as on wattness.tech, in this site's tokens and glyphs. The layer loads on first use (one dynamic import in
+  `src/float/index.ts`), in its own React root; each pane runs its page under its own memory router, so a link inside
+  it moves the pane, never the page. Drag a pane by its header, resize it at the corner; the newest is on top, Open
+  goes to the tab, Esc closes the top pane; from 767px down a pane is a full-height sheet. This browser keeps the open
+  panes (`gp.panes`, try/catch). Stacking: masthead 20, panes 25, battery list 30, market day 50, drawer 60, the
+  introduction in the top layer; Ask Ness's panel goes anywhere above 25. `test/float.test.mjs` holds the model.
 - New published data: add `scripts/data/<page>.mjs` whose default export takes the context documented in
   `scripts/build-data.mjs` (`day`, `batteries`, `leaf(resource)`, `writeJson`, ...). Modules run in name order;
   the size, credential and date checks cover their files too.

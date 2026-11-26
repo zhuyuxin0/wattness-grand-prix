@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { PRODUCT_NAME } from "../config";
+import { useFloatHost } from "../float";
 import { isCapture } from "../lib/capture";
 import { Loading } from "../ui/States";
 import { Footer } from "./Footer";
@@ -15,6 +16,8 @@ export function Layout() {
   const tab = tabAt(pathname);
   const [drawer, setDrawer] = useState(false);
   const menu = useRef<HTMLButtonElement>(null);
+  // Floating panes over the page: their layer loads on first use (float/).
+  useFloatHost();
 
   useEffect(() => {
     document.title = tab && tab.path !== "/" ? `${tab.label} · ${PRODUCT_NAME}` : PRODUCT_NAME;
