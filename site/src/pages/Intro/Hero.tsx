@@ -102,7 +102,7 @@ export function Hero({ facts, onPlay, onPlayIntent, playRef, onStillLoad }: Hero
         </div>
       </div>
       <p className="intro-hero__scope">
-        Chapter 01 of the introduction, which tells the Nov 26 record: {SHOWCASE.name} ({SHOWCASE.resource}) at night. Positions schematic.
+        Chapter 01 of the introduction: {SHOWCASE.name} ({SHOWCASE.resource}) at night. Positions schematic.
       </p>
     </section>
   );
