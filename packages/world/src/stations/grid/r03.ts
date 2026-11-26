@@ -13,7 +13,7 @@ import type { FrameContext, FrameHandle } from '../types';
 import { HEX, apron, plinth, track, poleLights, glow, emissive, screen, glassKit, finish, pulse, detail, counted, nightRig, poseFrom, livery, rectOf, boxCorners, fmt, type Footprint } from './venue';
 import { line } from './lines';
 import { auditPath } from './merkle';
-import { BOARD, buildBoard, quadMatrix } from '../venue/board';
+import { BOARD, boardCanvas, buildBoard, quadMatrix } from '../venue/board';
 import { caption, litType } from '../../words';
 
 /** The page's tamper rule (site/src/pages/Verify/useStewards.ts tamperPlan): one more MW in the selected arm's
@@ -204,7 +204,14 @@ export async function r03(ctx: FrameContext, state: CopyState = 'changed'): Prom
   const boardH = Math.round((BOARD.width * SCR.h) / SCR.w);
   const bezel = new THREE.Mesh(chamferBox(THREE, 0.3, SCR.h + 0.7, SCR.w + 0.7, 0.1), paint);
   bezel.position.set(WALL.x - 0.1, SCR.y, SCR.z); bezel.castShadow = true; root.add(bezel);
-  const scr = new THREE.Mesh(new THREE.PlaneGeometry(SCR.w, SCR.h), emissive('#101315'));
+  // the screen's face is the board itself, drawn from its laid-out DOM: the site hides a frame's DOM while the camera
+  // moves, so through a move the wall shows the board, and at rest the DOM board lands on it exactly
+  const states = CHECKS.map((c) => (c.pass ? 'pass' : 'fail') as 'pass' | 'fail');
+  const poster = buildBoard(d, states, changed, BOARD.width, boardH);
+  poster.style.visibility = 'hidden'; ctx.overlay.appendChild(poster);
+  const faceTex = new THREE.CanvasTexture(boardCanvas(poster, 2)); poster.remove();
+  faceTex.colorSpace = THREE.SRGBColorSpace; faceTex.anisotropy = 8;
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(SCR.w, SCR.h), new THREE.MeshBasicMaterial({ map: faceTex, toneMapped: false }));
   scr.position.set(SCR.x, SCR.y, SCR.z); scr.rotation.y = -Math.PI / 2; root.add(scr);
   const scrGlass = G.pane(SCR.w + 0.2, SCR.h + 0.2, { r: 0.3, rimW: 0.3, tintA: 0.06, refract: 0.02, frost: 0.04 }); scrGlass.position.set(SCR.x - 0.2, SCR.y, SCR.z); scrGlass.rotation.y = -Math.PI / 2; root.add(scrGlass);
   // the face's corners as seen from the bay (top left, top right, bottom right, bottom left): west of the wall, north is left
@@ -238,7 +245,7 @@ export async function r03(ctx: FrameContext, state: CopyState = 'changed'): Prom
       litType(ctx);
       // the Verify page's board on the screen's face, exact: its markup in the frame's DOM, set on the face's corners
       // (a film lays it out again through a leg, so it rides with the wall)
-      const board = buildBoard(d, CHECKS.map((c) => (c.pass ? 'pass' : 'fail')), changed, BOARD.width, boardH);
+      const board = buildBoard(d, states, changed, BOARD.width, boardH);
       const corners = screenCorners().map((q) => p.project(q));
       if (corners.every((q) => q)) {
         ctx.overlay.appendChild(board);

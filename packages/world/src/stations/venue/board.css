@@ -25,9 +25,13 @@
 .v-board .st-board { position: relative; height: 100%; display: grid; grid-template-columns: 276px minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr) auto; grid-template-areas: "who rows" "score rows"; column-gap: 26px;
   padding: 20px 26px 18px 24px; background: var(--chrome); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
-.v-board .st-board::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
-  background: linear-gradient(90deg, var(--pass) 0 72%, var(--rule) 72% 92%, var(--bnb) 92% 100%); }
-.v-board .st-board.is-tampered::before { background: var(--fail); }
+/* the top stripe, the site's seal mark: live teal, then the rule, then BNB yellow; red for a changed copy. Solid spans,
+   so boardCanvas draws it as the DOM does */
+.v-board .st-board__stripe { position: absolute; inset: 0 0 auto 0; height: 3px; display: flex; }
+.v-board .st-board__stripe span:nth-child(1) { flex: 72; background: var(--pass); }
+.v-board .st-board__stripe span:nth-child(2) { flex: 20; background: var(--rule); }
+.v-board .st-board__stripe span:nth-child(3) { flex: 8; background: var(--bnb); }
+.v-board .is-tampered .st-board__stripe span { background: var(--fail); }
 
 .v-board .st-board__who { grid-area: who; min-width: 0; }
 .v-board .st-board__eyebrow { font-size: 14px; font-weight: 500; color: var(--muted); white-space: nowrap; }

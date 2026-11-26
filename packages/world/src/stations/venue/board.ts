@@ -70,9 +70,61 @@ export function buildBoard(d: FrameData, checks: readonly CheckState[], tampered
     rows.appendChild(li);
   });
 
-  board.append(who, score, rows);
+  const stripe = el('div', 'st-board__stripe');
+  stripe.append(el('span'), el('span'), el('span'));
+  board.append(stripe, who, score, rows);
   root.appendChild(board);
   return root;
+}
+
+const clear = (c: string) => !c || c === 'transparent' || /rgba\([^)]*,\s*0\)$/.test(c);
+function rounded(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  g.beginPath(); g.roundRect(x, y, w, h, Math.max(0, Math.min(r, w / 2, h / 2)));
+}
+
+/** The board drawn into a canvas from its own laid-out DOM (in the document, visibility hidden or not, untransformed):
+ *  each box's fill and borders and each text run, where the markup puts them, at `scale` pixels per CSS px. A 3D screen
+ *  takes it as its texture, so the board shows through a move (the site hides a frame's DOM while the camera moves)
+ *  and the DOM, laid over it at rest, sharpens it without a jump. */
+export function boardCanvas(boardRoot: HTMLElement, scale = 2): HTMLCanvasElement {
+  const W = boardRoot.offsetWidth, H = boardRoot.offsetHeight;
+  const c = document.createElement('canvas'); c.width = Math.round(W * scale); c.height = Math.round(H * scale);
+  const g = c.getContext('2d')!;
+  const o = boardRoot.getBoundingClientRect(), k = o.width / Math.max(1, W);
+  g.scale(scale, scale);
+  const box = (r: DOMRect) => ({ x: (r.left - o.left) / k, y: (r.top - o.top) / k, w: r.width / k, h: r.height / k });
+  const draw = (e: Element) => {
+    const cs = getComputedStyle(e), b = box(e.getBoundingClientRect()), r = parseFloat(cs.borderTopLeftRadius) || 0;
+    g.save();
+    if (!clear(cs.backgroundColor)) { g.fillStyle = cs.backgroundColor; rounded(g, b.x, b.y, b.w, b.h, r); g.fill(); }
+    const side = (s: 'Top' | 'Right' | 'Bottom' | 'Left') => ({ w: parseFloat(cs.getPropertyValue(`border-${s.toLowerCase()}-width`)) || 0, c: cs.getPropertyValue(`border-${s.toLowerCase()}-color`) });
+    const t = side('Top'), rt = side('Right'), bt = side('Bottom'), l = side('Left');
+    if (t.w && t.w === rt.w && t.w === bt.w && t.w === l.w && r) { g.strokeStyle = t.c; g.lineWidth = t.w; rounded(g, b.x + t.w / 2, b.y + t.w / 2, b.w - t.w, b.h - t.w, r - t.w / 2); g.stroke(); }
+    else {
+      g.fillStyle = t.c; if (t.w) g.fillRect(b.x, b.y, b.w, t.w);
+      g.fillStyle = bt.c; if (bt.w) g.fillRect(b.x, b.y + b.h - bt.w, b.w, bt.w);
+      g.fillStyle = l.c; if (l.w) g.fillRect(b.x, b.y, l.w, b.h);
+      g.fillStyle = rt.c; if (rt.w) g.fillRect(b.x + b.w - rt.w, b.y, rt.w, b.h);
+    }
+    // what overflows a box that clips (the board's rounded corners, a long title) stays inside it
+    if (cs.overflow !== 'visible') { rounded(g, b.x, b.y, b.w, b.h, r); g.clip(); }
+    for (const n of e.childNodes) {
+      if (n.nodeType === Node.ELEMENT_NODE) draw(n as Element);
+      else if (n.nodeType === Node.TEXT_NODE && n.textContent?.trim()) {
+        const range = document.createRange(); range.selectNodeContents(n);
+        const rr = range.getBoundingClientRect(); if (!rr.width) continue;
+        const tb = box(rr);
+        g.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        (g as unknown as { letterSpacing: string }).letterSpacing = cs.letterSpacing === 'normal' ? '0px' : cs.letterSpacing;
+        g.fillStyle = cs.color; g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+        const m = g.measureText(n.textContent), A = m.fontBoundingBoxAscent, D = m.fontBoundingBoxDescent;
+        g.fillText(n.textContent, tb.x, tb.y + (tb.h - (A + D)) / 2 + A);
+      }
+    }
+    g.restore();
+  };
+  for (const e of boardRoot.children) draw(e);
+  return c;
 }
 
 /** The 3 x 3 homography taking the rect (0, 0)-(w, h) to four points (top left, top right, bottom right, bottom left),
