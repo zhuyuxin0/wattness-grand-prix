@@ -385,6 +385,13 @@ describe("requests", () => {
     for (const line of ["GET /day/<day>/index.json", "GET /day/<day>/<path>", "GET /verify/<battery>?od=<day>&network=bsc-mainnet"]) expect(body).toContain(line);
   });
 
+  it("links the repository's main page as its source, a page that exists before workers/edge is on main", async () => {
+    upstreams();
+    const body = await (await call(freshOrigin(), "/")).text();
+    expect.soft(body.endsWith("\nSource: https://github.com/zhuyuxin0/wattness-grand-prix\n")).toBe(true);
+    expect.soft(body).not.toContain("/tree/");
+  });
+
   it("answers HEAD with the headers alone and a CORS preflight with 204", async () => {
     upstreams();
     const head = await call(freshOrigin(), LEAF, { method: "HEAD" });

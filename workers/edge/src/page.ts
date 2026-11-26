@@ -49,5 +49,5 @@ Caching: a verified response on a record at least ${MIN_CONFIRMATIONS} blocks de
 day and by browsers for five minutes. Nothing is cached before it is verified; errors are never
 cached.
 
-Source: https://github.com/zhuyuxin0/wattness-grand-prix/tree/main/workers/edge
+Source: https://github.com/zhuyuxin0/wattness-grand-prix
 `;
