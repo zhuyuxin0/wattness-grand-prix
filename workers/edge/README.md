@@ -3,7 +3,8 @@
 A Cloudflare Worker that serves the Grand Prix's sealed records from Cloudflare's edge. It reads each operating
 day's files from the public-read bucket `wattness-grand-prix-records` on BNB Greenfield testnet and serves a file
 only after checking it against GateRecord (`0x2922c68cE15EB3e83B7f43b136e981dDc4262876`) on BSC. A file that
-fails a check is answered with 502 and the reason, never with its bytes.
+fails a check is answered with 502 and the reason instead of the file; a reason prints at most 200 characters of
+any value it quotes and is cut at 2,000 characters.
 
 Live at https://grand-prix-edge.wattness.workers.dev. `GET /` lists the endpoints and what each checks.
 

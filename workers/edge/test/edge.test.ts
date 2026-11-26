@@ -197,6 +197,48 @@ describe("a changed byte is refused", () => {
     }
   });
 
+  it("keeps a refusal short: at most 200 characters of any value it quotes, and 2,000 in all", async () => {
+    const INDEX = "/day/2026-11-26/index.json";
+    const json = (doc: unknown) => `${JSON.stringify(doc, null, 2)}\n`;
+    const plan = JSON.parse(text.dswl) as Record<string, unknown>;
+    const index = () => JSON.parse(text.index) as { leaves: Record<string, unknown>[] } & Record<string, unknown>;
+    const named = index();
+    named.leaves[93]!.resource = `DSWL_ESS_ESR1${"Z".repeat(100_000)}`;
+    const noted = index();
+    for (const l of noted.leaves) l.note = "anything";
+    const last = String(noted.leaves.at(-1)!.resource);
+    const cases: { what: string; object: string; body: string; path: string; under: number; absent: string }[] = [
+      { what: "a leaf carrying the plan in operating_day", object: "leaves/DSWL_ESS_ESR1.json", body: json({ ...plan, operating_day: { ...plan } }), path: LEAF, under: 1024, absent: "energy_kwh" },
+      { what: "the same leaf, asked for in an envelope", object: "leaves/DSWL_ESS_ESR1.json", body: json({ ...plan, operating_day: { ...plan } }), path: `${LEAF}?envelope=1`, under: 1024, absent: "energy_kwh" },
+      { what: "an index whose scope_label holds the index", object: "manifest.json", body: json({ ...index(), scope_label: index() }), path: INDEX, under: 1024, absent: '"leaf":"0x' },
+      { what: "an index with a field whose name is 100 kB", object: "manifest.json", body: json({ ...index(), [`k${"y".repeat(100_000)}`]: 1 }), path: INDEX, under: 1024, absent: "y".repeat(300) },
+      { what: "an index naming a battery in 100 kB", object: "manifest.json", body: json(named), path: INDEX, under: 2100, absent: "Z".repeat(300) },
+      { what: "an index with a field beside the planner's in each of 316 entries", object: "manifest.json", body: json(noted), path: INDEX, under: 2100, absent: `leaves: ${last}:` },
+      { what: "a receipt whose root is a 5,000-character object", object: "record.bsc-mainnet.json", body: json({ ...(JSON.parse(text.receiptMainnet) as object), root: { a: "x".repeat(5000) } }), path: "/day/2026-11-26/record.bsc-mainnet.json", under: 1024, absent: "x".repeat(300) },
+    ];
+    for (const c of cases) {
+      forgetVerified();
+      const u = upstreams();
+      u.objects.set(`${DAY}/${c.object}`, c.body);
+      const res = await call(freshOrigin(), c.path);
+      const bytes = await bytesOf(res);
+      const body = new TextDecoder().decode(bytes);
+      expect.soft(res.status, c.what).toBe(502);
+      expect.soft(bytes.length, c.what).toBeLessThan(c.under);
+      expect.soft(body.includes(c.absent), `${c.what}: the refusal carries ${JSON.stringify(c.absent.slice(0, 24))}`).toBe(false);
+    }
+    // A reason cut at 2,000 characters ends with its full length.
+    forgetVerified();
+    const u = upstreams();
+    u.objects.set(`${DAY}/manifest.json`, json(noted));
+    expect.soft(await (await call(freshOrigin(), INDEX)).text()).toMatch(/\.\.\. \(\d+ characters\)\n$/);
+    // A chain's answer is quoted the same way.
+    forgetVerified();
+    upstreams((network, c) => (c.method === "eth_chainId" ? `0x${"f".repeat(100_000)}` : undefined));
+    const rpc = await bytesOf(await call(freshOrigin(), INDEX));
+    expect.soft(rpc.length, "an RPC answering a 100 kB chain id").toBeLessThan(1024);
+  });
+
   it("refuses a receipt on its fields before looking up its transaction", async () => {
     // Mainnet's receipt under the testnet name: its fields are wrong for testnet, and testnet has no
     // receipt for its transaction. The fields decide, with a 502, whatever the transaction lookup would say.

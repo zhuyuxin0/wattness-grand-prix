@@ -14,7 +14,7 @@ import {
 } from "./abi.ts";
 import { checksumAddress, type Hex } from "./bytes.ts";
 import { PLAN_SCOPE_LABEL, type Config, type NetworkName } from "./config.ts";
-import { EdgeError } from "./errors.ts";
+import { EdgeError, cut } from "./errors.ts";
 
 const READ_ONLY = new Set(["eth_chainId", "eth_blockNumber", "eth_call", "eth_getTransactionReceipt"]);
 const TIMEOUT_MS = 8_000;
@@ -50,7 +50,7 @@ export async function rpcBatch(urls: readonly string[], calls: readonly RpcCall[
       const results = calls.map((c, i) => {
         const a = byId.get(i + 1);
         if (!a) throw new Error(`no answer to ${c.method}`);
-        if (a.error) throw new Error(`${c.method}: ${String(a.error.message ?? JSON.stringify(a.error))}`);
+        if (a.error) throw new Error(`${c.method}: ${cut(String(a.error.message ?? JSON.stringify(a.error)), 200)}`);
         if (!("result" in a)) throw new Error(`${c.method}: no result`);
         return a.result;
       });
@@ -116,7 +116,7 @@ export async function readDayRecord(cfg: Config, network: NetworkName, od: numbe
       head: quantity(head, "eth_blockNumber"),
     };
   } catch (err) {
-    throw new EdgeError(502, `${network} RPC ${new URL(url).host} gave an answer GateRecord cannot have given: ${(err as Error).message}`);
+    throw new EdgeError(502, `${network} RPC ${new URL(url).host} gave an answer GateRecord cannot have given: ${cut((err as Error).message, 200)}`);
   }
 }
 
@@ -156,6 +156,6 @@ export async function readCommitTx(cfg: Config, network: NetworkName, txHash: He
       committed,
     };
   } catch (err) {
-    throw new EdgeError(502, `${network} RPC ${new URL(url).host} gave a malformed receipt for ${txHash}: ${(err as Error).message}`);
+    throw new EdgeError(502, `${network} RPC ${new URL(url).host} gave a malformed receipt for ${txHash}: ${cut((err as Error).message, 200)}`);
   }
 }

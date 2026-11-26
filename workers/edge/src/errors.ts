@@ -11,3 +11,9 @@ export class EdgeError extends Error {
     this.status = status;
   }
 }
+
+/**
+ * At most max characters of s, then its length: how much of a value, or of a whole reason, an answer quotes.
+ * A refusal prints at most 200 characters of a value and 2,000 of its reason, so it never carries the file.
+ */
+export const cut = (s: string, max: number): string => (s.length > max ? `${s.slice(0, max)}... (${s.length} characters)` : s);

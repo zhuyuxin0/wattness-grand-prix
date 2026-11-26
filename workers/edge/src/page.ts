@@ -4,7 +4,8 @@ export const homePage = (cfg: Config): string => `Wattness Grand Prix: sealed re
 
 This Worker serves each sealed operating day's files from BNB Greenfield, and serves a file only after
 checking it against GateRecord ${cfg.contract} on BSC. A file that fails a check is answered
-with 502 and the reason, never with its bytes.
+with 502 and the reason instead of the file; a reason prints at most 200 characters of any
+value it quotes and is cut at 2,000 characters.
 
 Records served: those of ${cfg.committer} under the scope "${PLAN_SCOPE_LABEL}".
 Greenfield: ${cfg.greenfieldBase}od-YYYYMMDD/

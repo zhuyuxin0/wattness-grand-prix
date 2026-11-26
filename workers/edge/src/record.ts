@@ -6,7 +6,7 @@ import { codeHashFromTree, recordKey, scopeId, type ChainRecord } from "./abi.ts
 import { fileSha256, fromUtf8, isBytes32, utf8, type Hex } from "./bytes.ts";
 import { readCommitTx, readDayRecord, type DayRecord } from "./chain.ts";
 import { FLEET_SCHEMA, MANIFEST_SCHEMA, MIN_CONFIRMATIONS, NETWORKS, PLAN_SCOPE_LABEL, type Config, type NetworkName } from "./config.ts";
-import { EdgeError } from "./errors.ts";
+import { EdgeError, cut } from "./errors.ts";
 import { fetchObject, isPlainPath, objectUrl, type StoredObject } from "./greenfield.ts";
 import { canonicalJson } from "./jcs.ts";
 import { leafHash, merkleRoot } from "./merkle.ts";
@@ -47,7 +47,8 @@ export function check(name: string, rule: string, compared: Comparison[], extra:
 
 /**
  * A value as a reason prints it: as JSON, so a string is quoted and "135677078" is not 135677078, with
- * anything outside printable ASCII escaped, so a trailing space, a CR or a BOM shows.
+ * anything outside printable ASCII escaped, so a trailing space, a CR or a BOM shows; and at most 200
+ * characters of it, so a value that holds a file does not carry it.
  */
 function shown(v: unknown): string {
   let json: string | undefined;
@@ -56,8 +57,8 @@ function shown(v: unknown): string {
   } catch {
     json = undefined;
   }
-  if (json === undefined) return String(v);
-  return json.replace(/[^\x20-\x7e]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
+  if (json === undefined) return cut(String(v), 200);
+  return cut(json.replace(/[^\x20-\x7e]/g, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`), 200);
 }
 
 const describe = (c: Comparison): string => {
@@ -75,7 +76,7 @@ export const reasonOf = (checks: readonly Check[]): string =>
     .join("; ");
 
 function refuse(what: string, checks: readonly Check[]): void {
-  if (checks.some((c) => c.result === "fail")) throw new EdgeError(502, `${what} is not served: ${reasonOf(checks)}`);
+  if (checks.some((c) => c.result === "fail")) throw new EdgeError(502, `${what} is not served: ${cut(reasonOf(checks), 2000)}`);
 }
 
 // ---------------------------------------------------------------------------------------------------------
@@ -124,7 +125,7 @@ export function parseJson(object: StoredObject, what: string): Parsed {
   try {
     return { object, text, doc: JSON.parse(text) as unknown };
   } catch (err) {
-    throw new EdgeError(502, `${what} is not served: it is not JSON (${(err as Error).message})`);
+    throw new EdgeError(502, `${what} is not served: it is not JSON (${cut((err as Error).message, 200)})`);
   }
 }
 
@@ -155,6 +156,8 @@ const byteForm = (p: Parsed): Check => {
 const RESOURCE = /^[A-Z0-9_]+$/;
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const get = (v: unknown, ...path: string[]): unknown => path.reduce<unknown>((o, k) => (isRecord(o) ? o[k] : undefined), v);
+/** A battery name as a reason prints it: bare when it has a resource name's form, else as any value; bounded either way. */
+const label = (v: unknown): string => (typeof v === "string" && RESOURCE.test(v) ? cut(v, 200) : shown(v));
 
 // The fields the planner writes (core's FleetIndex), and the only ones an index may hold: a field no check
 // reads would be served as verified, and x-gate-not-covered would not name it.
@@ -166,11 +169,14 @@ const EXCLUSION_FIELDS = ["resource", "reason"];
 const fieldProblems = (where: string, o: Record<string, unknown>, allowed: readonly string[]): string[] => [
   ...Object.keys(o)
     .filter((k) => !allowed.includes(k))
-    .map((k) => `${where}: unknown field ${JSON.stringify(k)}`),
-  ...allowed.filter((k) => !Object.hasOwn(o, k)).map((k) => `${where}: missing field ${JSON.stringify(k)}`),
+    .map((k) => `${where}: unknown field ${shown(k)}`),
+  ...allowed.filter((k) => !Object.hasOwn(o, k)).map((k) => `${where}: missing field ${shown(k)}`),
 ];
 
-/** Core's fleetIndexErrors, plus the checks a reader needs before using the index to fetch files. */
+/**
+ * Core's fleetIndexErrors, plus the checks a reader needs before using the index to fetch files. Each value
+ * a problem quotes is the index's own, so each is printed bounded, as a refusal's values are.
+ */
 export function indexShapeErrors(doc: unknown, day: string): { problems: string[]; root: Hex | null } {
   const out: string[] = [];
   if (!isRecord(doc)) return { problems: ["index: expected object"], root: null };
@@ -181,41 +187,41 @@ export function indexShapeErrors(doc: unknown, day: string): { problems: string[
   const leaves = d.leaves as unknown[];
   if (!leaves.every(isRecord)) return { problems: [...out, "leaves: expected objects"], root: null };
   const entries = leaves as Partial<FleetLeaf>[];
-  leaves.forEach((l, i) => out.push(...fieldProblems(`leaves: ${typeof l.resource === "string" ? l.resource : `entry ${i + 1}`}`, l, LEAF_FIELDS)));
+  leaves.forEach((l, i) => out.push(...fieldProblems(`leaves: ${typeof l.resource === "string" ? label(l.resource) : `entry ${i + 1}`}`, l, LEAF_FIELDS)));
   const names = entries.map((l) => l.resource);
   if (names.some((n) => typeof n !== "string" || !RESOURCE.test(n))) out.push("leaves: bad resource name");
   for (let i = 1; i < names.length; i++) {
-    if (!((names[i - 1] as string) < (names[i] as string))) out.push(`leaves: ${names[i]} is out of order or repeated`);
+    if (!((names[i - 1] as string) < (names[i] as string))) out.push(`leaves: ${label(names[i])} is out of order or repeated`);
   }
   // No hash covers the paths, so they are fixed by the battery's name: a request for leaves/<R>.json can
   // then only reach R's entry, and the leaf's own battery.resource, checked when it is served, must be R.
   for (const l of entries) {
     const r = String(l.resource);
-    if (l.manifest !== `leaves/${r}.json`) out.push(`leaves: ${r} names ${JSON.stringify(l.manifest)} as its manifest, not leaves/${r}.json`);
-    if (l.scenarios !== `leaves/${r}.scenarios.json`) out.push(`leaves: ${r} names ${JSON.stringify(l.scenarios)} as its scenario set, not leaves/${r}.scenarios.json`);
+    if (l.manifest !== `leaves/${r}.json`) out.push(`leaves: ${label(l.resource)} names ${shown(l.manifest)} as its manifest, not leaves/${cut(r, 200)}.json`);
+    if (l.scenarios !== `leaves/${r}.scenarios.json`) out.push(`leaves: ${label(l.resource)} names ${shown(l.scenarios)} as its scenario set, not leaves/${cut(r, 200)}.scenarios.json`);
   }
-  if (d.leaf_count !== leaves.length) out.push(`leaf_count ${d.leaf_count}, ${leaves.length} leaves listed`);
+  if (d.leaf_count !== leaves.length) out.push(`leaf_count ${shown(d.leaf_count)}, ${leaves.length} leaves listed`);
   let root: Hex | null = null;
   if (entries.every((l) => isBytes32(l.leaf))) {
     root = merkleRoot(entries.map((l) => l.leaf as Hex));
-    if (d.root !== root) out.push(`root ${d.root}, leaves give ${root}`);
+    if (d.root !== root) out.push(`root ${shown(d.root)}, leaves give ${root}`);
   } else out.push("leaves: a leaf hash is not 32 bytes of lowercase hex");
-  if (d.showcase !== null && d.showcase !== undefined && !names.includes(d.showcase)) out.push(`showcase ${d.showcase} is not a leaf`);
+  if (d.showcase !== null && d.showcase !== undefined && !names.includes(d.showcase)) out.push(`showcase ${shown(d.showcase)} is not a leaf`);
   if (!/^[0-9a-f]{40}$/.test(d.code_tree ?? "")) out.push("code_tree: expected 40 lowercase hex digits");
-  if (d.scope_label !== PLAN_SCOPE_LABEL) out.push(`scope_label: expected ${PLAN_SCOPE_LABEL}, got ${JSON.stringify(d.scope_label)}`);
-  if (d.operating_day !== day) out.push(`operating_day ${JSON.stringify(d.operating_day)}, this is the record of ${day}`);
+  if (d.scope_label !== PLAN_SCOPE_LABEL) out.push(`scope_label: expected ${PLAN_SCOPE_LABEL}, got ${shown(d.scope_label)}`);
+  if (d.operating_day !== day) out.push(`operating_day ${shown(d.operating_day)}, this is the record of ${day}`);
   else {
     const gate = gateTs(Number(day.replaceAll("-", "")));
-    if (d.gate_unix !== gate) out.push(`gate_unix ${d.gate_unix}, the gate for ${day} is ${gate}`);
-    if (!(Number.isSafeInteger(d.plan_unix) && (d.plan_unix as number) < gate)) out.push(`plan_unix ${d.plan_unix} is not before the gate ${gate}`);
+    if (d.gate_unix !== gate) out.push(`gate_unix ${shown(d.gate_unix)}, the gate for ${day} is ${gate}`);
+    if (!(Number.isSafeInteger(d.plan_unix) && (d.plan_unix as number) < gate)) out.push(`plan_unix ${shown(d.plan_unix)} is not before the gate ${gate}`);
   }
   const exclusions: unknown = d.exclusions;
   if (!Array.isArray(exclusions) || !exclusions.every(isRecord)) out.push("exclusions: expected a list of {resource, reason}");
   else {
     exclusions.forEach((e, i) => {
-      const where = `exclusions: ${typeof e.resource === "string" ? e.resource : `entry ${i + 1}`}`;
+      const where = `exclusions: ${typeof e.resource === "string" ? label(e.resource) : `entry ${i + 1}`}`;
       out.push(...fieldProblems(where, e, EXCLUSION_FIELDS));
-      for (const k of EXCLUSION_FIELDS) if (Object.hasOwn(e, k) && typeof e[k] !== "string") out.push(`${where}: ${k} ${JSON.stringify(e[k])} is not a string`);
+      for (const k of EXCLUSION_FIELDS) if (Object.hasOwn(e, k) && typeof e[k] !== "string") out.push(`${where}: ${k} ${shown(e[k])} is not a string`);
     });
   }
   return { problems: out, root };

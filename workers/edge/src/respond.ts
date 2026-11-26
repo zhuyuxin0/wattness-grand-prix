@@ -112,7 +112,7 @@ export function textResponse(text: string, status = 200, cache = NO_STORE): Resp
   return new Response(text, { status, headers: { ...CORS, "content-type": "text/plain; charset=utf-8", "cache-control": cache } });
 }
 
-/** Errors carry a plain reason and never a byte of the file; nothing about them is cached. */
+/** Errors carry a plain reason instead of the file, its values bounded (errors.ts's cut); nothing about them is cached. */
 export function errorResponse(err: unknown, json: boolean): Response {
   const status = err instanceof EdgeError ? err.status : err instanceof RangeError ? 400 : 500;
   const reason = err instanceof Error ? err.message : String(err);
