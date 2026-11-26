@@ -66,6 +66,15 @@
     transition: none;
   }
 }
+/* The stage's sides fade into the room's dark, so the scene's words at its edges (a label running on under a pane)
+   end softly rather than in a cut letter. Over the 3D, out of the pointer's way. */
+.ov-room__stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #14171a, rgb(20 23 26 / 0) 28px, rgb(20 23 26 / 0) calc(100% - 28px), #14171a);
+  pointer-events: none;
+}
 
 /* ---------------------------------------------------------------- the panes' places */
 
