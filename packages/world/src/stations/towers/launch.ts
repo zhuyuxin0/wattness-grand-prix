@@ -12,7 +12,8 @@ import {
   mount, short, int, tagPlates, createBuilder, line, comets, grabTex, type Glow, type Mats,
 } from './set';
 
-/** The agent's token, one constant until the organizers answer on testnet tickers. */
+/** The agent token's ticker, one constant. Until the organizers say testnet tickers are fine, the frames print the plain
+ *  name ("the launched agent token") instead of it. */
 export const AGENT_TOKEN = 'PLNR';
 
 const C = { x: 330, z: 172 };            // the tower's center
@@ -357,7 +358,7 @@ function cardScreen(d: any, state: LaunchState) {
     days,
     el('dl.tw-kv', el('dt', 'checks'), el('dd', `${ev.passed} pass`)),
     pips,
-    el('div.rows', el('div.row', 'token', el('b', `Grand Prix Planner (${AGENT_TOKEN})`)),
+    el('div.rows', el('div.row', 'token', el('b', 'Grand Prix Planner')),
       el('div.row', 'launch', el('b', `OpenFour ${d.sponsors.openfour.presets.active.name}`))));
 }
 
@@ -457,7 +458,7 @@ export async function launchFrame(ctx: FrameContext, state: LaunchState): Promis
   return {
     time: 1.6,
     note: graduate
-      ? `Entirely a design: no evidence-gated module is deployed, no ${AGENT_TOKEN} token exists, no liquidity, no migration. The OpenFour testnet run is in progress; this frame claims no result from it. The plates describe how graduation works; the fill is the module's threshold mark, not a market figure. Real, as in T03: the agent's wallet, its one sealed day (${dayWord}, ${int(r0.seconds_before_gate)} s before the gate on BSC mainnet) and its checks (${ev.passed} pass, ${ev.skipped} skipped), from frame-data.json sealed_day and sponsors.agent_studio. ${AGENT_TOKEN} is a working name held in one constant. Jo decides whether a design frame belongs in the public cut.`
+      ? `Entirely a design: no evidence-gated module is deployed, no agent token exists, no liquidity, no migration. The OpenFour testnet run is in progress; this frame claims no result from it. The plates describe how graduation works; the fill is the module's threshold mark, not a market figure. Real, as in T03: the agent's wallet, its one sealed day (${dayWord}, ${int(r0.seconds_before_gate)} s before the gate on BSC mainnet) and its checks (${ev.passed} pass, ${ev.skipped} skipped), from frame-data.json sealed_day and sponsors.agent_studio. ${AGENT_TOKEN} is a working name held in one constant. Jo decides whether a design frame belongs in the public cut.`
       : `The state today. Real: the right lamp reads the ${dayWord} record, sealed ${int(r0.seconds_before_gate)} s before the gate (frame-data.json sealed_day.receipts[0]); the agent's wallet ${short(d.sealed_day.agent.wallet)} and its evaluation, ${ev.passed} checks pass and ${ev.skipped} skipped (sponsors.agent_studio.evaluation); OpenFour's ${of.presets.active.name} preset and its ${of.modules.length} modules, found by the testnet discovery probe (block ${int(of.block)}, ${of.block_time.ct.slice(11)}). The OpenFour testnet run is in progress; at this data no custom module is deployed, no token created and no migration run, so the liquidity lamp has nothing to read and stays dark and hatched, and the spiral has one lit turn for the one sealed day. ${AGENT_TOKEN} is a working name held in one constant. Illustrative: the tower and its signal head (on the crown, turned toward A9), the spiral's rise per day, the card's angle toward the lane, and the pool. Whether a developer-owned registry qualifies for OpenFour's Hub is an open question to OpenFour.`,
     update(t) {
       stage.setCamera(cam);
@@ -485,7 +486,7 @@ export async function launchFrame(ctx: FrameContext, state: LaunchState): Promis
           { id: 'lamp-r', text: `Sealed before the gate: ${dayWord} · ${int(r0.seconds_before_gate)} s`, at: tower.lamps.sealed, priority: 0 },
           { id: 'card', text: `The agent (${short(d.sealed_day.agent.wallet)}) · 1 day sealed · ${ev.passed} checks pass`, at: card.world([-3.55, 1.12, 1.3]), priority: 2 },
           { id: 'module', text: `OpenFour ${of.presets.active.name} · ${['zero', 'one', 'two', 'three', 'four', 'five', 'six'][of.modules.length] ?? of.modules.length} modules · migration behind an evidence gate`, at: tower.mid, priority: 3 },
-          { id: 'token', text: `Grand Prix Planner (${AGENT_TOKEN})`, at: tower.spiralEnd, priority: 4 },
+          { id: 'token', text: 'Grand Prix Planner, the launched agent token', at: tower.spiralEnd, priority: 4 },
         ], { max: 6, keepOut: cap ? [cap, cardBox] : [cardBox] });
         tagPlates(ctx, { 'Sealed before the gate': 'tw-sealed' });
       }
