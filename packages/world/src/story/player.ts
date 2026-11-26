@@ -1,5 +1,6 @@
 // THE STORY PLAYER. One renderer and one stage (lib/stage.ts over the kit's) for the whole story; each station frame is
-// built into it once, lazily, when the story comes near it, and disposed when the story has gone on (instances.ts).
+// built into it once, lazily, when the story comes near it, and disposed once the story has gone on and it is not among
+// the frames drawn last (instances.ts; trim).
 // One seekable time drives everything: draw(t) poses each frame shown at its own local time, sets the camera for the
 // leg or the rest, and renders. Where two frames meet, both are drawn in the same tick: the outgoing one is copied to
 // a 2D canvas beneath and the incoming one fades in over it on the WebGL canvas, as the intro's scenes cross-fade
@@ -143,11 +144,19 @@ export class StoryPlayer {
         await inst.build();
         const b1 = performance.now();
         inst.buildMs = Math.round(b1 - b0);
-        // only this frame's group visible while its programs compile
+        // only this frame's group visible while its programs compile, and the other frames' groups out of the scene
+        // until the compile has been queued: three's compile prepares every material in the scene, shown or not, so each
+        // build would prepare the kept frames' materials again under this frame's stage state (and queue variants of
+        // them no frame draws), and wait for all their programs. preparePrograms queues them before its first await.
         for (const x of this.insts.values()) x.root.visible = x === inst;
         inst.pose(inst.restLocal, 0);
         if (inst.restPose) this.stage.setCamera(inst.restPose);
-        const prep = await this.stage.preparePrograms([() => inst.pose(inst.restLocal, 0)], () => !this.dead && !inst.disposed);
+        const scene = this.stage.scene, parked = [...this.insts.values()].filter((x) => x !== inst && x.root.parent === scene);
+        for (const x of parked) scene.remove(x.root);
+        let compiled: ReturnType<WorldStage['preparePrograms']>;
+        try { compiled = this.stage.preparePrograms([() => inst.pose(inst.restLocal, 0)], () => !this.dead && !inst.disposed); }
+        finally { for (const x of parked) scene.add(x.root); }
+        const prep = await compiled;
         inst.root.visible = false;
         const b2 = performance.now();
         inst.readyMs = Math.round(b2 - b0);
@@ -239,6 +248,15 @@ export class StoryPlayer {
     for (const [id, inst] of this.insts) if (!k.has(id) && inst.ready && !this.building.has(id)) this.drop(id, inst);
   }
 
+  /** Lets frames go, least recently drawn first: those in keep stay, and so do the `drawn` frames drawn last (so a step
+   *  back to any of them draws at once); a frame built ahead and never drawn stays only while it is in keep. */
+  trim(keep: Iterable<string>, drawn: number) {
+    const k = new Set(keep);
+    const built = [...this.insts].filter(([id, inst]) => inst.ready && !this.building.has(id));
+    const recent = new Set(built.filter(([, i]) => i.lastUsed > 0).sort((a, b) => b[1].lastUsed - a[1].lastUsed).slice(0, Math.max(0, drawn)).map(([id]) => id));
+    for (const [id, inst] of built) if (!k.has(id) && !recent.has(id)) this.drop(id, inst);
+  }
+
   private drop(id: string, inst: FrameInstance) {
     this.rises.delete(inst); inst.dispose(); this.insts.delete(id);
     perfLog()?.events.push({ e: 'drop', frame: id, t: performance.now() });
@@ -257,6 +275,7 @@ export class StoryPlayer {
     for (const inst of this.insts.values()) inst.root.visible = false;
     let under = false;
     pic.draws.forEach((d, n) => {
+      d.inst.lastUsed = t0;
       d.inst.pose(d.local, dt);
       const r = this.rises.get(d.inst) ?? (d.rise != null ? this.riseFor(d.inst) : null);
       if (r) { if (d.rise != null) r.set(d.rise); else r.restore(); }

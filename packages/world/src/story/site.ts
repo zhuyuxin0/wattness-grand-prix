@@ -20,6 +20,8 @@ const STEP_PACE = 1.15;
 const SCREENS_PER_MOVE = 1.6;
 const SPRING = 6;
 const REDUCED_FADE_S = 0.45;
+/** Frames kept built after the story has passed them: the six drawn last (player.ts trim), so a step back draws at once. */
+const KEEP_DRAWN = 6;
 
 const typing = (t: EventTarget | null) => t instanceof HTMLElement && (t.isContentEditable || t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement);
 const arrowSvg = () => {
@@ -46,7 +48,6 @@ export class SiteController {
   private raf = 0;
   private last = 0;
   private drawnAt = NaN;
-  private settledAt = -1;
   private platesK = 0;
   private decorating = false;
   private stop = -1;
@@ -279,13 +280,12 @@ export class SiteController {
     if (p !== this.drawnAt) {
       this.P.render(pic, 0);
       this.drawnAt = p;
-      if (!atRest) { this.platesK = 0; this.settledAt = -1; }
+      if (!atRest) this.platesK = 0;
     }
     // the rest's plates: laid out once the picture has landed, then in over 0.3 s; out at once when it moves
     const restPic = atRest ? this.P.picture(this.P.film.keys[this.P.film.stops[Math.round(p)]!]!.at) : null;
     for (const b of [pic]) for (const d of b.draws) if (!restPic || d.inst !== restPic.draws[0]?.inst) d.inst.showPlates(0);
     if (restPic && restPic.plates) {
-      if (this.settledAt < 0) this.settledAt = now;
       if (restPic.plates.inst.decoratedFor !== restPic.plates.key) {
         this.decorating = true;
         const from = now, k = Math.round(p);
@@ -300,7 +300,8 @@ export class SiteController {
     } else if (this.P.last?.plates) this.P.last.plates.inst.showPlates(0);
     const stop = Math.round(p);
     if (stop !== this.stop) this.setStop(stop);
-    if (atRest && now - this.settledAt > 400) this.prefetch(stop);
+    // the frames round the rest start building as soon as the camera has landed and the plates are laid out
+    if (atRest && !this.decorating) this.prefetch(stop);
   };
 
   private showWait(now: number, why: string) {
@@ -314,7 +315,9 @@ export class SiteController {
     this.waitingSince = -1; this.wait.classList.remove('is-on');
   }
 
-  /** In idle time at a rest: the frames of the stops round it, one build at a time; the far ones let go. */
+  /** At a rest, from the moment it lands: the frames of the stops round it, the next chapter's first, one build at a
+   *  time. A frame the story has passed is let go once it is neither round the rest nor among the six drawn last (at
+   *  each new rest, and after each build), so the frames built stay bounded however quickly the visitor steps. */
   private prefetch(stop: number) {
     if (this.P.isBuilding()) return;
     const F = this.P.film, around = [stop + 1, stop - 1, stop + 2];
@@ -324,9 +327,9 @@ export class SiteController {
       const lo = F.stops[Math.max(0, s - 1)]!, hi = F.stops[s]!;
       for (let i = lo; i <= hi; i++) want.push(keyDef(F.keys[i]!.key).frame);
     }
+    if (this.prefetchIdx !== stop) { this.prefetchIdx = stop; this.P.trim(want, KEEP_DRAWN); }
     const next = want.find((f) => !this.P.inst(f).ready && !this.P.errors.has(f));
-    if (next) { this.P.ensure(next, 'prefetch').catch(() => undefined); return; }
-    if (this.prefetchIdx !== stop) { this.prefetchIdx = stop; this.P.prune(want); }
+    if (next) this.P.ensure(next, 'prefetch').then(() => { if (!this.dead) this.P.trim(want, KEEP_DRAWN); }, () => undefined);
   }
 
   private setStop(k: number) {
