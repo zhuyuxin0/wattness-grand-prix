@@ -243,7 +243,9 @@ function words(t: number, clock: FilmClock, world: BrainWorld) {
   else if (t < T.dive[0] + 1.0) {
     const landed = acrossLanded(world, (t - T.first[0]) * T.landing);
     const done = landed >= COUNTS.across && t >= T.find[1];
-    const rows: { n: string; label: string; tone?: 'em' | 'rose' }[][] = [[{ n: fmt(COUNTS.pages), label: 'pages' }, { n: String(landed), label: 'across brains' }]];
+    // the HUD states the record's total while the links draw, so a stop that rests mid-draw (the short clock's stop
+    // on the site) reads the same 55 as the Memory tab; `landed` still paces the pair rows below
+    const rows: { n: string; label: string; tone?: 'em' | 'rose' }[][] = [[{ n: fmt(COUNTS.pages), label: 'pages' }, { n: String(COUNTS.across), label: 'across brains' }]];
     if (done) rows.push([{ n: String(COUNTS.pairs['grand-prix|terminal'] ?? 0), label: 'build–Terminal' }, { n: String(COUNTS.pairs['battery-review|grand-prix'] ?? 0), label: 'build–review' }]);
     if (t >= T.conflict) rows.push([{ n: String(COUNTS.conflicts), label: 'conflict', tone: 'rose' }]);
     hud = rows;
