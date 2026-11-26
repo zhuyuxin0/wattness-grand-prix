@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Recompute a gate-record document's leaf hash and one-leaf root.
 
-    python3 tools/verify_hash.py records/2026-11-26/manifest.json [--expect 0x...]
+    python3 -I tools/verify_hash.py fixtures/od-20261126/leaves/DSWL_ESS_ESR1.json [--expect 0x...]
 
 A second implementation of packages/core, standard library only:
 leaf = SHA-256(0x00 || JCS(document)), and the RFC 6962 root of a single leaf
