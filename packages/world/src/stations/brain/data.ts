@@ -168,12 +168,14 @@ export function ctShort(s: Stamp, seconds = false): string {
 /** Thousands with commas. */
 export const fmt = (n: number) => n.toLocaleString('en-US');
 
-/** The scope line on every frame of our scene and on the Memory tab's stage. */
-export const SCOPE = `Living Brain: our three brains, drawn from its API · read ${ctShort(SCENE.source.crossChecked)}`;
-/** The scope line as shown: CT, and on the site the reader's own clock beside it (a film prints CT alone, as
- *  lib/yours.ts has every station do; a reader on Central time sees CT alone too). */
+/** The scope line on every frame of our scene and on the Memory tab's stage. Its time is the read of the combined
+ *  graph (the links across brains and the conflict), not the pages' own read the Memory tab's summary gives. */
+export const SCOPE = `Living Brain: our three brains, drawn from its API · links across brains read ${ctShort(SCENE.source.crossChecked)}`;
+/** The scope line as shown: CT, and on the site the reader's own clock beside it with its date, as the site's dualTime
+ *  prints it (a reader west of Central reads that time on the day before); a film prints CT alone, as lib/yours.ts has
+ *  every station do, and a reader on Central time sees CT alone too. */
 export function scopeLine(film: boolean): string {
   const at = Date.parse(SCENE.source.crossChecked.utc ?? '');
-  const own = Number.isFinite(at) ? yours(Math.floor(at / 1000), { film }) : null;
+  const own = Number.isFinite(at) ? yours(Math.floor(at / 1000), { film, date: true }) : null;
   return own ? `${SCOPE} (${own})` : SCOPE;
 }

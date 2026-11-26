@@ -82,7 +82,7 @@ export function Build({ b }: { b: BuildBrain }) {
           <Stat label="The build's brain" value={formatInt(b.brain.pages)} unit=" pages" note={`${formatInt(b.brain.connections)} connections: ${STRENGTHS.map((s) => `${b.brain.byStrength[s] ?? 0} ${s}`).join(" · ")}`} />
           {terminal && <Stat label="The Terminal's brain" value={formatInt(terminal.pages)} unit=" pages" note={`${formatInt(terminal.connections)} connections, "${terminal.name}"`} />}
           <Stat label="Across brains" value={formatInt(b.combined.crossBrainConnections)} unit=" links" note={`in "${b.combined.name}", ${formatInt(b.combined.pages)} pages in all`} />
-          <Stat label="Read back" value={read.ct} size="sm" note={read.yours ?? "market time"} />
+          <Stat label="Pages read back" value={read.ct} size="sm" note={read.yours ?? "market time"} />
         </StatRow>
         <p className="mem-source">
           {b.brain.description} Compiled by Living Brain from {formatInt(b.brain.notes.compiled)} short notes on the build. {SHORT}
