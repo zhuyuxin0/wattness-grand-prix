@@ -17,7 +17,7 @@ Wattness Grand Prix plans tomorrow for every ERCOT battery with complete public 
   ```
 
 - **How.** First the event is resolved, one call to `POST https://interface.cournot.ai/intelligence/v1/resolve`, and the response is saved (`node packages/adapters/cournot/dist/live.js resolve "<event description>"`). The plan run checks the chosen market against the rule, then makes one call to `POST https://interface.cournot.ai/intelligence/v1/probability` for that market only, with a 20-second limit. Requests are never retried automatically, so a call is never spent twice.
-- **The official Skill.** These are the endpoints the official Cournot Intelligence Skill documents ([Cournot-AI/cournot-skills](https://github.com/Cournot-AI/cournot-skills), `skills/cournot/references/query-flow.md` and `response-format.md`). The adapter calls them from our own MIT TypeScript and includes no code from the Skill's repository.
+- **The official Skill.** These are the endpoints the official Cournot Intelligence Oracle Skill calls, in its order: resolve, then probability. In [Cournot-AI/cournot-skills](https://github.com/Cournot-AI/cournot-skills), the Skill, `cournot`, documents the flow in `skills/cournot/references/query-flow.md` and the response in `skills/cournot/references/response-format.md`, and builds the request path `/intelligence/v1/<operation>` in `skills/cournot/scripts/account-flow.mjs`. The adapter makes the same two calls from this repository's MIT TypeScript, and the Skill itself made a live call too (section 5).
 - **What the rule reads.** A Kalshi lower-tail minimum-temperature market at Dallas–Fort Worth (station CLIDFW), for the operating day or the day before it. The claim (market ID, station, threshold and date) is read from the market's title and rules text, which must agree. The reading must arrive before the plan time and the gate, and at most 24 hours before the plan time.
 - **When it cannot be used.** If the market is not one the rule reads, the call fails, or the response cannot be read, the plan goes ahead without it and records `status: "not_applied"` with the reason; the scenarios stay equally weighted, and the seal never waits.
 - **Handling.** An HTTP 200 with a nonzero API code is not a success; a probability must be finite and within [0, 1]; the response must name the selected market and no other; HTTP 402 stops without paying and 429 is reported as rate limiting; redirects are refused; keys, IP fields and email addresses are removed from what is saved.
@@ -35,7 +35,7 @@ The rule is `gate-record.weather-stress.v1`, and its parameters are written into
 
 ## 4. Where users see the claim and the evidence
 
-- **The Forecast tab.** The [Forecast tab](https://gp.wattness.tech/#/agents/forecast)'s "Weather Odds from Cournot" card shows the rule beside a recorded reading: the exact claim (market, station, threshold and date), Cournot's probability, its basis (Kalshi's YES quote and its time), when it was received, the stress weight, the hedge limit and the contract cap, and the battery's own stress days. The rule's assumptions are labeled there as ours.
+- **The Forecast tab.** The [Forecast tab](https://gp.wattness.tech/#/agents/forecast)'s "Weather Odds from Cournot" card shows the rule beside a recorded reading, the Nov 25 call (Cournot market 24962617): the exact claim (market, station, threshold and date), Cournot's probability, its basis (Kalshi's YES quote and its time), when it was received, the stress weight, the hedge limit and the contract cap, and the battery's own stress days. The rule's assumptions are labeled there as ours.
 - **Every Nov 27 plan.** Each of the 316 plans carries, under `outside_inputs.cournot`: the rule and its parameters, the claim, p in parts per million, Cournot's basis as returned, the receipt time, the response's route and SHA-256, the stress days, and the stress weight and hedge cap before and after.
 - **The response itself.** Published beside the record on BNB Greenfield, at `od-20261127/cournot/probability.json` in the bucket `wattness-grand-prix-records`.
 
@@ -47,7 +47,7 @@ The rule is `gate-record.weather-stress.v1`, and its parameters are written into
 |---|---|
 | Requested | Nov 26, 08:05:03 CT (21:05:03 Bangkok) |
 | Answer | HTTP 200, code 0, `"Success"` |
-| Claim | Kalshi market 28288699: "Will the minimum temperature be <29° on Nov 26, 2026? (Yes: 28° or below)", Dallas (CLIDFW) |
+| Claim | Cournot market 28288699, Kalshi's KXLOWTDAL-26NOV26-T29: "Will the minimum temperature be <29° on Nov 26, 2026? (Yes: 28° or below)", Dallas (CLIDFW) |
 | Probability | 0.01 |
 | Basis | Kalshi's latest YES price, 0.0100, at 08:00:48 CT |
 | Received | 08:05:04 CT, rounded up to the second: 42 s before the plan time, 08:05:46 CT |
@@ -63,7 +63,9 @@ curl -s https://gnfd-testnet-sp3.nodereal.io/view/wattness-grand-prix-records/od
 
 The hash matches `outside_inputs.cournot.response.sha256` in any Nov 27 plan, and that plan's proof leads to the root on chain. The verifier does the same: its input check (V7) hashes the published response and compares its claim, probability, basis and time with the plan's, and its shape and rule check (V8) recomputes the weights, the hedge cap and the stress bucket from it.
 
-**The earlier live call.** On Nov 25, for the same Dallas market (Cournot market 24962617), Cournot returned p = 0.01, received 8 min 16 s before the Nov 26 gate. It is the reading the Forecast tab's card works through.
+**Through the official Skill itself.** On Nov 26 at 09:31:18 CT the Skill, `cournot`, resolved the same Kalshi market (Cournot market 25380188) and asked its probability. Cournot answered HTTP 200, `"Success"`, p = 0.01, with Kalshi's YES price, 0.0100 at 09:30:51 CT, as its basis. <!-- R3: link evidence/cournot/official-skill/probability-od26m-20261126T153118Z.json here once it is published. -->
+
+**The earlier live call.** On Nov 25, for the same Kalshi market, KXLOWTDAL-26NOV26-T29 (Cournot market 24962617), Cournot returned p = 0.01, received 8 min 16 s before the Nov 26 gate. It is the reading the Forecast tab's card works through.
 
 ## Setup
 

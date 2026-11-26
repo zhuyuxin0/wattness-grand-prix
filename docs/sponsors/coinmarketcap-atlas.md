@@ -2,7 +2,7 @@
 
 <!-- MEDIA: video-coinmarketcap-atlas -->
 
-Wattness Grand Prix seals the next day's plan for every ERCOT battery with complete public data (316 on Nov 26) on BNB Chain before the market's 10:00 CT gate. CoinMarketCap's Pro API and Atlas's signed reports and on-chain feeds decide how many independent checks of those plans a budget pays for, and stop the count when the prices are stale or disagree. Code: [`packages/adapters/atlas-cmc`](../../packages/adapters/atlas-cmc), server-side, with offline tests; setup in [its README](../../packages/adapters/atlas-cmc/README.md). Interface: the [Prices tab](https://gp.wattness.tech/#/markets/prices) and the Seal tab.
+CoinMarketCap's Pro API and Atlas's signed reports and on-chain feeds decide how many independent checks of Wattness Grand Prix's sealed plans a budget pays for, and stop the count when the prices are stale or disagree. The Grand Prix seals the next day's plan for every ERCOT battery with complete public data (316 on Nov 26) on BNB Chain before the market's 10:00 CT gate. Repository: [github.com/zhuyuxin0/wattness-grand-prix](https://github.com/zhuyuxin0/wattness-grand-prix), MIT; setup in [Run it](../../README.md#run-it). Code: [`packages/adapters/atlas-cmc`](../../packages/adapters/atlas-cmc), server-side, with offline tests and setup in [its README](../../packages/adapters/atlas-cmc/README.md). Interface: the [Prices tab](https://gp.wattness.tech/#/markets/prices) and the Seal tab.
 
 ## 1. The problem and the audience
 
@@ -37,4 +37,6 @@ Anyone can check a sealed plan for free with the verifier. An independent, paid 
 
 ## Team and contact
 
-<!-- TEAM-CONTACT: team names and contact, typed by Jo -->
+Team: Wattness.
+
+<!-- CONTACT: the contact line, typed by Jo (J9) -->
