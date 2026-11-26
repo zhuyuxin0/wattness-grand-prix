@@ -42,8 +42,12 @@
 .checkit--failed .checkit__status {
   color: var(--s-bad);
 }
-.checkit__status + .checkit__count::before {
-  content: "· ";
+/* the dot ends the status, so a phone that wraps the count starts its line with a word, not a dot */
+.checkit__status::after {
+  content: "·";
+  margin-left: 2px;
+  font-weight: 400;
+  color: var(--w-muted);
 }
 .checkit__open {
   display: inline-flex;
