@@ -4,7 +4,9 @@
 // combined brain with the three members on their orbits; a member brain clicked (or its chip) comes to the center; a
 // page's tag hovered lights its connections and shows a small card; clicked, its card pins, with its connections in
 // its brain and across brains, Living Brain's summary and the correction beside it, and "Open <tab>" where the page is a tab's
-// own. Drag, wheel and pinch orbit and zoom as Living Brain's controls do. Every page is also a button in a visually
+// own. Drag and pinch orbit and zoom as Living Brain's controls do; the wheel zooms with Ctrl or ⌘ held (a trackpad's
+// pinch arrives so) or once the visitor has pressed on the stage, and otherwise scrolls the page past it, and a vertical
+// swipe on a phone scrolls the page too. Every page is also a button in a visually
 // hidden list (the keyboard's path); without WebGL the list is the view, and under 720 px it opens as a drawer. The
 // mount never writes the URL: it calls onState and the host does. The 3D holds dark in either site theme.
 import './brain.css';
@@ -198,7 +200,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   // ── the words: chips, hint, HUD, card, hover card, lists ──────────────────────────────────────────────────
   const renderChrome = () => {
     setChips(chipsBox, S.focus);
-    hint.textContent = S.focus === 'all' ? 'Drag · Scroll · Click a brain or a page · Esc to clear' : 'Drag · Scroll · Click a page to see its connections · Esc for all brains';
+    if (!hint.classList.contains('is-tip')) hint.textContent = hintText();
     const b = S.focus === 'all' ? null : brainOf(S.focus);
     chrome.hud(b
       ? [[{ n: fmt(b.pages), label: b.pages === 1 ? 'page' : 'pages' }, { n: fmt(b.connections), label: 'connections' }, ...(b.connections ? [{ n: fmt(b.strong), label: 'strong', tone: 'em' as const }] : [])]]
@@ -215,6 +217,7 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     if (!drawer.hidden) fillDrawer();
     layout();
   };
+  const hintText = () => (S.focus === 'all' ? 'Drag · Ctrl/⌘ + scroll · Click a brain or a page · Esc to clear' : 'Drag · Ctrl/⌘ + scroll · Click a page to see its connections · Esc for all brains');
   /** The narrow layout (chips at the bottom over the scope line, the card a bottom sheet, the pages a drawer) under
    *  800 px, or wherever the HUD and the chips would meet in their row; and the scope line's height for the chips. */
   const layout = () => {
@@ -603,7 +606,25 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
     if (pts.size < 2) pinch0 = 0;
     if (!pts.size) { S.drag = false; root.classList.remove('is-grab'); down = null; S.vel.az = 0; S.vel.el = 0; }
   };
+  // the wheel zooms with Ctrl or ⌘ held (a trackpad's pinch arrives with ctrlKey) or once the visitor has pressed on the
+  // stage (until the pointer leaves it or the window loses focus); otherwise the page scrolls on, and the hint says how
+  // to zoom, once each time the pointer comes onto the stage
+  let engaged = false, tipped = false, tipTimer = 0;
+  const tip = () => {
+    if (tipped) return;
+    tipped = true;
+    hint.textContent = 'Hold Ctrl or ⌘ to zoom'; hint.classList.add('is-tip');
+    clearTimeout(tipTimer);
+    tipTimer = window.setTimeout(() => { hint.classList.remove('is-tip'); hint.textContent = hintText(); }, 2000);
+  };
+  const onEngage = () => { engaged = true; };
+  const onLeave = () => { engaged = false; tipped = false; };
+  root.addEventListener('pointerdown', onEngage);
+  root.addEventListener('pointerleave', onLeave);
+  window.addEventListener('blur', onLeave);
+  cleanups.push(() => { root.removeEventListener('pointerdown', onEngage); root.removeEventListener('pointerleave', onLeave); window.removeEventListener('blur', onLeave); clearTimeout(tipTimer); });
   const onWheel = (e) => {
+    if (!(e.ctrlKey || e.metaKey || engaged)) { tip(); return; }
     e.preventDefault();
     // Living Brain's zoom speed 0.8: a 120 px notch takes the distance times 0.952, eased in draw()
     S.zoomTo = Math.max(1.4, Math.min(dMax(), (S.zoomTo ?? S.cam.dist) * Math.pow(0.952, -e.deltaY / 120)));

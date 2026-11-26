@@ -27,6 +27,8 @@
 .lbm-root .lb-hint { z-index: 4; }
 /* a pinned card covers the stage's right side, where the hint ran under it: the card's close and Escape say the rest */
 .lbm-root.has-card .lb-hint { display: none; }
+/* how to zoom, for 2 s after a plain wheel over the stage scrolled the page on: shown in any layout */
+.lbm-root .lb-hint.is-tip, .lbm-root.has-card .lb-hint.is-tip, .lbm-root.is-narrow .lb-hint.is-tip { display: block; color: rgba(255, 255, 255, 0.85); border-color: rgba(34, 211, 238, 0.4); }
 
 /* the pinned card: right side; a bottom sheet in the narrow layout */
 .lbm-cardbox { position: absolute; z-index: 6; right: 12px; top: 52px; bottom: 12px; width: 320px; display: flex; flex-direction: column; justify-content: flex-start; pointer-events: none; }
@@ -95,6 +97,7 @@
 .lbm-pagesbtn { display: none; }
 .lbm-root.is-narrow .lbm-chips { left: 12px; right: 12px; top: auto; bottom: calc(var(--lbm-scope-h, 30px) + 16px); max-width: none; justify-content: center; }
 .lbm-root.is-narrow .lb-hint { display: none; }
+.lbm-root.is-narrow .lb-hint.is-tip { top: 52px; bottom: auto; }
 .lbm-root.is-narrow .lb-hud { max-width: calc(100% - 132px); }
 .lbm-root.is-narrow .lb-layer .lb-scope { bottom: 8px; left: 8px; font-size: 10.5px; }
 .lbm-root.is-narrow .lbm-cardbox { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 62%; }
