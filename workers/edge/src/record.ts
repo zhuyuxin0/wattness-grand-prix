@@ -117,6 +117,28 @@ export interface Parsed {
   doc: unknown;
 }
 
+/** The most levels of arrays and objects a parsed document may nest: 26 Nov's nest at most 4, the 27 Nov dry run's at most 5. */
+export const MAX_DEPTH = 64;
+
+/** Whether a parsed document nests arrays and objects more than max levels deep, walked without recursion. */
+export function nestsDeeperThan(doc: unknown, max: number): boolean {
+  const values: unknown[] = [doc];
+  const depths: number[] = [1];
+  while (values.length > 0) {
+    const v = values.pop();
+    const depth = depths.pop() as number;
+    if (typeof v !== "object" || v === null) continue;
+    if (depth > max) return true;
+    for (const child of Array.isArray(v) ? v : Object.values(v)) {
+      if (typeof child === "object" && child !== null) {
+        values.push(child);
+        depths.push(depth + 1);
+      }
+    }
+  }
+  return false;
+}
+
 export function parseJson(object: StoredObject, what: string): Parsed {
   let text: string;
   try {
@@ -124,11 +146,16 @@ export function parseJson(object: StoredObject, what: string): Parsed {
   } catch {
     throw new EdgeError(502, `${what} is not served: its bytes are not UTF-8`);
   }
+  let doc: unknown;
   try {
-    return { object, text, doc: JSON.parse(text) as unknown };
+    doc = JSON.parse(text) as unknown;
   } catch (err) {
     throw new EdgeError(502, `${what} is not served: it is not JSON (${cut((err as Error).message, 200)})`);
   }
+  // Each later step that walks the document recurses (its rendering, its RFC 8785 form, a value printed in
+  // a reason), so a document nested deeper than any sealed one is refused here, before any of them runs.
+  if (nestsDeeperThan(doc, MAX_DEPTH)) throw new EdgeError(502, `${what} is not served: it nests deeper than ${MAX_DEPTH} levels`);
+  return { object, text, doc };
 }
 
 /**
@@ -617,12 +644,15 @@ export async function sealedOutsideFile(day: Day, sealed: readonly SealedIndex[]
     indexSealed(sealed),
   ];
   refuse(path, checks);
+  // For the envelope only: the bytes are served as they are, since their SHA-256 is the leaf's. A document
+  // that does not parse, or nests deeper than the envelope can print, is given as null.
   let document: unknown = null;
   try {
     document = JSON.parse(fromUtf8(object.bytes)) as unknown;
   } catch {
     document = null;
   }
+  if (nestsDeeperThan(document, MAX_DEPTH)) document = null;
   return { path, bytes: object.bytes, contentType: contentTypeOf(path), checks, basis: `the SHA-256 ${facts.resource}'s verified leaf ${facts.leaf} records for outside_inputs.${ref.name}`, source: object.url, sealed: [...sealed], document };
 }
 

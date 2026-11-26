@@ -45,7 +45,9 @@ Every JSON file must also be its document's own rendering, pretty-printed with a
 form. A hash covers a document, not its whitespace; this rule means no byte is served that the document does not
 determine, other than the order of an object's keys, which no hash fixes: RFC 8785 sorts them, so a copy with its
 keys in another order hashes the same and is served. The rule refuses a duplicate key that one parser would read
-one way and another the other.
+one way and another the other. A JSON file the Worker parses must also nest at most 64 levels of arrays and
+objects (26 Nov's nest at most 4, the 27 Nov dry run's at most 5); a deeper one is refused with 502 before any
+check walks it.
 
 GateRecord accepts records from any wallet. The Worker serves those of the agent wallet named in
 `wrangler.jsonc` (`COMMITTER`), under the scope `gate-record/ercot-da-energy`.

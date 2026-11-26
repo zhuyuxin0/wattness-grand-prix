@@ -425,6 +425,44 @@ describe("the index holds the fields the planner writes, and no others", () => {
   });
 });
 
+describe("a document nested past 64 levels is refused", () => {
+  // {"a": [[...]]} n + 1 levels deep. At 200,000 levels it is 400 kB, well under the 8 MiB cap. 26 Nov's
+  // documents nest at most 4 levels (a leaf 4, a scenario set 3, the index 3, a receipt 1), the 27 Nov dry run's at most 5.
+  const deep = (n: number) => `{"a": ${"[".repeat(n)}${"]".repeat(n)}}\n`;
+  const cases: [string, string][] = [
+    ["leaves/DSWL_ESS_ESR1.json", LEAF],
+    ["leaves/DSWL_ESS_ESR1.scenarios.json", "/day/2026-11-26/leaves/DSWL_ESS_ESR1.scenarios.json"],
+    ["manifest.json", "/day/2026-11-26/index.json"],
+    ["record.bsc-mainnet.json", "/day/2026-11-26/record.bsc-mainnet.json"],
+    ["leaves/DSWL_ESS_ESR1.json", "/verify/DSWL_ESS_ESR1?od=2026-11-26"],
+    ["manifest.json", "/verify/DSWL_ESS_ESR1?od=2026-11-26"],
+  ];
+  for (const [object, path] of cases) {
+    it(`refuses ${object} nested 200,000 levels deep, asked for at ${path}`, async () => {
+      const u = upstreams();
+      u.objects.set(`${DAY}/${object}`, deep(200_000));
+      const res = await call(freshOrigin(), path);
+      expect.soft(res.status).toBe(502);
+      expect.soft(res.headers.get("x-gate-verified")).toBe("fail");
+      expect.soft(res.headers.get("cache-control")).toBe("no-store");
+      expect.soft((await res.text()).slice(0, 400)).toContain(`${object} is not served: it nests deeper than 64 levels`.replace("manifest.json", "the index of 2026-11-26"));
+    });
+  }
+
+  it("refuses at 65 levels, and leaves 64 to the other checks", async () => {
+    for (const [n, refused] of [
+      [63, false],
+      [64, true],
+    ] as const) {
+      const u = upstreams();
+      u.objects.set(`${DAY}/record.bsc-mainnet.json`, deep(n));
+      const res = await call(freshOrigin(), "/day/2026-11-26/record.bsc-mainnet.json");
+      expect.soft(res.status, `${n + 1} levels`).toBe(502);
+      expect.soft((await res.text()).includes("nests deeper than 64 levels"), `${n + 1} levels`).toBe(refused);
+    }
+  });
+});
+
 describe("an unknown day is a 404", () => {
   it("answers 404 for a day Greenfield holds no index for", async () => {
     const u = upstreams();
