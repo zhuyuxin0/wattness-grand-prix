@@ -69,30 +69,35 @@ export const GRID_TIMELINE = {
   receipt: [15.8, 3.4],
   // The close (Jo, Nov 26): the track and its 316 sealed plans become the
   // Wattness mark, the ring becomes a circle and BNB Chain's mark surfaces.
-  /** The receipt, the corner notes and the grid's paint step aside. */
-  close: 20.4,
-  /** The track's centerline flows into the mark's trace, front first (plus BEND_STAGGER along it). */
-  bend: [20.6, 3],
+  // One lead action at a time: the ring clears the plans, the track bends while
+  // the camera rises, the plans settle into the ink, the pole runs the trace,
+  // the ring seals, the words come.
+  /** The receipt (fully drawn from 18.8 s), the corner notes and the grid's paint step aside. */
+  close: 21,
+  /** The ring slides off the plans to the symbol's place, ahead of the bend, so it crosses the track once and early. */
+  slide: [21.1, 1.7],
+  /** The ellipse relaxes into the circle; its leaf ticks fold into it. */
+  relax: [21.3, 2.4],
+  /** The track's centerline flows into the mark's trace as one shape (plus a small BEND_STAGGER, front first). */
+  bend: [21.3, 3],
   /** The camera rises to face the marks. */
-  crane: [20.7, 4.3],
-  /** The ellipse relaxes into a circle; its leaf ticks fold into it. */
-  relax: [20.8, 3],
-  /** The plans lie down into the stroke (plus FLAT_STAGGER along it). */
-  flatten: [22.3, 1.5],
-  /** The track's surface becomes the mark's ink; the plans fade into it. */
-  ink: [23, 1],
-  fadePlans: [23.7, 0.6],
-  /** Desert Willow, on pole, rounds into the node at the trace's start, runs the trace and stays as the node. */
-  ready: [23.5, 0.6],
-  run: [24.1, 1.6],
+  crane: [21.2, 4.2],
+  /** The plans sink into the track, front first (plus SETTLE_STAGGER along it)... */
+  lower: [22.8, 0.9],
+  /** ...and the stroke inks where they went down, one wave behind them. */
+  ink: [23.3, 1],
+  /** Desert Willow, on pole, lights as the selection, is named where the trace starts, rounds into the node, runs the trace and stays as the node. */
+  lit: [21, 0.8],
+  name: [22.5, 0.6],
+  ready: [23.6, 0.8],
+  run: [24.6, 1.5],
   /** The trace's teal settles back to ink. */
-  settle: [25.7, 0.8],
-  /** The circle closes with BNB Chain yellow, then reopens and leaves the symbol. */
-  fill: [25.7, 0.9],
-  reveal: [26.7, 1.2],
+  settle: [26.1, 0.8],
+  /** The ring closes on its center and leaves BNB Chain's symbol where it passes. */
+  seal: [26.2, 1.5],
   /** The lockup's words. */
-  words: [28, 0.7],
-  line: [28.35, 0.7],
+  words: [27.8, 0.7],
+  line: [28.15, 0.7],
 } as const satisfies Record<string, number | readonly [number, number]>;
 
 const TL = GRID_TIMELINE;
@@ -116,9 +121,12 @@ const MARK_GAP = 0.68; // space between the node and the symbol, in symbol heigh
 const FINAL_DISTANCE = 520; // the camera's height over the marks at the end
 const FINAL_PAN = 40; // the composition sits this far right of the receipt view's target
 const MARKS_RAISE = 0.075; // the marks sit this fraction of the frame above its middle, for the words below
-const BEND_STAGGER = 0.6;
-const FLAT_STAGGER = 0.4;
-const FLAT_H = 0.03;
+// A larger lead than this snaps the front into the mark's corners while the
+// back still winds, and the track reads as buckling.
+const BEND_STAGGER = 0.25;
+const SETTLE_STAGGER = 0.5;
+const SINK = 0.08; // how far below the ink a settled plan ends, so it never shares the stroke's plane
+const POLE_FOOT = 1.3; // the pole's footprint once it is lit in the close
 
 function centerAt(s: number): [number, number] {
   const ramp = smooth(clamp01(s / STRAIGHT));
@@ -334,8 +342,6 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
   // The node sits on the trace's last line, this far past its end.
   const nodeR = W_NODE.r * MARK_SCALE;
   const nodeAlong = (W_NODE.cx - W_POINTS.at(-1)![0]) * MARK_SCALE;
-  const strokeW = W_STROKE * MARK_SCALE;
-  const planPitch = trace.length / Math.max(1, slots.length - 1);
   const symA = compW / 2 - symW / 2;
   const symCenter = toWorld(symA, 0);
   const sealR = BNB_SYMBOL.radius * kb;
@@ -387,7 +393,24 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
   const ink = new Color(color.text);
   const teal = new Color(color.teal);
   const black = new Color(0, 0, 0);
-  const surfaceMat = new MeshBasicMaterial({ color: asphalt.clone(), side: DoubleSide });
+  // The ink runs along the stroke with the plans settling into it, so each
+  // sample carries its own color (linear, as three.js reads vertex colors).
+  const surfaceCol = new Float32Array(ribbon.length * 6);
+  surfaceGeo.setAttribute("color", new BufferAttribute(surfaceCol, 3));
+  const surfaceMat = new MeshBasicMaterial({ vertexColors: true, side: DoubleSide });
+  const tmpInk = new Color();
+  let inkAt = Number.NaN;
+  const inkTrack = (t: number) => {
+    const key = Math.min(Math.max(t, TL.ink[0]), TL.ink[0] + TL.ink[1] + SETTLE_STAGGER);
+    if (key === inkAt) return;
+    inkAt = key;
+    for (let i = 0; i < ribbon.length; i++) {
+      tmpInk.copy(asphalt).lerp(ink, smoother(span(key, TL.ink[0] + SETTLE_STAGGER * ribbon[i]!.u, TL.ink[1])));
+      surfaceCol.set([tmpInk.r, tmpInk.g, tmpInk.b, tmpInk.r, tmpInk.g, tmpInk.b], i * 6);
+    }
+    (surfaceGeo.getAttribute("color") as BufferAttribute).needsUpdate = true;
+  };
+  inkTrack(0);
   const surface = new Mesh(surfaceGeo, surfaceMat);
   surface.renderOrder = -2;
   surface.frustumCulled = false;
@@ -651,13 +674,18 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
   const ticks = segments(stage, Array.from(writeTicks(0)), { color: color.bnb, width: 1, opacity: 0.7, order: 5 });
   scene.add(ticks);
   const ringFront = ringPoint(0, 3.2);
-  let ringAt = 0;
-  /** The ring at relax progress `e` (0: the ellipse round the grid, 1: the symbol's circle). */
-  const shapeRing = (e: number, retract: number) => {
-    if (e === ringAt && (e === 0 || e === 1)) return;
-    ringAt = e;
-    ring.x = lerp(cx, symCenter[0], e);
-    ring.z = lerp(cz, symCenter[1], e);
+  let ringAt = "0|0|0";
+  /**
+   * The ring at slide progress `move` (its center, from the grid's to the
+   * symbol's) and relax progress `e` (its radii, from the ellipse round the
+   * grid to the symbol's circle).
+   */
+  const shapeRing = (move: number, e: number, retract: number) => {
+    const key = `${move}|${e}|${retract}`;
+    if (key === ringAt) return;
+    ringAt = key;
+    ring.x = lerp(cx, symCenter[0], move);
+    ring.z = lerp(cz, symCenter[1], move);
     ring.rx = lerp(rx, sealR, e);
     ring.rz = lerp(rz, sealR, e);
     [1, -1].forEach((dir, h) => writeStrip(halves[h]!.line, ringLine(dir, 0, halfXyz[h]!)));
@@ -705,6 +733,13 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
     { dx: 12, dy: 0, ax: 0, ay: 1 },
   );
   const lockCount = lockLabel.el.lastElementChild as HTMLElement;
+  // In the close, the pole's battery is named again where the trace starts, so
+  // the dot that runs the mark reads as Desert Willow.
+  const poleName = stage.label(
+    "scene-tag scene-tag--teal scene-tag--right sg-pole",
+    `<div class="scene-tag__head"><span class="scene-tag__pos">P1</span>${SHOWCASE.name}</div>`,
+    { dx: -12, dy: 0, ax: 1, ay: 0.5 },
+  );
   const rootText = shortHash(data.day.root, 4, 5);
   const rootLabel = stage.label("scene-tag scene-tag--right scene-tag--bnb", "", { dx: -18, dy: 0, ax: 1, ay: 0.5 });
   const rootHead = el("div", "timing", "");
@@ -839,7 +874,6 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
     };
   };
   let lastPhase = "";
-  let fading = false;
 
   function update(t: number) {
     // Camera: the scripted path, then the crane up to face the marks.
@@ -893,8 +927,8 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
     // Track draws in from the start line; in the close it flows into the mark.
     const tin = easeOut(span(t, TL.trackIn[0], TL.trackIn[1]));
     shapeTrack(t);
-    const inked = smooth(span(t, TL.ink[0], TL.ink[1]));
-    surfaceMat.color.copy(asphalt).lerp(ink, inked);
+    inkTrack(t);
+    const inked = smooth(span(t, TL.ink[0], TL.ink[1] + SETTLE_STAGGER));
     for (const e of edges) {
       e.reveal(tin);
       e.opacity = 1 - inked;
@@ -916,6 +950,7 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
       const wave = Math.sin(2 * Math.PI * (t * 0.8 + sl.phase));
       let h = Math.max(0.0001, sl.h * grow * (1 + liveAmp * wave));
       let x = sl.x;
+      let y = 0;
       let z = sl.z;
       let yaw = sl.yaw;
       let fw = FOOT_W;
@@ -934,21 +969,26 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
         fw = 0.0001;
         fd = 0.0001;
       } else if (closing) {
-        // Each plan rides the track into its place along the trace, then lies down into the stroke.
+        // Each plan rides the track into its place on the trace (the middle of
+        // the stroke) and sinks into it; the ink follows where it went down.
+        // A lit column never matches the unlit ink, so none stands in the
+        // inked stroke: sunk below it, the stroke hides it.
         const e = smoother(span(t, TL.bend[0] + BEND_STAGGER * sl.u, TL.bend[1]));
-        const flat = smoother(span(t, TL.flatten[0] + FLAT_STAGGER * sl.u, TL.flatten[1]));
-        if (e > 0 || flat > 0) {
+        const low = smoother(span(t, TL.lower[0] + SETTLE_STAGGER * sl.u, TL.lower[1]));
+        if (low >= 1) {
+          h = 0.0001;
+          fw = 0.0001;
+          fd = 0.0001;
+        } else if (e > 0) {
           const w = trace.at(sl.u * trace.length);
           x = lerp(sl.x, w.x, e);
           z = lerp(sl.z, w.z, e);
           yaw = lerpAngle(sl.yaw, Math.atan2(-w.dx, -w.dz), e);
-          h = lerp(h, FLAT_H, flat);
-          fw = lerp(FOOT_W, strokeW, flat);
-          fd = lerp(FOOT_D, planPitch * 0.92, flat);
-          tmp.lerp(ink, flat);
+          h = Math.max(0.0001, h * (1 - low));
+          y = -SINK * low;
         }
       }
-      dummy.position.set(x, 0, z);
+      dummy.position.set(x, y, z);
       dummy.rotation.set(0, yaw, 0);
       dummy.scale.set(fw, h, fd);
       dummy.updateMatrix();
@@ -957,7 +997,7 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
 
       // A cap shows from the moment its plan is sealed, and shrinks away as the close begins.
       const cap = (sealed && t > sl.freeze ? 1 : 0) * capsOut;
-      dummy.position.set(x, h, z);
+      dummy.position.set(x, y + h, z);
       dummy.scale.set(cap ? fw * 0.84 * cap : 0.0001, cap ? 0.045 : 0.0001, cap ? fd * 0.84 * cap : 0.0001);
       dummy.updateMatrix();
       caps.setMatrixAt(i, dummy.matrix);
@@ -966,20 +1006,12 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
     if (cols.instanceColor) cols.instanceColor.needsUpdate = true;
     caps.instanceMatrix.needsUpdate = true;
     caps.visible = capsOut > 0.001;
-    // The plans fade into the inked stroke they now lie in.
-    const plansOut = smooth(span(t, TL.fadePlans[0], TL.fadePlans[1]));
-    const fadeNow = plansOut > 0;
-    if (fadeNow !== fading) {
-      fading = fadeNow;
-      colMat.transparent = fadeNow;
-      colMat.depthWrite = !fadeNow;
-      colMat.needsUpdate = true;
-    }
-    colMat.opacity = 1 - plansOut;
-    cols.visible = plansOut < 1;
+    // Every plan has sunk into the stroke.
+    cols.visible = t < TL.lower[0] + SETTLE_STAGGER + TL.lower[1];
 
     // Desert Willow: from the pole to the trace's start, then along the trace into the node.
     poleMesh.visible = closing;
+    poleName.opacity = 0;
     // The runner waits as far before the trace's start as the node sits past its end.
     let runArc = -nodeAlong;
     if (closing) {
@@ -999,11 +1031,18 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
       poleCol.round(settle);
       poleMesh.position.set(x, 0, z);
       poleMesh.rotation.set(0, yaw, 0);
-      poleMesh.scale.set(lerp(FOOT_W, 2 * nodeR, settle), lerp(pole.h, 0.04, settle), lerp(FOOT_D, 2 * nodeR, settle));
-      const lit = smooth(span(t, TL.ready[0], TL.ready[1]));
+      // Lit flat in the brand's selection teal as soon as the close begins, and
+      // a little broader, so the eye can follow it out of the grid; the node
+      // ends in exact ink.
+      const lit = smooth(span(t, TL.lit[0], TL.lit[1]));
+      const foot = lerp(FOOT_W, POLE_FOOT, lit);
+      const poleH = lerp(pole.h, 0.04, settle);
+      poleMesh.scale.set(lerp(foot, 2 * nodeR, settle), poleH, lerp(lerp(FOOT_D, POLE_FOOT, lit), 2 * nodeR, settle));
       const inkNow = smooth(span(t, TL.settle[0], TL.settle[1]));
       poleMat.color.copy(pole.ramp).lerp(black, lit);
       poleMat.emissive.copy(black).lerp(teal, lit).lerp(ink, inkNow);
+      poleName.world.set(x, poleH, z);
+      poleName.opacity = smooth(span(t, TL.name[0], TL.name[1])) * (1 - smooth(span(t, TL.run[0], 0.4)));
       // Cap 0 rides the pole while it shrinks away.
       dummy.position.set(x, pole.h, z);
       dummy.rotation.set(0, yaw, 0);
@@ -1043,16 +1082,18 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
     }
 
     // Ring and its leaf ticks; in the close, the circle and the seal.
+    const slide = smoother(span(t, TL.slide[0], TL.slide[1]));
     const relax = smoother(span(t, TL.relax[0], TL.relax[1]));
-    const fold = smoother(span(t, TL.relax[0], 1.4));
-    shapeRing(relax, fold);
+    const fold = smoother(span(t, TL.slide[0], 1.4));
+    shapeRing(slide, relax, fold);
     const ringIn = easeInOut(span(t, TL.ring[0], TL.ring[1]));
-    const ringOut = 1 - smoother(span(t, TL.reveal[0] + 0.1, 0.9));
+    // The seal's band starts as this line, so the line hands over in one frame.
+    const sweep = smoother(span(t, TL.seal[0], TL.seal[1]));
     for (const h of halves) {
       h.reveal(ringIn);
-      h.opacity = ringOut;
+      h.opacity = sweep > 0 ? 0 : 1;
     }
-    const innerOut = 1 - smooth(span(t, TL.relax[0], 0.8));
+    const innerOut = 1 - smooth(span(t, TL.slide[0], 0.8));
     for (const h of innerHalves) {
       h.reveal(easeInOut(span(t, TL.ring[0] + 0.35, TL.ring[1])));
       h.opacity = 0.28 * innerOut;
@@ -1061,10 +1102,8 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
     ticks.geometry.instanceCount = tickCount;
     ticks.material.opacity = 0.7 * (1 - fold);
     ticks.visible = tickCount > 0 && fold < 1;
-    const fill = smoother(span(t, TL.fill[0], TL.fill[1]));
-    sealMat.uniforms.uFill!.value = fill;
-    sealMat.uniforms.uReveal!.value = smoother(span(t, TL.reveal[0], TL.reveal[1]));
-    seal.visible = fill > 0;
+    sealMat.uniforms.uSweep!.value = sweep;
+    seal.visible = sweep > 0;
 
     // Labels.
     poleLabel.world.set(pole.x, pole.h * easeOut(span(t, pole.rise, 0.85)) + 0.25, pole.z);
@@ -1084,6 +1123,14 @@ export function createStartingGrid(stage: Stage, data: GridData, opts: { hud: bo
     rootLabel.dy = compact ? -14 : 0;
     rootLabel.el.classList.toggle("scene-tag--right", !compact);
     rootLabel.el.classList.toggle("scene-tag--above", compact);
+    // The pole's name sits left of the trace's start, which is near the stage's
+    // edge on a phone: there it hangs above the dot.
+    poleName.ax = compact ? 0.8 : 1;
+    poleName.ay = compact ? 1 : 0.5;
+    poleName.dx = compact ? 0 : -12;
+    poleName.dy = compact ? -12 : 0;
+    poleName.el.classList.toggle("scene-tag--right", !compact);
+    poleName.el.classList.toggle("scene-tag--above", compact);
     const rootIn = span(t, TL.ring[0] + TL.ring[1] * 0.55, 1.1);
     // Without the HUD (phones) the page shows the root beside the scene.
     rootLabel.opacity = opts.hud ? smooth(clamp01(rootIn * 2)) * paint : 0;

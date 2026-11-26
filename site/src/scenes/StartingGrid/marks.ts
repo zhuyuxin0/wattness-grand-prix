@@ -215,9 +215,10 @@ export const BNB_SYMBOL = (() => {
 })();
 
 /**
- * The seal: a disc of BNB Chain yellow that closes over the ring like an iris,
- * then reopens from the center and leaves the symbol, drawn exactly from its
- * polygons with a pixel-wide antialiased edge.
+ * The seal: the ring's own line, which closes on its center as a band of BNB
+ * Chain yellow and leaves the symbol wherever it has passed, drawn exactly from
+ * its polygons with a pixel-wide antialiased edge. One gesture, so no frame
+ * shows a bare disc or a stray fleck of the symbol's gaps.
  *
  * The color is written as the file's sRGB value with no conversion, tone
  * mapping or fog, so a sealed pixel reads #F0B90B.
@@ -233,8 +234,7 @@ export function sealMaterial(): ShaderMaterial {
       uEdges: { value: BNB_SYMBOL.edges },
       uCenter: { value: new Vector2(BNB_SYMBOL.cx, BNB_SYMBOL.cy) },
       uR: { value: BNB_SYMBOL.radius },
-      uFill: { value: 0 },
-      uReveal: { value: 0 },
+      uSweep: { value: 0 },
       uColor: { value: [((hex >> 16) & 255) / 255, ((hex >> 8) & 255) / 255, (hex & 255) / 255] },
     },
     vertexShader: /* glsl */ `
@@ -249,8 +249,7 @@ export function sealMaterial(): ShaderMaterial {
       uniform vec4 uEdges[${n}];
       uniform vec2 uCenter;
       uniform float uR;
-      uniform float uFill;
-      uniform float uReveal;
+      uniform float uSweep;
       uniform vec3 uColor;
       varying vec2 vSvg;
 
@@ -276,17 +275,24 @@ export function sealMaterial(): ShaderMaterial {
       void main() {
         float r = length(vSvg - uCenter);
         float px = max(fwidth(r), 1e-4);
-        // The fill: an iris closing from the rim (just inside the ring's line) to the center.
-        float inner = mix(uR + 1.0, -2.0 * px, uFill);
-        float fill = smoothstep(inner - px, inner + px, r) * (1.0 - smoothstep(uR + 0.6 - px, uR + 0.6 + px, r));
-        // The opening: the iris reopens from the center, and inside it only the symbol stays.
-        // It starts at 0.15 R, inside the symbol's solid middle, so the opening shows from its first frame.
-        float openR = mix(0.15 * uR, uR + 0.6 + 3.0 * px, uReveal);
-        float keep = smoothstep(openR - px, openR + px, r);
         float sd = symbol(vSvg);
         float sym = clamp(0.5 - sd / max(fwidth(sd), 1e-4), 0.0, 1.0);
-        // Open, nothing of the disc is left: the symbol alone, with no ring round it.
-        float a = uReveal >= 1.0 ? sym : fill * max(keep, sym);
+        // Done: the symbol alone, with nothing of the ring left round it.
+        float a = sym;
+        if (uSweep < 1.0) {
+          // At 0 the band is the ring's 2 px line on the circle the symbol is
+          // inscribed in. It stays a line, a little bolder on the way, and
+          // closes inside the symbol's solid middle (within 0.18 R): a wide
+          // band, or an open center, would read as another shape.
+          float c = mix(uR, -2.0 * px, uSweep);
+          float hw = px + 0.04 * uR * sin(3.14159265 * uSweep);
+          float band = smoothstep(c - hw - px, c - hw + px, r) * (1.0 - smoothstep(c + hw - px, c + hw + px, r));
+          // Behind the band the symbol is whole; ahead of it, it surfaces
+          // faintly and fills in as the band closes, so no hole is left.
+          float ghost = smoothstep(0.0, 0.2, uSweep) * mix(0.3, 1.0, smoothstep(0.55, 0.95, uSweep));
+          float body = r > c ? 1.0 : ghost;
+          a = clamp(band + (1.0 - band) * sym * body, 0.0, 1.0);
+        }
         if (a <= 0.0) discard;
         gl_FragColor = vec4(uColor, a);
       }`,

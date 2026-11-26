@@ -83,3 +83,9 @@
 .scene__fallback:has(> .sg-still) {
   background: var(--t-chrome);
 }
+
+/* The pole's name in the close; on a narrow stage it hangs above its dot, on
+   the selection's teal rather than the seal's yellow. */
+.scene-tag--above.sg-pole {
+  border-bottom-color: var(--teal);
+}
