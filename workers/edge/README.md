@@ -91,12 +91,12 @@ A verified response on a record at least 15 blocks deep is put in the edge cache
 verified. More than one copy of a file can verify, though: an index with other names beside the leaf hashes or its
 keys in another order, a leaf or a scenario set with its keys in another order or in RFC 8785 form. The edge keeps
 the first copy it served, so an index cached at the edge keeps the names it was verified with for up to a day
-(`s-maxage=86400`), whatever the bucket holds later. Nothing is cached before it is verified: refusals, 404s and responses on a fresher record carry
-`no-store`. The cache key includes the Worker's version (the version metadata binding), so a new deploy never
-serves an earlier version's verdicts or headers. Each isolate also keeps the indexes and leaves it has verified,
-so a burst of requests for one day reads the chain once. A remembered leaf is keyed by its day, its name and its
-hash, and vouches only for an entry listed under the name and day it was verified under; otherwise the leaf is
-read and checked again.
+(`s-maxage=86400`), whatever the bucket holds later. Nothing is cached before it is verified: refusals, 404s and
+responses on a fresher record carry `no-store`. The cache key includes the Worker's version (the version metadata
+binding), so a new deploy never serves an earlier version's verdicts or headers. Each isolate also keeps the
+indexes and leaves it has verified, so a burst of requests for one day reads the chain once. A remembered leaf is
+keyed by its day, its name and its hash, and vouches only for an entry listed under the name and day it was
+verified under; otherwise the leaf is read and checked again.
 
 ## Run it
 
