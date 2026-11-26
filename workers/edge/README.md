@@ -91,8 +91,9 @@ A verified response on a record at least 15 blocks deep is put in the edge cache
 verified. Nothing is cached before it is verified: refusals, 404s and responses on a fresher record carry
 `no-store`. The cache key includes the Worker's version (the version metadata binding), so a new deploy never
 serves an earlier version's verdicts or headers. Each isolate also keeps the indexes and leaves it has verified,
-so a burst of requests for one day reads the chain once. A remembered leaf is keyed by its hash and vouches only
-for an entry listed under the name it was verified under; under any other name the leaf is read and checked again.
+so a burst of requests for one day reads the chain once. A remembered leaf is keyed by its day, its name and its
+hash, and vouches only for an entry listed under the name and day it was verified under; otherwise the leaf is
+read and checked again.
 
 ## Run it
 

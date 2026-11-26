@@ -1,12 +1,15 @@
 import { env } from "cloudflare:workers";
 import { beforeEach, describe, expect, it } from "vitest";
 import { gateTs } from "../../../packages/core/src/gate.ts";
+import { callGateTs, callGet, callKeyOf, recordKey, scopeId } from "../src/abi.ts";
 import { fileSha256, type Hex } from "../src/bytes.ts";
+import { PLAN_SCOPE_LABEL, configFrom } from "../src/config.ts";
 import { merkleRoot } from "../src/merkle.ts";
 import { forgetVerified } from "../src/record.ts";
 import { EdgeError } from "../src/errors.ts";
 import { VERIFIED_CACHE, errorResponse } from "../src/respond.ts";
-import { BASE, DAY, bytesOf, call, freshOrigin, text, upstreams, utf8 } from "./fake.ts";
+import { BASE, DAY, bytesOf, call, freshOrigin, sealedObjects, text, upstreams, utf8 } from "./fake.ts";
+import chain from "./fixtures/chain.json";
 import { changeOneDigit } from "./tamper.ts";
 
 const ROOT = "0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7";
@@ -330,6 +333,43 @@ describe("a wrong root is refused", () => {
     expect.soft(res.headers.get("x-gate-verified")).toBe("fail");
     expect.soft(res.headers.get("cache-control")).toBe("no-store");
     expect.soft((await res.text()).slice(0, 400)).toContain(`resource: document "DSWL_ESS_ESR1", index "${name}"`);
+  });
+
+  it("lets a leaf the isolate verified vouch only on the day it was verified for", async () => {
+    // A synthetic 27 Nov whose record holds 26 Nov's root and leaf count: only the committer's key could
+    // write that record, so the chain's answers for 27 Nov are made here from 26 Nov's. Served directly, 26
+    // Nov's leaf is refused under 27 Nov's index (its operating_day), and so must be what it vouches for.
+    const od = 20261127;
+    const cfg = configFrom(env);
+    const scope = scopeId(PLAN_SCOPE_LABEL);
+    const key = recordKey(cfg.committer, scope, od);
+    const gate27 = gateTs(od);
+    const answers = chain.networks["bsc-testnet"] as { method: string; data?: string; result: unknown }[];
+    const recorded = String(answers.find((a) => a.method === "eth_call" && a.data?.toLowerCase() === callGet(KEY).toLowerCase())?.result);
+    const word = (hex: string) => hex.padStart(64, "0");
+    const calls = new Map([
+      [callKeyOf(cfg.committer, scope, od).toLowerCase(), key],
+      [callGet(key).toLowerCase(), `${recorded.slice(0, 2 + 64 * 4)}${word(od.toString(16))}${recorded.slice(2 + 64 * 5)}`],
+      [callGateTs(od).toLowerCase(), `0x${word(gate27.toString(16))}`],
+    ]);
+    const u = upstreams((network, c) => (c.method === "eth_call" ? calls.get(String((c.params[0] as { data: string }).data).toLowerCase()) : undefined));
+    for (const [name, body] of sealedObjects()) u.objects.set(name.replace(DAY, "od-20261127"), body);
+    u.objects.set("od-20261127/manifest.json", pretty({ ...(JSON.parse(text.index) as object), operating_day: "2026-11-27", gate_unix: gate27 }));
+    const on27 = (path: string) => call(freshOrigin(), `/day/2026-11-27/${path}?network=bsc-testnet`);
+    expect((await on27("index.json")).status, "27 Nov's index, under the record made here").toBe(200);
+    expect((await on27("leaves/DSWL_ESS_ESR1.json")).status, "26 Nov's leaf under 27 Nov's index").toBe(502);
+    for (const warm of [false, true]) {
+      for (const path of ["leaves/DSWL_ESS_ESR1.scenarios.json", "salt.txt"]) {
+        forgetVerified();
+        if (warm) expect((await call(freshOrigin(), `${LEAF}?network=bsc-testnet`)).status).toBe(200);
+        const res = await on27(path);
+        const what = `${path}, with 26 Nov's leaf ${warm ? "verified in this isolate" : "not verified"}`;
+        expect.soft(res.status, what).toBe(502);
+        expect.soft(res.headers.get("x-gate-verified"), what).toBe("fail");
+        expect.soft(res.headers.get("cache-control"), what).toBe("no-store");
+        expect.soft((await res.text()).slice(0, 600), what).toContain('operating day: document "2026-11-26", asked "2026-11-27"');
+      }
+    }
   });
 
   it("refuses the index when the chain answers with another root", async () => {

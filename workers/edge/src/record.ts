@@ -312,7 +312,10 @@ export interface SealedIndex {
 // Verified results only, and only for records deep enough to stay: GateRecord is write-once, so a day
 // verified here stays verified. Bounded, oldest first out.
 const sealedMemo = new Map<string, SealedIndex>();
-const leafMemo = new Map<Hex, LeafFacts>();
+// A leaf is remembered under its day, its name and its hash: the root fixes the hash, not the name beside it,
+// and a hash says nothing of the day whose root holds it.
+const leafMemo = new Map<string, LeafFacts>();
+const leafKey = (day: string, resource: string, leaf: Hex) => `${day}|${resource}|${leaf}`;
 const remember = <K, V>(map: Map<K, V>, key: K, value: V, max: number) => {
   map.set(key, value);
   if (map.size > max) map.delete(map.keys().next().value as K);
@@ -524,7 +527,7 @@ export async function sealedLeaf(day: Day, sealed: readonly SealedIndex[], posit
     salt: get(doc, "salt"),
     outside: collectOutside(doc),
   };
-  remember(leafMemo, entry.leaf, facts, 1024);
+  remember(leafMemo, leafKey(day.day, entry.resource, entry.leaf), facts, 1024);
   return {
     facts,
     served: {
@@ -541,13 +544,12 @@ export async function sealedLeaf(day: Day, sealed: readonly SealedIndex[], posit
 }
 
 /**
- * The facts of the entry's leaf: remembered, when this isolate verified that leaf under the same name, or
- * read and checked now. The memo is keyed by hash, and the root fixes the hash, not the name beside it.
+ * The facts of the entry's leaf: remembered, when this isolate verified that leaf for the same day under the
+ * same name, or read and checked now.
  */
 async function leafFacts(day: Day, sealed: readonly SealedIndex[], position: number): Promise<LeafFacts> {
   const entry = (sealed[0] as SealedIndex).index.leaves[position] as FleetLeaf;
-  const known = leafMemo.get(entry.leaf);
-  return known && known.resource === entry.resource ? known : (await sealedLeaf(day, sealed, position)).facts;
+  return leafMemo.get(leafKey(day.day, entry.resource, entry.leaf)) ?? (await sealedLeaf(day, sealed, position)).facts;
 }
 
 export async function sealedScenarios(day: Day, sealed: readonly SealedIndex[], position: number): Promise<Served> {
