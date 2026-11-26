@@ -1,0 +1,9 @@
+/* The map's slot, loaded with the page that holds it (the map's own styles come with its chunk). On the Fleet tab the
+   map leads, above the totals: the totals' strip, which tucks under the page head when it comes first, keeps the
+   page's own gap after the map, while it loads too. */
+.fmap-slot {
+  min-width: 0;
+}
+.fmap-slot--lead + .fl-lead {
+  margin-top: 0;
+}

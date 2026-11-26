@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { SOURCE_LINE } from "../../config";
+import { FleetMapPane } from "../../components/fleet-map";
 import { useDay, type BatterySummary, type DayIndex } from "../../data";
 import { arm as armMeta, type ArmName } from "../../design/tokens";
 import { formatDec1, formatInt, formatUsd } from "../../lib/format";
@@ -138,6 +139,8 @@ function Fleet({ day }: { day: DayIndex }) {
           </div>
         }
       />
+
+      <FleetMapPane />
 
       <section className="fl-lead" aria-label="The fleet's day">
         <StatRow className="fl-stats">
