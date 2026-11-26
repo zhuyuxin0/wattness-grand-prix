@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Measures the story on the built site, chapter by chapter, in headless Chrome on the machine's GPU.
 //
-//   node scripts/perf-story.mjs --dist dist --port 15197 [--out dir] [--label baseline]
+//   node scripts/perf-story.mjs --dist dist --port 15197 [--out dir] [--label baseline]   (--port 0: a port the OS assigns)
 //   node scripts/perf-story.mjs --url http://127.0.0.1:15197/ [--out dir] [--label baseline]
-//        [--w 1440 --h 900 --dpr 2] [--dwell film|<ms>] [--back <steps>] [--to <chapter>] [--reduced]
-//        [--headless new|shell] [--settle 4] [--shots <dir>] [--note "text"]
+//        [--w 1440 --h 900 --dpr 2] [--dwell film|<ms>] [--back <steps>] [--to <chapter>] [--reduced] [--scheme dark|light]
+//        [--headless new|shell] [--settle 4] [--shots <dir>] [--gpu] [--note "text"]
 //   node scripts/perf-story.mjs --compare before=a.json,b.json after=c.json,d.json
 //
 // It opens the Intro, clicks its Play button and steps through every chapter with the arrow key, resting at each
@@ -20,7 +20,10 @@
 //                       longest gap; with each gap, the 60 Hz frames it missed (headless Chrome's frames are not paced
 //                       by a display, so a rate can pass 60: the gaps and missed frames are what compare)
 //   long tasks          the main thread's tasks over 50 ms (PerformanceObserver 'longtask'), in the leg and at rest
-// with the live frames and renderer.info.memory at each rest. The player and the site push their events onto
+// with the live frames and renderer.info.memory at each rest. With --gpu, once the walk is done and the site's loop
+// stopped, each leg's GPU time per picture: the player's own render of five pictures through it (10% to 90% of its
+// time), drawn as the site draws them, each timed from a one-pixel readback to the next (in Chrome WebGL's finish() is
+// only a flush, so a readback is the sync), the median of three rounds and the worst. The player and the site push their events onto
 // window.__gpPerf, which this script defines before the page loads (player.ts perfLog); without it they record nothing.
 //
 // The GPU's load is read before anything starts (ioreg's "Device Utilization %", five times over 2 s once --settle
@@ -48,13 +51,13 @@ const STEP_PACE = 1.15;
 
 const argv = process.argv.slice(2);
 const opt = (name, fallback = null) => { const i = argv.indexOf(`--${name}`); return i >= 0 && argv[i + 1] != null && !argv[i + 1].startsWith('--') ? argv[i + 1] : fallback; };
-const usage = 'usage: node scripts/perf-story.mjs (--dist <dir> --port <p> | --url <served site>) [--out <dir>] [--label <name>] [--w 1440 --h 900 --dpr 2] [--dwell film|<ms>] [--back <steps>] [--to <chapter>] [--reduced] [--headless new|shell] [--shots <dir>] [--note <text>]\n       node scripts/perf-story.mjs --compare <name>=<receipt.json>[,<receipt.json>...] ...';
+const usage = 'usage: node scripts/perf-story.mjs (--dist <dir> --port <p> | --url <served site>) [--out <dir>] [--label <name>] [--w 1440 --h 900 --dpr 2] [--dwell film|<ms>] [--back <steps>] [--to <chapter>] [--reduced] [--scheme dark|light] [--headless new|shell] [--shots <dir>] [--gpu] [--note <text>]\n       node scripts/perf-story.mjs --compare <name>=<receipt.json>[,<receipt.json>...] ...';
 if (argv.includes('--compare')) { compare(); process.exit(0); }
 const dist = opt('dist');
-const port = Number(opt('port', '0'));
+const port = Number(opt('port', 'NaN'));
 let url = opt('url');
 if (!dist && !url) { console.error(usage); process.exit(2); }
-if (dist && !(Number.isInteger(port) && port > 0)) { console.error('--dist needs --port'); process.exit(2); }
+if (dist && !(Number.isInteger(port) && port >= 0)) { console.error('--dist needs --port (a spare port, or 0 for one the OS assigns)'); process.exit(2); }
 const portOf = (u) => { try { const x = new URL(u); return Number(x.port || (x.protocol === 'https:' ? 443 : 80)); } catch { return NaN; } };
 const usedPort = dist ? port : portOf(url);
 if (RESERVED.has(usedPort)) { console.error(`port ${usedPort} is reserved; pick a spare port`); process.exit(2); }
@@ -74,9 +77,13 @@ const toChapter = Number(opt('to', '0')) || Infinity;
 const headless = opt('headless', 'new') === 'shell' ? 'shell' : 'new';
 /** The visitor's setting for reduced motion: the rests as stills, a step cross-fading from one to the next. */
 const reduced = argv.includes('--reduced');
+/** The visitor's color scheme (the page's theme follows it; the 3D holds dark either way). */
+const scheme = opt('scheme', 'dark') === 'light' ? 'light' : 'dark';
 /** Seconds to wait before the first reading of the GPU's load: ioreg's figure can hold the last job's value for a few
  *  seconds (back-to-back runs read the run before's own 92-95% a second after it closed). */
 const settle = Math.max(0, Number(opt('settle', '4')) || 0);
+/** Each leg's GPU time per picture, after the walk (see the head of this file). */
+const gpuMode = argv.includes('--gpu');
 
 // ---- the clock and the machine's load ----
 
@@ -177,6 +184,30 @@ const AT_REST = () => {
     calls: P.stage.frameInfo.calls, triangles: P.stage.frameInfo.triangles };
 };
 
+/** --gpu: the site's loop stopped, each leg's pictures drawn by the player and timed to a one-pixel readback. */
+const GPU_LEGS = async (rounds) => {
+  const L = window.__gpPerf, P = L.player, S = L.site, r = P.stage.renderer, gl = r.getContext();
+  S.dead = true; cancelAnimationFrame(S.raf);
+  const px = new Uint8Array(4);
+  const sync = () => { r.setRenderTarget(null); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px); };
+  const F = P.film, out = [];
+  for (let s = 1; s < F.stops.length; s++) {
+    const A = F.keys[F.stops[s - 1]], B = F.keys[F.stops[s]];
+    const ts = [0.1, 0.3, 0.5, 0.7, 0.9].map((e) => A.until + (B.at - A.until) * e);
+    const need = new Set(); for (const t of ts) for (const f of P.framesNear(t, 0).need) need.add(f);
+    P.trim([...need], 0);
+    try { for (const f of need) await P.ensure(f); } catch (e) { out.push({ k: s, error: String(e) }); continue; }
+    const pics = ts.map((t) => P.picture(t)).filter(Boolean);
+    for (const pic of pics) { P.render(pic); sync(); }
+    const xs = [];
+    for (let round = 0; round < rounds; round++) for (const pic of pics) { sync(); const t0 = performance.now(); P.render(pic); sync(); xs.push(performance.now() - t0); }
+    xs.sort((a, b) => a - b);
+    out.push({ k: s, ms: xs[Math.floor((xs.length - 1) / 2)], max: xs[xs.length - 1], draws: pics.map((p) => p.draws.length).join('') });
+    await new Promise((ok) => requestAnimationFrame(() => ok()));
+  }
+  return out;
+};
+
 // ---- the run ----
 
 const loads = { before: [], during: [], after: null };
@@ -187,7 +218,7 @@ const started = new Date();
 const load0 = loadavg();
 
 let server = null;
-if (dist) { server = await serve(dist, port); url = `http://127.0.0.1:${port}/`; }
+if (dist) { server = await serve(dist, port); url = `http://127.0.0.1:${server.address().port}/`; }
 const base = new URL(url).origin;
 
 const require = createRequire(process.env.PLAYWRIGHT_DIR ? join(resolve(process.env.PLAYWRIGHT_DIR), 'noop.js') : import.meta.url);
@@ -196,7 +227,7 @@ const tmp = mkdtempSync(join(tmpdir(), 'gp-perf-'));
 const profile = join(tmp, 'profile');
 const ctx = await chromium.launchPersistentContext(profile, {
   headless: true, ...(headless === 'new' ? { channel: 'chromium' } : {}),
-  viewport: { width: W, height: H }, deviceScaleFactor: DPR, colorScheme: 'dark', serviceWorkers: 'block', reducedMotion: reduced ? 'reduce' : 'no-preference',
+  viewport: { width: W, height: H }, deviceScaleFactor: DPR, colorScheme: scheme, serviceWorkers: 'block', reducedMotion: reduced ? 'reduce' : 'no-preference',
   timezoneId: 'America/Chicago', locale: 'en-US',
   args: ['--use-mock-keychain', '--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--hide-scrollbars', '--force-color-profile=srgb'],
   env: { ...process.env, TMPDIR: tmp },
@@ -278,6 +309,7 @@ const raw = await page.evaluate(() => {
     gpu: P ? P.stage.gpu() : null, parallelCompile: r ? r.extensions.has('KHR_parallel_shader_compile') : null,
     canvas: r ? { w: r.domElement.width, h: r.domElement.height } : null, dpr: window.devicePixelRatio, now: performance.now() };
 }).catch((e) => ({ error: String(e) }));
+const gpuLegs = gpuMode && !result.error ? await page.evaluate(GPU_LEGS, 3).catch((e) => [{ k: 0, error: String(e).slice(0, 300) }]) : null;
 await ctx.close().catch(() => {});
 rmSync(tmp, { recursive: true, force: true });
 sampling = false;
@@ -364,6 +396,7 @@ const rows = visits.map((v, i) => {
     longLeg: { n: ltLeg.length, max: Math.max(0, ...ltLeg.map((x) => x[1])), total: ltLeg.reduce((s, x) => s + x[1], 0) },
     longRest: { n: ltRest.length, max: Math.max(0, ...ltRest.map((x) => x[1])), total: ltRest.reduce((s, x) => s + x[1], 0) },
     live: atRest?.live?.length ?? null, memory: atRest?.memory ?? null, calls: atRest?.calls ?? null,
+    gpuMs: v.dir > 0 ? (gpuLegs?.find((g) => g.k === v.k && !g.error)?.ms ?? null) : null,
   };
 });
 
@@ -380,7 +413,7 @@ const loadWhy = [gpuBefore > 10 ? `the GPU read at least ${gpuBefore}% before th
 const fwd = rows.filter((r) => r.dir > 0);
 const summary = {
   label, note, url: base, viewport: `${W} x ${H} CSS px at ${DPR}x`, canvas: raw.canvas, gpu: raw.gpu, parallelCompile: raw.parallelCompile,
-  dwell: dwellArg === 'film' ? "the film's hold at each chapter" : `${dwellArg} ms`, back, reduced,
+  dwell: dwellArg === 'film' ? "the film's hold at each chapter" : `${dwellArg} ms`, back, reduced, scheme,
   started: stamp(started), ended: stamp(ended),
   load: { underLoad, gpuUnknown, why: loadWhy || null, gpuBefore: loads.before, gpuDuring: { n: loads.during.length, median: median(loads.during), max: Math.max(...loads.during.filter(Number.isFinite), 0) }, gpuAfter: loads.after, loadavgBefore: load0.map((x) => +x.toFixed(2)), loadavgAfter: loadavg().map((x) => +x.toFixed(2)), othersBefore, othersDuring, othersAfter },
   open: raw.marks ? { codeMs: raw.marks['gp-story:code'] - raw.marks['gp-story:open'], readyMs: raw.marks['gp-story:ready'] - raw.marks['gp-story:open'], firstBeatMs: raw.marks['gp-story:first-beat'] - raw.marks['gp-story:open'] } : null,
@@ -394,8 +427,10 @@ const summary = {
     builds: builds.length, buildMs: builds.reduce((s, b) => s + (b.buildMs ?? 0), 0), readyMs: builds.reduce((s, b) => s + (b.readyMs ?? 0), 0),
     drops: ev.filter((e) => e.e === 'drop').length, maxLive: Math.max(0, ...rests.map((r) => r.live?.length ?? 0)),
     forwardHeldMs: fwd.reduce((s, r) => s + r.heldMs, 0),
+    gpuMsMedian: gpuLegs ? median(gpuLegs.filter((g) => !g.error).map((g) => g.ms)) : null,
+    gpuMsWorst: gpuLegs ? Math.max(0, ...gpuLegs.filter((g) => !g.error).map((g) => g.ms)) : null,
   },
-  refused, warnings: logs.slice(0, 40), error: result.error ?? raw.error ?? null,
+  gpuLegs, refused, warnings: logs.slice(0, 40), error: result.error ?? raw.error ?? null,
 };
 
 const pad2 = (n) => String(n).padStart(2, '0');
@@ -403,7 +438,7 @@ const fps = (x) => (x == null || !Number.isFinite(x) ? '' : x.toFixed(0));
 const lines = [];
 lines.push(`### Story speed: ${label}${underLoad ? ' (under load)' : gpuUnknown ? ' (GPU load unknown)' : ''}`);
 lines.push('');
-lines.push(`${summary.started} to ${summary.ended.replace(/^.*?, /, '')}. ${summary.viewport} (canvas ${raw.canvas?.w ?? '?'} x ${raw.canvas?.h ?? '?'}), ${raw.gpu ?? 'GPU unknown'}, parallel shader compile ${raw.parallelCompile ? 'on' : 'off'}. Dwell: ${summary.dwell}${back ? `; then ${back} steps back` : ''}.${reduced ? ' Reduced motion.' : ''}${note ? ` ${note}` : ''}`);
+lines.push(`${summary.started} to ${summary.ended.replace(/^.*?, /, '')}. ${summary.viewport} (canvas ${raw.canvas?.w ?? '?'} x ${raw.canvas?.h ?? '?'}), ${raw.gpu ?? 'GPU unknown'}, parallel shader compile ${raw.parallelCompile ? 'on' : 'off'}. Dwell: ${summary.dwell}${back ? `; then ${back} steps back` : ''}.${reduced ? ' Reduced motion.' : ''}${scheme === 'light' ? ' Light color scheme.' : ''}${note ? ` ${note}` : ''}`);
 lines.push(`GPU load before ${loads.before.join('/')}%, during median ${summary.load.gpuDuring.median}% (max ${summary.load.gpuDuring.max}%, with this run), after ${loads.after}%.${underLoad ? ` Under load: ${loadWhy}.` : ''}${gpuUnknown ? " The GPU's load could not be read before the run." : ''}${!underLoad && !gpuUnknown ? ' No busy process or GPU load seen besides this run.' : ''}`);
 if (summary.open) lines.push(`Open: the story's code ${ms(summary.open.codeMs)} ms after the click, ready ${ms(summary.open.readyMs)} ms, first beat drawn ${ms(summary.open.firstBeatMs)} ms.`);
 lines.push('');
@@ -415,6 +450,10 @@ for (const r of rows) {
 const T = summary.totals;
 lines.push('');
 lines.push(`Totals: held ${ms(T.heldMs)} ms over ${T.chapters} chapters (forward ${ms(T.forwardHeldMs)} ms), "Building the next station" shown ${ms(T.shownMs)} ms in ${T.chaptersWithWords} chapters; legs late by ${ms(T.lateMs)} ms in all. Leg fps median ${fps(T.legFpsMedian)} (lowest ${fps(T.legFpsMin)}), worst gap in a leg ${ms(T.worstLegGapMs)} ms, ${T.legMissed} frames missed at 60 Hz in the legs; rest fps median ${fps(T.restFpsMedian)}, worst gap at a rest ${ms(T.worstRestGapMs)} ms, ${T.restMissed} missed at rests. Long tasks ${T.longTasks} (${ms(T.longTaskMs)} ms, longest ${ms(T.longestTaskMs)} ms). Builds ${T.builds} (setup ${ms(T.buildMs)} ms, with programs ${ms(T.readyMs)} ms), frames let go ${T.drops}, most alive at once ${T.maxLive}.`);
+if (gpuLegs) {
+  const ok = gpuLegs.filter((g) => !g.error);
+  lines.push(`GPU ms per picture through each leg (the site's loop stopped after the walk; five pictures from 10% to 90% of the leg, each timed to a one-pixel readback, median of three rounds, then the worst): ${ok.map((g) => `${pad2(g.k + 1)} ${g.ms.toFixed(1)} (${g.max.toFixed(0)})`).join(', ')}. Median over the legs ${T.gpuMsMedian?.toFixed(1)} ms, worst leg ${T.gpuMsWorst?.toFixed(1)} ms.${gpuLegs.some((g) => g.error) ? ` Not measured: ${gpuLegs.filter((g) => g.error).map((g) => `${g.k + 1} (${g.error.split('\n')[0]})`).join('; ')}.` : ''}`);
+}
 if (refused.length) lines.push(`Refused requests: ${[...new Set(refused)].slice(0, 8).join(', ')}.`);
 if (summary.error) lines.push(`Stopped early: ${summary.error.split('\n')[0]}`);
 const table = lines.join('\n');
@@ -444,12 +483,13 @@ function compare() {
   const mean = (xs) => { const v = xs.filter(Number.isFinite); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : NaN; };
   const r0 = (x) => (Number.isFinite(x) ? String(Math.round(x)) : '');
   const cells = (f) => groups.map((g) => r0(mean(g.runs.map((r) => r.rows.filter((x) => x.dir >= 0)).map((rows) => f(rows))))).join(' / ');
+  const gpuCol = groups.some((g) => g.runs.some((r) => r.summary.gpuLegs));
   const out = [`Per chapter, forward: each group's mean over its runs (${groups.map((g) => `${g.name}: ${g.runs.length}`).join(', ')}), as ${groups.map((g) => g.name).join(' / ')}.`, '',
-    '| # | Chapter | Build ms | Ready ms | Held ms | Wait shown ms | Leg fps | Leg worst gap ms | Rest worst gap ms | Long tasks (n) |', '|---|---|---|---|---|---|---|---|---|---|'];
+    `| # | Chapter | Build ms | Ready ms | Held ms | Wait shown ms | Leg fps | Leg worst gap ms | Rest worst gap ms | Long tasks (n) |${gpuCol ? ' Leg GPU ms per picture |' : ''}`, `|---|---|---|---|---|---|---|---|---|---|${gpuCol ? '---|' : ''}`];
   const chapters = groups.flatMap((g) => g.runs).find((r) => r.rows?.length)?.rows.filter((x) => x.dir >= 0) ?? [];
   for (const c of chapters) {
     const at = (f) => (rows) => { const x = rows.find((y) => y.n === c.n); return x ? f(x) : NaN; };
-    out.push(`| ${String(c.n).padStart(2, '0')} | ${c.id} | ${cells(at((x) => (x.frames.length ? x.buildMs : NaN)))} | ${cells(at((x) => (x.frames.length ? x.readyMs : NaN)))} | ${cells(at((x) => x.heldMs))} | ${cells(at((x) => x.shownMs))} | ${cells(at((x) => x.legFps ?? NaN))} | ${cells(at((x) => x.legGapMs ?? NaN))} | ${cells(at((x) => x.restGapMs))} | ${cells(at((x) => x.longLeg.n + x.longRest.n))} |`);
+    out.push(`| ${String(c.n).padStart(2, '0')} | ${c.id} | ${cells(at((x) => (x.frames.length ? x.buildMs : NaN)))} | ${cells(at((x) => (x.frames.length ? x.readyMs : NaN)))} | ${cells(at((x) => x.heldMs))} | ${cells(at((x) => x.shownMs))} | ${cells(at((x) => x.legFps ?? NaN))} | ${cells(at((x) => x.legGapMs ?? NaN))} | ${cells(at((x) => x.restGapMs))} | ${cells(at((x) => x.longLeg.n + x.longRest.n))} |${gpuCol ? ` ${cells(at((x) => x.gpuMs ?? NaN))} |` : ''}`);
   }
   out.push('', 'Every run:', '', '| Group | Run | Started | Load | Held ms | Words shown ms (chapters) | Legs late ms | Leg fps median (lowest) | 60 Hz frames missed: legs / rests | Worst gap ms: leg / rest | Long tasks: n, total ms, longest | Setup ms / with programs ms | Most frames alive |',
     '|---|---|---|---|---|---|---|---|---|---|---|---|---|');
