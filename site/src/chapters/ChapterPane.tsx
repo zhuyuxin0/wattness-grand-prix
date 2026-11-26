@@ -48,7 +48,9 @@ function Pane({ chapter }: { chapter: Chapter }) {
   const [size, setSize] = useState<640 | 960>(640);
   const number = String(chapter.chapter).padStart(2, "0");
   const poster = chapterFile(chapter.loop, ".webp");
-  const label = `Open the introduction at chapter ${number}: ${chapter.name}${chapter.term ? ` (${chapter.term})` : ""}`;
+  // the part of the beat a loop shows (the stack's markets row), else the beat's racing term
+  const note = chapter.part ?? chapter.term;
+  const label = `Open the introduction at chapter ${number}: ${chapter.name}${note ? ` (${note})` : ""}`;
 
   useEffect(() => {
     const el = media.current;
@@ -113,7 +115,7 @@ function Pane({ chapter }: { chapter: Chapter }) {
             </span>
           </span>
           <span className="chapter-pane__name">{chapter.name}</span>
-          {chapter.term && <span className="chapter-pane__term">{chapter.term}</span>}
+          {note && <span className="chapter-pane__term">{note}</span>}
         </span>
       </span>
     </Link>
