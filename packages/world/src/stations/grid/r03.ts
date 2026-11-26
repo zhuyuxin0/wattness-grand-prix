@@ -13,6 +13,7 @@ import * as THREE from 'three';
 import bnbSymbol from '../stack/marks/bnbchain.svg?raw';
 import { createMaterials } from '../../kit/materials';
 import { exactColor } from '../../kit/tone';
+import * as sound from '../../lib/sound';
 import type { Vec3 } from '../../lib/stage';
 import type { FrameContext, FrameHandle } from '../types';
 import { HEX, apron, plinth, track, poleLights, glow, emissive, glassKit, finish, pulse, detail, counted, nightRig, poseFrom, livery, rectOf, boxCorners, fmt, type Footprint } from './venue';
@@ -460,13 +461,25 @@ export async function r03(ctx: FrameContext, state: CopyState = 'changed'): Prom
     : poseFrom([376, 14, 47], [441, 5, 5], 39, [0.03, 0]);
 
   const path = `the audit path is RFC 6962 over the ${leaves.length} leaf hashes of frame-data.json fleet.batteries in index order, for Desert Willow at index ${m} (position ${m + 1} of ${leaves.length}): ${n} steps, sides ${proof.steps.map((s) => s.side[0]).join('')}, folding to ${proof.root}, the sealed root.`;
+  // the frame's last pose: the changed copy's buzz sounds as its clock runs on through the break (lib/sound)
+  let lastT: number = REST;
   return {
     time: REST,
     note: changed
       ? `Real: ${path} The changed value is the page's tamper rule on showcase.arms.${show.selected_arm}.kw: hour ${tp.hour} (${tp.hour}:00 to ${tp.hour + 1}:00 CT), ${tp.sealed} to ${tp.changed} kW. The lamps' states follow the Verify page's own words for a changed copy ("checks 3 and 4 still pass; the leaf, the proof and the energy balance in check 5 do not": 01, 02 and 05 fail); this still does not run the verifier. The board over the lamps is the page's own board for the changed copy (venue/board.ts, the one the films' split screen carries), with those five states. On the frame's clock the bay starts as the sealed one and the failure plays in from ${REVEAL.card} s (the rest is ${REST} s). The coin's face is BNB Chain's symbol from its published file (stations/stack/marks/bnbchain.svg) in BNB Chain's black. Illustrative: the bay's architecture, the rails and lights, the coin as the record's picture.`
       : `Real: ${path} The card is the sealed plan as sealed (showcase.arms.${show.selected_arm}.kw, leaf ${show.leaf}). The five lamps show the page's checks on the sealed copy, all passing, as the page reads it before any change ("${CHECKS.length} of ${CHECKS.length} checks pass"); this still does not run the verifier. The board over the lamps is the page's own board for the sealed plan (venue/board.ts, the one the films' split screen carries). The coin's face is BNB Chain's symbol from its published file (stations/stack/marks/bnbchain.svg) in BNB Chain's black. Illustrative: the bay's architecture, the rails and lights, the coin as the record's picture.`,
     // the comets on the track hold still in the changed copy, so its first moments match the sealed bay at rest
-    update(t) { stage.setCamera(cam); detail(ctx, M); pulse(root, changed ? REST : t); reveal?.(t); },
+    update(t) {
+      stage.setCamera(cam); detail(ctx, M); pulse(root, changed ? REST : t); reveal?.(t);
+      // the climb breaks at hash 1: with sound on, a low buzz as the clock runs on through it, or as the frame is first
+      // drawn a moment after it (a leg's cross-fade); never on a step back or a jump to the rest
+      if (changed) {
+        const ran = t > lastT && t - lastT < 0.5 && lastT < REVEAL.crack && t >= REVEAL.crack;
+        const cameIn = lastT - t > 0.5 && t >= REVEAL.crack && t < REVEAL.crack + 0.15;
+        if (ran || cameIn) sound.fail();
+      }
+      lastT = t;
+    },
     // the story lets go of the textures on the frame's materials; the ones the reveal swaps between may not be on one
     // when the frame goes, so they go here (a second dispose of the same texture does nothing)
     dispose() { for (const t of [cardTex.sealed, ...swaps, ...lamps.map((l) => l.plateSealed), ...boards]) t.dispose(); },
