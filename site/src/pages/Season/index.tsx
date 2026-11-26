@@ -206,7 +206,7 @@ export default function SeasonPage() {
   return (
     <div className="page page--season">
       <PageHeader
-        title="Season"
+        title="Season Token"
         lede="A new way to launch on Flap: the token launches only once a real-world proof is on chain, the Wattness agent's plan for a day of ERCOT batteries sealed in GateRecord before the market's 10:00 CT gate. Below, the launch App itself, live on BSC testnet: round 3 as a race, its replay, and Alice, Bob and Carol played out."
       />
 

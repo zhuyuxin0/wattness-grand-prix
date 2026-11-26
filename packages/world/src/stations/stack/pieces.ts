@@ -23,7 +23,7 @@ export type TabId = (typeof ROUTES)[PieceId];
 export const TAB_LABEL: Record<string, string> = {
   fleet: 'Fleet', about: 'How It Works', risk: 'Risk', hedge: 'Hedge', agents: 'Agent IDs', forecast: 'Forecast', state: 'State of Charge',
   battery: 'Battery', memory: 'Memory', seal: 'Seal', files: 'Files', verify: 'Verify', prices: 'Prices', 'add-agent': 'Add Your Agent',
-  season: 'Season', launchpad: 'Launchpad',
+  season: 'Season Token', launchpad: 'Launchpad',
 };
 
 /** The testnet tokens' tickers are placeholders (PLAN.md: one constant each) and the event's "no token tickers" rule is

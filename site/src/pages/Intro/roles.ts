@@ -34,7 +34,7 @@ export const AUDIENCES: readonly Role[] = [
 /** "Judging a track?": each sponsor by its logo chip, opening the part of the site where its technology works. */
 export const SPONSORS: readonly Role[] = [
   { id: "bnb-chain", name: "BNB Chain", logos: ["bnbchain"], line: "The day's plans under one root on BSC mainnet.", to: "/seal" },
-  { id: "flap", name: "Flap", logos: ["flap"], line: "Season tokens that launch only on a sealed plan.", to: "/markets/season" },
+  { id: "flap", name: "Flap", logos: ["flap"], line: "Season tokens that launch only once sealed.", to: "/markets/season" },
   { id: "openfour", name: "OpenFour", logos: ["openfour"], line: "No sealed record, no graduation.", to: "/markets/launchpad" },
   { id: "cmc-atlas", name: "CoinMarketCap × Atlas", logos: ["cmc", "atlas"], line: "Signed prices set what checking the plans costs.", to: "/markets/prices#px-sources" },
   { id: "cournot", name: "Cournot", logos: ["cournot"], line: "Weather odds read and sealed before the gate.", to: "/agents/forecast#fc-cournot" },

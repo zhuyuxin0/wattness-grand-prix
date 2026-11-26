@@ -198,7 +198,7 @@ export const PANEL: PanelEntry[] = [
   {
     kind: "tab",
     id: "season",
-    label: "Season",
+    label: "Season Token",
     icon: "trophy",
     sponsor: "flap",
     path: "/markets/season",

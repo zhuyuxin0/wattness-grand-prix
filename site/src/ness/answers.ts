@@ -146,7 +146,7 @@ const S = {
   fleet: { label: "Fleet", href: "/fleet" },
   dswl: { label: "Desert Willow's plan", href: "/battery/DSWL_ESS_ESR1" },
   overview: { label: "Overview", href: "/overview" },
-  season: { label: "Season", href: "/markets/season" },
+  season: { label: "Season Token", href: "/markets/season" },
   launchpad: { label: "Launchpad", href: "/markets/launchpad" },
   prices: { label: "Prices", href: "/markets/prices" },
   onePlan: { label: "ONE PLAN", href: "/markets/one-plan" },

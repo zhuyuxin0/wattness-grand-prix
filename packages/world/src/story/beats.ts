@@ -14,7 +14,7 @@ export type TabId = 'intro' | 'overview' | 'fleet' | 'battery' | 'forecast' | 's
 /** The tabs' labels as the site's panel prints them. */
 export const TAB_LABEL: Record<TabId, string> = {
   intro: 'Intro', overview: 'Overview', fleet: 'Fleet', battery: 'Battery', forecast: 'Forecast', state: 'State of Charge', hedge: 'Hedge',
-  risk: 'Risk', memory: 'Memory', seal: 'Seal', verify: 'Verify', files: 'Files', season: 'Season', launchpad: 'Launchpad', 'one-plan': 'ONE PLAN',
+  risk: 'Risk', memory: 'Memory', seal: 'Seal', verify: 'Verify', files: 'Files', season: 'Season Token', launchpad: 'Launchpad', 'one-plan': 'ONE PLAN',
   about: 'How It Works', 'add-agent': 'Add Your Agent',
 };
 
