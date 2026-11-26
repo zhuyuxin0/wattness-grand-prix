@@ -10,5 +10,6 @@ declare namespace Cloudflare {
     GATE_RECORD: string;
     RPC_BSC_MAINNET: string;
     RPC_BSC_TESTNET: string;
+    CF_VERSION_METADATA?: { id: string };
   }
 }

@@ -68,8 +68,9 @@ On a served file: `x-gate-verified`, `x-gate-network`, `x-gate-root`, `x-gate-re
 A verified response on a record at least 15 blocks deep is put in the edge cache (the Cache API) and marked
 `public, max-age=300, s-maxage=86400`. GateRecord is write-once, so a file verified against a day's root stays
 verified. Nothing is cached before it is verified: refusals, 404s and responses on a fresher record carry
-`no-store`. Each isolate also keeps the indexes and leaves it has verified, so a burst of requests for one day
-reads the chain once.
+`no-store`. The cache key includes the Worker's version (the version metadata binding), so a new deploy never
+serves an earlier version's verdicts or headers. Each isolate also keeps the indexes and leaves it has verified,
+so a burst of requests for one day reads the chain once.
 
 ## Run it
 

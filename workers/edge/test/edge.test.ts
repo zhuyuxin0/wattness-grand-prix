@@ -1,3 +1,4 @@
+import { env } from "cloudflare:workers";
 import { beforeEach, describe, expect, it } from "vitest";
 import { gateTs } from "../../../packages/core/src/gate.ts";
 import { fileSha256, type Hex } from "../src/bytes.ts";
@@ -254,6 +255,15 @@ describe("edge caching", () => {
     expect(second.headers.get("x-gate-cache")).toBe("hit");
     expect(await second.text()).toBe(text.dswl);
     expect(u.log.length).toBe(fetched);
+  });
+
+  it("keeps each deployed version's cached responses to itself", async () => {
+    upstreams();
+    const origin = freshOrigin();
+    const version = (id: string) => ({ ...env, CF_VERSION_METADATA: { id } });
+    expect((await call(origin, LEAF, undefined, version("a"))).headers.get("x-gate-cache")).toBe("miss");
+    expect((await call(origin, LEAF, undefined, version("a"))).headers.get("x-gate-cache")).toBe("hit");
+    expect((await call(origin, LEAF, undefined, version("b"))).headers.get("x-gate-cache")).toBe("miss");
   });
 
   it("caches nothing it refused", async () => {

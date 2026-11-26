@@ -106,9 +106,9 @@ let origin = 0;
 /** A fresh origin per test, so one test's edge cache entries are not another's. */
 export const freshOrigin = () => `https://t${++origin}.edge.test`;
 
-export async function call(origin: string, path: string, init?: RequestInit): Promise<Response> {
+export async function call(origin: string, path: string, init?: RequestInit, bindings: Cloudflare.Env = env): Promise<Response> {
   const ctx = createExecutionContext();
-  const res = await worker.fetch(new Request(`${origin}${path}`, init) as Request<unknown, IncomingRequestCfProperties>, env, ctx);
+  const res = await worker.fetch(new Request(`${origin}${path}`, init) as Request<unknown, IncomingRequestCfProperties>, bindings, ctx);
   await waitOnExecutionContext(ctx);
   return res;
 }

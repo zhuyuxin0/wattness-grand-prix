@@ -57,12 +57,15 @@ function flag(url: URL, name: string): boolean {
 const headOnly = (request: Request, res: Response): Response => (request.method === "HEAD" ? new Response(null, res) : res);
 
 /**
- * The edge cache, keyed by the request in its canonical form. Only a 200 whose Cache-Control says it was
- * verified on a record deep enough to stay is put; a refusal, a 404 or a fresh record never is.
+ * The edge cache, keyed by the request in its canonical form and the Worker's version: the bytes of a
+ * verified file never change, but a verdict, an envelope or a header can from one version to the next.
+ * Only a 200 whose Cache-Control says it was verified on a record deep enough to stay is put; a refusal,
+ * a 404 or a fresh record never is.
  */
-async function edgeCached(request: Request, ctx: ExecutionContext, key: string, produce: () => Promise<Response>): Promise<Response> {
+async function edgeCached(request: Request, env: Env, ctx: ExecutionContext, key: string, produce: () => Promise<Response>): Promise<Response> {
   const cache = caches.default;
-  const cacheKey = new Request(key, { method: "GET" });
+  const version = env.CF_VERSION_METADATA?.id ?? "unversioned";
+  const cacheKey = new Request(`${key}${key.includes("?") ? "&" : "?"}version=${encodeURIComponent(version)}`, { method: "GET" });
   const hit = await cache.match(cacheKey);
   if (hit) {
     const res = new Response(request.method === "HEAD" ? null : hit.body, hit);
@@ -112,7 +115,7 @@ async function route(request: Request, url: URL, env: Env, ctx: ExecutionContext
     const networks = networksOf(url, false);
     const envelope = flag(url, "envelope");
     const key = `${url.origin}/day/${isoFromOd(od)}/${path}?network=${networks.join(",")}${envelope ? "&envelope=1" : ""}`;
-    return edgeCached(request, ctx, key, async () => servedResponse(await dayFile(cfg, od, path, networks), envelope));
+    return edgeCached(request, env, ctx, key, async () => servedResponse(await dayFile(cfg, od, path, networks), envelope));
   }
   if (parts[1] === "verify" && parts.length === 3) {
     const battery = parts[2] ?? "";
@@ -122,7 +125,7 @@ async function route(request: Request, url: URL, env: Env, ctx: ExecutionContext
     const od = parseDay(raw);
     const [network] = networksOf(url, true) as [NetworkName];
     const key = `${url.origin}/verify/${battery}?od=${isoFromOd(od)}&network=${network}`;
-    return edgeCached(request, ctx, key, async () => {
+    return edgeCached(request, env, ctx, key, async () => {
       const v = await verdictFor(dayOf(cfg, od), network, battery);
       return verdictResponse(v, cacheableVerdict(v));
     });

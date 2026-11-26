@@ -12,6 +12,8 @@ export interface Env {
   /** Comma-separated public RPC URLs, tried in order. */
   RPC_BSC_MAINNET: string;
   RPC_BSC_TESTNET: string;
+  /** The deployed version; absent where nothing binds it. */
+  CF_VERSION_METADATA?: { id: string };
 }
 
 export const NETWORKS = { "bsc-mainnet": 56, "bsc-testnet": 97 } as const;

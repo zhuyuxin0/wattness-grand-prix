@@ -9,6 +9,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": false,
+  // The version is part of every edge cache key, so a deploy never serves an earlier version's output.
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
   "vars": {
     "GREENFIELD_BASE": "https://gnfd-testnet-sp3.nodereal.io/view/wattness-grand-prix-records/",
     "COMMITTER": "0xfa22C29C4c3d975FCC617D899B1B695eFF2d94b8",
