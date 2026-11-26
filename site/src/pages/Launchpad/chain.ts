@@ -44,6 +44,12 @@ const ERC20_ABI = parseAbi([
 
 const TRANSFER_ABI = parseAbi(["event Transfer(address indexed from, address indexed to, uint256 value)"]);
 
+/** Core's own events: the curve's first price at the create, each trade's amounts and the price after it. */
+const CORE_EVENTS = parseAbi([
+  "event TokenCreated(uint256 requestId, uint256 indexed presetId, address indexed creator, address indexed token, string name, string symbol, uint256 maxSupply, uint256 saleAmount, uint256 raiseAmount, uint256 initialPrice, address quoteAsset, address vault, address curveModule, address tradeModule, address migrateModule, address customData, address tokenModule, string tokenMetaUri, uint256 flags, bytes encodedTags)",
+  "event TradeExecuted(address indexed token, address indexed trader, uint256 indexed presetId, bool isBuy, address quoteAsset, address vault, uint256 requestedTokenAmount, uint256 tokenAmount, uint256 curveQuoteAmount, uint256 traderQuoteAmount, uint256 lastPrice, uint256 slippageLimit, uint256 protocolFee, uint256 taxFee, uint256 devFee, uint256 antiSniperFee, uint256 totalRaised, uint256 remainingForSale)",
+]);
+
 const PAIR_ABI = parseAbi([
   "function token0() view returns (address)",
   "function factory() view returns (address)",
@@ -114,7 +120,10 @@ export interface LaunchRead {
   replays: ReplayCheck[];
 }
 
-/** One replayed launch held to the chain: every frame's receipt read again, its status, block, time and token moves. */
+/**
+ * One replayed launch held to the chain: every frame's receipt read again, its status, block, time and token moves,
+ * the create's first price and each trade's amounts, fees and price after it.
+ */
 export interface ReplayCheck {
   id: string;
   /** Receipts read: the frames and the setup transactions. */
@@ -139,6 +148,30 @@ export async function checkReplay(client: PublicClient, l: LaunchReplay): Promis
     const moves = parseEventLogs({ abi: TRANSFER_ABI, logs, eventName: "Transfer" }).map((e) => key(e.args.from, e.args.to, e.args.value));
     const want = f.moves.map((x) => key(x.from === ZERO ? zeroAddress : x.from, x.to, x.amount));
     if (moves.sort().join() !== want.sort().join()) mismatches.push(`${what}: ${l.symbol} moves differ`);
+    // the price the page draws, and each trade's amounts, from Core's own log
+    const core = m.logs.filter((x) => getAddress(x.address) === getAddress(OPENFOUR.core)) as Log[];
+    if (f.kind === "create" && f.price) {
+      const e = parseEventLogs({ abi: CORE_EVENTS, logs: core, eventName: "TokenCreated" })[0]?.args;
+      if (!e || String(e.initialPrice) !== f.price) mismatches.push(`${what}: first price ${e ? String(e.initialPrice) : "not logged"}`);
+    }
+    if (f.trade) {
+      const e = parseEventLogs({ abi: CORE_EVENTS, logs: core, eventName: "TradeExecuted" })[0]?.args;
+      const t = f.trade;
+      const sale = BigInt(l.saleAmount);
+      if (!e) mismatches.push(`${what}: no TradeExecuted`);
+      else if (
+        e.isBuy !== (f.kind === "buy") ||
+        getAddress(e.trader) !== getAddress(t.trader) ||
+        String(e.tokenAmount) !== t.tokens ||
+        String(e.curveQuoteAmount) !== t.curve ||
+        String(e.traderQuoteAmount) !== t.traderQuote ||
+        e.protocolFee + e.devFee + e.taxFee + e.antiSniperFee !== BigInt(t.fees) ||
+        String(e.lastPrice) !== f.price ||
+        String(e.totalRaised) !== f.raised ||
+        e.remainingForSale !== sale - BigInt(f.sold)
+      )
+        mismatches.push(`${what}: the trade's amounts or price differ`);
+    }
   });
   const setup = await Promise.all(l.setup.map((s) => readMined(client, s.hash)));
   setup.forEach((m, i) => {
