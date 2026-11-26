@@ -46,7 +46,7 @@ export function lineFor(row: string): string {
 interface Look { film: boolean; tags: boolean; words: boolean }
 
 /** Builds the brain world into the stage and returns the handle for a moment (or the whole clock). */
-async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string; row?: string; line?: string; calibrate?: boolean; view?: { az: number; el: number }; look?: Partial<Look>; moments?: Moments; at?: (local: number) => number } = {}): Promise<FrameHandle> {
+async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string; row?: string; line?: string; calibrate?: boolean; view?: { az: number; el: number }; look?: Partial<Look>; moments?: Moments; at?: (local: number) => number; live?: boolean } = {}): Promise<FrameHandle> {
   const st = ctx.stage, W = ctx.width, H = ctx.height;
   const look: Look = { film: true, tags: !o.calibrate, words: !o.calibrate, ...(o.look ?? {}) };
   // a black stage, nothing lit: everything in the brain is emissive and additive
@@ -109,6 +109,9 @@ async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string
 
   return {
     time,
+    // a frame that moves at its rest (the site's Living Brain stop): the story runs its clock on while the visitor rests
+    // there (FrameHandle.live), as Living Brain is never still: the members on their orbits, the turn, the twinkle
+    live: !!o.live,
     note: o.calibrate
       ? `Calibration pose (SPEC 3.4): the Grand Prix brain alone, formed, camera at Living Brain's distance 2.08 on a 37 degree lens, no words. ${NOTE_DESIGN}`
       : `Our rendering of our data in Living Brain's visual language, not Living Brain's interface. ${NOTE_DATA} ${NOTE_DESIGN} The scope line names the source.`,
@@ -297,7 +300,7 @@ export const frames: StationModule['frames'] = {
   // the master's and the 90-second cut's beat: the combined brain on a short clock of its own (moments.ts T_SHARED)
   // its line says when the brains were written and who wrote them: after the seal, by the build and the review; no plan
   // reads them (the site's stop stands after the weather odds; the films' rows say it too)
-  'brain.shared': async (ctx) => { readReview(ctx); return brainFrame(ctx, T_SHARED.lb3, { caption: 'Memory', moments: T_SHARED, line: `Living Brain holds our three brains: ${fmt(COUNTS.pages)} pages, ${COUNTS.across} connections across them, written after the seal by the build and Desert Willow's review. No plan reads them.` }); },
+  'brain.shared': async (ctx) => { readReview(ctx); return brainFrame(ctx, T_SHARED.lb3, { caption: 'Memory', moments: T_SHARED, live: true, line: `Living Brain holds our three brains: ${fmt(COUNTS.pages)} pages, ${COUNTS.across} connections across them, written after the seal by the build and Desert Willow's review. No plan reads them.` }); },
   'brain.calibrate': async (ctx) => brainFrame(ctx, 31.0, { calibrate: true }),
   // the silhouette checks (SPEC 7.3): the same brain from its left side and from the front, level
   'brain.calibrate-side': async (ctx) => brainFrame(ctx, 31.0, { calibrate: true, view: { az: 270, el: 0 } }),

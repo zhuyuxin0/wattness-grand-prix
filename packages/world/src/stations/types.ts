@@ -46,6 +46,10 @@ export interface FrameHandle {
   /** The plates' skin: 'walk', the Hedging walkthrough's 1920 cut (16 px plates, 40/26 px caption; the default), or
    *  'intro', the landing intro's (12.5 px plates). */
   readonly skin?: 'walk' | 'intro';
+  /** The frame moves at its rest (the stack's comets along its strands, as the Tech Stack tab runs them): the story
+   *  runs the frame's clock on from `time` while it rests there, the site's on the wall clock, a film's through the
+   *  hold. With reduced motion the site's rest stays a still. Default false: the rest is one picture. */
+  readonly live?: boolean;
   /** For the storyboard, in plain words: what the frame shows, which figures are real and from which file, and what
    *  is illustrative or has not run yet. */
   readonly note: string;

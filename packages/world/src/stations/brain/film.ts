@@ -60,8 +60,9 @@ export function brainMaster(from: number): FilmKey[] {
 
 /** The site's Living Brain stop, after the weather odds (beats.ts SITE_KEYS: the brains were written after the seal and
  *  no plan reads them): the combined brain at the short clock's rest, every link across brains drawn and the conflict
- *  flagged, the hop in playing Find links' burst. The site never shows Living Brain's own interface: its recording is
- *  not in a site's checkout. */
+ *  flagged, the hop in playing Find links' burst; brain.shared moves at its rest (FrameHandle.live), so while the
+ *  visitor rests there its clock runs on, the members on their orbits. The site never shows Living Brain's own
+ *  interface: its recording is not in a site's checkout. */
 export function brainSite(from: number): FilmKey[] {
   return [{ key: 'shared-memory', at: from + 2.6, until: from + 4.0, leg: { cam: 'hop', clockB: [1.2, T_SHARED.lb3] } }];
 }
