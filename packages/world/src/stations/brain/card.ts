@@ -1,0 +1,154 @@
+// The Memory tab's card (SPEC 5): ours, in Living Brain's card shape (dark navy, a cyan hairline, radius 16, 320 px; a
+// bottom sheet under 720 px), with our type. The badge and title, the meta line, Living Brain's summary as it wrote
+// it, the check against the repository where the summary misstates it, the conflict across brains, the connections in
+// its brain and across brains (each row selects its page), and "Open <tab>" where the page is a tab's own. Also the
+// small hover card, and the page list (the keyboard's path, and the fallback without WebGL or at phone width).
+import { BRAINS, PLAIN, acrossOf, brainOf, conflictOf, linksOf, pagesOf, tabsOf, type BrainId, type Page, type Strength } from './data';
+
+const two = (n: number) => String(n).padStart(2, '0');
+const el = <K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string, text?: string) => {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text != null) e.textContent = text;
+  return e;
+};
+const badge = (p: Page) => { const b = el('span', 'lb-n', two(p.n)); b.style.setProperty('--lb-c', brainOf(p.brain).color); return b; };
+const STRENGTH: Record<Strength, string> = { strong: 'Strong', medium: 'Medium', weak: 'Weak' };
+const pct = (s: number) => `${Math.round(s * 100)}% match`;
+
+export interface CardHost {
+  /** Selects a page (in another brain: the mount moves there first). */
+  select(brain: BrainId, slug: string): void;
+  /** Calls the host's onRoute with a tab id. */
+  route(tab: string): void;
+  close(): void;
+  /** The host's tabs, by id: which "Open <tab>" buttons may show. */
+  tabs: Map<string, string>;
+}
+
+/** The pinned card for a page. */
+export function pageCard(p: Page, host: CardHost): HTMLElement {
+  const card = el('section', 'lbm-card');
+  card.setAttribute('aria-label', `${p.title}, page ${two(p.n)} of the ${PLAIN[p.brain]}`);
+  card.dataset.brain = p.brain; card.dataset.page = p.slug;
+  const head = el('header', 'lbm-head');
+  const h = el('h3', 'lbm-title');
+  h.append(badge(p), document.createTextNode(p.title));
+  const x = el('button', 'lbm-close'); x.type = 'button'; x.setAttribute('aria-label', 'Close');
+  x.innerHTML = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  x.addEventListener('click', () => host.close());
+  head.append(h, x);
+  const own = linksOf(p.brain, p.slug), across = acrossOf(p.brain, p.slug);
+  const meta = el('p', 'lbm-meta', [`${PLAIN[p.brain]} (${brainOf(p.brain).name})`, `page ${two(p.n)}`, `${p.connections} ${p.connections === 1 ? 'connection' : 'connections'}`, ...(p.across ? [`${p.across} across brains`] : [])].join(' · '));
+  card.append(head, meta);
+  // where the page belongs on the site
+  const tabs = tabsOf(p.brain, p.slug);
+  const actions = el('div', 'lbm-actions');
+  if (tabs.own && host.tabs.has(tabs.own)) {
+    const b = el('button', 'lbm-open', `Open ${host.tabs.get(tabs.own)}`); b.type = 'button'; b.dataset.tab = tabs.own;
+    b.addEventListener('click', () => host.route(tabs.own!));
+    actions.append(b);
+  }
+  const partOf = tabs.partOf.filter((t) => host.tabs.has(t));
+  if (partOf.length) {
+    const s = el('p', 'lbm-part', 'Part of: ');
+    partOf.forEach((t, i) => {
+      if (i) s.append(document.createTextNode(', '));
+      const a = el('button', 'lbm-link', host.tabs.get(t)!); a.type = 'button'; a.dataset.tab = t;
+      a.addEventListener('click', () => host.route(t));
+      s.append(a);
+    });
+    actions.append(s);
+  }
+  if (actions.childElementCount) card.append(actions);
+  if (p.summary) card.append(el('p', 'lbm-label', "Living Brain's summary"), el('p', 'lbm-text', p.summary));
+  if (p.correction) {
+    const c = el('div', 'lbm-check');
+    c.append(el('p', 'lbm-label', 'Checked against the repository'), el('p', 'lbm-text', p.correction));
+    card.append(c);
+  }
+  const conflict = conflictOf(p.brain, p.slug);
+  if (conflict) {
+    const c = el('div', 'lbm-conflict');
+    c.append(el('p', 'lbm-label is-rose', 'Conflict across brains'), el('p', 'lbm-text', conflict.conflict), el('p', 'lbm-text is-sub', conflict.correction));
+    card.append(c);
+  }
+  const list = (title: string, rows: { other: Page; strength: Strength; similarity: number; reasoning: string | null; correction?: string }[], acrossRows: boolean) => {
+    if (!rows.length) return;
+    const sec = el('div', 'lbm-sec');
+    sec.append(el('p', 'lbm-label', `${title} · ${rows.length}`));
+    const ul = el('ul', 'lbm-rows');
+    for (const r of rows) {
+      const li = el('li', 'lbm-row');
+      const b = el('button', 'lbm-rowbtn'); b.type = 'button';
+      b.dataset.brain = r.other.brain; b.dataset.page = r.other.slug;
+      const name = el('span', 'lbm-rowname');
+      if (acrossRows) { const dot = el('span', 'lbm-dot'); dot.style.background = brainOf(r.other.brain).color; dot.title = PLAIN[r.other.brain]; name.append(dot); }
+      name.append(badge(r.other), document.createTextNode(r.other.title));
+      const chip = el('span', `lbm-chip is-${r.strength}`, STRENGTH[r.strength]);
+      const m = el('span', 'lbm-match', pct(r.similarity));
+      b.append(name, chip, m);
+      b.addEventListener('click', () => host.select(r.other.brain, r.other.slug));
+      const more = el('details', 'lbm-why');
+      more.append(el('summary', undefined, 'Why'), el('p', 'lbm-text', r.reasoning ?? 'Living Brain gave no reason.'));
+      if (r.correction) more.append(el('p', 'lbm-label', 'Checked against the repository'), el('p', 'lbm-text', r.correction));
+      li.append(b, more);
+      ul.append(li);
+    }
+    sec.append(ul);
+    card.append(sec);
+  };
+  list('In this brain', own.map(({ other, c }) => ({ other, strength: c.strength, similarity: c.similarity, reasoning: c.reasoning, correction: c.correction })), false);
+  list('Across brains', across.map(({ other, x }) => ({ other, strength: x.strength, similarity: x.similarity, reasoning: x.reasoning, correction: x.correction })), true);
+  return card;
+}
+
+/** The small card on hover: number, title, counts. */
+export function hoverCard(p: Page): HTMLElement {
+  const c = el('div', 'lbm-hover');
+  const h = el('p', 'lbm-htitle'); h.append(badge(p), document.createTextNode(p.title));
+  c.append(h, el('p', 'lbm-meta', `${PLAIN[p.brain]} (${brainOf(p.brain).name}) · ${p.connections} ${p.connections === 1 ? 'connection' : 'connections'}${p.across ? ` · ${p.across} across` : ''}`));
+  return c;
+}
+
+/** A brain's pages as rows (number order): the keyboard's path and the fallback list. */
+export function pageRows(brain: BrainId, onPick: (p: Page) => void, onFocus?: (p: Page | null) => void): HTMLElement {
+  const ul = el('ul', 'lbm-list');
+  ul.setAttribute('aria-label', `The ${PLAIN[brain]}'s pages`);
+  for (const p of pagesOf(brain)) {
+    const li = el('li');
+    const b = el('button', 'lbm-listbtn'); b.type = 'button'; b.dataset.brain = p.brain; b.dataset.page = p.slug;
+    b.append(badge(p), el('span', 'lbm-listtitle', p.title), el('span', 'lbm-listmeta', `${p.connections}${p.across ? ` · ${p.across} across` : ''}`));
+    b.addEventListener('click', () => onPick(p));
+    if (onFocus) { b.addEventListener('focus', () => onFocus(p)); b.addEventListener('blur', () => onFocus(null)); }
+    li.append(b); ul.append(li);
+  }
+  return ul;
+}
+
+/** The brains' chips: each focuses its brain; "All brains" when one is focused. */
+export function brainChips(focus: 'all' | BrainId, onFocus: (b: 'all' | BrainId) => void, onHover?: (b: BrainId | null) => void): HTMLElement {
+  const box = el('div', 'lbm-chips');
+  box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Brains');
+  const all = el('button', 'lbm-chipbtn is-all', 'All brains'); all.type = 'button'; all.dataset.brain = 'all';
+  all.addEventListener('click', () => onFocus('all'));
+  box.append(all);
+  for (const b of BRAINS) {
+    const c = el('button', 'lbm-chipbtn'); c.type = 'button'; c.dataset.brain = b.id;
+    const dot = el('span', 'lbm-dot'); dot.style.background = b.color;
+    c.append(dot, document.createTextNode(PLAIN[b.id]));
+    c.addEventListener('click', () => onFocus(b.id));
+    if (onHover) { c.addEventListener('pointerenter', () => onHover(b.id)); c.addEventListener('pointerleave', () => onHover(null)); }
+    box.append(c);
+  }
+  setChips(box, focus);
+  return box;
+}
+
+/** The chips for a focus, in place: the same buttons stay, so the one clicked keeps its focus. */
+export function setChips(box: HTMLElement, focus: 'all' | BrainId) {
+  for (const c of box.querySelectorAll<HTMLButtonElement>('.lbm-chipbtn')) {
+    if (c.dataset.brain === 'all') c.hidden = focus === 'all';
+    else c.setAttribute('aria-pressed', focus === c.dataset.brain ? 'true' : 'false');
+  }
+}

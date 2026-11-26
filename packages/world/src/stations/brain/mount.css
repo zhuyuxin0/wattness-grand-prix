@@ -1,0 +1,107 @@
+/* The Memory tab's mount (mount.ts): the stage holds dark in either site theme; our chrome over it is Wattness
+   (Libre Franklin Brand for titles, the system font for small text, tabular figures). The fallback list follows the
+   page's theme (data-site-theme on the root). */
+.lbm-root { position: relative; width: 100%; height: 100%; overflow: hidden; isolation: isolate; background: #000102; color: #e6e8ea;
+  font-family: var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); -webkit-font-smoothing: antialiased; }
+.lbm-root:focus { outline: none; }
+.lbm-root:focus-visible { box-shadow: inset 0 0 0 2px rgba(103, 232, 249, 0.5); }
+.lbm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.lbm-root .lb-layer { z-index: 2; }
+.lbm-root .lb-tag, .lbm-root .lb-member { pointer-events: auto; cursor: pointer; }
+.lbm-root .lb-tag:focus-visible { outline: 2px solid rgba(103, 232, 249, 0.8); outline-offset: 2px; }
+.lbm-root.is-grab .lbm-canvas { cursor: grabbing; }
+.lbm-root .lb-hud { left: 16px; top: 14px; }
+.lbm-root .lb-layer .lb-scope { left: 12px; bottom: 46px; right: auto; text-align: left; font-size: 11.5px; padding: 4px 8px; max-width: calc(100% - 24px); }
+
+.lbm-chips { position: absolute; right: 12px; top: 12px; z-index: 5; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 200px); }
+.lbm-chipbtn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; cursor: pointer;
+  font: 500 12px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: #e6e8ea; background: rgba(8, 11, 25, 0.72); border: 1px solid rgba(255, 255, 255, 0.14); }
+.lbm-chipbtn:hover, .lbm-chipbtn:focus-visible { border-color: rgba(255, 255, 255, 0.4); outline: none; }
+.lbm-chipbtn[aria-pressed="true"] { border-color: rgba(103, 232, 249, 0.6); }
+.lbm-chipbtn.is-all { color: #a5f3fc; }
+.lbm-chipbtn[hidden] { display: none; }
+.lbm-dot { display: inline-block; flex: none; width: 8px; height: 8px; border-radius: 50%; }
+
+.lbm-root .lb-hint { z-index: 4; }
+
+/* the pinned card: right side; a bottom sheet in the narrow layout */
+.lbm-cardbox { position: absolute; z-index: 6; right: 12px; top: 52px; bottom: 12px; width: 320px; display: flex; flex-direction: column; justify-content: flex-start; pointer-events: none; }
+.lbm-card { pointer-events: auto; box-sizing: border-box; max-height: 100%; overflow: auto; padding: 16px; border-radius: 16px; background: #090d21;
+  border: 1px solid rgba(51, 185, 205, 0.3); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28); color: #fff; overscroll-behavior: contain;
+  animation: lbm-in 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes lbm-in { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: none; } }
+.lbm-head { display: flex; align-items: flex-start; gap: 8px; }
+.lbm-title { flex: 1; display: flex; align-items: center; gap: 8px; margin: 0; font: 600 18px/1.3 var(--t-font-display, "Libre Franklin Brand", system-ui, sans-serif); }
+.lbm-title .lb-n, .lbm-htitle .lb-n { width: 18px; height: 18px; font-size: 9px; }
+.lbm-close { flex: none; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; border: 0; background: transparent; color: rgba(255, 255, 255, 0.6); cursor: pointer; }
+.lbm-close:hover, .lbm-close:focus-visible { color: #fff; background: rgba(255, 255, 255, 0.08); outline: none; }
+.lbm-meta { margin: 6px 0 0; font: 500 11px/1.5 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); letter-spacing: 0.12em; text-transform: uppercase; color: rgb(50, 185, 205); font-variant-numeric: tabular-nums; }
+.lbm-actions { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.lbm-open { height: 32px; padding: 0 14px; border-radius: 12px; border: 0; cursor: pointer; font: 600 12px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: #04121a; background: rgba(34, 211, 238, 0.9); }
+.lbm-open:hover, .lbm-open:focus-visible { background: rgb(103, 232, 249); outline: none; }
+.lbm-part { margin: 0; font: 400 12px/1.5 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: rgb(166, 170, 186); }
+.lbm-link { padding: 0; border: 0; background: none; cursor: pointer; font: inherit; color: #a5f3fc; text-decoration: underline; text-underline-offset: 2px; }
+.lbm-label { margin: 14px 0 0; font: 500 10px/1.4 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255, 255, 255, 0.45); }
+.lbm-label.is-rose { color: rgba(253, 164, 175, 0.9); }
+.lbm-text { margin: 4px 0 0; font: 400 13px/1.6 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: rgb(166, 170, 186); }
+.lbm-text.is-sub { font-size: 12px; color: rgba(166, 170, 186, 0.85); }
+.lbm-check, .lbm-conflict { margin-top: 12px; padding-left: 10px; border-left: 2px solid rgba(255, 255, 255, 0.18); }
+.lbm-conflict { border-left-color: rgba(253, 164, 175, 0.55); }
+.lbm-check .lbm-label, .lbm-conflict .lbm-label { margin-top: 0; }
+.lbm-sec { margin-top: 14px; }
+.lbm-rows { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; }
+.lbm-rowbtn { width: 100%; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 8px; padding: 6px 6px; border-radius: 8px; border: 0;
+  background: transparent; color: #fff; cursor: pointer; text-align: left; font: 400 12.5px/1.35 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); }
+.lbm-rowbtn:hover, .lbm-rowbtn:focus-visible { background: rgba(255, 255, 255, 0.06); outline: none; }
+.lbm-rowname { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
+.lbm-rowname .lb-n { width: 14px; height: 14px; font-size: 7.5px; }
+.lbm-chip { font: 500 10px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); padding: 3px 6px; border-radius: 999px; }
+.lbm-chip.is-strong { color: rgb(110, 231, 183); background: rgba(16, 185, 129, 0.14); }
+.lbm-chip.is-medium { color: rgb(252, 211, 77); background: rgba(245, 158, 11, 0.14); }
+.lbm-chip.is-weak { color: rgb(203, 213, 225); background: rgba(148, 163, 184, 0.14); }
+.lbm-match { font: 400 11px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: rgba(255, 255, 255, 0.55); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lbm-why { margin: 0 6px 4px 28px; }
+.lbm-why summary { cursor: pointer; font: 500 10.5px/1.6 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: rgba(255, 255, 255, 0.45); letter-spacing: 0.06em; text-transform: uppercase; }
+.lbm-why .lbm-text { font-size: 12px; }
+
+.lbm-hover { position: absolute; z-index: 7; left: 0; top: 0; pointer-events: none; padding: 10px 12px; border-radius: 12px; background: #090d21; border: 1px solid rgba(51, 185, 205, 0.3);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28); max-width: 280px; animation: lbm-in 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lbm-htitle { margin: 0; display: flex; align-items: center; gap: 7px; font: 600 14px/1.3 var(--t-font-display, "Libre Franklin Brand", system-ui, sans-serif); color: #fff; }
+.lbm-hover .lbm-meta { margin-top: 4px; font-size: 10px; }
+
+/* the keyboard's list (visually hidden), and the fallback (shown) */
+.lbm-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.lbm-sr:focus-within { /* stays hidden: focus shows the hover card on the stage */ }
+.lbm-list { list-style: none; margin: 0; padding: 0; }
+.lbm-listbtn { width: 100%; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 9px 12px; border: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: transparent; color: inherit; cursor: pointer; text-align: left; font: 400 14px/1.35 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); }
+.lbm-listbtn:hover, .lbm-listbtn:focus-visible { background: rgba(255, 255, 255, 0.06); outline: none; }
+.lbm-listbtn .lb-n { width: 18px; height: 18px; font-size: 9px; }
+.lbm-listmeta { font-size: 12px; color: rgba(255, 255, 255, 0.5); font-variant-numeric: tabular-nums; }
+
+/* the narrow layout (mount.ts layout: under 800 px, or where the HUD and the chips would meet): the chips at the
+   bottom, over the scope line whatever its height; the card as a bottom sheet; the pages as a drawer over the stage's
+   lower half */
+.lbm-pagesbtn { display: none; }
+.lbm-root.is-narrow .lbm-chips { left: 12px; right: 12px; top: auto; bottom: calc(var(--lbm-scope-h, 30px) + 16px); max-width: none; justify-content: center; }
+.lbm-root.is-narrow .lb-hint { display: none; }
+.lbm-root.is-narrow .lb-hud { max-width: calc(100% - 132px); }
+.lbm-root.is-narrow .lb-layer .lb-scope { bottom: 8px; left: 8px; font-size: 10.5px; }
+.lbm-root.is-narrow .lbm-cardbox { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 62%; }
+.lbm-root.is-narrow .lbm-card { border-radius: 16px 16px 0 0; }
+.lbm-root.is-narrow .lbm-pagesbtn { display: inline-flex; position: absolute; z-index: 5; right: 12px; top: 12px; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 999px;
+  font: 500 12px/1 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); color: #e6e8ea; background: rgba(8, 11, 25, 0.8); border: 1px solid rgba(255, 255, 255, 0.18); cursor: pointer; }
+.lbm-drawer { position: absolute; z-index: 6; left: 0; right: 0; bottom: 0; max-height: 58%; overflow: auto; background: rgba(9, 13, 33, 0.96); border-top: 1px solid rgba(51, 185, 205, 0.3);
+  border-radius: 16px 16px 0 0; overscroll-behavior: contain; }
+.lbm-drawer[hidden] { display: none; }
+.lbm-drawer h4 { margin: 0; padding: 12px 14px 6px; font: 600 14px/1.3 var(--t-font-display, "Libre Franklin Brand", system-ui, sans-serif); }
+
+/* without WebGL: the list is the view, in the page's theme, scrolling inside the host's box */
+.lbm-root.is-flat { height: 100%; overflow: auto; overscroll-behavior: contain; background: var(--lbm-bg, #0d1117); }
+.lbm-root.is-flat[data-site-theme="light"] { --lbm-bg: #ffffff; color: #1a1a1a; }
+.lbm-root.is-flat[data-site-theme="light"] .lbm-listbtn { border-bottom-color: rgba(0, 0, 0, 0.08); }
+.lbm-root.is-flat[data-site-theme="light"] .lbm-listmeta { color: rgba(0, 0, 0, 0.55); }
+.lbm-flat { padding: 12px; }
+.lbm-flat .lbm-chips { position: static; justify-content: flex-start; max-width: none; margin-bottom: 10px; }
+.lbm-flat .lbm-note { margin: 0 0 10px; font: 400 12.5px/1.5 var(--w-font-sans, -apple-system, system-ui, "Segoe UI", Roboto, sans-serif); opacity: 0.75; }
+.lbm-flat .lbm-cardbox { position: static; width: auto; margin-top: 12px; }
