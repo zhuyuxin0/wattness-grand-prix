@@ -6,9 +6,11 @@ import { addressUrl, blockUrl, txUrl } from "../../lib/testnet";
 import { dualTime, formatOperatingDay } from "../../lib/time";
 import { Glyph, Hash, ParcFerme, Stat, StatRow } from "../../ui";
 import type { AgentDays, ContributorView, DayRecord, RoundView, TxView } from "./chain";
+import { CheckIt } from "./CheckIt";
 import { agentWord, bpsText, cap, odDay, pct, percentText, prix, usd } from "./view";
 
-// The launched round and round 3, as read at one block.
+// The launched round and round 3, as read at one block. The figures show; each
+// round's addresses, claims and transactions sit in one Check it.
 
 function When({ unix, seconds = true }: { unix: number; seconds?: boolean }) {
   const t = dualTime(unix, { seconds });
@@ -83,9 +85,7 @@ function SeasonDays({ a, now }: { a: AgentDays; now: number }) {
   const sealed = a.days.filter((d) => d.counts).length;
   return (
     <div className="season-days">
-      <h3 className="season-sub">
-        Season days for {word ?? "the agent"} <Hash value={a.agent} href={addressUrl(a.agent)} label="agent address" copy={false} />
-      </h3>
+      <h3 className="season-sub">Season days for {word ?? "the agent"}</h3>
       <ul className="season-days__list">
         {a.days.map((d) => (
           <DayRow key={d.od} d={d} now={now} />
@@ -285,29 +285,41 @@ export function LaunchedRound({ round, txs = [], symbol, now }: { round: RoundVi
       </StatRow>
       <p className="season-note season-note--tight">Prices are the pool's own ratio of test USD to {round.symbol}. A token's price says nothing about an agent's plans.</p>
 
-      <LaunchedContracts round={round} symbol={symbol} />
-
       {round.agents
         .filter((a) => round.contributors.some((c) => c.agent.toLowerCase() === a.agent.toLowerCase()))
         .map((a) => (
           <SeasonDays key={a.agent} a={a} now={now} />
         ))}
 
-      <div className="season-claims">
-        <h3 className="season-sub">Claims</h3>
-        <div className="season-claims__grid">
-          {round.contributors.map((c) => (
-            <Claim key={c.account} c={c} round={round} symbol={symbol} />
-          ))}
+      <CheckIt what={`its contracts, ${round.contributors.length === 1 ? "its claim" : "its claims"}${txs.length > 0 ? " and its transactions" : ""}`}>
+        <LaunchedContracts round={round} symbol={symbol} />
+        {round.agents.length > 0 && (
+          <dl className="season-dl season-dl--tight">
+            {round.agents.map((a) => (
+              <div key={a.agent}>
+                <dt>Agent backed</dt>
+                <dd>
+                  <Agent address={a.agent} />
+                </dd>
+              </div>
+            ))}
+          </dl>
+        )}
+        <div className="season-claims">
+          <h3 className="season-sub">Claims</h3>
+          <div className="season-claims__grid">
+            {round.contributors.map((c) => (
+              <Claim key={c.account} c={c} round={round} symbol={symbol} />
+            ))}
+          </div>
         </div>
-      </div>
-
-      {txs.length > 0 && (
-        <div>
-          <h3 className="season-sub">Its transactions</h3>
-          <Txs txs={txs} />
-        </div>
-      )}
+        {txs.length > 0 && (
+          <div>
+            <h3 className="season-sub">Its transactions</h3>
+            <Txs txs={txs} />
+          </div>
+        )}
+      </CheckIt>
     </>
   );
 }
@@ -402,6 +414,7 @@ export function RoundThree({ round, symbol, now }: { round: RoundView; symbol: s
             <span className="num">{formatInt(round.contributorCount)}</span> of up to <span className="num">{formatInt(round.maxContributors)}</span> contributors, up to{" "}
             <span className="num">{usd(round.walletCap, symbol)}</span> per wallet.
           </p>
+          <CheckIt what="its contracts">
           <dl className="season-dl season-dl--tight">
             <div>
               <dt>Launcher</dt>
@@ -439,6 +452,7 @@ export function RoundThree({ round, symbol, now }: { round: RoundView; symbol: s
               </div>
             )}
           </dl>
+          </CheckIt>
         </article>
       </div>
     </>

@@ -1,0 +1,47 @@
+{
+  "what": "The Wattness Season Mini App, release 7, built for the web: the same Component.tsx, VaultABI.ts, i18n.json and manifest.json as the release's ZIP for Flap, in a guest host that reads BSC testnet (chain 97) over public RPC and holds no wallet. Writes are refused; Open on Flap leads to Flap's host.",
+  "release": 7,
+  "slug": "wattness-season",
+  "artifactId": "vaultui_wattness-season_01M8B7TYBFEQE0QK4PP4DFY5E6",
+  "zip": {
+    "name": "wattness-season-mini-app-release-7.zip",
+    "sha256": "6328b9b604778510bdb48ebef8687a4a770d61fe42ea4d101aed9c3bc43d43a7",
+    "bytes": 69725,
+    "checks": "app:check (0 blocking; 2 warnings, the manual review of the App's two fixed contracts), app:build, app:e2e (6 of 6), app:package and app:verify-package, Nov 26 13:21 to 13:22 CT (Nov 27 02:21 to 02:22 Bangkok)"
+  },
+  "source": {
+    "Component.tsx": "d8b183733864e1b4c0207400e937370fa53fc4d2fb591b2f37239bf452a23756",
+    "VaultABI.ts": "7bb66b457d7cecf56c1d77e0904be60d03a606c5c2ef2be2c2101f657cadcd9a",
+    "i18n.json": "6781eb4addfa6393d8123eb4200531236d3b84b5a852e884a010dffb3601554c",
+    "manifest.json": "95ade7d364562d3f79dd41c845ac7063a6c4679dc3fb773ddf84e93d2f10d083"
+  },
+  "template": {
+    "repository": "github.com/flap-sh/flap-vault-component-template",
+    "commit": "b912fd1f89694a723adfba8e4e68757980239766",
+    "vaultRuntime": "0.1.50"
+  },
+  "host": {
+    "files": {
+      "entry.tsx": "8f226f828584080ecb8ac81ca28478131c20dfceef10d3c7c06dc2d1174fc5ad",
+      "input.css": "97ed8866958315b20bc17c5cdaaaa24d85277f4e3c95487e3d5b44e6e209aa50",
+      "tailwind.config.ts": "cb2602947a80feeb07d8c9d8429aa1182adfad962f03ab504e33c3634c6d38ec",
+      "tsconfig.json": "542e76459a96f36f36033c678231adf750c293db73337e95b854ac497007f663",
+      "build.mjs": "72ad9b2496adfa6171c24c8e824bf7ba32289f6c5a719074b4b4719893282a23"
+    },
+    "words": "Three of the dictionary's words are the guest host's own: actions.guest, actions.connect (Open on Flap) and race.footMini, in en, zh and ko."
+  },
+  "tools": {
+    "esbuild": "0.27.7",
+    "tailwindcss": "3.4.19",
+    "react": "19.2.8",
+    "viem": "2.50.4"
+  },
+  "files": {
+    "OFL.txt": "eab3eb64df66b4490da3d2fe84e5829115345f2a6d9d0ba6e3904ba9866c720d",
+    "app.3ae05023e452.js": "3ae05023e4526639db32dd749ee6c5539674050a7da4e4690b5ad85d0eef7029",
+    "app.c623347ba250.css": "c623347ba250e539e09cee05ca1cc142f7f726a460cbe6b5eb10e56dfddd7849",
+    "index.html": "192db5cc6f6bb9a93ee880838bd10addf3d82c6767c946a80ef934403006713b",
+    "librefranklin-100-900-latin-ext.woff2": "96176420d1e4d66b81149e47347c5d8c76c5be3d74671e0c87a661da69ea33ed",
+    "librefranklin-100-900-latin.woff2": "d21d1545591ddfa2ce9c208879298e9086b1a8dba7c81d50b686c70a259e91e8"
+  }
+}
