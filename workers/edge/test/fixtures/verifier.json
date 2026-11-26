@@ -1,0 +1,93 @@
+{
+  "schema": "gate-record.edge-verifier-golden.v1",
+  "produced_by": "packages/verifier verify() over fixtures/od-20261126, with each receipt as record.json and the chain answered from test/fixtures/chain.json",
+  "chain_recorded": "2026-11-26T08:49:24.788Z",
+  "cases": {
+    "sealed on bsc-mainnet": {
+      "battery": "DSWL_ESS_ESR1",
+      "network": "bsc-mainnet",
+      "tamper": null,
+      "results": {
+        "V1": {
+          "status": "PASS",
+          "details": [
+            "root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 from leaf 93 of 316 and its audit path"
+          ]
+        },
+        "V2": {
+          "status": "PASS",
+          "details": [
+            "key 0xafee502d7b63d89f48434a1e9c1b73c949ca08f7189f68be54e30f2d81fdedf9 (scope \"gate-record/ercot-da-energy\")",
+            "bsc-mainnet 0x2922c68cE15EB3e83B7f43b136e981dDc4262876, block 135677078",
+            "codeHash is source tree b83af42225f0ac312b05c5dd269f6c35502ec6b4"
+          ]
+        },
+        "V3": {
+          "status": "PASS",
+          "details": [
+            "committed 2026-11-25 09:15:17 CST (unix 1795619717), 2683 s before the gate",
+            "gate 2026-11-25 10:00:00 CST = 2026-11-25 23:00:00 GMT+7 (unix 1795622400)"
+          ]
+        }
+      }
+    },
+    "sealed on bsc-testnet": {
+      "battery": "DSWL_ESS_ESR1",
+      "network": "bsc-testnet",
+      "tamper": null,
+      "results": {
+        "V1": {
+          "status": "PASS",
+          "details": [
+            "root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7 from leaf 93 of 316 and its audit path"
+          ]
+        },
+        "V2": {
+          "status": "PASS",
+          "details": [
+            "key 0xafee502d7b63d89f48434a1e9c1b73c949ca08f7189f68be54e30f2d81fdedf9 (scope \"gate-record/ercot-da-energy\")",
+            "bsc-testnet 0x2922c68cE15EB3e83B7f43b136e981dDc4262876, block 144810495",
+            "codeHash is source tree b83af42225f0ac312b05c5dd269f6c35502ec6b4"
+          ]
+        },
+        "V3": {
+          "status": "PASS",
+          "details": [
+            "committed 2026-11-25 09:17:00 CST (unix 1795619820), 2580 s before the gate",
+            "gate 2026-11-25 10:00:00 CST = 2026-11-25 23:00:00 GMT+7 (unix 1795622400)"
+          ]
+        }
+      }
+    },
+    "one changed digit on bsc-mainnet": {
+      "battery": "DSWL_ESS_ESR1",
+      "network": "bsc-mainnet",
+      "tamper": "battery.energy_kwh, its last digit plus one",
+      "results": {
+        "V1": {
+          "status": "FAIL",
+          "details": [
+            "record.json says 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7",
+            "root 0x83a15f0131f2641ced8236c63cae3bc8aa4c03bd2a4877e7884418ebb591e97b from leaf 93 of 316 and its audit path"
+          ]
+        },
+        "V2": {
+          "status": "FAIL",
+          "details": [
+            "on-chain root 0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7, recomputed 0x83a15f0131f2641ced8236c63cae3bc8aa4c03bd2a4877e7884418ebb591e97b",
+            "key 0xafee502d7b63d89f48434a1e9c1b73c949ca08f7189f68be54e30f2d81fdedf9 (scope \"gate-record/ercot-da-energy\")",
+            "bsc-mainnet 0x2922c68cE15EB3e83B7f43b136e981dDc4262876, block 135677078",
+            "codeHash is source tree b83af42225f0ac312b05c5dd269f6c35502ec6b4"
+          ]
+        },
+        "V3": {
+          "status": "PASS",
+          "details": [
+            "committed 2026-11-25 09:15:17 CST (unix 1795619717), 2683 s before the gate",
+            "gate 2026-11-25 10:00:00 CST = 2026-11-25 23:00:00 GMT+7 (unix 1795622400)"
+          ]
+        }
+      }
+    }
+  }
+}
