@@ -3,12 +3,12 @@
  "what": "ElectronX's piece in the stack, in its place: the hedge's instrument, ElectronX's published hourly contract terms.",
  "frame": "_objects.stack-electronx",
  "code": {
-  "base": "7ff01507be78bd70ca423445854a4171fa393666",
+  "base": "14da724c9e55b66fa819840a0ebfee8d87adf28c",
   "rig": {
    "path": "packages/world/src/stations/_objects/index.ts",
    "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
   },
-  "world_tree": "6ac4c591c479b580e84134393b6d3cac9307ca72",
+  "world_tree": "9e3badeaf5d72caa84b0d1d412cf9b775df59491",
   "note": "packages/world as on main (base), plus the rig named here (src/stations/_objects): the stations' own builders and frames from the frame data, with the rig's camera, or the chapter's own with its lens narrowed onto the object where the frame is a crop"
  },
  "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
@@ -16,8 +16,8 @@
   "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.stack-electronx --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
   "lab": "lab.html?frame=_objects.stack-electronx&w=1280&h=720&theme=dark&plates=0",
   "rendered": {
-   "bangkok": "2026-11-27 02:13",
-   "ct": "2026-11-26 13:13"
+   "bangkok": "2026-11-27 03:07",
+   "ct": "2026-11-26 14:07"
   },
   "gpu": "ANGLE Metal Renderer: Apple M1 Max",
   "deterministic": "2 draws in fresh pages, byte-identical",
