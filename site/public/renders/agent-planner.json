@@ -3,12 +3,12 @@
  "what": "The Planner's instrument as the garage stands it: three boards for Desert Willow's Nov 26 plans, A (no hedge), B (a hedge on A's schedule) and C (schedule and hedge together, sealed, edged in BNB yellow), each with its schedule and its 301-scenario spread.",
  "frame": "_objects.agent-planner",
  "code": {
-  "base": "14da724c9e55b66fa819840a0ebfee8d87adf28c",
+  "base": "d90c8e55d3b7116dcb6e97e94a4dc539719ad9b1",
   "rig": {
    "path": "packages/world/src/stations/_objects/index.ts",
    "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
   },
-  "world_tree": "9e3badeaf5d72caa84b0d1d412cf9b775df59491",
+  "world_tree": "14243947e9c415e102e4dbf29972bb7c7834fc87",
   "note": "packages/world as on main (base), plus the rig named here (src/stations/_objects): the stations' own builders and frames from the frame data, with the rig's camera, or the chapter's own with its lens narrowed onto the object where the frame is a crop"
  },
  "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
@@ -16,8 +16,8 @@
   "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.agent-planner --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
   "lab": "lab.html?frame=_objects.agent-planner&w=1280&h=720&theme=dark&plates=0",
   "rendered": {
-   "bangkok": "2026-11-27 03:07",
-   "ct": "2026-11-26 14:07"
+   "bangkok": "2026-11-27 03:10",
+   "ct": "2026-11-26 14:10"
   },
   "gpu": "ANGLE Metal Renderer: Apple M1 Max",
   "deterministic": "2 draws in fresh pages, byte-identical",
@@ -61,12 +61,12 @@
  "loop": {
   "what": "The same picture with the camera swung 8 degrees round the object and back over 4 s, played over the still while its card is hovered or focused.",
   "code": {
-   "base": "14da724c9e55b66fa819840a0ebfee8d87adf28c",
+   "base": "d90c8e55d3b7116dcb6e97e94a4dc539719ad9b1",
    "rig": {
     "path": "packages/world/src/stations/_objects/index.ts",
     "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
    },
-   "world_tree": "9e3badeaf5d72caa84b0d1d412cf9b775df59491"
+   "world_tree": "14243947e9c415e102e4dbf29972bb7c7834fc87"
   },
   "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/spin.mjs --port <port> --frame _objects.agent-planner --name agent-planner-loop --out <dir> --w 960 --h 540 --scale 2 --seconds 4 --fps 30 --swing 8 --formats mp4",
   "lab": "lab.html?frame=_objects.agent-planner&w=960&h=540&theme=dark&plates=0",

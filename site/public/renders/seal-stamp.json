@@ -3,12 +3,12 @@
  "what": "The seal's stamp as chapter 13 draws it: Parc fermé's gate at 09:15:17 CT on Nov 25, its clock, and the sealing ring lit gold as the Nov 26 root lands on BNB Chain, before the 10:00 CT gate.",
  "frame": "_objects.seal-stamp",
  "code": {
-  "base": "14da724c9e55b66fa819840a0ebfee8d87adf28c",
+  "base": "d90c8e55d3b7116dcb6e97e94a4dc539719ad9b1",
   "rig": {
    "path": "packages/world/src/stations/_objects/index.ts",
    "git_blob": "7c4ace6fee42c47b9c87a3eeed69eb5a71ec9bdf"
   },
-  "world_tree": "9e3badeaf5d72caa84b0d1d412cf9b775df59491",
+  "world_tree": "14243947e9c415e102e4dbf29972bb7c7834fc87",
   "note": "packages/world as on main (base), plus the rig named here (src/stations/_objects): the stations' own builders and frames from the frame data, with the rig's camera, or the chapter's own with its lens narrowed onto the object where the frame is a crop"
  },
  "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
@@ -16,22 +16,22 @@
   "command": "packages/world: sh scripts/serve.sh <port>, then node scripts/render.mjs --port <port> --frames _objects.seal-stamp --out <dir> --w 1280 --h 720 --scale 2 --plates 0 --raw --repeat 2",
   "lab": "lab.html?frame=_objects.seal-stamp&w=1280&h=720&theme=dark&plates=0",
   "rendered": {
-   "bangkok": "2026-11-27 03:08",
-   "ct": "2026-11-26 14:08"
+   "bangkok": "2026-11-27 03:11",
+   "ct": "2026-11-26 14:11"
   },
   "gpu": "ANGLE Metal Renderer: Apple M1 Max",
   "deterministic": "2 draws in fresh pages, byte-identical",
   "master": {
    "size": "2560 x 1440",
-   "sha256": "b026ac045dfc14f29a16c21d0a55786efa5ce2cba43c104bfb67b90d2ecdf94f"
+   "sha256": "ec3c7f61adc14ad4614dc1f83cd108d2327d95cca51a0c09fb59ad072f457036"
   },
   "png_1280": {
    "size": "1280 x 720, render.mjs's Lanczos from the master",
-   "sha256": "eac0e595bf5d79cbcc540866be64542f9e5be3ec498288f02882ceef153f33b1"
+   "sha256": "629eec4d2489524f2d5c2f7e080d3b2b17ae41f2728d08bccce03d832d0fc7e5"
   },
   "png_640": {
    "size": "640 x 360, ffmpeg's Lanczos from the master",
-   "sha256": "e48eb783167c44f73f70d16b6a929930426dcd2d9f903c38f8e066a0d48cf88d"
+   "sha256": "c3950fd77da072990f50c6a2c4bc1f455371a209561920d768210f0c3e9e48ce"
   },
   "webp": "cwebp 1.6.0 -q 86 -m 6 -sharp_yuv -metadata none"
  },
@@ -39,14 +39,14 @@
   "seal-stamp-640.webp": {
    "width": 640,
    "height": 360,
-   "bytes": 16186,
-   "sha256": "d2313b94c5ab47cb3d9b44e2f0b0f30149dd70906f24a27bd4314714906ded37"
+   "bytes": 16220,
+   "sha256": "9bf25aa2cb0c49c7716e6e6e59088c840eb6693b6f5ea346c40d67de6b6a4f34"
   },
   "seal-stamp-1280.webp": {
    "width": 1280,
    "height": 720,
-   "bytes": 43058,
-   "sha256": "c27f6623c9828b73cbae472494553390692e691e2b23a88888d8dae11df7b0ab"
+   "bytes": 43130,
+   "sha256": "eee268b18c88084d39deab4ebc7925a35d19f23e95396034700d3c334089d646"
   }
  },
  "rerender_when": "Parc fermé (stations/grid/r02.ts), the story's beat (story/beats.ts sealed), the rig, or the frame data changes"
