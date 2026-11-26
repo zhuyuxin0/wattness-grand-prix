@@ -16,7 +16,7 @@ Exit 0 when nothing failed, 1 when a check failed, 2 on a usage or I/O error.
 | Check | What it recomputes |
 |---|---|
 | V1 | leaf = SHA-256(0x00 ‖ JCS(manifest)); RFC 6962 root over the one leaf; record.json's root; for a copy, every changed field |
-| V2 | `get(key)` with key = keccak256(abi.encode(wallet, scope, od)): root, leaf count, committer, od, scope; `keyOf` agrees with the local key; whether codeHash is the engine commit |
+| V2 | `get(key)` with key = keccak256(abi.encode(wallet, scope, od)): root, leaf count, committer, od, scope; `keyOf` agrees with the local key; whether codeHash is the manifest's source tree (`engine.tree`) |
 | V3 | the gate from the DST rule and from IANA America/Chicago, the manifest's gate, the contract's `gateTs`; committedAt before it; plan time before it |
 | V4 | per arm and hour: power, SOC path from the opening SOC with losses on charging, SOC bounds, closing floor, cycle cap, contract limit, hedge within the scheduled energy |
 | V5 | entry prices from the entry rule, collateral, the objective from mean and CVaR; with scenarios.json, its digest and each arm's mean and CVaR over the scenarios, weighted by the weather rule when a Cournot reading was applied |
