@@ -1,0 +1,101 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 05 of the introduction, \"How each day runs\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "the-map",
+ "beat": "the-map",
+ "chapter": 5,
+ "name": "How each day runs",
+ "term": "the paddock",
+ "tab": "about",
+ "frame": "venue.hub",
+ "local": null,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops the-map --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:41",
+   "ct": "2026-11-26 12:41"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 25299,
+   "per_frame_ms": {
+    "mean": 165,
+    "p95": 194
+   },
+   "gpu_load_pct": {
+    "before": 63,
+    "after": 98
+   },
+   "load_average": "{ 27.02 33.48 45.30 }",
+   "under_load": true
+  }
+ },
+ "files": {
+  "the-map.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 25638,
+   "sha256": "5c1f223bf5ba8dbaccc819950835fee2df1c49eee2d6570c216c5c3c8ddc58ba"
+  },
+  "the-map-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 40 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 294823,
+   "sha256": "9614bda381eea1d75633a8b7641a40d29110aa61346ad639df1aa29c77f0e2f9"
+  },
+  "the-map-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 28",
+   "bytes": 264559,
+   "sha256": "35b1ce7e48a313674e4bb431106e672aea0d39ee5b8b7d78136029e9ec018151"
+  },
+  "the-map-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 209754,
+   "sha256": "760805e16fbdb16c34d0b13c4b779e9c79e7da41e573bcfe49ba3e0fe45ee1a1"
+  },
+  "the-map-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 211309,
+   "sha256": "6b95067877a6c38307354b657b37b3360c4ef516bf51bb37556a4251ad14b24b"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/venue/**, its kit parts or the frame data), or its place in the site's story"
+}

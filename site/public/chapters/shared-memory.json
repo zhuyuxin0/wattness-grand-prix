@@ -1,0 +1,101 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 15 of the introduction, \"Memory: our three brains in Living Brain\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "shared-memory",
+ "beat": "shared-memory",
+ "chapter": 15,
+ "name": "Memory: our three brains in Living Brain",
+ "term": "team data",
+ "tab": "memory",
+ "frame": "brain.shared",
+ "local": 5,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops shared-memory --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:34",
+   "ct": "2026-11-26 12:34"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 23829,
+   "per_frame_ms": {
+    "mean": 149,
+    "p95": 233
+   },
+   "gpu_load_pct": {
+    "before": 80,
+    "after": 99
+   },
+   "load_average": "{ 69.80 51.75 55.88 }",
+   "under_load": true
+  }
+ },
+ "files": {
+  "shared-memory.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 31142,
+   "sha256": "82940650275006c3bfc25b067565a196a4c760386ab87f224277096bad883eb4"
+  },
+  "shared-memory-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 40 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 249073,
+   "sha256": "7f1752d1e0c6141527e3f5ebeeedaca273f28789c369e2dfaec40840ecebfe0a"
+  },
+  "shared-memory-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 26",
+   "bytes": 294743,
+   "sha256": "175f9901ded41fcac534bc9caa7bc6a465ad6bb707d3f3af60e4d19c6bb30133"
+  },
+  "shared-memory-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 155348,
+   "sha256": "c33d9817d676a7021cb28add7e8b3329808cf505aefcc440f1ce123968e6b425"
+  },
+  "shared-memory-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 163595,
+   "sha256": "f074befc3460c7644b33639347fae6222f57147ab6fe48d92ffd15ddf8bb7faf"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/brain/**, its kit parts or the frame data), or its place in the site's story"
+}

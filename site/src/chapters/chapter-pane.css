@@ -1,0 +1,214 @@
+/* A tab's chapter of the introduction (ChapterPane.tsx) on the Terminal's liquid glass (packages/world's
+   kit/css/glass.css, the Terminal's apps/mms/src/ui/glass.css): a tinted, diffused fill, a hairline, a lit rim and a
+   soft drop. From 900px it floats in the top right corner of the page's head, any aside of the page's own beside it;
+   under 900px it is one small row under the head, full width. Its hover lifts the glass alone: the link's own box,
+   the pointer's target, never moves. */
+
+.chapter-pane {
+  --cp-fill: color-mix(in srgb, var(--t-raised) 68%, transparent);
+  --cp-hairline: color-mix(in srgb, white 40%, transparent);
+  --cp-graze: color-mix(in srgb, black 30%, transparent);
+  --cp-rim: inset 0 1.5px 1px -0.5px rgb(255 255 255 / 0.96), inset 0 -1.5px 1px -0.5px rgb(0 0 0 / 0.34),
+    inset 0 0 4px -2px rgb(255 255 255 / 0.35), inset 0 0 0 1px rgb(255 255 255 / 0.16);
+  --cp-lift: 0 3px 10px -7px rgb(0 0 0 / 0.4);
+  --cp-depth: 0 12px 30px -14px rgb(0 0 0 / 0.38);
+  --cp-depth-up: 0 18px 36px -14px rgb(0 0 0 / 0.42);
+  display: block;
+  width: clamp(216px, 18vw, 256px);
+  color: var(--w-fg);
+  text-decoration: none;
+  border-radius: var(--t-radius-paper);
+  -webkit-tap-highlight-color: transparent;
+}
+:root[data-theme="dark"] .chapter-pane {
+  --cp-fill: color-mix(in srgb, var(--t-raised) 78%, transparent);
+  --cp-hairline: color-mix(in srgb, white 22%, transparent);
+  --cp-graze: rgb(0 0 0 / 0.55);
+  --cp-rim: inset 0 1.5px 1px -0.5px rgb(255 255 255 / 0.34), inset 0 -1.5px 1px -0.5px rgb(0 0 0 / 0.5),
+    inset 0 0 4px -2px rgb(255 255 255 / 0.14), inset 0 0 0 1px rgb(255 255 255 / 0.08);
+  --cp-lift: 0 3px 10px -7px rgb(0 0 0 / 0.6);
+  --cp-depth: 0 14px 32px -12px rgb(0 0 0 / 0.6);
+  --cp-depth-up: 0 20px 40px -12px rgb(0 0 0 / 0.66);
+}
+.chapter-pane:hover {
+  color: var(--w-fg);
+}
+.chapter-pane:focus-visible {
+  outline: 2px solid var(--w-accent);
+  outline-offset: 3px;
+}
+
+.chapter-pane__glass {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 6px 6px 9px;
+  border-radius: inherit;
+  isolation: isolate;
+  transition:
+    transform var(--m-dur-m) var(--m-ease-out),
+    box-shadow var(--m-dur-m) var(--m-ease-out);
+}
+.chapter-pane__glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, white 12%, transparent), transparent 48%, color-mix(in srgb, var(--w-accent) 3%, transparent)),
+    var(--cp-fill);
+  border: 1px solid var(--cp-hairline);
+  -webkit-backdrop-filter: blur(6px) saturate(1.4);
+  backdrop-filter: blur(6px) saturate(1.4);
+  box-shadow:
+    0 0 0 1px var(--cp-graze),
+    var(--cp-rim),
+    var(--cp-lift),
+    var(--cp-depth);
+  transition: box-shadow var(--m-dur-m) var(--m-ease-out);
+}
+@media (hover: hover) {
+  .chapter-pane:hover .chapter-pane__glass {
+    transform: translateY(-2px);
+  }
+  .chapter-pane:hover .chapter-pane__glass::before {
+    box-shadow:
+      0 0 0 1px var(--cp-graze),
+      var(--cp-rim),
+      var(--cp-lift),
+      var(--cp-depth-up);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chapter-pane:hover .chapter-pane__glass {
+    transform: none;
+  }
+}
+
+/* The loop: the 3D is dark in either theme, so its box is too until the poster is in. */
+.chapter-pane__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #101315;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.06);
+}
+.chapter-pane__media video,
+.chapter-pane__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chapter-pane__text {
+  display: grid;
+  gap: 2px;
+  padding: 0 4px;
+  min-width: 0;
+}
+.chapter-pane__kicker {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--t-fs-2xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--w-muted);
+}
+.chapter-pane__icon {
+  color: var(--t-accent-text);
+}
+.chapter-pane__name {
+  font-size: var(--t-fs-sm);
+  font-weight: 600;
+  line-height: 1.3;
+}
+.chapter-pane__term {
+  font-size: var(--t-fs-2xs);
+  color: var(--w-muted);
+}
+
+/* In the head, from 900px: the pane in the top right corner, any aside of the page's own beside it at the foot, and
+   the title at the top, level with the pane. */
+@media (min-width: 900px) {
+  .page-header:has(> .page-header__aside > .chapter-pane) > .page-header__text {
+    align-self: start;
+  }
+  .page-header__aside:has(> .chapter-pane) {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: flex-end;
+    gap: var(--t-space-5);
+    align-self: stretch;
+  }
+  .page-header__aside > .chapter-pane {
+    align-self: flex-start;
+    flex: none;
+  }
+}
+
+/* Under 900px the head is one column: the pane is a row under it, full width and small. */
+@media (max-width: 899px) {
+  .page-header__aside:has(> .chapter-pane) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--t-space-4);
+  }
+  .page-header__aside > .chapter-pane {
+    order: 1;
+  }
+  .chapter-pane {
+    width: 100%;
+  }
+  .chapter-pane__glass {
+    grid-template-columns: 104px minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px 5px 5px;
+  }
+  .chapter-pane__text {
+    padding: 0;
+  }
+  .chapter-pane__name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+}
+
+/* A tab previewed in a floating pane (src/float) shows its page without the chapter's loop: the page under the
+   preview has its own. Hidden, the pane is never near the view, so its files are never asked for. */
+.gp-pane__page .chapter-pane {
+  display: none;
+}
+
+/* The Overview's control room sets the page's head in a narrow column over the 3D (pages/Overview/ControlRoom.tsx):
+   there the pane is the phone's small row, under the head's words, at any width. */
+.ov-room__head.page-header:has(.chapter-pane) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ov-room__head .page-header__aside:has(> .chapter-pane) {
+  display: block;
+}
+.ov-room__head .chapter-pane {
+  width: 100%;
+  text-shadow: none;
+}
+.ov-room__head .chapter-pane__glass {
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px 5px 5px;
+}
+.ov-room__head .chapter-pane__text {
+  padding: 0;
+}

@@ -1,0 +1,101 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 14 of the introduction, \"Weather odds, read after the seal\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "odds",
+ "beat": "odds",
+ "chapter": 14,
+ "name": "Weather odds, read after the seal",
+ "term": "the weather radar",
+ "tab": "forecast",
+ "frame": "world.W02-radar",
+ "local": null,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops odds --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:29",
+   "ct": "2026-11-26 12:29"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 26204,
+   "per_frame_ms": {
+    "mean": 170,
+    "p95": 197
+   },
+   "gpu_load_pct": {
+    "before": 17,
+    "after": 99
+   },
+   "load_average": "{ 56.12 39.75 56.53 }",
+   "under_load": false
+  }
+ },
+ "files": {
+  "odds.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 15264,
+   "sha256": "a083145c8d73c0bf24b7cfca1c014125352cbb33d3768c35817115752d85eea4"
+  },
+  "odds-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 109449,
+   "sha256": "8e1ab89e027af14cec89ed5679287b2362207b856c89049a21dbde6c84fb0ce1"
+  },
+  "odds-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 191700,
+   "sha256": "fe725bd535ea1fe0881d822fdb43c6b0f8a9058fa2452b8103877921f0b48f49"
+  },
+  "odds-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 51265,
+   "sha256": "a5e2528448a8fe2f192cacbff5a0b32214989778a166ca2d134bb0b09f69835f"
+  },
+  "odds-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 97912,
+   "sha256": "ab7c4634e51950f864fc821f5d29122a42cb5016da9bd7b19f3aa39f046dc8f8"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/world/**, its kit parts or the frame data), or its place in the site's story"
+}

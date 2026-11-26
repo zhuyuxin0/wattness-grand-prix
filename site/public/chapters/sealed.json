@@ -1,0 +1,101 @@
+{
+ "schema": "grand-prix.chapter-loop.v1",
+ "what": "Chapter 13 of the introduction, \"Plans sealed before the market closes\", as a 5 s loop for the chapter panes: the beat at the site's rest, drawn without its caption, scope line or plates, the camera drifting round its rest pose and back. Positions are schematic, as in the story.",
+ "loop": "sealed",
+ "beat": "sealed",
+ "chapter": 13,
+ "name": "Plans sealed before the market closes",
+ "term": "parc fermé",
+ "tab": "seal",
+ "frame": "grid.R02",
+ "local": 4,
+ "code": {
+  "commit": "2eb9912f2b38a843e7198e46fd7c23b9de9463f1",
+  "world": "packages/world as the commit holds it"
+ },
+ "frame_data_sha256": "6b603d9ad6999cc1530e84945f189226a7fb74aafa8939734da63778867f0faf",
+ "render": {
+  "command": "packages/world: sh scripts/serve.sh <port>; site: WORLD_BROWSER_LIB=<launcher> node scripts/render-chapters.mjs --port <port> --loops sealed --seconds 5 --fps 30",
+  "page": "src/story/story.html?mode=capture&cut=master&w=1920&h=1080&captions=none, the player set to the site's stops",
+  "drawn": "1920 x 1080 CSS px at 1x, Lanczos to each size",
+  "loop": {
+   "seconds": 5,
+   "fps": 30,
+   "frames": 150,
+   "drift": {
+    "az": 2.4,
+    "el": 0.6,
+    "push": 0.03
+   }
+  },
+  "rendered": {
+   "bangkok": "2026-11-27 01:42",
+   "ct": "2026-11-26 12:42"
+  },
+  "gpu": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+  "tools": [
+   "ffmpeg version 8.1 Copyright (c) 2000-2026 the FFmpeg developers",
+   "1.6.0\nlibsharpyuv: 0.4.2"
+  ],
+  "timing": {
+   "wall_ms": 31670,
+   "per_frame_ms": {
+    "mean": 207,
+    "p95": 238
+   },
+   "gpu_load_pct": {
+    "before": 91,
+    "after": 27
+   },
+   "load_average": "{ 23.94 29.58 42.47 }",
+   "under_load": true
+  }
+ },
+ "files": {
+  "sealed.webp": {
+   "kind": "poster",
+   "width": 960,
+   "height": 540,
+   "encoder": "cwebp -q 80 -m 6 -sharp_yuv",
+   "bytes": 16794,
+   "sha256": "f4428aa5edc98165795fbb71586f329176b4fe9a72ad5f59180d9714a01d9ab7"
+  },
+  "sealed-960.webm": {
+   "kind": "webm",
+   "width": 960,
+   "height": 540,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 195129,
+   "sha256": "bceb34cc42ce59911323933ec7cb9c6dd71c418a7d9ed1df2aa6b7ee4daff268"
+  },
+  "sealed-960.mp4": {
+   "kind": "mp4",
+   "width": 960,
+   "height": 540,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 222431,
+   "sha256": "30148b661505f35304c7c38b73a36bbb0cc680dc13dafe3b9ebe8becc88b56a7"
+  },
+  "sealed-640.webm": {
+   "kind": "webm",
+   "width": 640,
+   "height": 360,
+   "codec": "VP9",
+   "encoder": "libvpx-vp9 -crf 34 -b:v 0 -deadline good -cpu-used 2",
+   "bytes": 104480,
+   "sha256": "a15b9c00d1e0b54faada057658a3a13b3bb22ff7572334b4c630b32613bfa3ef"
+  },
+  "sealed-640.mp4": {
+   "kind": "mp4",
+   "width": 640,
+   "height": 360,
+   "codec": "H.264 High",
+   "encoder": "libx264 -preset slow -crf 24",
+   "bytes": 119479,
+   "sha256": "8781aa76d39b75d62d575588c28ace7009d5d03db1c2b53e72100ca2a40c8c1f"
+  }
+ },
+ "rerender_when": "the beat's frame changes (packages/world/src/stations/grid/**, its kit parts or the frame data), or its place in the site's story"
+}

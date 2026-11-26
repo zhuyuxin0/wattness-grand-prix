@@ -1,3 +1,5 @@
+import { ChapterPane } from "../chapters/ChapterPane";
+import { paneChapter } from "../chapters/map";
 import type { ReactNode } from "react";
 import { useLocation } from "react-router-dom";
 import { RelatedStrip } from "../shell/RelatedStrip";
@@ -20,6 +22,7 @@ export function PageHeader({ title, lede, kicker, term, aside, className }: Page
   const tab = tabAt(useLocation().pathname);
   const eyebrow = kicker ?? (tab ? groupOf(tab)?.label : undefined);
   const word = term === false ? undefined : (term ?? tab?.term);
+  const chapter = paneChapter(tab?.id) ? <ChapterPane tabId={tab?.id} /> : null;
   return (
     <header className={`page-header${className ? ` ${className}` : ""}`}>
       <div className="page-header__text">
@@ -29,7 +32,13 @@ export function PageHeader({ title, lede, kicker, term, aside, className }: Page
         {word && <p className="page-header__term">In racing terms, {word}.</p>}
         <RelatedStrip tabId={tab?.id} />
       </div>
-      {aside && <div className="page-header__aside">{aside}</div>}
+      {/* the tab's chapter of the introduction (src/chapters), above any aside of the page's own */}
+      {(chapter || aside) && (
+        <div className="page-header__aside">
+          {chapter}
+          {aside}
+        </div>
+      )}
     </header>
   );
 }
