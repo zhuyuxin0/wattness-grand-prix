@@ -2,11 +2,13 @@
 // ramp's color of its day total, a brass rim (bright for the worst tenth) and the bracket under the worst tenth. When
 // the plan changes only coins whose place changes move: across tubes on a short arc, within a tube straight down or up;
 // at a game's start they drop from the field's front lip column by column. Every coin's position is a pure function
-// of the time since the last change, its delays seeded by its scenario, so a frame can be drawn at any time.
+// of the time since the last change, its delays seeded by its scenario, so a frame can be drawn at any time. A coin
+// that lands between one pose and the next clinks (lib/sound: only with sound on, a dozen a second at most).
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { heatAt } from '../../kit/hedge/fields';
 import { lin } from '../../kit/region/geo';
+import * as sound from '../../lib/sound';
 import { enamelMaterial, PAL } from './look';
 
 export interface TrayFrame {
@@ -44,6 +46,8 @@ export class CoinTray {
   readonly at: { x: number; y: number }[];
   bracket: { x0: number; x1: number; y: number; z: number } | null = null;
   private lastEnd = 0;
+  /** The time of the last pose: the coins that land after it and by the next one clink. */
+  private posedAt = Number.NaN;
 
   constructor(private readonly F: TrayFrame, readonly count: number, brass: THREE.Material) {
     const { coin } = F;
@@ -151,6 +155,14 @@ export class CoinTray {
     }
     this.rimN.count = iN; this.rimT.count = iT;
     for (const m of [this.coins, this.rimN, this.rimT]) m.instanceMatrix.needsUpdate = true;
+    // the coins that landed since the last pose, when the clock ran on to this one (not a jump, nor a pose again)
+    const from = this.posedAt;
+    this.posedAt = t;
+    if (t > from && t - from < 0.5 && from < this.lastEnd) {
+      let landed = 0;
+      for (const p of this.paths) { const end = p.t0 + p.dur; if (p.dur > 0 && end > from && end <= t) landed++; }
+      if (landed) sound.coin(landed);
+    }
     return t < this.lastEnd;
   }
 
