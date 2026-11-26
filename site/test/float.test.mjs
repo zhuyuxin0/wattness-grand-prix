@@ -163,7 +163,8 @@ function sourceFiles(dir) {
 test("rc-dock and the layer load only on first use: one dynamic import, from the front door", () => {
   const files = sourceFiles(src).map((p) => ({ p: relative(src, p), text: readFileSync(p, "utf8") }));
   const rcDock = files.filter((f) => /from\s+["']rc-dock/.test(f.text) || /import\s+["']rc-dock/.test(f.text)).map((f) => f.p);
-  assert.deepEqual(rcDock, [join("float", "layer.tsx")]);
+  // The layer, and a band's dock (band-dock.tsx, reached by band.tsx's own dynamic import: test/band.test.mjs).
+  assert.deepEqual(rcDock.sort(), [join("float", "band-dock.tsx"), join("float", "layer.tsx")]);
   const staticLayer = files.filter((f) => /^\s*import[^;]*from\s+["'][./]*(float\/)?layer["']/m.test(f.text)).map((f) => f.p);
   assert.deepEqual(staticLayer, [], "no static import of the layer");
   const dynamic = files.filter((f) => /import\(\s*["']\.\/layer["']\s*\)/.test(f.text)).map((f) => f.p);

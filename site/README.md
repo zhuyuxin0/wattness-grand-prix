@@ -120,6 +120,18 @@ carries to the rest; a link may name one with `/battery/<resource>` or `?battery
   goes to the tab, Esc closes the top pane; from 767px down a pane is a full-height sheet. This browser keeps the open
   panes (`gp.panes`, try/catch). Stacking: masthead 20, panes 25, battery list 30, market day 50, drawer 60, the
   introduction in the top layer; Ask Ness's panel goes anywhere above 25. `test/float.test.mjs` holds the model.
+- Dock panes in a band (`src/float/band.tsx`, `<PaneBand>`): a page's own parts as rc-dock float panes inside one
+  region of the page, in the layer's look. Drag a pane by its header (or, there, move it with the arrow keys and resize
+  it with Shift and an arrow), resize it at its edges and corner, close it; the band's Panes menu shows or hides each
+  pane and resets the layout. The default arrangement (`band-model.ts`) stands a column down each side and a row along
+  the foot, the middle left open, each pane at its contents' height (measured); the page's head sits in the top left
+  corner over the left column, the menu in the top right. Places are kept as fractions of the band, in this browser
+  under the band's key once the reader changes one (try/catch). Narrower than its `minWidth` the band draws the page's
+  own markup for its parts instead (a phone's column). rc-dock and the dock load by one dynamic import
+  (`band-dock.tsx`); until then the panes stand in their places as named frames. `test/band.test.mjs` holds the model.
+  The Overview's control room is the first band (`pages/Overview/RoomBand.tsx`, `room-band.ts`): from 1000px of room
+  its parts are dock panes in the room's own arrangement and column width (`gp.room`), and below that the room's own
+  column. `test/room-band.test.mjs` holds it.
 - Related (`src/shell/related.ts`, one set per tab; drawn by `PageHeader` and under the Intro's hero by
   `src/shell/RelatedStrip.tsx`): the two to four tabs each page leads to. A click previews the tab as a floating pane
   over the page; a link held with ⌘, Ctrl or Shift, or a middle click, opens it in a new browser tab; the pane's Open
