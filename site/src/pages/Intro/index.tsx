@@ -12,6 +12,7 @@ import { Closing } from "./Closing";
 import { Hero } from "./Hero";
 import { STORY_MARK, STORY_PLAYABLE, markStory, warmStory, warmWhenIdle } from "./story";
 import StoryOverlay from "./StoryOverlay";
+import { useChapterLink } from "../../chapters/link";
 import "./styles.css";
 
 // Intro: the Grand Prix's opening. It opens on chapter 01 of the introduction,
@@ -115,11 +116,15 @@ export default function IntroPage() {
     markStory(STORY_MARK.open);
     setStory(true);
   }, []);
-  // Esc or the close button: back to the button that opened it.
+  // A chapter's address (/?chapter=<beat>, from a tab's chapter pane): the introduction opens at that beat.
+  const chapter = useChapterLink(STORY_PLAYABLE ? openStory : null);
+  const leaveChapter = chapter.leave;
+  // Esc or the close button: back to the button that opened it, or to the tab whose chapter pane did.
   const closeStory = useCallback(() => {
     setStory(false);
+    if (leaveChapter()) return;
     requestAnimationFrame(() => (opener.current ?? play.current)?.focus({ preventScroll: true }));
-  }, []);
+  }, [leaveChapter]);
   // The introduction's code, on an idle moment once the still is in: never on first paint.
   const [stillIn, setStillIn] = useState(false);
   useEffect(() => (stillIn ? warmWhenIdle() : undefined), [stillIn]);
@@ -176,7 +181,7 @@ export default function IntroPage() {
   return (
     <div className="page page--intro">
       <Hero facts={factsLine} onPlay={STORY_PLAYABLE ? () => openStory() : undefined} onPlayIntent={warmStory} playRef={play} onStillLoad={onStillLoad} />
-      {story && <StoryOverlay onClose={closeStory} onRoute={routeFromStory} />}
+      {story && <StoryOverlay key={chapter.beat ?? ""} onClose={closeStory} onRoute={routeFromStory} startBeat={chapter.beat ?? undefined} still={chapter.still} />}
 
       <div className="intro-body">
         <RelatedStrip tabId="intro" />

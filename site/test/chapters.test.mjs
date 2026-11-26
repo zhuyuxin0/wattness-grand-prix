@@ -187,3 +187,11 @@ test("every loop's files are the ones its receipt names, byte for byte", () => {
   const present = readdirSync(dir).filter((n) => !n.startsWith("."));
   assert.deepEqual(present.filter((n) => !expected.has(n)).sort(), [], "public/chapters holds only the receipts' files");
 });
+
+test("the Intro opens the story at a chapter's beat", () => {
+  const overlay = read(join(site, "src", "pages", "Intro", "StoryOverlay.tsx"));
+  const intro = read(join(site, "src", "pages", "Intro", "index.tsx"));
+  assert.match(overlay, /mountStory\(el, \{[^}]*\bstartBeat\b/, "StoryOverlay passes its startBeat to mountStory");
+  assert.match(intro, /useChapterLink\(/, "the Intro reads ?chapter=");
+  assert.match(intro, /startBeat=\{chapter\.beat/, "the Intro opens the story at the address's beat");
+});

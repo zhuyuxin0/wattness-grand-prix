@@ -49,9 +49,13 @@ interface Props {
   onClose: () => void;
   /** A beat's "Open <tab>", or a way on from the failed state: the dialog goes and the site opens that path. */
   onRoute: (to: string) => void;
+  /** The beat to open at (a chapter's address, /?chapter=<beat>); chapter 01 when left out. */
+  startBeat?: string;
+  /** That beat's still until the story draws it; chapter 01's when left out. */
+  still?: { src: string; width: number; height: number };
 }
 
-export default function StoryOverlay({ onClose, onRoute }: Props) {
+export default function StoryOverlay({ onClose, onRoute, startBeat, still }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
   const close = useRef<HTMLButtonElement>(null);
   const host = useRef<HTMLDivElement>(null);
@@ -172,6 +176,7 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
       markStory(STORY_MARK.code);
       const story = mountStory(el, {
         mode: "site",
+        startBeat,
         theme: theme.current,
         reducedMotion: prefersReducedMotion(),
         onRoute: (id) => {
@@ -234,7 +239,11 @@ export default function StoryOverlay({ onClose, onRoute }: Props) {
       <div className="story-dialog__stage" aria-busy={!shown && !failed ? true : undefined}>
         <div ref={host} className="story-dialog__host" />
         <figure className="story-dialog__still" data-gone={shown || undefined} aria-hidden="true">
-          <img src={HERO_STILL.src} srcSet={HERO_STILL.srcSet} sizes="100vw" width={HERO_STILL.width} height={HERO_STILL.height} alt="" decoding="async" />
+          {still ? (
+            <img src={still.src} width={still.width} height={still.height} alt="" decoding="async" />
+          ) : (
+            <img src={HERO_STILL.src} srcSet={HERO_STILL.srcSet} sizes="100vw" width={HERO_STILL.width} height={HERO_STILL.height} alt="" decoding="async" />
+          )}
         </figure>
         {!shown && !failed && (
           <p className="story-dialog__status" role="status">
