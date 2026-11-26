@@ -7,6 +7,7 @@ import { BatteryBar, Glyph, PageHeader, Ready, Section, Stat, StatRow, Table, us
 import { allFigures, lambda, scoreFormula, tailPercent, type ArmFigures } from "../Battery/model";
 import { count, delta, Fact, Facts, Flow, Key, Legend, money, moneyWords, num2, planColor, PlanName, PLANS, Readout, TabLink, useNarrow, weightingWords } from "../Battery/kit";
 import { Dumbbell, type Bell } from "./Dumbbell";
+import { RiskObject } from "./RiskObject";
 import "./styles.css";
 
 // Risk: each plan's downside over the price scenarios, the score that weighs
@@ -48,6 +49,7 @@ export default function RiskPage() {
           </>
         }
       />
+      <RiskObject />
       <BatteryBar choice={choice} />
       <Ready state={all} label="Loading the plans">
         {([desk, common]) => {
