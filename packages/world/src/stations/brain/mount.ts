@@ -240,10 +240,12 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   };
   const renderCard = () => {
     cardbox.replaceChildren();
+    root.classList.remove('has-card');
     const s = S.sel;
     if (!s) return;
     const p = page(s.brain, s.slug);
     if (!p) return;
+    root.classList.add('has-card');
     cardbox.appendChild(pageCard(p, { select: (b, slug) => keepFocus(() => select(b, slug, 'user')), route: (t) => { emit('route', t); opts.onRoute?.(t); }, close: () => keepFocus(() => select(null, null, 'user')), tabs, fix }));
   };
   const setHover = (h: null | { brain: string; slug: string }) => {

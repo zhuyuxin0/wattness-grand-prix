@@ -47,14 +47,16 @@ export function fixOf(c?: { pages?: Record<string, string>; connections?: Record
 }
 
 const SVG = 'http://www.w3.org/2000/svg';
-/** The site's drawn glyphs (the Terminal's close and next, as site/src/ui/glyph.css publishes them), in the text's color. */
-function glyph(kind: 'close' | 'next', px: number): SVGSVGElement {
+/** The site's drawn glyphs (the Terminal's close, next and caret, as site/src/ui/glyph.css publishes them), in the text's
+ *  color: never a typed character or the browser's own disclosure triangle. */
+const GLYPH = { close: 'M2 2l6 6M8 2l-6 6', next: 'M4.5 3l3 3-3 3', caret: 'M3 4.5l3 3 3-3' } as const;
+function glyph(kind: keyof typeof GLYPH, px: number): SVGSVGElement {
   const svg = document.createElementNS(SVG, 'svg');
   const box = kind === 'close' ? 10 : 12;
   svg.setAttribute('viewBox', `0 0 ${box} ${box}`); svg.setAttribute('width', String(px)); svg.setAttribute('height', String(px));
   svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('class', `lbm-glyph is-${kind}`);
   const path = document.createElementNS(SVG, 'path');
-  path.setAttribute('d', kind === 'close' ? 'M2 2l6 6M8 2l-6 6' : 'M4.5 3l3 3-3 3');
+  path.setAttribute('d', GLYPH[kind]);
   path.setAttribute('fill', 'none'); path.setAttribute('stroke', 'currentColor'); path.setAttribute('stroke-width', kind === 'close' ? '1.4' : '1.5');
   path.setAttribute('stroke-linecap', 'round'); path.setAttribute('stroke-linejoin', 'round');
   svg.appendChild(path);
@@ -127,7 +129,8 @@ export function pageCard(p: Page, host: CardHost): HTMLElement {
       b.append(name, chip, m);
       b.addEventListener('click', () => host.select(r.other.brain, r.other.slug));
       const more = el('details', 'lbm-why');
-      more.append(el('summary', undefined, 'Why'), el('p', 'lbm-text', r.reasoning ?? 'Living Brain gave no reason.'));
+      const why = el('summary'); why.append(glyph('caret', 9), document.createTextNode('Why'));
+      more.append(why, el('p', 'lbm-text', r.reasoning ?? 'Living Brain gave no reason.'));
       if (r.correction) more.append(el('p', 'lbm-label', 'Correction'), el('p', 'lbm-text', r.correction));
       li.append(b, more);
       ul.append(li);
