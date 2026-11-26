@@ -618,7 +618,8 @@ export function mountBrain(el: HTMLElement, opts: BrainOptions = {}): BrainHandl
   cleanups.push(() => root.removeEventListener('pointermove', onPtr));
   const onKey = (e) => {
     if (e.key === 'Escape') {
-      if (S.sel) select(null, null, 'user'); else if (S.focus !== 'all') focusBrain('all', 'user');
+      // the control that had focus may go with the card or the brain's page list: focus comes back to the stage
+      if (S.sel) keepFocus(() => select(null, null, 'user')); else if (S.focus !== 'all') keepFocus(() => focusBrain('all', 'user'));
       e.preventDefault(); return;
     }
     if (e.target !== root) return;
