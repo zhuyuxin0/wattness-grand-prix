@@ -8,7 +8,8 @@ with 502 and the reason instead of the file; a reason prints at most 200 charact
 value it quotes and is cut at 2,000 characters.
 
 Records served: those of ${cfg.committer} under the scope "${PLAN_SCOPE_LABEL}".
-Greenfield: ${cfg.greenfieldBase}od-YYYYMMDD/
+Greenfield: ${cfg.greenfieldBase}od-YYYYMMDD/<path>, such as
+    ${cfg.greenfieldBase}od-20261126/manifest.json (the bucket lists no folders).
 
 GET /day/<day>/index.json
     The day's index (manifest.json on Greenfield): one leaf hash per battery, in resource order.

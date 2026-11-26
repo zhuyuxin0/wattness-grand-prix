@@ -5,7 +5,7 @@ import { fileSha256, type Hex } from "../src/bytes.ts";
 import { merkleRoot } from "../src/merkle.ts";
 import { forgetVerified } from "../src/record.ts";
 import { VERIFIED_CACHE } from "../src/respond.ts";
-import { DAY, bytesOf, call, freshOrigin, text, upstreams, utf8 } from "./fake.ts";
+import { BASE, DAY, bytesOf, call, freshOrigin, text, upstreams, utf8 } from "./fake.ts";
 import { changeOneDigit } from "./tamper.ts";
 
 const ROOT = "0xf4d4002344fe98be0f64870221e5cc0b5e1d6111c05fe46c0131763d725bbce7";
@@ -520,6 +520,13 @@ describe("requests", () => {
     const body = await (await call(freshOrigin(), "/")).text();
     expect.soft(body.endsWith("\nSource: https://github.com/zhuyuxin0/wattness-grand-prix\n")).toBe(true);
     expect.soft(body).not.toContain("/tree/");
+  });
+
+  it("names a Greenfield URL that answers: an object, since the bucket lists no folders", async () => {
+    upstreams();
+    const body = await (await call(freshOrigin(), "/")).text();
+    expect.soft(body).toContain(`${BASE}od-20261126/manifest.json`);
+    expect.soft(body.match(/https:\/\/\S+\/$/gm) ?? [], "a URL that ends at a folder").toEqual([]);
   });
 
   it("answers HEAD with the headers alone and a CORS preflight with 204", async () => {
