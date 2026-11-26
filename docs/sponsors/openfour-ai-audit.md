@@ -58,9 +58,9 @@ How the code holds them:
 
 ### [H-1] A launch whose record never qualifies freezes the raise: no exit after sell-out, no deadline
 
-- **Location:** `evaluate` L156–160, `executeMigration` L175–178; the preset keeps Bonding V1's vault, whose `SoldOut` phase closes internal buying and selling (OpenFour integration guide: "Internal buy/sell are unavailable").
+- **Location:** `evaluate` L156–160, `executeMigration` L175–178; the preset keeps Bonding V1's vault, whose `SoldOut` phase closes internal buying and selling (OpenFour integration guide: "Internal buy/sell are unavailable"). Observed on chain: replayed with `eth_call` at block 145,021,250 (26 Nov 11:41:00 CT / 27 Nov 00:41:00 Bangkok), when the 27 Nov launch was sold out and its graduation had just been refused, both a sell and a buy by a holder revert with Core's `CoreErrBadPhase`.
 - **Condition:** the sale sells out and no record ever qualifies for this launch: the agent stops sealing, seals with different code while `codeHash` is pinned, covers fewer than `minLeafCount` batteries, or, with `outcomeStage > 0`, never links that stage.
-- **Impact:** graduation reverts forever. The raised quote (0.1 WBNB in these launches) and the reserve tokens stay in the vault, holders cannot sell back to the curve, and there is no pool. The module gives no way out; only a beacon upgrade by the Registry owner (M-3) or an intervention in Core could release the funds. The standard Bonding V1 migrate cannot reach this state, because it graduates at sell-out; this module adds it.
+- **Impact:** graduation reverts forever. The raised quote (0.1 WBNB in these launches) and the reserve tokens stay in the vault, holders cannot sell back to the curve, and there is no pool. The module gives no way out; only a beacon upgrade by the Registry owner (M-3) or an intervention in Core could release the funds. The standard Bonding V1 migrate graduates in the sell-out buy itself (OpenFour's fork toolkit README), so it never waits after sell-out; this module adds the wait.
 - **Fix:** move the evidence requirement before the point of no return. In order of preference:
   1. Require the binding before the sale can close: a view-only Trade module that answers `allowed = false` for the buy that would sell out the sale while `status().evidenceBound` is false. Sells stay open, so holders keep the curve as an exit. Stricter still: require the binding before trading opens, so buyers see the record before they buy.
   2. Add `evidenceDeadline` to `Params`: after it, `executeMigration` graduates without evidence and emits `GraduatedUnverified`, so liquidity is never stranded and indexers can mark the launch as unverified.
@@ -78,7 +78,7 @@ How the code holds them:
 - **Location:** `_addLiquidity` L404–406 (`PoolNotEmpty`). OpenFour's `OpenFourToken._blocksBeforeMigration` blocks transfers only to pools already marked, and this module marks the pair only at graduation (L182).
 - **Condition:** before graduation, a holder creates (or finds) the token/WBNB pair, sends it some tokens and some WBNB, and mints LP.
 - **Impact:** the pair's LP supply never returns to zero (1,000 LP stay locked at address 0), so graduation reverts `PoolNotEmpty` for good; after sell-out this becomes the frozen state of H-1. OpenFour's own `PancakeV2MigrateLib` has the same check (`"PancakeMigrate: non-empty pool"`).
-- **Fix:** in `init`, mark the canonical pair before any trade: get it from the factory (`createPair`, or its CREATE2 address) and call `token.setMigratedPool(pair, true)`. The standard token then refuses transfers into the pair until the vault reaches `MigratePending`, and WBNB alone cannot mint LP. Alternatively, on a seeded pair, add liquidity at the pair's ratio and send the remainder to `0x…dEaD`.
+- **Fix:** in `init`, mark the canonical pair before any trade: get it from the factory (`createPair`, or its CREATE2 address) and call `token.setMigratedPool(pair, true)`. The standard token then refuses transfers into the pair until its phase is `MigratePending` or `Migrated` (`_blocksBeforeMigration`), and WBNB alone cannot mint LP. Alternatively, on a seeded pair, add liquidity at the pair's ratio and send the remainder to `0x…dEaD`.
 
 ### [M-3] One key can change every live launch's logic through the beacon (Medium on this fork; Informational on OpenFour's Hub)
 
@@ -91,7 +91,7 @@ How the code holds them:
 
 - **Location:** `_liquidityReady` L354; `_addLiquidity` L408–410.
 - **Condition:** a launch created with `liquidityPredicate = 1` graduates once `totalRaised ≥ minQuoteRaised`, before the sale sells out.
-- **Impact:** `tokenAmount = maxSupply − sold` then includes the unsold sale tokens, so the pool opens below the curve's last price and the curve's buyers start under water. A floor above `raiseAmount` can never be met (sells stay open while the vault is `Trading`, so holders keep an exit).
+- **Impact:** `tokenAmount = maxSupply − sold` then includes the unsold sale tokens, so the pool opens lower than it would at sell-out, and can open below the curve's last price, leaving the curve's buyers under water. A floor above `raiseAmount` can never be met (sells stay open while the vault is `Trading`, so holders keep an exit).
 - **Fix:** with predicate 1, move only the reserve (`maxSupply − saleAmount`) plus tokens matching the raised quote at the curve's last price, and burn the rest; or accept predicate 1 only with `minQuoteRaised == raiseAmount`; check the floor against `raiseAmount` in the preset validator (L-2).
 
 ### [L-1] One record can graduate any number of launches; an early `minOd` accepts old records
@@ -195,13 +195,13 @@ Read from the fork Registry at block 145,025,906 (27 Nov 01:16 Bangkok). Evidenc
 
 ## Tests
 
-The module's suite: 19 tests pass (27 Nov 01:14 Bangkok), on Hardhat's in-process chain against the real GateRecord, with test doubles for Core, the vault, the token and a V2 pair. They cover the locked implementation, schema order, parameters the module could not enforce, a sold-out sale closing without evidence and then `EvidenceMissing`, binding only the agent's own record, graduation into the pair with the LP at `0x…dEaD`, migration inside the sell-out buy when the record is bound first, the liquidity recheck, Core-only execution with the token's own vault, predicate 1, code hash, coverage and settlement stage, a non-empty pool, and the launch tower reads. Worth adding: pool seeding against the real `OpenFourToken` (M-2), the creator binding an unrelated agent (M-1), and a fork test against OpenFour's own Core and vault for the `SoldOut` behavior H-1 rests on.
+The module's suite: 19 tests pass (27 Nov 01:14 Bangkok), on Hardhat's in-process chain against the real GateRecord, with test doubles for Core, the vault, the token and a V2 pair. They cover the locked implementation, schema order, parameters the module could not enforce, a sold-out sale closing without evidence and then `EvidenceMissing`, binding only the agent's own record, graduation into the pair with the LP at `0x…dEaD`, migration inside the sell-out buy when the record is bound first, the liquidity recheck, Core-only execution with the token's own vault, predicate 1, code hash, coverage and settlement stage, a non-empty pool, and the launch tower reads. Worth adding: pool seeding against the real `OpenFourToken` (M-2), the creator binding an unrelated agent (M-1), and a fork test against OpenFour's own Core and vault for the `SoldOut` behavior H-1 rests on (observed on testnet by `eth_call`, not yet in a test).
 
 On chain, both launches ran the full flow on BSC testnet: [tokens.json](../../modules/openfour/submission/tokens.json) lists every transaction with its block and time, read from at least two of three RPCs run by different operators.
 
 ## Residual risk
 
-- OpenFour's Core, Registry, FeeRouter, vault and token module are trusted. Their implementations are not published; the behavior this module relies on (Core initializes instances inside `createToken`, sets `MigratePending` before `executeMigration` and passes its revert back to the caller, and the vault closes trading at `SoldOut`) was observed on testnet, not read in source.
+- OpenFour's Core, Registry, FeeRouter, vault and token module are trusted. Their implementations are not published; the behavior this module relies on (Core initializes instances inside `createToken`, sets `MigratePending` before `executeMigration` and passes its revert back to the caller, and refuses trades at `SoldOut` and after migration with `CoreErrBadPhase`) was observed on testnet, not read in source.
 - GateRecord (MIT, ours, not upgradeable) is trusted for its gate time, including the Central-time daylight-saving rule.
 - PancakeSwap V2's testnet factory and pair are trusted as deployed.
 - Everything here is on BSC testnet with testnet tokens; nothing is deployed on mainnet.
