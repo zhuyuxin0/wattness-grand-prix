@@ -2,7 +2,7 @@
 
 <!-- MEDIA: video-coinmarketcap-atlas -->
 
-CoinMarketCap's Pro API and Atlas's signed reports and on-chain feeds decide how many independent checks of Wattness Grand Prix's sealed plans a budget pays for, and stop the count when the prices are stale or disagree. The Grand Prix seals the next day's plan for every ERCOT battery with complete public data (316 on Nov 26) on BNB Chain before the market's 10:00 CT gate. Repository: [github.com/zhuyuxin0/wattness-grand-prix](https://github.com/zhuyuxin0/wattness-grand-prix), MIT; setup in [Run it](../../README.md#run-it). Code: [`packages/adapters/atlas-cmc`](../../packages/adapters/atlas-cmc), server-side, with offline tests and setup in [its README](../../packages/adapters/atlas-cmc/README.md). Interface: the [Prices tab](https://gp.wattness.tech/markets/prices) and the Seal tab.
+CoinMarketCap's Pro API and Atlas's signed reports and on-chain feeds decide how many paid checks of Wattness Grand Prix's sealed plans a budget pays for, and stop the count when the prices are stale or disagree. The Grand Prix seals the next day's plan for every ERCOT battery with complete public data (316 on Nov 26) on BNB Chain before the market's 10:00 CT gate. Repository: [github.com/zhuyuxin0/wattness-grand-prix](https://github.com/zhuyuxin0/wattness-grand-prix), MIT; setup in [Run it](../../README.md#run-it). Code: [`packages/adapters/atlas-cmc`](../../packages/adapters/atlas-cmc), server-side, with offline tests and setup in [its README](../../packages/adapters/atlas-cmc/README.md). Interface: the [Prices tab](https://gp.wattness.tech/markets/prices) and the Seal tab.
 
 ## 1. The problem and the audience
 
@@ -23,7 +23,7 @@ Anyone can check a sealed plan for free with the verifier. An independent, paid 
 ## 3. BNB Chain contracts and data
 
 - GateRecord `0x2922c68cE15EB3e83B7f43b136e981dDc4262876`, BSC mainnet and testnet: the sealed records being checked ([Nov 27 seal](https://bscscan.com/tx/0xd6ce6ebdd4f70dfe3aafae5fb76f014152f10a9f3a6c83d52362954cf853dbef)).
-- ERC-8183 on BSC testnet: commerce `0xa206c0517B6371C6638CD9e4a42Cc9f02A33B0DE`, router `0xD7d36D66d2F1B608A0F943f722D27e3744f66F25`, policy `0xd6a4217588F6B1F5657a92A3e94E6422aD771cEA`, payment token `0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565`. Paid checks so far: jobs 1871, 1873 and 1902.
+- ERC-8183 on BSC testnet: commerce `0xa206c0517B6371C6638CD9e4a42Cc9f02A33B0DE`, router `0xD7d36D66d2F1B608A0F943f722D27e3744f66F25`, policy `0xd6a4217588F6B1F5657a92A3e94E6422aD771cEA`, payment token `0xc70B8741B8B07A6d61E54fd4B20f22Fa648E5565`. Paid checks so far: jobs 1871, 1873, 1902 and 1908.
 - ERC-8004 registry `0x8004A818BFB912233c491871b3d84c89A494BD9e`, BSC testnet: the evaluator (2922) and the planning agents (2923 to 2928).
 - Atlas's feeds, as in the table.
 
