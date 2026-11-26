@@ -13,6 +13,7 @@ import { ISO, stageLook, fitRest, labelItems, zoneItems, afterItems, keyRows, sc
 import { hoverController } from './hover';
 import { GLYPH_COLOR } from './glyphs';
 import { chipsReady, logoChip } from '../../kit/logos';
+import * as sound from '../../lib/sound';
 import { inFilm } from '../../lib/yours';
 import GF from './greenfield-record.json';
 import TN from './integrations.json';
@@ -268,6 +269,8 @@ async function setup(ctx: FrameContext, kind: Kind, hoverId: string | null = nul
         const bnb = document.createElement('img'); bnb.src = theme === 'light' ? MARK_URLS.bnbLogoYellow : MARK_URLS.bnbLogoWhite; bnb.style.height = '34px'; bnb.alt = '';
         const lineEl = document.createElement('div'); lineEl.className = 'line'; lineEl.textContent = 'Sealed on BNB Chain';
         lk.append(word, rule, bnb, lineEl); host.appendChild(lk);
+        // the closing card: with sound on, one soft chord as it is laid out (lib/sound; a film never clicks, so is silent)
+        sound.chord();
         lk.dataset.theme = theme;
         await bnb.decode().catch(() => {});
         const capR = (cap as HTMLElement | null)?.getBoundingClientRect(), hostR = host.getBoundingClientRect();
