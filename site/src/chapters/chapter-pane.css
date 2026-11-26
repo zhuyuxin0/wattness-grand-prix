@@ -190,3 +190,25 @@
 .gp-pane__page .chapter-pane {
   display: none;
 }
+
+/* The Overview's control room sets the page's head in a narrow column over the 3D (pages/Overview/ControlRoom.tsx):
+   there the pane is the phone's small row, under the head's words, at any width. */
+.ov-room__head.page-header:has(.chapter-pane) {
+  grid-template-columns: minmax(0, 1fr);
+}
+.ov-room__head .page-header__aside:has(> .chapter-pane) {
+  display: block;
+}
+.ov-room__head .chapter-pane {
+  width: 100%;
+  text-shadow: none;
+}
+.ov-room__head .chapter-pane__glass {
+  grid-template-columns: 104px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px 5px 5px;
+}
+.ov-room__head .chapter-pane__text {
+  padding: 0;
+}
