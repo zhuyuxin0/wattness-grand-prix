@@ -13,7 +13,7 @@
 // Written to public/data/forecast/hubs.json.
 
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 
 const HOURS = 24;
 const QUANTILES = [
@@ -43,7 +43,7 @@ function bands(rows) {
 }
 
 export default function forecast(ctx) {
-  const { day, dayDir, leaf, readJson, writeJson } = ctx;
+  const { day, dayDir, repo, leaf, readJson, writeJson } = ctx;
   const hubs = {};
   let historyDays = null;
   let basisDays = null;
@@ -101,6 +101,6 @@ export default function forecast(ctx) {
           .map((h) => [h, { batteries: hubs[h].batteries, bands: hubs[h].bands, paths: hubs[h].paths }]),
       ),
     },
-    "out/od-20261126/leaves/*.scenarios.json",
+    `${relative(repo, dayDir)}/leaves/*.scenarios.json`,
   );
 }

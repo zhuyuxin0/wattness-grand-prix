@@ -80,3 +80,27 @@
   font-size: var(--t-fs-xs);
   color: var(--w-muted);
 }
+/* A check that holds takes the state color, as on Verify and Agent IDs. */
+.fc-cn__check {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  margin-top: 2px;
+}
+.fc-cn__check .glyph {
+  flex: none;
+  position: relative;
+  top: 1px;
+  color: var(--s-ok);
+}
+.fc-cn__check--no .glyph {
+  color: var(--refused);
+}
+.fc-cn__file {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-right: var(--t-space-2);
+  font-size: var(--t-fs-sm);
+  color: inherit;
+}

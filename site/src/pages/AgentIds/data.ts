@@ -49,6 +49,8 @@ export interface Job {
   operatingDay: string;
   timing: string;
   status: string;
+  /** For a job between two roles: what its own day's sealed record says (the leaf's scenarios digest, the day's first commit), when on file. */
+  sealed?: { operatingDay: string; scenariosDigest: Hex; firstCommitUnix: number | null } | null;
   transactions: (Tx & { step: string })[];
 }
 

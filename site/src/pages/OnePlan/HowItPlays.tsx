@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
+import type { Field } from "@world/game";
 import { SOURCE_LINE } from "../../config";
-import { useShowcaseManifest, type Manifest } from "../../data";
 import { formatInt } from "../../lib/format";
 import { now } from "../../lib/capture";
 import { formatOperatingDay, gateFor } from "../../lib/time";
 import { Glyph } from "../../ui";
 
 // What the cabinet's controls mean, in plain words: the dial, the glass, the
-// score and the seal. The figures are the sealed plan's own (its published
-// leaf, public/data/showcase), the same record the cabinet plays.
+// score and the seal. The figures are the field's own, the sealed day the
+// cabinet plays (the world's frame data), as the cabinet reports it once
+// ready; until then the words go without figures.
 
 /** "half" for a risk weight of 0.5, else the weight as a multiplier. */
 function weightWords(lambdaPpm: number): string {
@@ -30,11 +31,11 @@ interface Item {
   body: ReactNode;
 }
 
-function items(m: Manifest | null): Item[] {
-  const venue = m?.instrument.venue ?? "ElectronX";
-  const size = m ? `${formatInt(m.instrument.size_kwh / 1000)} MWh` : null;
-  const cap = m ? Number(m.assumptions.max_contracts_per_hour) : null;
-  const n = m ? formatInt(m.scenarios.count) : null;
+function items(m: Field | null): Item[] {
+  const venue = "ElectronX";
+  const size = m ? `${formatInt(m.sizeKwh / 1000)} MWh` : null;
+  const cap = m ? m.maxContractsPerHour : null;
+  const n = m ? formatInt(m.n) : null;
   return [
     {
       term: "The dial",
@@ -49,7 +50,7 @@ function items(m: Manifest | null): Item[] {
       term: "The glass",
       body: (
         <>
-          The hedge: {venue}'s hourly contracts{m ? <> at {m.instrument.location}</> : null}
+          The hedge: {venue}'s hourly contracts{m ? <> at {m.hub}</> : null}
           {size ? <>, <span className="num">{size}</span> each</> : null}. Glass sells on hours the battery discharges and buys on hours it charges, in whole
           contracts up to{" "}
           {cap ? (
@@ -68,20 +69,20 @@ function items(m: Manifest | null): Item[] {
       body: (
         <>
           The planner's own objective over the same {n ? <span className="num">{n}</span> : null} sealed price scenarios: the mean day minus{" "}
-          {m ? weightWords(m.risk.lambda_ppm) : "half"} the {m ? tailWords(m.risk.alpha_ppm) : "worst tenth"}'s average loss, computed exactly in your
+          {m ? weightWords(m.lambdaPpm) : "half"} the {m ? tailWords(m.alphaPpm) : "worst tenth"}'s average loss, computed exactly in your
           browser. Each coin on the stage is one scenario's day.
         </>
       ),
     },
     // The seal: a field whose gate is ahead takes the visitor's own; once the gate has passed, the card shows the
     // plan sealed for that day, and so does this line.
-    !m || now() / 1000 >= gateFor(m.operating_day)
+    !m || now() / 1000 >= gateFor(m.operatingDay)
       ? {
           term: "The seal",
           body: (
             <>
-              The planner's plan for this day was sealed on BNB Chain before the 10:00 CT gate; its record is on <Link to="/seal">Seal</Link>, and its score is the
-              one yours is measured against.
+              The planner's plan for {m ? formatOperatingDay(m.operatingDay).replace(/, \d{4}$/, "") : "this day"} was sealed on BNB Chain before the 10:00 CT gate; its
+              record is on <Link to="/seal">Seal</Link>, and its score is the one yours is measured against.
             </>
           ),
         }
@@ -97,7 +98,7 @@ function items(m: Manifest | null): Item[] {
   ];
 }
 
-function Body({ m }: { m: Manifest | null }) {
+function Body({ m }: { m: Field | null }) {
   return (
     <dl className="how__list">
       {items(m).map((it) => (
@@ -110,12 +111,12 @@ function Body({ m }: { m: Manifest | null }) {
   );
 }
 
-function Source({ m }: { m: Manifest | null }) {
+function Source({ m }: { m: Field | null }) {
   return (
     <p className="how__source">
       {m ? (
         <>
-          The field: Desert Willow (<span className="mono">{m.battery.resource}</span>), its sealed plan for {formatOperatingDay(m.operating_day)}.{" "}
+          The field: {m.name} (<span className="mono">{m.resource}</span>), its sealed plan for {formatOperatingDay(m.operatingDay)}.{" "}
         </>
       ) : null}
       {SOURCE_LINE}
@@ -127,9 +128,8 @@ function Source({ m }: { m: Manifest | null }) {
  * Beside the cabinet on a wide page; folded above it on a narrow one, so the
  * stage stays near the top and the words are one tap away.
  */
-export function HowItPlays({ folded = false }: { folded?: boolean }) {
-  const state = useShowcaseManifest();
-  const m = state.status === "ready" ? state.data : null;
+export function HowItPlays({ folded = false, field }: { folded?: boolean; field: Field | null }) {
+  const m = field;
   if (folded) {
     return (
       <details className="how how--folded">

@@ -42,9 +42,9 @@ const SITE_CORRECTIONS = {
     "grand-prix:wattness-grand-prix":
       "No language model writes the plans: each battery's three plans are solved as a mixed-integer program (HiGHS), and the six roles are deterministic code. The bucket's owner, 0xfa22…94b8, is the record wallet that commits each day's root; it holds no agent ID.",
     "grand-prix:forecast-tab":
-      "The Nov 26 scenarios on this tab were computed and sealed (09:15:17 CT on Nov 25) before the Forecaster's ID, agent 2925, was registered at 14:19 CT.",
+      "The Nov 27 scenarios on this tab are stress-weighted: every Nov 27 plan read Cournot's weather odds before its seal. The Nov 26 scenarios were equally weighted, and were computed and sealed (09:15:17 CT on Nov 25) before the Forecaster's ID, agent 2925, was registered at 14:19 CT.",
     "grand-prix:hedge-tab":
-      "The Nov 26 hedges on this tab were computed and sealed (09:15:17 CT on Nov 25) before the Hedger's ID, agent 2926, was registered at 14:19 CT.",
+      "The Nov 26 hedges were computed and sealed (09:15:17 CT on Nov 25) before the Hedger's ID, agent 2926, was registered at 14:19 CT; the Nov 27 hedges on this tab were planned on Nov 26, after it.",
     "grand-prix:planner-erc-8004-agent-2928":
       "Desert Willow's Nov 26 plan (arm C) was sealed at 09:15:17 CT on Nov 25 by the record wallet 0xfa22…94b8, before agent 2928 was registered at 14:19 CT.",
     "grand-prix:fleet-index":
@@ -63,6 +63,17 @@ const SITE_CORRECTIONS = {
   },
 };
 
+/**
+ * Site corrections an earlier build published, each with the page whose
+ * current correction replaces it, so a kept copy (no build-brain.json on
+ * hand) never shows a superseded line.
+ */
+const SUPERSEDED = {
+  "The Nov 26 scenarios on this tab were computed and sealed (09:15:17 CT on Nov 25) before the Forecaster's ID, agent 2925, was registered at 14:19 CT.":
+    "grand-prix:forecast-tab",
+  "The Nov 26 hedges on this tab were computed and sealed (09:15:17 CT on Nov 25) before the Hedger's ID, agent 2926, was registered at 14:19 CT.": "grand-prix:hedge-tab",
+};
+
 function arg(name) {
   const i = process.argv.indexOf(name);
   return i > 0 ? process.argv[i + 1] : undefined;
@@ -78,8 +89,22 @@ export default function memory({ repo, readJson, writeJson, copyVerbatim }) {
     } catch {
       kept = null;
     }
-    if (kept) copyVerbatim(OUT, kept, "Living Brain build brain (kept)");
-    else console.warn(`memory: no build-brain.json in ${sources} and none published; ${OUT} is not written`);
+    if (!kept) {
+      console.warn(`memory: no build-brain.json in ${sources} and none published; ${OUT} is not written`);
+      return;
+    }
+    const doc = JSON.parse(kept.toString("utf8"));
+    let replaced = 0;
+    const bring = (x) => {
+      const key = SUPERSEDED[x.correction];
+      if (!key || `${x.brain}:${x.slug}` !== key) return x;
+      replaced++;
+      return { ...x, correction: SITE_CORRECTIONS.pages[key] };
+    };
+    if (doc.pages) doc.pages = doc.pages.map(bring);
+    // One label either way, so a rebuild from the updated copy lists the same files.json.
+    if (replaced) writeJson(OUT, doc, "Living Brain build brain (kept)");
+    else copyVerbatim(OUT, kept, "Living Brain build brain (kept)");
     return;
   }
 

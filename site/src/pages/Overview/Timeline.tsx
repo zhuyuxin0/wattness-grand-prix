@@ -62,7 +62,8 @@ export function Timeline({ day, receipts, late, nowMs }: { day: DayIndex; receip
           {test && (
             <>
               {" "}
-              {test.chainName} followed at <span className="num">{formatInZone(test.blockTime, CENTRAL_TZ, { date: false })}</span> CT.
+              {test.chainName} {test.blockTime < main.blockTime ? "had it first, at" : "followed at"}{" "}
+              <span className="num">{formatInZone(test.blockTime, CENTRAL_TZ, { date: false })}</span> CT.
             </>
           )}{" "}
           From here anyone can check any plan against the chain.

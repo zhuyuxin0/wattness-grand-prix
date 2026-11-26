@@ -86,9 +86,11 @@ test("the agents' record names seven identities and three jobs, steps in order",
     f.agents.filter((a) => a.runs.where === "hosted").map((a) => a.agentId),
     [2922],
   );
+  // The evaluator's two jobs (1871, 1873) and every job between two roles the deployment record holds.
+  const dep = JSON.parse(readFileSync(join(repo, "contracts", "deployments", "agents.bsc-testnet.json"), "utf8"));
   assert.deepEqual(
     f.jobs.map((j) => j.jobId),
-    [1871, 1872, 1873],
+    [1871, 1873, ...dep.jobs.map((j) => j.jobId)].sort((a, b) => a - b),
   );
   for (const j of f.jobs) {
     assert.match(j.deliverable, /^0x[0-9a-f]{64}$/);

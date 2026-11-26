@@ -239,7 +239,10 @@ function Verify({ day }: { day: DayIndex }) {
           </div>
           <div className="vf-cli__step">
             <h3>Every check, with the full verifier</h3>
-            <p>Every check on this page, plus the hedge accounting and a fetch of each named input from the release, for the batteries in the repository's fixture.</p>
+            <p>
+              Every check on this page, plus the hedge accounting and a fetch of each named input from the release, for the batteries in the repository's fixture: two of the
+              Nov 26 record's plans, checked against that day's commit.
+            </p>
             <pre className="vf-code">
               <code>{`git clone ${REPO_URL}
 cd wattness-grand-prix && pnpm install

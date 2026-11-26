@@ -52,3 +52,10 @@ export function dayRange(days: readonly string[]): string {
   if (days.length === 1) return dayYearFmt.format(asDate(first));
   return `${shortDay(first)}–${dayYearFmt.format(asDate(last))}`;
 }
+
+/** The scenarios' weighting in words: "equally weighted", or "stress-weighted" for the weather rule's. */
+export function weightingWords(weighting: string | undefined): string {
+  if (!weighting || weighting === "equal") return "equally weighted";
+  if (weighting.startsWith("stress-weighted")) return "stress-weighted";
+  return weighting.replace(/\s*weights?$/, "");
+}

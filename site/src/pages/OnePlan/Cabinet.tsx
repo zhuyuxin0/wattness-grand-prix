@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import type { OnePlanHandle, SealReceipt } from "@world/game";
+import type { Field, OnePlanHandle, SealReceipt } from "@world/game";
 import { SHOWCASE } from "../../config";
 import { now } from "../../lib/capture";
 import { useTheme } from "../../ui";
@@ -19,8 +19,10 @@ function pagePath(e: MouseEvent): string | null {
   return (a.getAttribute("target") ?? "_self") === "_self" ? href : null;
 }
 
-export function Cabinet({ onSeal }: { onSeal: (receipt: SealReceipt) => void }) {
+export function Cabinet({ onSeal, onField }: { onSeal: (receipt: SealReceipt) => void; onField?: (field: Field) => void }) {
   const el = useRef<HTMLDivElement>(null);
+  const fieldTo = useRef(onField);
+  fieldTo.current = onField;
   const game = useRef<OnePlanHandle | null>(null);
   const theme = useTheme();
   const themeNow = useRef(theme);
@@ -62,7 +64,11 @@ export function Cabinet({ onSeal }: { onSeal: (receipt: SealReceipt) => void }) 
         recordHref: "/seal",
       });
       game.current = handle;
-      handle.ready.catch(fail);
+      const h = handle;
+      // The field the cabinet plays (its own sealed day, from the world's frame data), for the words beside it.
+      h.ready.then(() => {
+        if (!gone) fieldTo.current?.(h.field());
+      }, fail);
     }, fail);
     return () => {
       gone = true;
@@ -81,7 +87,7 @@ export function Cabinet({ onSeal }: { onSeal: (receipt: SealReceipt) => void }) 
       <div ref={el} className="arcade__cabinet" hidden={failed} aria-label="ONE PLAN: the cabinet and its controls" role="region" />
       {failed && (
         <p className="arcade__fallback">
-          This browser cannot draw the cabinet. Desert Willow's three plans, scored over the same price scenarios, are on{" "}
+          This browser cannot draw the cabinet. Desert Willow's three plans for the latest sealed day, each scored over that day's price scenarios, are on{" "}
           <Link to={`/battery/${SHOWCASE.resource}`}>Battery</Link> and <Link to={`/agents/risk?battery=${SHOWCASE.resource}`}>Risk</Link>.
         </p>
       )}

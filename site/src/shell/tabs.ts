@@ -220,7 +220,7 @@ export const PANEL: PanelEntry[] = [
     label: "ONE PLAN",
     icon: "gamepad",
     path: "/markets/one-plan",
-    summary: "Plan Desert Willow's sealed day yourself and score it over the same 301 price scenarios with the planner's objective.",
+    summary: "Plan Desert Willow's sealed day of Nov 26 yourself and score it over the same 301 price scenarios with the planner's objective.",
     term: "the arcade",
     page: page(() => import("../pages/OnePlan")),
   },

@@ -1,6 +1,9 @@
 import bnbBlack from "../assets/brand/bnb-chain-logo-black.svg";
 import bnbYellow from "../assets/brand/bnb-chain-logo-yellow.svg";
 import { CONTRACT_ADDRESS, REPO_URL, SHADOW_NOTE, SOURCE_LINE, TERMINAL_URL } from "../config";
+import { useDay } from "../data";
+import { formatInt } from "../lib/format";
+import { formatOperatingDay } from "../lib/time";
 import { Glyph } from "../ui/Glyph";
 import { middle } from "../ui/Hash";
 import { Logo } from "../ui/Logo";
@@ -14,6 +17,10 @@ const LINKS = [
 
 /** A quiet band on chrome: what the site is, its sources, where else to look, and the chain it seals on. */
 export function Footer() {
+  // The latest sealed day's count, from its index; the sentence stands without it while the index loads.
+  const day = useDay();
+  const count =
+    day.status === "ready" ? ` (${formatInt(day.data.leafCount)} on ${formatOperatingDay(day.data.operatingDay).replace(/^\w+, /, "").replace(/, \d{4}$/, "").replace(" ", "\u00a0")})` : "";
   return (
     <footer className="footer">
       <div className="footer__inner">
@@ -23,7 +30,9 @@ export function Footer() {
             <span className="footer__word">Wattness</span>
             <span className="brand-product">Grand Prix</span>
           </div>
-          <p>Tomorrow's plan for every Texas battery with complete public data (316 on Nov&nbsp;26), sealed on BNB Chain before the 10:00&nbsp;CT day-ahead gate.</p>
+          <p>
+            Tomorrow's plan for every Texas battery with complete public data{count}, sealed on BNB Chain before the 10:00&nbsp;CT day-ahead gate.
+          </p>
         </div>
         <div className="footer__lines">
           <p className="footer__source">{SOURCE_LINE}</p>

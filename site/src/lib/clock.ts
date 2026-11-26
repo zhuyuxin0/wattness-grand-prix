@@ -24,10 +24,12 @@ export function operatingWindow(day: string): { start: number; end: number } {
   return { start, end };
 }
 
-/** "44 min 43 s" */
+/** "44 min 43 s"; from an hour, "1 h 49 min 19 s". */
 export function minSec(seconds: number): string {
   const s = Math.abs(Math.round(seconds));
-  return `${Math.floor(s / 60)} min ${String(s % 60).padStart(2, "0")} s`;
+  const h = Math.floor(s / 3600);
+  const rest = `${Math.floor((s % 3600) / 60)} min ${String(s % 60).padStart(2, "0")} s`;
+  return h ? `${h} h ${rest}` : rest;
 }
 
 /** "44:43" */

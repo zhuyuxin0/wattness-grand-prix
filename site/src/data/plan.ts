@@ -39,6 +39,30 @@ export interface Bands {
   p95: number[];
 }
 
+/** Whether the weather rule was applied to one battery's plans, as its leaf records it (outside_inputs.cournot). */
+export interface DeskCournot {
+  status: "applied" | "not_applied";
+  reason: string | null;
+}
+
+/** The Cournot reading every leaf of the day records, the same in each. */
+export interface CournotReading {
+  rule: { id: string; stress_hours: number[]; stress_share: [number, number] } & Record<string, unknown>;
+  claim: { market_id: string; title: string; station: string; measure: string; comparator: string; threshold_f: number; date: string } | null;
+  probabilityPpm: number | null;
+  basis: { source: string; time: string; summary: string; url: string }[];
+  observed: { unix: number; local: string } | null;
+  /** The saved response, published at data/<route>, and its SHA-256. */
+  response: { route: string; sha256: string } | null;
+  /** How many of the day's plans the rule was applied to. */
+  appliedTo: number;
+  /** The plan's own contract cap before the rule, and the rule's settings, the same in every plan it was applied to; null when it was applied to none. */
+  planCap: number | null;
+  after: { stress_weight_ppm: number; hedge_limit_kwh: number; max_contracts_per_hour: number } | null;
+  /** Each hub's stress bucket as its leaves record it, and the bucket's share under equal weights. */
+  buckets: Record<string, { days: string[]; scenarios: number; equalWeightPpm: number | null }>;
+}
+
 export interface Desk {
   schema: "grand-prix.pit-wall.v1";
   resource: string;
@@ -54,6 +78,8 @@ export interface Desk {
   /** cents per MWh, hours 0..23 CT */
   nodeForecastCents: number[];
   nodeScenarioCents: Bands | null;
+  /** Absent in files built before the weather rule was recorded; null when the leaf read no Cournot. */
+  cournot?: DeskCournot | null;
   arms: Partial<Record<ArmName, DeskArm>>;
 }
 
@@ -101,6 +127,8 @@ export interface DeskCommon {
   scenarios: { method: string; count: number; weighting: string };
   inputsRelease: string;
   engine: { commit: string; solver: string; solverPackage: string };
+  /** The day's Cournot reading; null when no leaf read one. */
+  cournot?: CournotReading | null;
   entryCents: Record<string, number[]>;
   hubForecastCents: Record<string, number[]>;
 }
