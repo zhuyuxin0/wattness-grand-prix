@@ -5,6 +5,7 @@ import { dualTime } from "../../lib/time";
 import { panelSections } from "../../shell/tabs";
 import { Section, Stat, StatRow } from "../../ui";
 import { pageKey, type BuildBrain, type BuildConnection, type BuildPage } from "./data";
+import { readSelection, selectedKey, selectionOf, writeSelection } from "./select";
 
 // The build's own brain: every tab of this site and the page Living Brain keeps
 // on it, and one page at a time with its connections, in this brain and across
@@ -13,8 +14,9 @@ import { pageKey, type BuildBrain, type BuildConnection, type BuildPage } from "
 // repository or the chain record.
 //
 // ?tab=<id> names the tab the visitor came from (the quiet line at each tab's
-// foot links here) and opens its page; ?page=<brain>:<slug> opens any page,
-// and picking another tab's row only changes that.
+// foot links here) and opens its page; ?brain=<brain>&page=<slug> opens any
+// page (select.ts: the 3D stage over it reads and writes the same two), and
+// picking another tab's row only changes those.
 
 const STRENGTHS = ["strong", "medium", "weak"] as const;
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -53,7 +55,7 @@ export function Build({ b }: { b: BuildBrain }) {
   const sections = useMemo(() => panelSections(), []);
   const asked = params.get("tab");
   const here = asked && b.tabs[asked] ? asked : "memory";
-  const pick = params.get("page");
+  const pick = selectedKey(readSelection(params));
   const selected = (pick && pages.get(pick)) || pages.get(pageKey("grand-prix", b.tabs[here]?.page ?? "memory-tab")) || b.pages[0]!;
   const pageRef = useRef<HTMLDivElement>(null);
 
@@ -65,9 +67,7 @@ export function Build({ b }: { b: BuildBrain }) {
   }, [asked]);
 
   const openPage = (key: string) => {
-    const next = new URLSearchParams(params);
-    next.set("page", key);
-    setParams(next, { replace: true });
+    setParams(writeSelection(params, selectionOf(key)), { replace: true });
     pageRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
   };
 

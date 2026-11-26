@@ -4,16 +4,20 @@ import { formatInt } from "../../lib/format";
 import { dualTime } from "../../lib/time";
 import type { MemoryGraph } from "../../scenes/data";
 import { Glyph, PageHeader, Ready, Section, Stat, StatRow, nextSort, sortRows, type SortKind, type SortState, type SortValue } from "../../ui";
+import { BrainStage } from "./BrainStage";
 import { Build } from "./Build";
 import { loadBuild } from "./data";
 import "./styles.css";
 
-// Memory: what Living Brain keeps on the build and on the Terminal. First the build's
-// own brain (Build.tsx): a page for every tab of this site, one page at a time
-// with its connections, in this brain and across brains, each correction
-// beside the text it corrects. Then the Terminal's brain: one page per part of
-// the Terminal, and the connections between pages, each with Living Brain's
-// similarity score and its reasoning; selecting a page narrows them to its own.
+// Memory: what Living Brain keeps on the build and on the Terminal. It opens on
+// the three brains in 3D (BrainStage.tsx, mountBrain): all brains, a brain at
+// the center, a page's connections and its card. Then the build's own brain
+// (Build.tsx): a page for every tab of this site, one page at a time with its
+// connections, in this brain and across brains, each correction beside the
+// text it corrects; the stage and that page view share one selection
+// (select.ts). Then the Terminal's brain: one page per part of the Terminal,
+// and the connections between pages, each with Living Brain's similarity score
+// and its reasoning; selecting a page narrows them to its own.
 
 const STRENGTH: Record<string, number> = { strong: 3, medium: 2, weak: 1 };
 const STRENGTHS = ["strong", "medium", "weak"] as const;
@@ -56,8 +60,9 @@ export default function MemoryPage() {
     <div className="page page--memory">
       <PageHeader
         title="Memory"
-        lede="What Living Brain keeps on the build and on the Wattness Terminal: a brain on the build itself, with a page for every tab of this site, and a brain on the Wattness Terminal, where every plan's inputs come from. Between pages, the connections Living Brain draws, each with its reasoning; where its text misstates the repository or the chain record, a correction stands beside it."
+        lede="Three brains in Living Brain: one on the build itself, with a page for every tab of this site; one on the Wattness Terminal, where every plan's inputs come from; and Desert Willow's review. The build and the review wrote them; people and later sessions read them. Between pages, the connections Living Brain draws, each with its reasoning; where its text misstates the repository or the chain record, a correction stands beside it."
       />
+      <BrainStage build={build.status === "ready" ? build.data : null} settled={build.status !== "loading"} />
       <Ready state={build}>{(b) => (b ? <Build b={b} /> : null)}</Ready>
       <Ready state={ctx}>{(c) => (c ? <Memory ctx={c} /> : null)}</Ready>
     </div>

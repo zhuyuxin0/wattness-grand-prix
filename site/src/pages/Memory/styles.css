@@ -2,6 +2,26 @@
    grammar. Long text wraps inside its row; picking a page narrows the
    connections to its own, marked with the selection's teal edge. */
 
+/* ---------------------------------------------------------------- the stage */
+
+/* The three brains in 3D (BrainStage.tsx): the mount fills the space and holds
+   its own dark in either theme, framed as one pane like the other 3D tabs.
+   Without WebGL the mount's list scrolls inside the same box, in the page's
+   theme. The summary under it sits close, as its key. */
+.mem-stage {
+  overflow: hidden;
+  border: 1px solid var(--w-border);
+  border-radius: var(--t-radius-md);
+  background: #000102;
+}
+.mem-stage--flat {
+  background: var(--t-chrome);
+}
+.mem-stage__space {
+  position: relative;
+  height: clamp(480px, 70vh, 820px);
+}
+
 .mem-lead {
   display: grid;
   gap: var(--t-space-3);

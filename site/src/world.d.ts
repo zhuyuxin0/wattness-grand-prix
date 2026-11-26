@@ -1,10 +1,10 @@
-// The 3D world's three mounts, declared at the site's boundary.
+// The 3D world's four mounts, declared at the site's boundary.
 //
-// packages/world (the story, ONE PLAN and the stack) is imported from source as
-// @world (vite.config.ts), only by dynamic import inside the tab that shows each
-// mount. The site type-checks with stricter options than the package
-// (noUncheckedIndexedAccess, noUnusedLocals, noUnusedParameters), so it checks
-// its own calls against these declarations, written by hand from
+// packages/world (the story, ONE PLAN, the stack and the brain) is imported
+// from source as @world (vite.config.ts), only by dynamic import inside the
+// tab that shows each mount. The site type-checks with stricter options than
+// the package (noUncheckedIndexedAccess, noUnusedLocals, noUnusedParameters),
+// so it checks its own calls against these declarations, written by hand from
 // packages/world/README.md and the mounts' own types, and never compiles the
 // package's sources: there is no `paths` entry for @world. A change to a
 // mount's options or handle is made here too.
@@ -334,4 +334,62 @@ declare module "@world/stations/stack/mount" {
   }
 
   export function mountStack(el: HTMLElement, opts?: StackOptions): StackHandle;
+}
+
+declare module "@world/stations/brain/mount" {
+  /** The view's brain: all three combined, or one member at the center. */
+  export type BrainFocus = "all" | "grand-prix" | "terminal" | "battery-review";
+
+  /** What the view shows: a brain, and a page in it (a page always comes with its brain; slugs repeat across brains). */
+  export interface BrainState {
+    brain: BrainFocus;
+    page: string | null;
+  }
+
+  export interface BrainOptions {
+    /** The page's theme: the stage holds dark in both; the list without WebGL follows it. */
+    theme?: "light" | "dark";
+    /** The host's tabs, by the package's tab ids: which "Open <tab>" and "Part of" links show, and their labels. */
+    tabs?: { id: string; label: string }[];
+    /** Where to open, from the host's URL (?brain=&page=). A page needs its brain. */
+    initial?: Partial<BrainState>;
+    /** "Open <tab>" or "Part of" clicked, with the package's tab id (brain-scene.json's tabs). */
+    onRoute?: (tab: string) => void;
+    /** The visitor changed the view: focusing a brain asks for a history entry, selecting a page replaces it. The mount never writes the URL. */
+    onState?: (state: BrainState, how: { history: "push" | "replace" }) => void;
+    /** Drawing-buffer pixels per CSS pixel; min(devicePixelRatio, 2) by default, 1.5 at most on phones. */
+    dpr?: number;
+    /** "auto" (the default): full clouds on desktop, lighter ones under 720 px or on a coarse pointer. */
+    quality?: "auto" | "high" | "low";
+    /** The visitor's prefers-reduced-motion by default. */
+    reducedMotion?: boolean;
+    /** Corrections beside Living Brain's text the scene's own data lacks: pages by "brain/slug", connections by "brainA/a>brainB/b". */
+    corrections?: { pages?: Record<string, string>; connections?: Record<string, string> };
+  }
+
+  export interface BrainHandle {
+    /** Settles once the first picture is drawn; rejects if the stage cannot run here. */
+    readonly ready: Promise<void>;
+    state(): BrainState;
+    /** The host's own moves (back and forward, a link): no onState. */
+    goTo(state: Partial<BrainState>): void;
+    setTheme(theme: "light" | "dark"): void;
+    /**
+     * Each returns its own unsubscribe. The package types every payload as unknown; these name what each event carries
+     * (stations/brain/mount.ts emits them).
+     */
+    on(event: "ready", fn: () => void): () => void;
+    on(event: "state", fn: (state: BrainState) => void): () => void;
+    on(event: "route", fn: (tab: string) => void): () => void;
+    on(event: "error", fn: (error: unknown) => void): () => void;
+    /** For checks and recordings: a page's tag or dot on screen, CSS px from the element's top left; null when not shown. */
+    screenOf(brain: string, slug: string): { x: number; y: number } | null;
+    /** For checks and recordings: a member brain's center on screen and its radius. */
+    brainAt(brain: string): { x: number; y: number; r: number } | null;
+    /** For checks and recordings: a page's dot on screen and how squarely it faces the camera; null behind the camera. */
+    dotOf(brain: string, slug: string): { x: number; y: number; facing: number } | null;
+    dispose(): void;
+  }
+
+  export function mountBrain(el: HTMLElement, opts?: BrainOptions): BrainHandle;
 }
