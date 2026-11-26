@@ -68,6 +68,11 @@ describe("the verdict for Desert Willow on 26 Nov matches the repository verifie
     expect(got.V1.details.at(-1)).toBe(want.V1.details.at(-1));
     expect(got.V3).toEqual(want.V3);
     expect(res.headers.get("cache-control")).toBe("no-store");
+    // The two places the lines differ, as the README says: V1's first line is worded for the chain, not
+    // record.json, and V2 has no "on-chain root ..., recomputed ..." line; V2's other lines are the same.
+    expect(got.V1.details).toEqual(want.V1.details.map((l) => l.replace(/^record\.json says /, "GateRecord holds ")));
+    expect(got.V2.details).toEqual(want.V2.details.filter((l) => !l.startsWith("on-chain root ")));
+    expect(want.V1.details.length + want.V2.details.length - got.V1.details.length - got.V2.details.length).toBe(1);
   });
 });
 

@@ -57,8 +57,11 @@ leaf is served, must be R, so the index cannot serve one battery's plan under an
 names, such as `sync/<R>.json`, answer 404 with their Greenfield URL.
 
 The verdict's checks follow the repository verifier's V1 (the root from the leaf and its audit path), V2 (the
-record key and the record at it) and V3 (the gate) and print the same lines. `test/verify.test.ts` compares them
-with `packages/verifier`'s output on the same chain answers, for the sealed leaf and for one with a changed digit.
+record key and the record at it) and V3 (the gate). `test/verify.test.ts` compares them with `packages/verifier`'s
+output on the same chain answers. For a plan that passes they print the verifier's lines. For the leaf with one
+changed digit the results agree (V1 and V2 fail, V3 passes), and V1's root line, V2's key, chain and code-hash
+lines and V3 are the verifier's; V1's first line reads `GateRecord holds <root>` where the verifier's reads
+`record.json says <root>`, and V2 has no `on-chain root <root>, recomputed <root>` line.
 
 ## Headers
 

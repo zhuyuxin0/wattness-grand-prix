@@ -1,6 +1,7 @@
 // GET /verify/<battery>: one battery's plan against the chain, check by check. The checks follow the
 // repository verifier's V1 (root from the leaf and its audit path), V2 (the on-chain record) and V3 (the
-// gate), and print the same lines, so the two can be compared on the same day.
+// gate), so the two can be compared on the same day: for a plan that passes they print the verifier's lines,
+// and for a changed leaf the results agree and two lines differ (test/verify.test.ts pins which).
 import { formatInZone, gateTs, gateTsFromTimeZone } from "../../../packages/core/src/gate.ts";
 import { codeHashFromTree, scopeId } from "./abi.ts";
 import { checksumAddress, isBytes32, type Hex } from "./bytes.ts";
