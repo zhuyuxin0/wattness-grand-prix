@@ -467,6 +467,9 @@ export async function r03(ctx: FrameContext, state: CopyState = 'changed'): Prom
       : `Real: ${path} The card is the sealed plan as sealed (showcase.arms.${show.selected_arm}.kw, leaf ${show.leaf}). The five lamps show the page's checks on the sealed copy, all passing, as the page reads it before any change ("${CHECKS.length} of ${CHECKS.length} checks pass"); this still does not run the verifier. The board over the lamps is the page's own board for the sealed plan (venue/board.ts, the one the films' split screen carries). The coin's face is BNB Chain's symbol from its published file (stations/stack/marks/bnbchain.svg) in BNB Chain's black. Illustrative: the bay's architecture, the rails and lights, the coin as the record's picture.`,
     // the comets on the track hold still in the changed copy, so its first moments match the sealed bay at rest
     update(t) { stage.setCamera(cam); detail(ctx, M); pulse(root, changed ? REST : t); reveal?.(t); },
+    // the story lets go of the textures on the frame's materials; the ones the reveal swaps between may not be on one
+    // when the frame goes, so they go here (a second dispose of the same texture does nothing)
+    dispose() { for (const t of [cardTex.sealed, ...swaps, ...lamps.map((l) => l.plateSealed), ...boards]) t.dispose(); },
     decorate() {
       const p = ctx.plates;
       litType(ctx);
