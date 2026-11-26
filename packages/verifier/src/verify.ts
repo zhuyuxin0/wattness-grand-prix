@@ -189,8 +189,8 @@ function changedFields(input: VerifyInput): string[] {
   return changes.length > 0 ? ["changed against the reference copy:", ...formatChanges(changes).map((l) => `  ${l}`)] : [];
 }
 
-function checkRoot(root: Hex, size: number, record: RecordFile | undefined, tamper: string[], index?: number): CheckResult {
-  const notes = [size === 1 ? `root ${root} over 1 leaf` : `root ${root} from leaf ${index} of ${size} and its audit path`];
+function checkRoot(root: Hex, size: number, record: RecordFile | undefined, tamper: string[], index = 0): CheckResult {
+  const notes = [size === 1 ? `root ${root} over 1 leaf` : `root ${root} from leaf ${index + 1} of ${size} and its audit path`];
   const problems: string[] = [];
   if (record?.root && record.root.toLowerCase() !== root) problems.push(`record.json says ${record.root}`);
   if (record?.leafCount !== undefined && record.leafCount !== size) problems.push(`record.json says ${record.leafCount} leaves`);
