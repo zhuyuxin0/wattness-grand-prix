@@ -1,7 +1,7 @@
-// The market day behind the masthead's gate: which moments have passed, which phase runs now, the countdowns to the
-// DAM deadline and to the next Adjustment Period close, and the two days a year Central time changes. Run with
-// `pnpm test` (Node 22.18 or later runs the TypeScript modules directly; the hook below adds the ".ts" that Vite
-// resolves on its own).
+// The masthead's market clock and its day, as wattness.tech computes them (wattness-site apps/mms/src/ui/clock.tsx):
+// the phase and its color, the countdowns and their rounding, the DAM deadline and the Operating Day it is for, the
+// Adjustment Period's next close, the day's rows, and the two days a year Central time changes. Run with `pnpm test`
+// (Node 22.18 or later runs the TypeScript modules directly; the hook below adds the ".ts" that Vite resolves on its own).
 
 import assert from "node:assert/strict";
 import { registerHooks } from "node:module";
@@ -18,54 +18,75 @@ registerHooks({
   },
 });
 
-const { EVENTS, PHASES, hourLabels, leftText, leftWords, marketDayAt, shownAt } = await import("../src/shell/market-day.ts");
-const { formatCountdown, formatInZone, nextGate } = await import("../src/lib/time.ts");
+const { EVENTS, PHASES, cite, countdown, endTime, hourTokens, marketClockAt, readerTime, tone } = await import("../src/shell/market-day.ts");
+const { formatInZone, nextGate } = await import("../src/lib/time.ts");
 
 const ms = (iso) => Date.parse(iso);
-const unix = (iso) => Date.parse(iso) / 1000;
-const states = (day) => Object.fromEntries(day.moments.map((m) => [m.key, m.state]));
-const hhmm = (u, zone) => formatInZone(u, zone, { date: false, seconds: false });
+const passed = (s) => Object.fromEntries(s.rows.map((r) => [r.key, r.passed ? "passed" : "ahead"]));
+const hhmm = (t, zone) => formatInZone(Math.floor(t / 1000), zone, { date: false, seconds: false });
 
-/** The gate tag's countdown at an instant, as the masthead prints it: "01:08:24", "1d 00:00:00". */
-const tag = (t) => formatCountdown(nextGate(t).unix - Math.floor(t / 1000));
-/** That countdown read down to the minute, in the panel's words, parsed from the tag's own text. */
-function tagInPanelWords(countdown) {
-  const [, d = "0", hh, mm] = countdown.match(/^(?:(\d+)d )?(\d\d):(\d\d):\d\d$/);
-  const h = Number(d) * 24 + Number(hh);
-  const m = Number(mm);
-  return h ? `${h} h ${mm} min` : m ? `${m} min` : "< 1 min";
+/** The masthead's three items after the wall time, in wattness.tech's words. */
+function items(s) {
+  return {
+    tag: `${s.phase.label} · ${s.operatingDayShort}${s.phase.atDeadline ? "" : ` · ${countdown(s.phase.left)} left`}`,
+    tone: s.phase.tone,
+    dead: `DAM deadline ${countdown(s.deadline.left)}`,
+    rt: `HE${s.he} · adjustments for HE${s.adjustment.he} close in ${countdown(s.adjustment.left)}`,
+  };
 }
 
-test("the register runs 00:00 to 24:00 without a gap, each line with its Protocols section", () => {
+test("the register is wattness.tech's, word for word: 00:00 to 24:00 without a gap, each line with its Protocols section", () => {
   assert.equal(PHASES[0].start, "00:00");
   assert.equal(PHASES.at(-1).end, "24:00");
   for (let i = 1; i < PHASES.length; i++) assert.equal(PHASES[i].start, PHASES[i - 1].end, `${PHASES[i].id} starts where ${PHASES[i - 1].id} ends`);
   for (const line of [...PHASES, ...EVENTS]) {
     assert.match(line.source, /^Protocols §/, `${line.id} cites the Protocols`);
     assert.ok(line.quote.length > 40, `${line.id} carries the Protocols' sentence`);
-    // Labels write times as the site does; ERCOT's 1000 stays inside the quotations and sources only.
-    assert.doesNotMatch(line.label, /\b\d{4}\b/, `${line.id}'s label writes HH:MM`);
   }
+  assert.deepEqual(
+    PHASES.map((p) => p.label),
+    ["DAM bids and offers due", "DAM clearing", "DAM results out", "DRUC", "Adjustment Period"],
+  );
+  assert.deepEqual(
+    EVENTS.map((e) => e.label),
+    ["AS Plan and ASDCs posted", "AS offers capped at RTSWCAP, not DASWCAP", "DRUC results, about 1600", "DAM may be aborted if not run by 1900"],
+    "the labels keep ERCOT's own notation, as wattness.tech's list prints them",
+  );
+  assert.equal(PHASES[1].next, "DAM results, no later than 1330");
   assert.deepEqual(
     EVENTS.filter((e) => !e.firm).map((e) => e.id),
     ["druc-results"],
     "only DRUC results' 16:00 is a figure rather than a rule",
   );
+  assert.equal(endTime("24:00"), "00:00");
+  assert.equal(endTime("13:30"), "13:30");
 });
 
-test("08:51 CT on the 26th: bids for the 27th are due, the plan is posted, everything else is ahead", () => {
-  const day = marketDayAt(ms("2026-11-26T14:51:36Z"));
-  assert.equal(day.now, unix("2026-11-26T14:51:00Z"), "held to the minute");
-  assert.equal(day.day, "2026-11-26");
-  assert.equal(day.operatingDay, "2026-11-27");
-  assert.equal(day.hours, 24);
-  assert.equal(day.x, (8 * 60 + 51) / 1440);
-  assert.equal(day.phase.id, "dam-offers-due");
-  assert.equal(day.phase.atDeadline, true, "the deadline carries the one DAM countdown");
-  assert.deepEqual(states(day), {
-    "dam-offers-due": "now",
+test("11:40:07 CT on Nov 26, Jo's reference: DAM clearing in ink, the deadline for the 28th, HE12 and HE14's close", () => {
+  const t = ms("2026-11-26T17:40:07Z");
+  const s = marketClockAt(t);
+  assert.equal(s.wall, "11:40:07");
+  assert.equal(readerTime(t, "Asia/Bangkok"), "00:40", "the reader's own clock beside it");
+  assert.equal(s.day, "2026-11-26");
+  assert.equal(s.dayShort, "Nov 26");
+  assert.equal(s.operatingDay, "2026-11-27");
+  assert.deepEqual(items(s), {
+    tag: "DAM clearing · Nov 27 · 1h 49m left",
+    tone: "clear",
+    dead: "DAM deadline 22h 19m",
+    rt: "HE12 · adjustments for HE14 close in 19:53",
+  });
+  assert.equal(s.deadline.operatingDay, "2026-11-28");
+  assert.equal(s.deadline.operatingDayShort, "Nov 28");
+  assert.equal(s.deadline.urgency, "");
+  assert.equal(hhmm(s.deadline.at, "America/Chicago"), "10:00");
+  assert.equal(readerTime(s.deadline.at, "Asia/Bangkok"), "23:00");
+  assert.deepEqual([s.adjustment.topHH, s.adjustment.sameDay, readerTime(s.adjustment.at, "Asia/Bangkok")], ["12", true, "01:00"]);
+  assert.equal(s.x, (11 * 60 + 40) / 1440, "the now line held to the minute");
+  assert.deepEqual(passed(s), {
+    "dam-offers-due": "passed",
     "as-plan": "passed",
-    "dam-clearing": "ahead",
+    "dam-clearing": "passed",
     "dam-results": "ahead",
     druc: "ahead",
     "offer-cap-switch": "ahead",
@@ -74,7 +95,7 @@ test("08:51 CT on the 26th: bids for the 27th are due, the plan is posted, every
     "dam-abort-bound": "ahead",
   });
   assert.deepEqual(
-    day.moments.map((m) => `${m.at} ${m.key}`),
+    s.rows.map((r) => `${r.at} ${r.key}`),
     [
       "00:00 dam-offers-due",
       "06:00 as-plan",
@@ -86,228 +107,250 @@ test("08:51 CT on the 26th: bids for the 27th are due, the plan is posted, every
       "18:00 adjustment-period",
       "19:00 dam-abort-bound",
     ],
-    "the day's moments in order, the phase before the event at 14:30",
+    "the day's rows in order, the phase before the event at 14:30",
   );
   assert.deepEqual(
-    day.moments.map((m) => m.cite),
+    s.rows.map((r) => r.cite),
     [
       "Protocols §5.4(1)(b), item (i)",
       "Protocols §4.2.1.1(1)",
       "Protocols §4.5.1(1)",
       "Protocols §4.5.2(1)",
-      "Protocols §5.3(1)",
+      'Protocols §5.3(1). Results "in the Day-Ahead" (§5.5.3(2))',
       "Protocols §4.4.7.2.1(3)",
       "Protocols §5.5.3(2) gives no time",
       "Protocols §6.3(2)",
       "Protocols §4.1.2(5)",
     ],
-    "each moment shows its first reference",
+    "each row's reference runs to its source's first semicolon, as wattness.tech's list prints it",
   );
-  assert.deepEqual(day.deadline, { unix: unix("2026-11-26T16:00:00Z"), operatingDay: "2026-11-27", left: 68 * 60 + 24 });
-  assert.equal(tag(ms("2026-11-26T14:51:36Z")), "01:08:24", "the gate tag above it");
-  assert.equal(leftText(day.deadline.left), "1 h 08 min", "the tag's 01:08:24 rounded down, as wattness.tech's 1h 08m");
-  // The same instant on every reader's clock: CT first, the reader's own beside it.
-  assert.equal(hhmm(day.deadline.unix, "America/Chicago"), "10:00");
-  assert.equal(hhmm(day.deadline.unix, "Asia/Bangkok"), "23:00");
-  assert.equal(hhmm(day.deadline.unix, "Europe/London"), "16:00");
-  assert.deepEqual(day.adjustment, { closes: unix("2026-11-26T15:00:00Z"), left: 8 * 60 + 24, hour: "HE11", day: null, current: "HE09" });
-  assert.equal(leftText(day.adjustment.left), "8 min", "8:24 to 09:00 CT");
+  assert.deepEqual(
+    s.rows.map((r) => r.tone),
+    ["open", null, "clear", "post", "post", null, null, "adj", null],
+    "a phase's swatch is its color with the whole day ahead; an event's is a ring",
+  );
+  assert.deepEqual(
+    s.segments.map((g) => [g.id, g.tone, g.from, g.to]),
+    [
+      ["dam-offers-due", "open", 0, 600 / 1440],
+      ["dam-clearing", "clear", 600 / 1440, 810 / 1440],
+      ["dam-results", "post", 810 / 1440, 870 / 1440],
+      ["druc", "post", 870 / 1440, 1080 / 1440],
+      ["adjustment-period", "adj", 1080 / 1440, 1],
+    ],
+  );
+  assert.deepEqual(
+    s.ticks.map((k) => [k.at, k.low]),
+    [["00:00", false], ["10:00", true], ["13:30", false], ["14:30", true], ["18:00", false], ["24:00", true]],
+  );
 });
 
-test("each time left is what the gate tag reads, rounded down to the minute, and never 0 min", () => {
-  const cases = [
-    // [instant, CT, the tag, DAM deadline, the running phase, the adjustments close, the gate's spoken time]
-    ["2026-11-26T06:00:30Z", "00:00:30", "09:59:30", "9 h 59 min", null, "59 min", "9 hours 59 minutes"],
-    ["2026-11-26T14:51:36Z", "08:51:36", "01:08:24", "1 h 08 min", null, "8 min", "1 hour 8 minutes"],
-    ["2026-11-26T15:59:00Z", "09:59:00", "00:01:00", "1 min", null, "1 min", "1 minute"],
-    ["2026-11-26T15:59:30Z", "09:59:30", "00:00:30", "< 1 min", null, "< 1 min", "less than a minute"],
-    ["2026-11-26T19:29:59Z", "13:29:59", "20:30:01", "20 h 30 min", "< 1 min", "30 min", "20 hours 30 minutes"],
-    ["2026-11-27T05:59:59.999Z", "23:59:59", "10:00:01", "10 h 00 min", "< 1 min", "< 1 min", "10 hours"],
-  ];
-  for (const [iso, ct, countdown, deadline, phase, adjustment, words] of cases) {
-    const t = ms(iso);
-    const day = marketDayAt(t);
-    assert.equal(formatInZone(Math.floor(t / 1000), "America/Chicago", { date: false }), ct);
-    assert.equal(tag(t), countdown, `the tag at ${ct} CT`);
-    assert.equal(leftText(day.deadline.left), deadline, `the DAM deadline at ${ct} CT`);
-    assert.equal(leftText(day.deadline.left), tagInPanelWords(countdown));
-    if (phase) assert.equal(leftText(day.phase.left), phase, `the phase at ${ct} CT`);
-    assert.equal(leftText(day.adjustment.left), adjustment, `the adjustments close at ${ct} CT`);
-    assert.equal(leftWords(day.deadline.left), words, `the gate's spoken name at ${ct} CT`);
-  }
-});
-
-test("the panel drawn at shownAt reads the same as at the instant itself, and redraws twice a minute", () => {
-  const m = ms("2026-11-26T14:51:00Z");
-  assert.equal(shownAt(m), m, "the minute's first second is drawn at its start");
-  assert.equal(shownAt(m + 999), m);
-  assert.equal(shownAt(m + 1000), m + 1000, "the rest of it one second in");
-  assert.equal(shownAt(m + 59_999), m + 1000);
-  assert.equal(shownAt(m + 60_000), m + 60_000);
-
-  const drawn = (day) => ({
-    now: day.now,
-    x: day.x,
-    phase: [day.phase.id, leftText(day.phase.left)],
-    states: states(day),
-    deadline: [day.deadline.unix, day.deadline.operatingDay, leftText(day.deadline.left), day.deadline.left <= 600],
-    adjustment: [day.adjustment.closes, day.adjustment.hour, day.adjustment.day, day.adjustment.current, leftText(day.adjustment.left)],
+test("08:51:36 CT: bids for the 27th are due, and the deadline alone carries the countdown", () => {
+  const s = marketClockAt(ms("2026-11-26T14:51:36Z"));
+  assert.equal(s.phase.id, "dam-offers-due");
+  assert.equal(s.phase.atDeadline, true, "the phase ends at the deadline, so its tag drops the time left");
+  assert.deepEqual(items(s), {
+    tag: "DAM bids and offers due · Nov 27",
+    tone: "open",
+    dead: "DAM deadline 1h 08m",
+    rt: "HE09 · adjustments for HE11 close in 08:24",
   });
-  // An ordinary day and both change days, every 23rd minute (so every minute of the hour in turn), at the edges of its
-  // first two seconds and its last.
-  for (const start of ["2026-11-26T06:00:00Z", "2026-11-01T05:00:00Z", "2027-03-14T06:00:00Z"]) {
-    for (let minute = ms(start); minute < ms(start) + 25 * 3_600_000; minute += 23 * 60_000) {
-      for (const offset of [0, 999, 1000, 1001, 30_500, 59_999]) {
-        const t = minute + offset;
-        assert.deepEqual(drawn(marketDayAt(shownAt(t))), drawn(marketDayAt(t)), `at ${new Date(t).toISOString()}`);
-      }
-    }
-  }
+  assert.equal(s.deadline.operatingDayShort, "Nov 27");
+  assert.equal(passed(s)["as-plan"], "passed");
+  assert.equal(passed(s)["dam-offers-due"], "passed", "a phase reads passed from its start, as wattness.tech's list has it");
+  assert.equal(passed(s)["dam-clearing"], "ahead");
 });
 
-test("a moment passes on its minute, not a second before", () => {
-  const before = marketDayAt(ms("2026-11-26T15:59:59.999Z"));
-  assert.equal(before.phase.id, "dam-offers-due");
-  assert.equal(states(before)["dam-clearing"], "ahead");
-  assert.equal(before.deadline.unix, unix("2026-11-26T16:00:00Z"));
-  assert.equal(leftText(before.deadline.left), "< 1 min", "a countdown never reads 0 min before its moment");
-  assert.equal(before.adjustment.hour, "HE12");
+test("the phase's color through the day, and the deadline's last hour", () => {
+  const at = (iso) => marketClockAt(ms(iso));
+  const cases = [
+    // [instant, CT, the tag's tone, the deadline's countdown, its urgency]
+    ["2026-11-26T06:00:30Z", "00:00", "open", "9h 59m", ""],
+    ["2026-11-26T15:00:01Z", "09:00", "near", "59:59", "near"],
+    ["2026-11-26T15:15:00Z", "09:15", "near", "45:00", "near"],
+    ["2026-11-26T15:45:00Z", "09:45", "near", "15:00", "near"],
+    ["2026-11-26T15:45:01Z", "09:45", "urgent", "14:59", "urgent"],
+    ["2026-11-26T15:59:30Z", "09:59", "urgent", "00:30", "urgent"],
+    ["2026-11-26T16:00:00Z", "10:00", "clear", "24h 00m", ""],
+    ["2026-11-26T19:30:00Z", "13:30", "post", "20h 30m", ""],
+    ["2026-11-26T21:40:00Z", "15:40", "post", "18h 20m", ""],
+    ["2026-11-27T00:00:00Z", "18:00", "adj", "16h 00m", ""],
+    ["2026-11-27T03:30:00Z", "21:30", "adj", "12h 30m", ""],
+  ];
+  for (const [iso, ct, expected, dead, urgency] of cases) {
+    const s = at(iso);
+    assert.equal(hhmm(ms(iso), "America/Chicago"), ct);
+    assert.equal(s.phase.tone, expected, `the tag's color at ${ct} CT`);
+    assert.equal(countdown(s.deadline.left), dead, `the DAM deadline at ${iso}`);
+    assert.equal(s.deadline.urgency, urgency, `the deadline's urgency at ${iso}`);
+  }
+  // 09:45:00 exactly is 15 minutes out: the tag turns bad below 15 minutes, as the countdown's color does.
+  assert.equal(tone("dam-offers-due", 15 * 60_000), "near");
+  assert.equal(tone("dam-offers-due", 15 * 60_000 - 1), "urgent");
+  assert.equal(tone("dam-offers-due", 60 * 60_000), "open");
+  assert.equal(tone("dam-offers-due", 60 * 60_000 - 1), "near");
+  assert.equal(tone("dam-offers-due", Infinity), "open");
+  assert.deepEqual(["dam-clearing", "dam-results", "druc", "adjustment-period"].map((id) => tone(id, 0)), ["clear", "post", "post", "adj"]);
+  assert.equal(marketClockAt(ms("2026-11-26T15:45:00Z")).phase.tone, "near", "09:45:00 CT, 15:00 left");
+});
 
-  const at = marketDayAt(ms("2026-11-26T16:00:00Z"));
+test("15:40 and 21:30 CT: DRUC, then the Adjustment Period, each with its time left", () => {
+  assert.deepEqual(items(marketClockAt(ms("2026-11-26T21:40:00Z"))), {
+    tag: "DRUC · Nov 27 · 2h 20m left",
+    tone: "post",
+    dead: "DAM deadline 18h 20m",
+    rt: "HE16 · adjustments for HE18 close in 20:00",
+  });
+  const late = marketClockAt(ms("2026-11-27T03:30:00Z"));
+  assert.deepEqual(items(late), {
+    tag: "Adjustment Period · Nov 27 · 2h 30m left",
+    tone: "adj",
+    dead: "DAM deadline 12h 30m",
+    rt: "HE22 · adjustments for HE24 close in 30:00",
+  });
+  assert.equal(late.deadline.operatingDayShort, "Nov 28");
+  assert.ok(late.rows.every((r) => r.passed), "by 21:30 every row has passed, the running Adjustment Period with them");
+});
+
+test("late evening: the next close is for the next day's second hour, named with its day", () => {
+  const s = marketClockAt(ms("2026-11-27T05:30:00Z")); // 23:30 CT on the 26th
+  assert.equal(s.phase.id, "adjustment-period");
+  assert.equal(countdown(s.phase.left), "30:00");
+  assert.equal(s.he, "24");
+  assert.deepEqual([s.adjustment.he, s.adjustment.sameDay, s.adjustment.dayShort, s.adjustment.topHH], ["02", false, "Nov 27", "00"]);
+  assert.equal(countdown(s.adjustment.left), "30:00");
+  assert.equal(endTime(s.phase.end), "00:00", "the tag's title names the phase's end as the next midnight");
+});
+
+test("a phase starts and a row passes on its minute, not a second before", () => {
+  const before = marketClockAt(ms("2026-11-26T15:59:59.999Z"));
+  assert.equal(before.phase.id, "dam-offers-due");
+  assert.equal(passed(before)["dam-clearing"], "ahead");
+  assert.equal(countdown(before.deadline.left), "00:00", "rounded down, as wattness.tech's countdown is");
+  assert.equal(before.deadline.operatingDay, "2026-11-27");
+  assert.deepEqual([before.he, before.adjustment.he], ["10", "12"]);
+
+  const at = marketClockAt(ms("2026-11-26T16:00:00Z"));
   assert.equal(at.phase.id, "dam-clearing");
   assert.equal(at.phase.atDeadline, false);
-  assert.equal(leftText(at.phase.left), "3 h 30 min");
-  assert.equal(states(at)["dam-offers-due"], "passed");
-  assert.equal(states(at)["dam-clearing"], "now");
+  assert.equal(countdown(at.phase.left), "3h 30m");
+  assert.equal(passed(at)["dam-clearing"], "passed");
   assert.equal(at.operatingDay, "2026-11-27", "the phases are still the 27th's");
-  assert.deepEqual(at.deadline, { unix: unix("2026-11-27T16:00:00Z"), operatingDay: "2026-11-28", left: 24 * 3600 }, "the next deadline is tomorrow's, for the 28th");
-  assert.equal(leftText(at.deadline.left), "24 h 00 min");
-  assert.equal(at.adjustment.current, "HE11");
-  assert.equal(at.adjustment.hour, "HE13", "HE12's window closed at 10:00; HE13's closes at 11:00");
-  assert.equal(at.adjustment.closes, unix("2026-11-26T17:00:00Z"));
+  assert.equal(at.deadline.operatingDay, "2026-11-28", "the next deadline is tomorrow's, for the 28th");
+  assert.equal(countdown(at.deadline.left), "24h 00m");
+  assert.deepEqual([at.he, at.adjustment.he], ["11", "13"], "HE12's window closed at 10:00; HE13's closes at 11:00");
 });
 
-test("late evening: the Adjustment Period runs, and the next close is for the next day's second hour", () => {
-  const day = marketDayAt(ms("2026-11-27T05:30:00Z")); // 23:30 CT on the 26th
-  assert.equal(day.day, "2026-11-26");
-  assert.equal(day.phase.id, "adjustment-period");
-  assert.equal(leftText(day.phase.left), "30 min");
-  assert.ok(day.moments.every((m) => m.state === (m.key === "adjustment-period" ? "now" : "passed")));
-  assert.deepEqual(day.adjustment, { closes: unix("2026-11-27T06:00:00Z"), left: 30 * 60, hour: "HE02", day: "2026-11-27", current: "HE24" });
-  assert.equal(day.deadline.operatingDay, "2026-11-28");
-  assert.equal(leftText(day.deadline.left), "10 h 30 min");
+test("countdowns read as wattness.tech's: hours and minutes from an hour up, minutes and seconds under it, rounded down", () => {
+  assert.equal(countdown(0), "00:00");
+  assert.equal(countdown(-5000), "00:00");
+  assert.equal(countdown(999), "00:00");
+  assert.equal(countdown(1000), "00:01");
+  assert.equal(countdown(59_999), "00:59");
+  assert.equal(countdown(60_000), "01:00");
+  assert.equal(countdown(19 * 60_000 + 53_999), "19:53");
+  assert.equal(countdown(3_599_999), "59:59");
+  assert.equal(countdown(3_600_000), "1h 00m");
+  assert.equal(countdown(3_659_999), "1h 00m");
+  assert.equal(countdown(3_660_000), "1h 01m");
+  assert.equal(countdown(22 * 3_600_000 + 19 * 60_000 + 59_999), "22h 19m");
+  assert.equal(countdown(25 * 3_600_000), "25h 00m");
+  // A clock that ticks a few milliseconds after the second reads one second less, as wattness.tech's does.
+  const s = marketClockAt(ms("2026-11-26T17:40:07.004Z"));
+  assert.equal(countdown(s.adjustment.left), "19:52");
 });
 
-test("the fall change, Nov 1, 2026: 25 hours, the repeated hour is HE02*, the countdown spans the extra hour", () => {
-  assert.deepEqual(hourLabels("2026-11-01"), ["01", "02", "02*", ...Array.from({ length: 22 }, (_, i) => String(i + 3).padStart(2, "0"))]);
-  assert.equal(hourLabels("2026-11-02").length, 24);
+test("the fall change, Nov 1, 2026: 25 hours, the repeated hour is HE2R, the countdowns span the extra hour", () => {
+  assert.deepEqual(hourTokens("2026-11-01"), ["01", "02", "2R", ...Array.from({ length: 22 }, (_, i) => String(i + 3).padStart(2, "0"))]);
+  assert.equal(hourTokens("2026-11-02").length, 24);
 
-  const noonBefore = marketDayAt(ms("2026-10-31T17:00:00Z")); // 12:00 CDT
-  assert.equal(noonBefore.deadline.unix, unix("2026-11-01T16:00:00Z"), "10:00 CST");
+  const noonBefore = marketClockAt(ms("2026-10-31T17:00:00Z")); // 12:00 CDT
+  assert.equal(noonBefore.deadline.at, ms("2026-11-01T16:00:00Z"), "10:00 CST");
   assert.equal(noonBefore.deadline.operatingDay, "2026-11-02");
-  assert.equal(leftText(noonBefore.deadline.left), "23 h 00 min", "22 hours on the wall clock, 23 elapsed");
+  assert.equal(countdown(noonBefore.deadline.left), "23h 00m", "22 hours on the wall clock, 23 elapsed");
 
-  const evening = marketDayAt(ms("2026-11-01T04:30:00Z")); // 23:30 CDT on the 31st
-  assert.deepEqual([evening.adjustment.current, evening.adjustment.hour, evening.adjustment.day], ["HE24", "HE02", "2026-11-01"]);
+  const evening = marketClockAt(ms("2026-11-01T04:30:00Z")); // 23:30 CDT on the 31st
+  assert.deepEqual([evening.he, evening.adjustment.he, evening.adjustment.dayShort], ["24", "02", "Nov 1"]);
 
-  const midnight = marketDayAt(ms("2026-11-01T05:30:00Z")); // 00:30 CDT
-  assert.deepEqual([midnight.adjustment.current, midnight.adjustment.hour], ["HE01", "HE02*"], "the hour starting at the second 01:00");
-  assert.equal(midnight.adjustment.closes, unix("2026-11-01T06:00:00Z"));
+  const midnight = marketClockAt(ms("2026-11-01T05:30:00Z")); // 00:30 CDT
+  assert.deepEqual([midnight.he, midnight.adjustment.he], ["01", "2R"], "the hour starting at the second 01:00");
+  assert.equal(midnight.adjustment.at, ms("2026-11-01T06:00:00Z"));
 
-  const first = marketDayAt(ms("2026-11-01T06:30:00Z")); // 01:30 CDT, the first time
-  assert.deepEqual([first.adjustment.current, first.adjustment.hour], ["HE02", "HE03"]);
-  assert.equal(hhmm(first.adjustment.closes, "America/Chicago"), "01:00", "closes as the clock reads 01:00 again");
-  assert.equal(first.adjustment.left, 30 * 60);
+  const first = marketClockAt(ms("2026-11-01T06:30:00Z")); // 01:30 CDT, the first time
+  assert.deepEqual([first.he, first.adjustment.he], ["02", "03"]);
+  assert.equal(hhmm(first.adjustment.at, "America/Chicago"), "01:00", "closes as the clock reads 01:00 again");
+  assert.equal(first.adjustment.topHH, "01");
+  assert.equal(countdown(first.adjustment.left), "30:00");
 
-  const second = marketDayAt(ms("2026-11-01T07:30:00Z")); // 01:30 CST, the second time
-  assert.deepEqual([second.adjustment.current, second.adjustment.hour], ["HE02*", "HE04"]);
+  const second = marketClockAt(ms("2026-11-01T07:30:00Z")); // 01:30 CST, the second time
+  assert.deepEqual([second.wall, second.he, second.adjustment.he], ["01:30:00", "2R", "04"]);
   assert.equal(second.hours, 25);
-  assert.equal(second.x, 2.5 / 25, "the marker moves on with elapsed time; it never steps back an hour");
+  assert.equal(second.x, 2.5 / 25, "the now line moves on with elapsed time; it never steps back an hour");
   assert.ok(second.x > first.x);
   assert.deepEqual(
     second.ticks.map((t) => [t.at, t.x]),
     [["00:00", 0], ["10:00", 11 / 25], ["13:30", 14.5 / 25], ["14:30", 15.5 / 25], ["18:00", 19 / 25], ["24:00", 1]],
   );
-  assert.equal(states(second)["as-plan"], "ahead");
-  assert.equal(marketDayAt(ms("2026-11-01T11:59:00Z")).moments.find((m) => m.key === "as-plan").state, "ahead", "05:59 CST");
-  assert.equal(marketDayAt(ms("2026-11-01T12:00:00Z")).moments.find((m) => m.key === "as-plan").state, "passed", "06:00 CST");
+  assert.equal(passed(second)["as-plan"], "ahead");
+  assert.equal(passed(marketClockAt(ms("2026-11-01T11:59:00Z")))["as-plan"], "ahead", "05:59 CST");
+  assert.equal(passed(marketClockAt(ms("2026-11-01T12:00:00Z")))["as-plan"], "passed", "06:00 CST");
 });
 
 test("the spring change, Mar 14, 2027: 23 hours, no HE03, and the deadline an hour nearer", () => {
-  const labels = hourLabels("2027-03-14");
-  assert.equal(labels.length, 23);
-  assert.ok(!labels.includes("03"));
-  assert.deepEqual(labels.slice(0, 4), ["01", "02", "04", "05"]);
+  const tokens = hourTokens("2027-03-14");
+  assert.equal(tokens.length, 23);
+  assert.ok(!tokens.includes("03"));
+  assert.deepEqual(tokens.slice(0, 4), ["01", "02", "04", "05"]);
 
-  const noonBefore = marketDayAt(ms("2027-03-13T18:00:00Z")); // 12:00 CST
-  assert.equal(noonBefore.deadline.unix, unix("2027-03-14T15:00:00Z"), "10:00 CDT");
+  const noonBefore = marketClockAt(ms("2027-03-13T18:00:00Z")); // 12:00 CST
+  assert.equal(noonBefore.deadline.at, ms("2027-03-14T15:00:00Z"), "10:00 CDT");
   assert.equal(noonBefore.deadline.operatingDay, "2027-03-15");
-  assert.equal(leftText(noonBefore.deadline.left), "21 h 00 min");
+  assert.equal(countdown(noonBefore.deadline.left), "21h 00m");
 
-  const night = marketDayAt(ms("2027-03-14T07:30:00Z")); // 01:30 CST
-  assert.deepEqual([night.adjustment.current, night.adjustment.hour], ["HE02", "HE05"], "HE04 starts at 03:00 CDT; HE05's window closes then");
-  assert.equal(hhmm(night.adjustment.closes, "America/Chicago"), "03:00");
-  assert.equal(night.adjustment.left, 30 * 60);
+  const night = marketClockAt(ms("2027-03-14T07:30:00Z")); // 01:30 CST
+  assert.deepEqual([night.he, night.adjustment.he], ["02", "05"], "HE04 starts at 03:00 CDT; HE05's window closes then");
+  assert.equal(hhmm(night.adjustment.at, "America/Chicago"), "03:00");
+  assert.equal(night.adjustment.topHH, "03");
+  assert.equal(countdown(night.adjustment.left), "30:00");
   assert.equal(night.hours, 23);
   assert.equal(night.ticks.find((t) => t.at === "10:00").x, 9 / 23);
 
-  const morning = marketDayAt(ms("2027-03-14T14:00:00Z")); // 09:00 CDT
+  const morning = marketClockAt(ms("2027-03-14T14:00:00Z")); // 09:00 CDT
   assert.equal(morning.phase.id, "dam-offers-due");
-  assert.equal(leftText(morning.deadline.left), "1 h 00 min");
-  assert.equal(morning.adjustment.current, "HE10");
+  assert.equal(morning.phase.tone, "open", "exactly an hour out is still open");
+  assert.equal(countdown(morning.deadline.left), "1h 00m");
+  assert.equal(morning.he, "10");
 });
 
-test("over two years, every minute sampled agrees with the site's gate and with itself", () => {
+test("over two years, every sample agrees with the site's gate and with itself", () => {
   const from = ms("2026-01-01T00:00:00Z");
   const to = ms("2028-01-01T00:00:00Z");
   // A step that is not a whole number of hours walks through every minute of the hour across the run.
-  for (let t = from; t < to; t += 7 * 3_600_000 + 13 * 60_000 + 17_000) {
-    const day = marketDayAt(t);
-    const now = day.now;
+  for (let t = from; t < to; t += 7 * 3_600_000 + 13 * 60_000 + 17_123) {
+    const s = marketClockAt(t);
     const gate = nextGate(t);
-    assert.equal(day.deadline.unix, gate.unix, `the deadline is the site's gate at ${new Date(t).toISOString()}`);
-    assert.equal(day.deadline.operatingDay, gate.operatingDay);
-    assert.ok(day.deadline.left > 0 && day.deadline.left <= 24 * 3600 + 3600, "the next deadline is within a day and an hour");
-    assert.equal(leftText(day.deadline.left), tagInPanelWords(tag(t)), "the panel's DAM deadline is the gate tag's, rounded down");
-    assert.ok(day.adjustment.left > 0 && day.adjustment.left <= 3600);
-    assert.equal(day.adjustment.closes % 3600, 0, "adjustments close on the hour");
-    assert.ok([23, 24, 25].includes(day.hours));
-    assert.ok(day.x >= 0 && day.x < 1);
-    assert.equal(day.segments[0].from, 0);
-    assert.equal(day.segments.at(-1).to, 1);
-    assert.equal(day.segments.filter((s) => s.current).length, 1, "one phase runs at a time");
-    const runs = day.segments.find((s) => s.current);
-    assert.ok(runs.from <= day.x && day.x < runs.to, "the marker sits in the phase that runs");
-    assert.equal(day.phase.id, runs.id);
-    for (const m of day.moments) {
-      if (m.kind === "event") assert.equal(m.state, m.unix <= now ? "passed" : "ahead", `${m.key} at ${new Date(t).toISOString()}`);
-      else if (m.state === "ahead") assert.ok(m.unix > now);
-      else assert.ok(m.unix <= now);
-    }
-    assert.ok(day.moments.every((m, i, all) => i === 0 || all[i - 1].unix <= m.unix), "in time order");
+    assert.equal(s.deadline.at, gate.unix * 1000, `the deadline is the site's gate at ${new Date(t).toISOString()}`);
+    assert.equal(s.deadline.operatingDay, gate.operatingDay);
+    assert.ok(s.deadline.left > 0 && s.deadline.left <= 25 * 3_600_000, "the next deadline is within a day and an hour");
+    assert.ok(s.adjustment.left > 0 && s.adjustment.left <= 3_600_000);
+    assert.equal(s.adjustment.at % 3_600_000, 0, "adjustments close on the hour");
+    assert.ok(s.phase.left > 0);
+    assert.ok([23, 24, 25].includes(s.hours));
+    assert.ok(s.x >= 0 && s.x < 1);
+    assert.equal(s.segments[0].from, 0);
+    assert.equal(s.segments.at(-1).to, 1);
+    const runs = s.segments.filter((g) => g.from <= s.x && s.x < g.to);
+    assert.equal(runs.length, 1, "the now line sits in one stretch");
+    assert.equal(runs[0].id, s.phase.id, "the stretch of the phase the tag names");
+    const minute = Math.floor(t / 60_000) * 60_000;
+    for (const r of s.rows) assert.equal(r.passed, r.ms <= minute, `${r.key} at ${new Date(t).toISOString()}`);
+    assert.ok(s.rows.every((r, i, all) => i === 0 || all[i - 1].ms <= r.ms), "in time order");
+    assert.ok(hourTokens(s.day).includes(s.he), "the Operating Hour is one of the day's own");
   }
 });
 
-test("left times read in hours and minutes, rounded down", () => {
-  assert.equal(leftText(1), "< 1 min");
-  assert.equal(leftText(59), "< 1 min");
-  assert.equal(leftText(59.9), "< 1 min", "a part of a second rounds down too");
-  assert.equal(leftText(60), "1 min");
-  assert.equal(leftText(119), "1 min");
-  assert.equal(leftText(3599.5), "59 min");
-  assert.equal(leftText(9 * 60), "9 min");
-  assert.equal(leftText(3599), "59 min");
-  assert.equal(leftText(3600), "1 h 00 min");
-  assert.equal(leftText(69 * 60), "1 h 09 min");
-  assert.equal(leftText(68 * 60 + 24), "1 h 08 min");
-  assert.equal(leftText(25 * 3600), "25 h 00 min");
-  // and in words for the triggers' spoken names
-  assert.equal(leftWords(30), "less than a minute");
-  assert.equal(leftWords(59.9), "less than a minute");
-  assert.equal(leftWords(60), "1 minute");
-  assert.equal(leftWords(9 * 60), "9 minutes");
-  assert.equal(leftWords(3600), "1 hour");
-  assert.equal(leftWords(69 * 60), "1 hour 9 minutes");
-  assert.equal(leftWords(68 * 60 + 24), "1 hour 8 minutes");
-  assert.equal(leftWords(24 * 3600), "24 hours");
+test("cite stops at the first semicolon and keeps everything before it", () => {
+  assert.equal(cite("Protocols §4.1.2(5)"), "Protocols §4.1.2(5)");
+  assert.equal(cite('Protocols §6.3(2); §2.1 "Adjustment Period"'), "Protocols §6.3(2)");
+  assert.equal(cite('Protocols §5.3(1). Results "in the Day-Ahead" (§5.5.3(2)); the §5.2.1 figure'), 'Protocols §5.3(1). Results "in the Day-Ahead" (§5.5.3(2))');
 });

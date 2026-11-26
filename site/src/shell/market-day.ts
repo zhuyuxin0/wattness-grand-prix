@@ -1,16 +1,18 @@
 import { CENTRAL_TZ } from "../config";
-import { nextGate, zonedInstant } from "../lib/time";
+import { zonedInstant } from "../lib/time";
 
-// The day before an Operating Day as ERCOT's Protocols set it: the phases a battery's bids pass through, the moments
-// between them, and the two deadlines always running. This is the register wattness.tech's market clock serves: each
-// line keeps the Protocols' own sentence (verbatim, ERCOT's 24-hour notation inside quotation marks) and its section.
-// The site writes times in labels as it writes them everywhere, 10:00 rather than 1000.
+// The market clock, as wattness.tech's masthead draws it (wattness-site apps/mms/src/ui/clock.tsx): Central time with
+// the reader's own beside it, the phase tomorrow's Operating Day is in, the next DAM deadline, and today's Operating Hour
+// with the Adjustment Period's next close. The register is the one wattness.tech serves at /api/market-clock
+// (wattness.iso.ercot_cadence in the desk): each line keeps its label, ERCOT's sentence verbatim and its section, word
+// for word as wattness.tech shows them. Here the browser computes every time itself, with no network.
 //
 // Everything is computed from instants, never from wall-clock arithmetic, so the two days a year Central time changes
-// come out right: the long day of 25 hours (its repeated hour is HE02*) and the short day of 23 (it has no HE03).
+// come out right: the long day of 25 hours (its repeated hour is HE2R, ERCOT's token, as wattness.tech's clock writes
+// it) and the short day of 23 (it has no HE03).
 
-/** What a battery desk can do in a phase: bids open, clearing, results and DRUC, the Adjustment Period. */
-export type Tone = "open" | "clear" | "post" | "adjust";
+/** The tag's color: what a battery desk can do in the phase, not its name (clock.tsx's tone). */
+export type Tone = "open" | "near" | "urgent" | "clear" | "post" | "adj";
 
 export interface Phase {
   id: string;
@@ -18,13 +20,12 @@ export interface Phase {
   /** Central wall-clock time on the Day-Ahead, "HH:MM"; "24:00" is the next midnight. */
   start: string;
   end: string;
-  /** What ends the phase. */
+  /** What the countdown counts to, at `end`. */
   next: string;
-  /** False where the time is a figure in the Protocols rather than a rule. */
+  /** False where the source is a figure or "approximately". */
   firm: boolean;
   quote: string;
   source: string;
-  tone: Tone;
 }
 
 export interface DayEvent {
@@ -36,6 +37,7 @@ export interface DayEvent {
   source: string;
 }
 
+/** The day before an Operating Day, midnight to midnight, no gaps. */
 export const PHASES: readonly Phase[] = [
   {
     id: "dam-offers-due",
@@ -47,18 +49,16 @@ export const PHASES: readonly Phase[] = [
     quote:
       "Submit any Three-Part Supply Offers, Energy Bid/Offer Curves, and Ancillary Service Offers before: (i) 1000 in the Day-Ahead for the Day-Ahead Market (DAM) and Day-Ahead Reliability Unit Commitment (DRUC) being run in that Day-Ahead",
     source: "Protocols §5.4(1)(b), item (i); also §4.4.7.2(1)-(4), §4.4.7.2.1(2), §4.4.9.5(1), §4.4.9.6(1)",
-    tone: "open",
   },
   {
     id: "dam-clearing",
     label: "DAM clearing",
     start: "10:00",
     end: "13:30",
-    next: "DAM results, no later than 13:30",
+    next: "DAM results, no later than 1330",
     firm: true,
     quote: "At 1000 in the Day-Ahead, ERCOT shall start the Day-Ahead Market (DAM) clearing process.",
     source: "Protocols §4.5.1(1); results bound §4.5.2(1)-(2)",
-    tone: "clear",
   },
   {
     id: "dam-results",
@@ -70,7 +70,6 @@ export const PHASES: readonly Phase[] = [
     quote:
       "As soon as practicable, but no later than 1330 in the Day-Ahead, ERCOT shall notify the parties to each cleared DAM transaction (e.g., the buyer and the seller) of the results of the DAM as follows:",
     source: "Protocols §4.5.2(1); COP and trades before 1430: §5.4(1)(c)-(e)",
-    tone: "post",
   },
   {
     id: "druc",
@@ -81,7 +80,6 @@ export const PHASES: readonly Phase[] = [
     firm: true,
     quote: "ERCOT shall start the Day-Ahead Reliability Unit Commitment (DRUC) process at 1430 in the Day-Ahead.",
     source: 'Protocols §5.3(1). Results "in the Day-Ahead" (§5.5.3(2)); the §5.2.1 figure ends the DRUC box at 1600',
-    tone: "post",
   },
   {
     id: "adjustment-period",
@@ -93,11 +91,10 @@ export const PHASES: readonly Phase[] = [
     quote:
       "Activities for the Adjustment Period begin at 1800 in the Day-Ahead and end one full hour before the start of the Operating Hour.",
     source: 'Protocols §6.3(2); §2.1 "Adjustment Period"',
-    tone: "adjust",
   },
 ];
 
-/** The day-ahead moments between the phases' boundaries. */
+/** The day-ahead instants the day's list names between the phases' boundaries. */
 export const EVENTS: readonly DayEvent[] = [
   {
     id: "as-plan",
@@ -118,7 +115,7 @@ export const EVENTS: readonly DayEvent[] = [
   },
   {
     id: "druc-results",
-    label: "DRUC results, about 16:00",
+    label: "DRUC results, about 1600",
     at: "16:00",
     firm: false,
     quote:
@@ -127,7 +124,7 @@ export const EVENTS: readonly DayEvent[] = [
   },
   {
     id: "dam-abort-bound",
-    label: "DAM may be aborted if not run by 19:00",
+    label: "DAM may be aborted if not run by 1900",
     at: "19:00",
     firm: true,
     quote:
@@ -136,36 +133,55 @@ export const EVENTS: readonly DayEvent[] = [
   },
 ];
 
-/** The real-time lane's rule behind the adjustments line: each Operating Hour's window closes an hour before it starts. */
-export const ADJUSTMENT_CLOSE = {
-  quote:
-    "Adjustment Period — For each Operating Hour, the time between 1800 in the Day-Ahead up to the start of the hour before that Operating Hour.",
-  source: 'Protocols §2.1 "Adjustment Period"; §6.3(2)',
+/** The real-time lane's rules, which the Operating Hour's tag quotes in its title. */
+export const REAL_TIME = {
+  adjustmentClose: {
+    label: "Adjustment Period closes for the hour after next",
+    quote:
+      "Adjustment Period — For each Operating Hour, the time between 1800 in the Day-Ahead up to the start of the hour before that Operating Hour.",
+    source: 'Protocols §2.1 "Adjustment Period"; §6.3(2)',
+  },
+  bidOfferToSced: {
+    label: "Energy Bid/Offer Curve open to each SCED run",
+    quote:
+      "In the RTM, a QSE may submit or change an Energy Bid/Offer Curve at any time prior to SCED execution, and SCED will use the latest updated Energy Bid/Offer Curve available in the system.",
+    source: "Protocols §4.4.9.7(5); AS Offers the same, §6.4.9.1(2)",
+  },
+  sced: {
+    label: "SCED, about every five minutes",
+    quote:
+      "The SCED process is designed to simultaneously manage energy, Ancillary Services, the system power balance and network congestion through Resource Base Points, Ancillary Service awards, and the calculation of LMPs and Real-Time MCPCs approximately every five minutes, or more frequently if necessary.",
+    source: "Protocols §6.5.7.3(1)",
+  },
+  statusCheck: {
+    label: "COP status checked against telemetry",
+    quote:
+      "Five minutes before the end of each hour, ERCOT shall identify inconsistencies between the telemetered Resource Status and the Resource Status stated in the COP for that Resource in the next hour.",
+    source: "Protocols §6.4.6(2)(b)",
+  },
 } as const;
 
 export const EDITION = "ERCOT Nodal Protocols, August 28, 2026";
 export const TIME_BASIS =
   "Any reference to time is to Central Prevailing Time; the 24-hour clock is used unless otherwise noted. (Protocols §1.7(2)(p))";
 
-export type MomentState = "passed" | "now" | "ahead";
-
 /** A row of the day's list: a phase at its start, or an event. */
-export interface Moment {
+export interface Row {
   key: string;
-  kind: "phase" | "event";
   /** Central wall-clock time, "HH:MM". */
   at: string;
-  /** Unix seconds. */
-  unix: number;
+  /** Unix ms. */
+  ms: number;
   label: string;
   firm: boolean;
   quote: string;
   source: string;
-  /** The source's first reference, which the list shows; the whole source goes with the quotation. */
+  /** What the row's reference column shows: the source up to its first semicolon, as wattness.tech's list does. */
   cite: string;
+  /** A phase's color, or null for an event (a hollow mark). */
   tone: Tone | null;
-  /** A phase is now while it runs; an event has passed from its minute on. */
-  state: MomentState;
+  /** From the row's minute on. */
+  passed: boolean;
 }
 
 export interface Segment {
@@ -177,7 +193,6 @@ export interface Segment {
   /** Its place in the day's real length, 0..1. */
   from: number;
   to: number;
-  current: boolean;
 }
 
 export interface Tick {
@@ -187,50 +202,41 @@ export interface Tick {
   low: boolean;
 }
 
-export interface MarketDay {
-  /** The start of the current minute, unix seconds: what has passed and what runs hold until the next one. */
+export interface MarketClockState {
+  /** Unix ms the state is for. */
   now: number;
-  /** The CT date now falls on (the Day-Ahead), YYYY-MM-DD. */
+  /** Central wall time, "11:40:07". */
+  wall: string;
+  /** The CT date now falls on (the Day-Ahead), YYYY-MM-DD and "Nov 26". */
   day: string;
-  /** The Operating Day the Day-Ahead's phases are for: the next CT date. */
+  dayShort: string;
+  /** The Operating Day the Day-Ahead's phases are for (the next CT date), YYYY-MM-DD and "Nov 27". */
   operatingDay: string;
-  /** The Day-Ahead's real length, 23, 24 or 25 hours, and where now falls in it, 0..1. */
+  operatingDayShort: string;
+  /** The Day-Ahead's real length, 23, 24 or 25 hours, and where now falls in it, 0..1 (held to the minute). */
   hours: number;
   x: number;
-  phase: {
-    id: string;
-    label: string;
+  phase: Phase & {
     tone: Tone;
-    next: string;
-    end: string;
-    /** Unix seconds the phase ends, and the seconds left to it from the clock's second. */
+    /** Unix ms the phase ends, and the ms left to it. */
     until: number;
     left: number;
-    /** True while the phase ends at the DAM deadline, which carries the one countdown. */
+    /** While offers are due the phase ends at the DAM deadline, which keeps the one countdown. */
     atDeadline: boolean;
   };
+  /** The next DAM transaction deadline, the Operating Day it is for, the ms left, and how near it is. */
+  deadline: { at: number; operatingDay: string; operatingDayShort: string; left: number; urgency: "" | "near" | "urgent" };
+  /** Today's Operating Hour token, "12" (or "2R", the long day's repeated hour). */
+  he: string;
+  /** The next Adjustment Period close: at the top of the clock hour, for the Operating Hour that starts an hour later. */
+  adjustment: { at: number; left: number; he: string; dayShort: string; sameDay: boolean; topHH: string };
   segments: Segment[];
   ticks: Tick[];
-  moments: Moment[];
-  /**
-   * The next DAM transaction deadline (the site's gate), the Operating Day it closes bids for, and the seconds left to
-   * it from the clock's second: the gate tag's countdown.
-   */
-  deadline: { unix: number; operatingDay: string; left: number };
-  /** The next Adjustment Period close: at the top of the hour, for the Operating Hour that starts an hour later. */
-  adjustment: {
-    /** Unix seconds, and the seconds left to it from the clock's second. */
-    closes: number;
-    left: number;
-    /** The hour it closes for, "HE11", and its CT date when that is not today's. */
-    hour: string;
-    day: string | null;
-    /** The Operating Hour now running. */
-    current: string;
-  };
+  rows: Row[];
 }
 
 const HOUR = 3_600_000;
+const MINUTE = 60_000;
 const pad = (n: number) => String(n).padStart(2, "0");
 
 interface Ymd {
@@ -246,13 +252,15 @@ const partsFmt = new Intl.DateTimeFormat("en-US", {
   month: "2-digit",
   day: "2-digit",
   hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
 });
 
-/** The CT date and hour at an instant. */
-function central(ms: number): Ymd & { hour: number } {
+/** The CT date and time at an instant. */
+function central(ms: number): Ymd & { H: number; M: number; S: number } {
   const p: Record<string, number> = {};
   for (const part of partsFmt.formatToParts(new Date(ms))) if (part.type !== "literal") p[part.type] = Number(part.value);
-  return { y: p.year!, m: p.month!, d: p.day!, hour: p.hour! };
+  return { y: p.year!, m: p.month!, d: p.day!, H: p.hour!, M: p.minute!, S: p.second! };
 }
 
 function shift({ y, m, d }: Ymd, n: number): Ymd {
@@ -262,10 +270,9 @@ function shift({ y, m, d }: Ymd, n: number): Ymd {
 
 const isoDay = ({ y, m, d }: Ymd) => `${y}-${pad(m)}-${pad(d)}`;
 
-function parseDay(day: string): Ymd {
-  const [y, m, d] = day.split("-").map(Number) as [number, number, number];
-  return { y, m, d };
-}
+const shortFmt = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+/** "Nov 27", as wattness.tech's clock names a day. */
+export const shortDay = ({ y, m, d }: Ymd): string => shortFmt.format(new Date(Date.UTC(y, m - 1, d)));
 
 /** The instant (ms) a CT wall-clock time happens on a CT date; "24:00" is the next date's midnight. */
 function at(day: Ymd, hhmm: string): number {
@@ -278,62 +285,91 @@ function at(day: Ymd, hhmm: string): number {
 }
 
 /**
- * ERCOT's hour-ending labels for a CT date, in order: 24 of them, 23 on the spring change (no 03), 25 on the fall
- * change, whose repeated hour ERCOT's reports mark 02*.
+ * ERCOT's hour tokens for a CT date, in order, as wattness.tech's clock reads them (lib/hours.ts hourTokens): 24 of
+ * them, 23 on the spring change (no 03), 25 on the fall change, whose repeated hour is 2R (never 02R).
  */
-export function hourLabels(day: string): string[] {
-  const ymd = parseDay(day);
-  const start = at(ymd, "00:00");
-  const n = Math.round((at(ymd, "24:00") - start) / HOUR);
+export function hourTokens(day: string): string[] {
+  const [y, m, d] = day.split("-").map(Number) as [number, number, number];
+  const start = at({ y, m, d }, "00:00");
+  const n = Math.round((at({ y, m, d }, "24:00") - start) / HOUR);
   const out: string[] = [];
+  const seen = new Set<string>();
   for (let i = 0; i < n; i++) {
-    const label = pad(central(start + i * HOUR).hour + 1);
-    out.push(out.includes(label) ? `${label}*` : label);
+    const h = central(start + i * HOUR).H;
+    const plain = pad(h + 1);
+    if (seen.has(plain)) out.push(`${h + 1}R`);
+    else {
+      seen.add(plain);
+      out.push(plain);
+    }
   }
   return out;
 }
 
-/** The hour-ending label of the Operating Hour that starts at or runs through an instant, and its CT date. */
-function operatingHour(ms: number): { label: string; day: string } {
+/** The Operating Hour token for the hour that starts at or runs through an instant, and its CT date. */
+function operatingHour(ms: number): { he: string; day: Ymd } {
   const c = central(ms);
-  const day = isoDay(c);
-  const labels = hourLabels(day);
+  const tokens = hourTokens(isoDay(c));
   const i = Math.floor((ms - at(c, "00:00")) / HOUR);
-  return { label: `HE${labels[Math.min(i, labels.length - 1)]}`, day };
+  return { he: tokens[Math.min(i, tokens.length - 1)]!, day: c };
 }
-
-/** A time left in whole hours and minutes, rounded down, as a countdown reads: 01:08:24 is 1 h 08 min. */
-function hoursMinutes(seconds: number): { h: number; m: number } {
-  const s = Math.max(0, Math.floor(seconds));
-  return { h: Math.floor(s / 3600), m: Math.floor((s % 3600) / 60) };
-}
-
-/** "1 h 08 min", "9 min", and "< 1 min" in the last minute: never more than is left, never 0 min before the moment. */
-export function leftText(seconds: number): string {
-  const { h, m } = hoursMinutes(seconds);
-  if (h) return `${h} h ${pad(m)} min`;
-  return m ? `${m} min` : "< 1 min";
-}
-
-/** The same time in words, for a control's spoken name: "1 hour 8 minutes", "less than a minute". */
-export function leftWords(seconds: number): string {
-  const { h, m } = hoursMinutes(seconds);
-  const unit = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
-  if (!h) return m ? unit(m, "minute") : "less than a minute";
-  return m ? `${unit(h, "hour")} ${unit(m, "minute")}` : unit(h, "hour");
-}
-
-const cite = (source: string) => source.split(/; |\. /)[0]!.trim();
 
 /**
- * The market day at an instant (unix ms). What has passed and what runs hold for the minute. Each time left counts from
- * the clock's second, as the masthead's clock and gate tag show it, so the panel's minutes are the tag's rounded down.
+ * Time left as wattness.tech's clock writes it, rounded down to the second: "22h 19m" from an hour up (the minutes
+ * rounded down), "19:53" under it, "00:00" once it is reached.
  */
-export function marketDayAt(nowMs: number): MarketDay {
-  const t = Math.floor(nowMs / 60_000) * 60_000;
-  const second = Math.floor(nowMs / 1000);
-  const c = central(t);
+export function countdown(ms: number): string {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(s / 3600);
+  return h > 0 ? `${h}h ${pad(Math.floor((s % 3600) / 60))}m` : `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+}
+
+/** The tag's color while offers are due follows the deadline: open, then near in its last hour, urgent in its last 15 minutes. */
+export function tone(id: string, msToDeadline: number): Tone {
+  if (id === "dam-offers-due") {
+    if (msToDeadline < 15 * MINUTE) return "urgent";
+    if (msToDeadline < 60 * MINUTE) return "near";
+    return "open";
+  }
+  if (id === "dam-clearing") return "clear";
+  if (id === "adjustment-period") return "adj";
+  return "post";
+}
+
+/** The deadline's own countdown turns caution, then bad, on the same bounds. */
+function urgency(msToDeadline: number): "" | "near" | "urgent" {
+  if (msToDeadline < 15 * MINUTE) return "urgent";
+  if (msToDeadline < 60 * MINUTE) return "near";
+  return "";
+}
+
+/** "the source up to its first semicolon": what wattness.tech's list prints in its reference column. */
+export const cite = (source: string): string => source.split(";")[0]!;
+
+const readerFmt = new Map<string, Intl.DateTimeFormat>();
+/** A time on the reader's own clock, "00:40", as wattness.tech writes "yours". Undefined: the browser's zone. */
+export function readerTime(ms: number, timeZone?: string): string {
+  const key = timeZone ?? "";
+  let f = readerFmt.get(key);
+  if (!f) {
+    f = new Intl.DateTimeFormat("en-US", { hour: "2-digit", minute: "2-digit", hourCycle: "h23", ...(timeZone ? { timeZone } : {}) });
+    readerFmt.set(key, f);
+  }
+  return f.format(new Date(ms));
+}
+
+/** "10:00" from "10:00", and "00:00" for the next midnight, as the tag's title names a phase's end. */
+export const endTime = (hhmm: string): string => (hhmm === "24:00" ? "00:00" : hhmm);
+
+/**
+ * The market clock at an instant (unix ms), computed as wattness.tech's clock computes it: the phase and the list's
+ * passed rows hold for the minute; every time left counts the milliseconds to its moment, rounded down by countdown().
+ */
+export function marketClockAt(now: number): MarketClockState {
+  const t = Math.floor(now / MINUTE) * MINUTE;
+  const c = central(now);
   const today: Ymd = { y: c.y, m: c.m, d: c.d };
+  const tomorrow = shift(today, 1);
   const start = at(today, "00:00");
   const end = at(today, "24:00");
   const place = (ms: number) => (ms - start) / (end - start);
@@ -341,95 +377,94 @@ export function marketDayAt(nowMs: number): MarketDay {
   const spans = PHASES.map((p) => ({ p, from: at(today, p.start), to: at(today, p.end) }));
   const current = spans.find((s) => s.from <= t && t < s.to) ?? spans[0]!;
 
-  const gate = nextGate(t);
-  const deadline = { unix: gate.unix, operatingDay: gate.operatingDay, left: gate.unix - second };
+  // The DAM transaction deadline that is next, and the Operating Day it is for.
+  const deadlineHHMM = PHASES[0]!.end;
+  const todayDeadline = at(today, deadlineHHMM);
+  const beforeToday = now < todayDeadline;
+  const deadlineAt = beforeToday ? todayDeadline : at(tomorrow, deadlineHHMM);
+  const forDay = beforeToday ? tomorrow : shift(today, 2);
+  const toDeadline = deadlineAt - now;
 
-  const moments: Moment[] = [
+  // Today's Operating Hour, and the Adjustment Period's close at the top of this clock hour for the Operating Hour that
+  // starts one hour later (§2.1). Central time keeps whole-hour offsets, so the top is a whole number of hours from midnight.
+  const idx = Math.floor((now - start) / HOUR);
+  const tokens = hourTokens(isoDay(today));
+  const he = tokens[Math.min(idx, tokens.length - 1)]!;
+  const top = start + (idx + 1) * HOUR;
+  const closesFor = operatingHour(top + HOUR);
+
+  const rows: Row[] = [
     ...spans.map(
-      ({ p, from, to }): Moment => ({
+      ({ p, from }): Row => ({
         key: p.id,
-        kind: "phase",
         at: p.start,
-        unix: from / 1000,
+        ms: from,
         label: p.label,
         firm: p.firm,
         quote: p.quote,
         source: p.source,
         cite: cite(p.source),
-        tone: p.tone,
-        state: to <= t ? "passed" : from <= t ? "now" : "ahead",
+        tone: tone(p.id, Infinity),
+        passed: from <= t,
       }),
     ),
-    ...EVENTS.map((e): Moment => {
+    ...EVENTS.map((e): Row => {
       const when = at(today, e.at);
       return {
         key: e.id,
-        kind: "event",
         at: e.at,
-        unix: when / 1000,
+        ms: when,
         label: e.label,
         firm: e.firm,
         quote: e.quote,
         source: e.source,
         cite: cite(e.source),
         tone: null,
-        state: when <= t ? "passed" : "ahead",
+        passed: when <= t,
       };
     }),
     // A stable sort: at the same minute the phase lists before the event (14:30, DRUC, then the offer cap).
-  ].sort((a, b) => a.unix - b.unix);
-
-  // CT keeps whole-hour offsets, so the top of the next clock hour is a whole number of hours from midnight.
-  const top = start + (Math.floor((t - start) / HOUR) + 1) * HOUR;
-  const after = operatingHour(top + HOUR);
+  ].sort((a, b) => a.ms - b.ms);
 
   return {
-    now: t / 1000,
+    now,
+    wall: `${pad(c.H)}:${pad(c.M)}:${pad(c.S)}`,
     day: isoDay(today),
-    operatingDay: isoDay(shift(today, 1)),
+    dayShort: shortDay(today),
+    operatingDay: isoDay(tomorrow),
+    operatingDayShort: shortDay(tomorrow),
     hours: Math.round((end - start) / HOUR),
     x: place(t),
     phase: {
-      id: current.p.id,
-      label: current.p.label,
-      tone: current.p.tone,
-      next: current.p.next,
-      end: current.p.end,
-      until: current.to / 1000,
-      left: current.to / 1000 - second,
-      atDeadline: current.to / 1000 === deadline.unix,
+      ...current.p,
+      tone: tone(current.p.id, toDeadline),
+      until: current.to,
+      left: current.to - now,
+      atDeadline: current.to === deadlineAt,
+    },
+    deadline: { at: deadlineAt, operatingDay: isoDay(forDay), operatingDayShort: shortDay(forDay), left: toDeadline, urgency: urgency(toDeadline) },
+    he,
+    adjustment: {
+      at: top,
+      left: top - now,
+      he: closesFor.he,
+      dayShort: shortDay(closesFor.day),
+      sameDay: closesFor.day.d === today.d,
+      topHH: pad(central(top).H),
     },
     segments: spans.map(({ p, from, to }) => ({
       id: p.id,
       label: p.label,
-      tone: p.tone,
+      tone: tone(p.id, Infinity),
       start: p.start,
       end: p.end,
       from: place(from),
       to: place(to),
-      current: p.id === current.p.id,
     })),
     ticks: [...new Set([...PHASES.map((p) => p.start), "24:00"])].map((hhmm, i) => ({ at: hhmm, x: place(at(today, hhmm)), low: i % 2 === 1 })),
-    moments,
-    deadline,
-    adjustment: {
-      closes: top / 1000,
-      left: top / 1000 - second,
-      hour: after.label,
-      day: after.day === isoDay(today) ? null : after.day,
-      current: operatingHour(t).label,
-    },
+    rows,
   };
 }
 
-/**
- * The instant to draw the market day for at `nowMs`. What the panel shows changes twice a minute and never between: a
- * moment passes on its minute, and every time left (to a whole minute, from the clock's second) drops a minute one
- * second later. So a minute's first second is drawn at its start and the rest of it one second in, and the panel
- * redraws on those two seconds rather than on every tick.
- */
-export function shownAt(nowMs: number): number {
-  const second = Math.floor(nowMs / 1000);
-  const minute = Math.floor(second / 60) * 60;
-  return (second === minute ? minute : minute + 1) * 1000;
-}
+/** The segments that carry their name on the strip: those of at least 12% of the day, as on wattness.tech. */
+export const LABELED_SHARE = 0.12;

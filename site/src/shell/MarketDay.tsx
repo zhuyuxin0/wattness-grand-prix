@@ -1,17 +1,17 @@
-import { memo, useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { dualTime, formatOperatingDay } from "../lib/time";
 import { Glyph } from "../ui/Glyph";
-import { ADJUSTMENT_CLOSE, EDITION, PHASES, TIME_BASIS, leftText, marketDayAt, shownAt, type Moment } from "./market-day";
+import { EDITION, LABELED_SHARE, PHASES, TIME_BASIS, countdown, marketClockAt, readerTime } from "./market-day";
 import "./market-day.css";
 
-// The market day, opened from the masthead's clock and gate: a popover under the control on a wide screen, a sheet
-// from the foot of a phone. It reads nothing but the clock it is given; the register lives in market-day.ts.
+// The market day, opened from the masthead's wall time and phase tag: wattness.tech's popover (clock.tsx, in its
+// liquid-glass frame from ui/popover.tsx and ui/glass.css) under the clock on a wide screen, a sheet from the foot of a
+// phone. It reads nothing but the clock it is given; the register lives in market-day.ts.
 
 const PHONE = "(max-width: 767px)";
-/** Pixels the popover keeps from the trigger and from the window's edges. */
-const GAP = 6;
-const MARGIN = 12;
+/** Pixels the popover keeps from the clock and from the window's edges, as wattness.tech's top-layer menus do. */
+const GAP = 4;
+const MARGIN = 8;
 
 function useMedia(query: string): boolean {
   const [match, setMatch] = useState(() => window.matchMedia(query).matches);
@@ -25,46 +25,26 @@ function useMedia(query: string): boolean {
   return match;
 }
 
-/**
- * One control's hold on the market day: the props that make it the trigger (Enter and Space open it, as a button's
- * click does) and the close that returns focus to it.
- */
-export function useMarketDay() {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLButtonElement>(null);
-  const id = useId();
-  const close = useCallback((returnFocus: boolean) => {
-    setOpen(false);
-    if (returnFocus) ref.current?.focus({ preventScroll: true });
-  }, []);
-  const trigger = {
-    ref,
-    "aria-haspopup": "dialog" as const,
-    "aria-expanded": open,
-    "aria-controls": open ? id : undefined,
-    onClick: () => setOpen((o) => !o),
-  };
-  return { open, close, trigger, id, ref };
-}
-
 const TABBABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
 
 interface PanelProps {
   id: string;
+  /** The clock: the popover's right edge lines up with its right edge, under it. */
   anchor: RefObject<HTMLElement>;
-  /** Unix ms; the panel redraws only when what it shows changes (shownAt). */
+  /** Whether a press landed on a control that toggles the panel itself. */
+  owns: (target: Node) => boolean;
+  /** Unix ms. */
   now: number;
   onClose: (returnFocus: boolean) => void;
 }
 
-export function MarketDayPanel({ id, anchor, now, onClose }: PanelProps) {
+export function MarketDayPanel({ id, anchor, owns, now, onClose }: PanelProps) {
   const sheet = useMedia(PHONE);
   const opened = useRef(sheet);
   const panel = useRef<HTMLDivElement>(null);
-  const at = shownAt(now);
   const closeBack = useCallback(() => onClose(true), [onClose]);
 
-  // Under the trigger, its right edge on the trigger's, kept inside the window.
+  // Under the clock, its right edge on the clock's, kept inside the window (ui/popover.tsx's place()).
   useLayoutEffect(() => {
     const p = panel.current;
     if (!p || sheet) return;
@@ -73,15 +53,20 @@ export function MarketDayPanel({ id, anchor, now, onClose }: PanelProps) {
       if (!a) return;
       const r = a.getBoundingClientRect();
       const vw = document.documentElement.clientWidth;
-      const top = Math.round(r.bottom + GAP);
-      p.style.top = `${top}px`;
-      p.style.left = `${Math.round(Math.max(MARGIN, Math.min(r.right - p.offsetWidth, vw - p.offsetWidth - MARGIN)))}px`;
-      p.style.maxHeight = `${Math.max(200, window.innerHeight - top - MARGIN)}px`;
+      const vh = document.documentElement.clientHeight;
+      const w = p.offsetWidth;
+      const h = p.offsetHeight;
+      p.style.left = `${Math.round(Math.max(MARGIN, Math.min(r.right - w, vw - w - MARGIN)))}px`;
+      p.style.top = `${Math.round(Math.max(MARGIN, Math.min(r.bottom + GAP, vh - h - MARGIN)))}px`;
+      p.style.maxWidth = `${Math.max(0, vw - 2 * MARGIN)}px`;
     };
     place();
+    const size = new ResizeObserver(place);
+    size.observe(p);
     window.addEventListener("resize", place);
     window.addEventListener("scroll", place, { passive: true });
     return () => {
+      size.disconnect();
       window.removeEventListener("resize", place);
       window.removeEventListener("scroll", place);
     };
@@ -141,7 +126,7 @@ export function MarketDayPanel({ id, anchor, now, onClose }: PanelProps) {
     // A press anywhere else closes the popover where it lands; the sheet's scrim closes the sheet.
     const press = (e: PointerEvent) => {
       const target = e.target as Node;
-      if (p.contains(target) || anchor.current?.contains(target)) return;
+      if (p.contains(target) || owns(target)) return;
       onClose(false);
     };
     document.addEventListener("keydown", key);
@@ -150,42 +135,39 @@ export function MarketDayPanel({ id, anchor, now, onClose }: PanelProps) {
       document.removeEventListener("keydown", key);
       document.removeEventListener("pointerdown", press, true);
     };
-  }, [sheet, onClose, anchor]);
+  }, [sheet, onClose, owns]);
 
   const titleId = `${id}-title`;
-  const body = <MarketDayBody at={at} titleId={titleId} onClose={closeBack} />;
   return createPortal(
     sheet ? (
       <div className="gate-sheet">
         <div className="gate-sheet__scrim" onClick={closeBack} aria-hidden="true" />
-        <div ref={panel} id={id} className="gate-day gate-day--sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
-          {body}
+        <div ref={panel} id={id} className="mc-sheet" role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
+          <MarketDayBody now={now} titleId={titleId} onClose={closeBack} sheet />
         </div>
       </div>
     ) : (
-      <div ref={panel} id={id} className="gate-day gate-day--pop" role="dialog" aria-labelledby={titleId} tabIndex={-1}>
-        {body}
+      <div ref={panel} id={id} className="mc-host" role="dialog" aria-labelledby={titleId} tabIndex={-1}>
+        <span className="mc-bezel" aria-hidden="true" />
+        <div className="mc-pop">
+          <MarketDayBody now={now} titleId={titleId} onClose={closeBack} sheet={false} />
+        </div>
       </div>
     ),
     document.body,
   );
 }
 
-const hm = { date: false, seconds: false } as const;
-
-/** "Nov 27" */
-const shortDay = (day: string) => formatOperatingDay(day).replace(/^\w+, /, "").replace(/, \d{4}$/, "");
-
 /**
- * A label is drawn on a stretch of the bar only where it fits (the hour of DAM results is 4% of the day); the list
- * below names every stretch. Measured again when the bar's width or the day's length changes.
+ * On the phone's sheet a stretch keeps its name only where the name fits whole (wattness.tech's popover is never that
+ * narrow); elsewhere the 12% rule alone decides, as there. Measured again when the strip's width changes.
  */
-function useFittedLabels(strip: RefObject<HTMLElement>, day: string) {
+function useFittedLabels(strip: RefObject<HTMLElement>, on: boolean) {
   useLayoutEffect(() => {
     const el = strip.current;
-    if (!el) return;
+    if (!el || !on) return;
     const fit = () => {
-      for (const label of el.querySelectorAll<HTMLElement>(".gate-day__seg-label")) {
+      for (const label of el.querySelectorAll<HTMLElement>(".mc-seg > span")) {
         label.hidden = false;
         label.hidden = label.scrollWidth > label.clientWidth + 1;
       }
@@ -194,122 +176,91 @@ function useFittedLabels(strip: RefObject<HTMLElement>, day: string) {
     const watch = new ResizeObserver(fit);
     watch.observe(el);
     return () => watch.disconnect();
-  }, [strip, day]);
+  }, [strip, on]);
 }
 
-const MarketDayBody = memo(function MarketDayBody({ at, titleId, onClose }: { at: number; titleId: string; onClose: () => void }) {
-  const day = marketDayAt(at);
-  const strip = useRef<HTMLDivElement>(null);
-  useFittedLabels(strip, day.day);
-
-  const now = dualTime(day.now, hm);
-  const deadline = dualTime(day.deadline.unix, hm);
-  const adjust = dualTime(day.adjustment.closes, hm);
-  const late = day.deadline.left <= 600;
-  const yours = day.moments.map((m) => dualTime(m.unix, hm).yours);
+function MarketDayBody({ now, titleId, onClose, sheet }: { now: number; titleId: string; onClose: () => void; sheet: boolean }) {
+  const s = marketClockAt(now);
+  const strip = useRef<HTMLSpanElement>(null);
+  useFittedLabels(strip, sheet);
   const bids = PHASES[0]!;
+
+  const title = (
+    <span id={titleId} className="mc-pop-h">
+      The day before Operating Day {s.operatingDayShort} · Central time
+    </span>
+  );
 
   return (
     <>
-      <div className="gate-day__head">
-        <h2 id={titleId} className="gate-day__title">
-          The day before Operating Day {formatOperatingDay(day.operatingDay)}
-          <span className="gate-day__zone"> · Central time</span>
-        </h2>
-        <button type="button" className="btn gate-day__close" onClick={onClose} aria-label="Close the market day" title="Close (Esc)">
-          <Glyph name="close" />
-        </button>
-      </div>
-
-      {/* The spaces between the flex items are for reading aloud; the gap does the layout. */}
-      <p className="gate-day__now" title={`Next: ${day.phase.next}.`}>
-        <span className="gate-day__now-at">
-          Now <span className="num">{now.ct}</span>
-          {now.yours && <span className="gate-day__muted num"> · {now.yours}</span>}
-        </span>{" "}
-        <span className={`gate-day__phase gate-day__tone--${day.phase.tone}`}>{day.phase.label}</span>{" "}
-        <span>
-          until <span className="num">{day.phase.end} CT</span>
-          {!day.phase.atDeadline && (
-            <>
-              {" · "}
-              <span className="gate-day__left num">{leftText(day.phase.left)} left</span>
-            </>
-          )}
-        </span>
-      </p>
-
-      {/* The list below says all of this in words; the bar is its picture. */}
-      <div className="gate-day__bar" aria-hidden="true">
-        <div className="gate-day__track">
-          <div className="gate-day__strip" ref={strip}>
-            {day.segments.map((s) => (
-              <span
-                key={s.id}
-                className={`gate-day__seg gate-day__tone--${s.tone}`}
-                style={{ left: `${s.from * 100}%`, width: `${(s.to - s.from) * 100}%` }}
-                title={`${s.start}–${s.end} CT ${s.label}`}
-              >
-                <span className="gate-day__seg-label">{s.label}</span>
-              </span>
-            ))}
-          </div>
-          <span className="gate-day__marker" style={{ left: `${day.x * 100}%` }} />
+      {sheet ? (
+        <div className="mc-sheet__head">
+          {title}
+          <button type="button" className="btn mc-sheet__close" onClick={onClose} aria-label="Close the market day" title="Close (Esc)">
+            <Glyph name="close" />
+          </button>
         </div>
-        <div className="gate-day__ticks">
-          {day.ticks.map((t) => (
-            <span key={t.at} className={`num${t.low ? " gate-day__tick--low" : ""}`} style={{ left: `${t.x * 100}%` }}>
-              {t.at}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <ol className={`gate-day__list${yours.some(Boolean) ? "" : " gate-day__list--ct"}`}>
-        {day.moments.map((m, i) => (
-          <MomentRow key={m.key} m={m} yours={yours[i] ?? null} />
+      ) : (
+        title
+      )}
+      {/* The list below says all of this in words; the strip is its picture. The now line is drawn last, over the
+          stretches and their names, unbroken. */}
+      <span className="mc-strip" ref={strip} aria-hidden="true">
+        {s.segments.map((g) => (
+          <span
+            key={g.id}
+            className={`mc-seg mc-${g.tone}`}
+            style={{ left: `${g.from * 100}%`, width: `${(g.to - g.from) * 100}%` }}
+            title={`${g.start}–${g.end} ${g.label}`}
+          >
+            {g.to - g.from >= LABELED_SHARE ? <span>{g.label}</span> : null}
+          </span>
         ))}
-      </ol>
-
-      <div className="gate-day__deadlines">
-        <p title={`“${bids.quote}”\n— ${bids.source}`}>
-          DAM deadline for Operating Day {formatOperatingDay(day.deadline.operatingDay)}: <b className="num">{deadline.ct}</b>
-          {deadline.yours && <span className="num"> · {deadline.yours}</span>}
-          {" · "}
-          <b className={`gate-day__left num${late ? " gate-day__late" : ""}`}>{leftText(day.deadline.left)} left</b>.
-        </p>
-        <p title={`“${ADJUSTMENT_CLOSE.quote}”\n— ${ADJUSTMENT_CLOSE.source}`}>
-          Adjustments for {day.adjustment.hour}
-          {day.adjustment.day && ` (${shortDay(day.adjustment.day)})`} close at <b className="num">{adjust.ct}</b>
-          {adjust.yours && <span className="num"> · {adjust.yours}</span>}
-          {" · "}
-          <b className="gate-day__left num">{leftText(day.adjustment.left)} left</b>. Current Operating Hour: {day.adjustment.current}.
-        </p>
-      </div>
-      <p className="gate-day__foot">
+        <span className="mc-now" style={{ left: `${s.x * 100}%` }} />
+      </span>
+      {/* Every boundary gets its time, on two alternating rows so 13:30 and 14:30, an hour apart, never print over each
+          other. */}
+      <span className="mc-ticks" aria-hidden="true">
+        {s.ticks.map((t) => (
+          <span key={t.at} className={t.low ? "mc-tick-low" : ""} style={{ left: `${t.x * 100}%` }}>
+            {t.at}
+          </span>
+        ))}
+      </span>
+      <table className="mc-list">
+        <tbody>
+          {s.rows.map((r) => (
+            <tr key={r.key} className={r.passed ? "mc-passed" : ""} title={`"${r.quote}"\n— ${r.source}`}>
+              <td className="mc-at">
+                <span className={`mc-swatch ${r.tone ? `mc-${r.tone}` : "mc-event"}`} />
+                {r.at}
+              </td>
+              <td>{r.passed ? "passed" : "ahead"}</td>
+              <td>
+                {r.label}
+                {r.firm ? "" : <em> (a figure, not a rule)</em>}
+              </td>
+              <td className="mc-src">{r.cite}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <span className="mc-pop-deadlines">
+        <span>
+          DAM deadline for Operating Day {s.deadline.operatingDayShort}: {bids.end} CT{" · "}
+          {readerTime(s.deadline.at)} yours{" · "}
+          {countdown(s.deadline.left)} left.
+        </span>
+        <span>
+          Adjustments for HE{s.adjustment.he}
+          {s.adjustment.sameDay ? "" : ` (${s.adjustment.dayShort})`} close at {s.adjustment.topHH}:00 CT{" · "}
+          {readerTime(s.adjustment.at)} yours{" · "}
+          {countdown(s.adjustment.left)} left. Current Operating Hour: HE{s.he}.
+        </span>
+      </span>
+      <span className="mc-foot">
         {EDITION}. {TIME_BASIS}
-      </p>
+      </span>
     </>
-  );
-});
-
-function MomentRow({ m, yours }: { m: Moment; yours: string | null }) {
-  return (
-    <li className={`gate-day__moment gate-day__moment--${m.state}`} aria-current={m.state === "now" ? "step" : undefined} title={`“${m.quote}”\n— ${m.source}`}>
-      <span className="gate-day__at">
-        <i className={`gate-day__swatch ${m.tone ? `gate-day__tone--${m.tone}` : "gate-day__swatch--event"}`} aria-hidden="true" />
-        <span className="num">{m.at}</span>
-        <span className="visually-hidden"> CT</span>
-      </span>
-      <span className="gate-day__yours num">{yours ?? ""}</span>
-      <span className="gate-day__state">{m.state}</span>
-      <span className="gate-day__what">
-        <span className="gate-day__label">
-          {m.label}
-          {!m.firm && <em> (a figure, not a rule)</em>}
-        </span>{" "}
-        <span className="gate-day__cite">{m.cite}</span>
-      </span>
-    </li>
   );
 }
