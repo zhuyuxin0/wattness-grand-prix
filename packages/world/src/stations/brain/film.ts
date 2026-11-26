@@ -15,7 +15,7 @@ export const BRAIN_KEYS = {
   'team-brain': { frame: 'brain.sequence', local: T.lb2, part: 'III', name: 'Combined into one team brain', term: null, tab: 'memory' },
   'across-brains': { frame: 'brain.sequence', local: T.lb3, part: 'III', name: 'Linked across brains by Living Brain', term: null, tab: 'memory' },
   // the master's and the 90-second cut's beat: the combined brain on its own short clock (moments.ts T_SHARED)
-  'shared-memory': { frame: 'brain.shared', local: T_SHARED.lb3, part: 'III', name: 'Shared memory: our three brains in Living Brain', term: 'team data', tab: 'memory' },
+  'shared-memory': { frame: 'brain.shared', local: T_SHARED.lb3, part: 'III', name: 'Memory: our three brains in Living Brain', term: 'team data', tab: 'memory' },
   'grand-prix-brain': { frame: 'brain.sequence', local: T.lb4, part: 'III', name: 'Inside the Grand Prix brain', term: null, tab: 'memory' },
   'one-page': { frame: 'brain.sequence', local: T.lb5, part: 'III', name: 'One page and its connections', term: null, tab: 'memory' },
   'page-across': { frame: 'brain.sequence', local: T.lb6, part: 'III', name: 'The same page across brains', term: null, tab: 'memory' },

@@ -9,12 +9,11 @@ import { BrainWorld, restPose, REST, type WorldPose } from './world';
 import { FilmClock, T, T_SHARED, acrossLanded, COUNTS, type Moments } from './clock';
 import { BrainBloomPass } from './bloom';
 import { Chrome, memberScreen, memberScreenAt, projectorFor, projectorNow, restCamera, type TagSpec } from './tags';
-import { SCENE, BRAINS, BRAIN_IDS, brainOf, linksOf, acrossOf, ctShort, fmt, page, type BrainId } from './data';
+import { SCENE, BRAINS, BRAIN_IDS, brainOf, linksOf, acrossOf, fmt, page, scopeLine, type BrainId } from './data';
 import { assignLayers } from '../../lib/stage';
 import { interfaceFrame, HAS_RECORDING } from './interface';
+import { inFilm } from '../../lib/yours';
 
-/** The scope line on every frame of our scene. */
-export const SCOPE = `Living Brain: our three brains, drawn from its API · read ${ctShort(SCENE.source.crossChecked)}`;
 /** What is data and what is design, for every frame's note. */
 const NOTE_DATA = `Data, from brain-scene.json (made by make-scene-data.py from build-brain.json, sha256 ${SCENE.source.sha256.slice(0, 12)}…, read ${SCENE.source.read.ct}, across links read ${SCENE.source.crossChecked.ct}): which brains and their colors (Living Brain's member order), every page dot with its number (its place in Living Brain's node order in its own brain) and title, every connection and its strength (similarity), the ${SCENE.combined.across} connections across brains and when each was made, the conflict, the counts.`;
 const NOTE_DESIGN = 'Design, as in Living Brain, encoding nothing: the brain shape (our own field, shape.ts), the particles and where they sit, the core, the motes, the filaments, the orbit lights, the camera and the motion.';
@@ -89,7 +88,7 @@ async function brainFrame(ctx: FrameContext, time: number, o: { caption?: string
       chrome.member(b, { name: ms.name, detail: ms.detail }, { name: w.members[b].name * shown(`mn:${b}`), detail: w.members[b].detail * shown(`md:${b}`) });
     }
     chrome.hud(w.hud);
-    chrome.scope(SCOPE);
+    chrome.scope(scopeLine(inFilm(ctx.overlay)));
     const card = w.card;
     if (card) {
       const s = project(card.cloud, card.index);
@@ -257,7 +256,7 @@ const moment = (time: number, row: string, caption: string) => async (ctx: Frame
 
 export const frames: StationModule['frames'] = {
   // the film's frame: the whole clock; the story's keys rest on it at their local times
-  'brain.sequence': async (ctx) => { readReview(ctx); return brainFrame(ctx, T.lb3, { caption: 'Shared memory', row: 'LB3' }); },
+  'brain.sequence': async (ctx) => { readReview(ctx); return brainFrame(ctx, T.lb3, { caption: 'Memory', row: 'LB3' }); },
   'brain.three': moment(T.lb1, 'LB1', 'Three brains'),
   'brain.combined': moment(T.lb2, 'LB2', 'One team brain'),
   'brain.links': moment(T.lb3, 'LB3', 'Connections across brains'),
@@ -266,7 +265,7 @@ export const frames: StationModule['frames'] = {
   'brain.across': moment(T.lb6, 'LB6', 'Across brains'),
   'brain.review': moment(T.lb7, 'LB7', 'Remember and retrieve'),
   // the master's and the 90-second cut's beat: the combined brain on a short clock of its own (moments.ts T_SHARED)
-  'brain.shared': async (ctx) => { readReview(ctx); return brainFrame(ctx, T_SHARED.lb3, { caption: 'Shared memory', moments: T_SHARED, line: `Living Brain holds three of our brains: ${fmt(COUNTS.pages)} pages, linked by ${COUNTS.across} connections across them.` }); },
+  'brain.shared': async (ctx) => { readReview(ctx); return brainFrame(ctx, T_SHARED.lb3, { caption: 'Memory', moments: T_SHARED, line: `Living Brain holds three of our brains: ${fmt(COUNTS.pages)} pages, linked by ${COUNTS.across} connections across them.` }); },
   'brain.calibrate': async (ctx) => brainFrame(ctx, 31.0, { calibrate: true }),
   // the silhouette checks (SPEC 7.3): the same brain from its left side and from the front, level
   'brain.calibrate-side': async (ctx) => brainFrame(ctx, 31.0, { calibrate: true, view: { az: 270, el: 0 } }),

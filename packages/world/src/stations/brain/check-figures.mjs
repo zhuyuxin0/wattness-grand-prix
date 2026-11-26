@@ -94,6 +94,9 @@ if (port) {
         .filter((e) => e.childElementCount === 0 || e.classList.contains('v') || e.classList.contains('s'))
         .filter((e) => { const st = getComputedStyle(e); return st.visibility !== 'hidden' && Number(st.opacity) > 0.02 && e.closest('[style*="opacity: 0;"]') == null; })
         .map((e) => e.textContent).join(' | ')).join(' | '));
+      // the scope line's reader's own clock beside CT (data.ts scopeLine, lib/yours.ts): the read's stamp in the page's zone
+      const zone = await page.evaluate(() => Intl.DateTimeFormat().resolvedOptions().timeZone);
+      if (scene.source.crossChecked.utc) times.add(new Intl.DateTimeFormat('en-US', { timeZone: zone, hourCycle: 'h23', hour: '2-digit', minute: '2-digit' }).format(new Date(scene.source.crossChecked.utc)));
       const nums = [...text.matchAll(/\d{1,2}:\d{2}(?::\d{2})?|\d[\d,]*/g)].map((m) => m[0]);
       const bad = nums.filter((n) => (n.includes(':') ? !times.has(n) : !allowed.has(n.replace(/,/g, '')) && !titleNums.has(n)));
       frames.push({ id, numbers: nums.length, bad });
