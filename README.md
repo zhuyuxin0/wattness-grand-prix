@@ -94,6 +94,8 @@ GateRecord is `0x2922c68cE15EB3e83B7f43b136e981dDc4262876`, one address on BSC m
 
 ## Sponsor tracks
 
+**The films:** one per sponsor track, in one playlist on YouTube: [Wattness Grand Prix at BNB Bangkok](https://www.youtube.com/playlist?list=PLCw_WaKL-vB4).
+
 
 <table>
 <tr>
