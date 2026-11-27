@@ -18,12 +18,12 @@
 
 **Judges' path**
 
-<!-- VIDEO-TODO(developer): replace the link below with the demo film's YouTube URL; then add item 1, "Watch the demo (under 3 minutes)", linking the same URL. -->
-<!-- FILM-LINK-PENDING <p align="center"><a href="https://youtu.be/VIDEO-TODO-developer"><img src="docs/media/video-developer.jpg" alt="Watch the demo film of Wattness Grand Prix" width="88%"></a></p> -->
+<p align="center"><a href="https://youtu.be/Jj-pQoyrkDU"><img src="docs/media/video-developer.jpg" alt="Watch the demo film of Wattness Grand Prix" width="88%"></a></p>
 
-1. **Open the site:** [gp.wattness.tech](https://gp.wattness.tech). It opens on a 3D introduction to one operating day; the [Overview](https://gp.wattness.tech/overview) and the tabs beside it hold every battery's plan, the agents, the seal and the checks.
-2. **See the Nov 27 seal on BSC mainnet:** [transaction 0xd6ce6ebd…f853dbef](https://bscscan.com/tx/0xd6ce6ebdd4f70dfe3aafae5fb76f014152f10a9f3a6c83d52362954cf853dbef). 316 plans under one root, committed 1 h 49 min before the gate, each plan carrying Cournot's weather probability.
-3. **Check a plan in one click:** [Desert Willow's Nov 26 plan against BSC mainnet](https://grand-prix-edge.wattness.workers.dev/verify/DSWL_ESS_ESR1?od=2026-11-26&network=bsc-mainnet), checked at the edge (proof, record and gate, each `pass`), or on the [Verify tab](https://gp.wattness.tech/verify). From a clone, [one command](#run-it) runs every check, with no key and no wallet.
+1. **Watch the demo (under 3 minutes):** [the film on YouTube](https://youtu.be/Jj-pQoyrkDU): the 3D story, then every tab of the site in use, and where it goes.
+2. **Open the site:** [gp.wattness.tech](https://gp.wattness.tech). It opens on a 3D introduction to one operating day; the [Overview](https://gp.wattness.tech/overview) and the tabs beside it hold every battery's plan, the agents, the seal and the checks.
+3. **See the Nov 27 seal on BSC mainnet:** [transaction 0xd6ce6ebd…f853dbef](https://bscscan.com/tx/0xd6ce6ebdd4f70dfe3aafae5fb76f014152f10a9f3a6c83d52362954cf853dbef). 316 plans under one root, committed 1 h 49 min before the gate, each plan carrying Cournot's weather probability.
+4. **Check a plan in one click:** [Desert Willow's Nov 26 plan against BSC mainnet](https://grand-prix-edge.wattness.workers.dev/verify/DSWL_ESS_ESR1?od=2026-11-26&network=bsc-mainnet), checked at the edge (proof, record and gate, each `pass`), or on the [Verify tab](https://gp.wattness.tech/verify). From a clone, [one command](#run-it) runs every check, with no key and no wallet.
 
 <p align="center">
   <a href="https://gp.wattness.tech"><img src="docs/media/desert-willow-3d.jpg" alt="Chapter 01 of the 3D introduction: Desert Willow at night, 150 MW and 338.307 MWh in Ellis County, Texas: 65 battery enclosures, 36 inverter and transformer skids, its substation and the line to the grid" width="32%"></a>
@@ -112,7 +112,7 @@ GateRecord is `0x2922c68cE15EB3e83B7f43b136e981dDc4262876`, one address on BSC m
 
 | Track | What it does here | Proof | One page | Film |
 |---|---|---|---|---|
-| BNB Chain (Developer Track) | The record on BSC mainnet and testnet, the files on BNB Greenfield, seven agent identities and their paid jobs | [Nov 27 seal](https://bscscan.com/tx/0xd6ce6ebdd4f70dfe3aafae5fb76f014152f10a9f3a6c83d52362954cf853dbef) | [bnb-chain.md](docs/sponsors/bnb-chain.md) | — |
+| BNB Chain (Developer Track) | The record on BSC mainnet and testnet, the files on BNB Greenfield, seven agent identities and their paid jobs | [Nov 27 seal](https://bscscan.com/tx/0xd6ce6ebdd4f70dfe3aafae5fb76f014152f10a9f3a6c83d52362954cf853dbef) | [bnb-chain.md](docs/sponsors/bnb-chain.md) | [Watch, 2:58](https://youtu.be/Jj-pQoyrkDU) |
 | Flap | A season token that launches only once a named agent's plan is sealed before its gate | [Round 3 launch](https://testnet.bscscan.com/tx/0x4881264736e39903dd28eadd23602d8d710c558055be4f2f74db9d5eeb872429) | [flap.md](docs/sponsors/flap.md) | [Watch, 1:42](https://youtu.be/-BQ1hzr93EM) |
 | OpenFour (Four.meme) | A launch that graduates only once the agent's sealed record is bound to it | [Graduation](https://testnet.bscscan.com/tx/0xc549f6e5a6598ba308e6ecb837cf0da2a6fa23c1d72a6e40065df4c585af5330) | [openfour.md](docs/sponsors/openfour.md) | [Watch, 2:02](https://youtu.be/MKUSWZ3LxvQ) |
 | CoinMarketCap × Atlas | Signed prices that decide what checking the plans costs | [Signed Atlas report](site/public/data/prices.json) | [coinmarketcap-atlas.md](docs/sponsors/coinmarketcap-atlas.md) | [Watch, 1:08](https://youtu.be/YsGXH2I-JPk) |
@@ -150,7 +150,6 @@ Flap's Pool Launch Portal launches tokens through Launcher Factories. Ours launc
 - **The launch UI.** The Wattness Season Mini App, built from Flap's vault component template and [open on Flap's host](https://utter.cash/apps/wattness-season?artifactPath=vaultui_wattness-season_01M8B7TYBFEQE0QK4PP4DFY5E6%2Fv20261126132700625_wattness-season_b2e5ede52980&lang=en), is round 3's launch UI and reads the round live from BSC testnet; the [Season Token tab](https://gp.wattness.tech/markets/season) reads rounds 1 and 3.
 - **Code.** [`modules/flap`](modules/flap) holds the Launcher, the Vault and their factories, tested against a stand-in Portal and the real GateRecord; [`packages/adapters/flap`](packages/adapters/flap) holds the read clients.
 
-<!-- VIDEO-TODO(flap): replace the link below with the film's YouTube URL. -->
 <a href="https://youtu.be/-BQ1hzr93EM"><img src="docs/media/video-flap.jpg" alt="Watch the Flap film: the Season Token" width="440"></a>
 
 ### OpenFour (Four.meme)
@@ -164,7 +163,6 @@ OpenFour, Four.meme's open launch framework, builds each launch from swappable m
 - **On BSC testnet.** The sold-out launch's graduation was [refused](https://testnet.bscscan.com/tx/0x219f25a2b86a8a73595911f40dd81f072655bd6711fdd4eb6b8108b6a733686e) with `EvidenceMissing`. The Nov 26 record was then [bound](https://testnet.bscscan.com/tx/0xd100cfa2402baaeec7de4545deedec2f72d238bbb53ec3fc34753d93718a1128), and the launch [graduated](https://testnet.bscscan.com/tx/0xc549f6e5a6598ba308e6ecb837cf0da2a6fa23c1d72a6e40065df4c585af5330) into its PancakeSwap V2 pair. Preset `1795634196178`; module `0xfc2E00dCfC39C71F97Ce0e6ba9C52717Ed8fbA8e`; PLNR `0xB1e792b2C6Bf7Ae7A1D972af313442039422ef14`.
 - **Interface and code.** The [Launchpad tab](https://gp.wattness.tech/markets/launchpad) reads the launch with view calls. [`modules/openfour`](modules/openfour) holds the module, its tests on Hardhat against the real GateRecord, the launch runner and the read client.
 
-<!-- VIDEO-TODO(openfour): replace the link below with the film's YouTube URL. -->
 <a href="https://youtu.be/MKUSWZ3LxvQ"><img src="docs/media/video-openfour.jpg" alt="Watch the OpenFour film: the evidence-gated launch" width="440"></a>
 
 ### CoinMarketCap × Atlas
@@ -184,7 +182,6 @@ The plans themselves are valued only at ERCOT's prices; these prices decide what
 <p align="center"><a href="https://gp.wattness.tech/seal"><img src="docs/media/seal-cost.png" alt="The Seal tab's What the Seal Cost: sealing all 316 plans for Nov 27 took 172,209 gas at 0.05 gwei, 0.00000861045 BNB, priced in dollars with Atlas's BNB/USD feed read live from BNB Smart Chain" width="100%"></a></p>
 <p align="center"><sub>The Seal tab prices the Nov 27 seal's gas in dollars with Atlas's BNB/USD feed, read live from BNB Smart Chain</sub></p>
 
-<!-- VIDEO-TODO(coinmarketcap-atlas): replace the link below with the film's YouTube URL. -->
 <a href="https://youtu.be/YsGXH2I-JPk"><img src="docs/media/video-coinmarketcap-atlas.jpg" alt="Watch the CoinMarketCap and Atlas film" width="440"></a>
 
 ### Living Brain (ChatAndBuild)
@@ -199,7 +196,6 @@ Living Brain is the agents' persistent memory, reached through its API: a review
 - **Connect.** Living Brain links pages within and across brains. The [Memory tab](https://gp.wattness.tech/agents/memory) shows three: the build's own (123 pages, 276 connections), the Terminal's (18 pages, 53 connections) and Desert Willow's review brain, 142 pages in all with 55 links across brains.
 - **The run** (Nov 25, 10:58 CT / 23:58 Bangkok). Two captures for Desert Willow; a fresh client retrieved page `dswl-ess-esr1`, version 2, and cited it. Its review of the plan's hedge moved from "needs-supported-review" to "assumed-entry-scenario": the second interaction knew the reviewed rule, that the hedge's entry is assumed at the model's fair value, so the result is a scenario comparison and not a trade. Code: [`packages/adapters/living-brain`](packages/adapters/living-brain).
 
-<!-- VIDEO-TODO(living-brain): replace the link below with the film's YouTube URL. -->
 <a href="https://youtu.be/KLQ_pEghhjw"><img src="docs/media/video-living-brain.jpg" alt="Watch the Living Brain film: memory that remembers, retrieves and connects" width="440"></a>
 
 ### Cournot
@@ -209,7 +205,6 @@ Living Brain is the agents' persistent memory, reached through its API: a review
 
 Cournot's Intelligence Oracle gives the risk officer one probability before the gate: the odds, from Kalshi's market, that the Dallas–Fort Worth low falls below 29°F. Wattness's declared rule turns it into the weight on each battery's stress scenarios and the hourly hedge cap, and the response's SHA-256 is sealed in every Nov 27 plan on BSC mainnet. The five items the track asks for are in [Cournot Integration](#cournot-integration).
 
-<!-- VIDEO-TODO(cournot): replace the link below with the film's YouTube URL. -->
 <a href="https://youtu.be/bRecEqEVoOw"><img src="docs/media/video-cournot.jpg" alt="Watch the Cournot film: weather odds sealed in every plan" width="440"></a>
 
 ## Cournot Integration

@@ -2,8 +2,7 @@
 
 <p align="center"><img src="../media/bnb-chain-verify.gif" alt="Verify against BSC mainnet: with one hourly value of Desert Willow's Nov 27 plan changed, 2 of 5 checks pass and the changed field is named; as sealed, 5 of 5 pass" width="100%"></p>
 
-<!-- VIDEO-TODO(developer): replace the link below with the film's YouTube URL. -->
-<!-- FILM-LINK-PENDING <a href="https://youtu.be/VIDEO-TODO-developer"><img src="../media/video-developer.jpg" alt="Watch the demo film of Wattness Grand Prix" width="440"></a> -->
+<a href="https://youtu.be/Jj-pQoyrkDU"><img src="../media/video-developer.jpg" alt="Watch the demo film of Wattness Grand Prix" width="440"></a>
 
 BNB Smart Chain keeps the record, BNB Greenfield keeps the files, and the BNB Agent SDK and BNB Agent Studio give the agents their identities and paid jobs. Before ERCOT's 10:00 CT day-ahead gate, six agents plan the next day for every ERCOT battery with complete public data (316 on Nov 26: 20.8 GW and 44.3 GWh in all), and one transaction seals all the plans under one root in GateRecord on BSC mainnet, with the same root on BSC testnet. The contract computes the gate itself and refuses a late or a second record. Anyone can check any battery's plan against the chain.
 

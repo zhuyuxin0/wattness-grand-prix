@@ -2,7 +2,6 @@
 
 <p align="center"><img src="../media/cournot-weather-odds.gif" alt="The Forecast tab's Weather Odds from Cournot: the rule, the reading sealed into the Nov 27 plans, and Check it, which hashes the saved response in the browser" width="100%"></p>
 
-<!-- VIDEO-TODO(cournot): replace the link below with the film's YouTube URL. -->
 <a href="https://youtu.be/bRecEqEVoOw"><img src="../media/video-cournot.jpg" alt="Watch the Cournot film: weather odds sealed in every plan" width="440"></a>
 
 Cournot's Intelligence Oracle gives the planner one outside view before the market's gate: the odds, from Kalshi's market, that the Dallas–Fort Worth low falls below 29°F. Wattness's declared rule turns that probability into the weight on each battery's stress scenarios and the hourly hedge cap, and the response's SHA-256 is sealed in every Nov 27 plan on BSC mainnet. Code: [`packages/adapters/cournot`](../../packages/adapters/cournot) and the rule, [`packages/core/src/weather.ts`](../../packages/core/src/weather.ts).
