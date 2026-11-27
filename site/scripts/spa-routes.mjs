@@ -75,7 +75,10 @@ export function pageFor(html, tab) {
   if (!tab || tab.path === "/") return html;
   const title = attr(`${tab.label} · ${PRODUCT_NAME}`);
   const titled = once(html, /<title>[^<]*<\/title>/, () => `<title>${title}</title>`, "titles");
-  return once(titled, /(<meta\s+name="description"\s+content=")[^"]*(")/, (_, open, close) => `${open}${attr(tab.summary)}${close}`, "descriptions");
+  const described = once(titled, /(<meta\s+name="description"\s+content=")[^"]*(")/, (_, open, close) => `${open}${attr(tab.summary)}${close}`, "descriptions");
+  // the link preview's title and text follow the tab's, so a shared link to a tab unfurls as that tab
+  const ogTitled = once(described, /(<meta\s+property="og:title"\s+content=")[^"]*(")/, (_, open, close) => `${open}${title}${close}`, "og:titles");
+  return once(ogTitled, /(<meta\s+property="og:description"\s+content=")[^"]*(")/, (_, open, close) => `${open}${attr(tab.summary)}${close}`, "og:descriptions");
 }
 
 /** Writes 404.html and every path's files into dist; returns the counts. */

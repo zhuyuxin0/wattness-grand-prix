@@ -79,7 +79,14 @@ test("a tab's copy carries its title and summary, and nothing else changes", () 
   const page = pageFor(html, verify);
   assert.ok(page.includes(`<title>Verify · ${PRODUCT_NAME}</title>`));
   assert.ok(page.includes(`content="${verify.summary}"`));
-  const strip = (s) => s.replace(/<title>[^<]*<\/title>/, "").replace(/(name="description"\s+content=")[^"]*"/, "$1\"");
+  assert.ok(page.includes(`property="og:title" content="Verify · ${PRODUCT_NAME}"`));
+  assert.ok(page.includes(`property="og:description" content="${verify.summary}"`));
+  const strip = (s) =>
+    s
+      .replace(/<title>[^<]*<\/title>/, "")
+      .replace(/(name="description"\s+content=")[^"]*"/, "$1\"")
+      .replace(/(property="og:title"\s+content=")[^"]*"/, "$1\"")
+      .replace(/(property="og:description"\s+content=")[^"]*"/, "$1\"");
   assert.equal(strip(page), strip(html));
   assert.equal(pageFor(html, undefined), html);
   assert.equal(pageFor(html, TABS.find((t) => t.path === "/")), html);
